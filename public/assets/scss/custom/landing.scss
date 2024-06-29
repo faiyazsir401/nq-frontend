@@ -1,0 +1,40 @@
+.imgcon {
+//   background-color: pri;
+  border-radius: 50%;
+  align-items: center;
+}
+.hed {
+  position: "sticky";
+  top: 0;
+  z-index: 1000;
+  background-color: white;
+}
+.navbaritem{
+    margin-left: "8%";
+    float: "right";
+     align-items: 'end'
+}
+
+.dot-btn:before{
+  width: 16px;
+  height: 16px;
+}
+@media (min-width: 820px) {
+  .imgcon {
+    //   background-image: url('/assets/images/1-removebg 1.png');
+    //   background-color: #9d01ac;
+    height: 450px;
+    margin-top: 20px;
+  }
+  .hed {
+    position: none;
+    top: 0;
+    z-index: 0;
+   
+  }
+  .nav{
+    margin-left: 0%;
+    float: "left";
+     align-items: none;
+  }
+}

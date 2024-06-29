@@ -1,0 +1,93 @@
+.custom-scroll {
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px $light-color;
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background-color: rgba($primary-color, 0.15);
+  }
+}
+
+.scroll-invisiable {
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+.owl-carousel {
+  position: unset;
+}
+
+// Sidebar position fixed
+.custom-sidebar {
+  @extend .custom-scroll;
+  position: fixed;
+}
+
+.custom-sidebar-content-booking {
+  // position: absolute;
+  padding: 10px;
+  max-width: 100%;
+  width: 90%;
+  left: 103px !important;
+  margin: 0;
+
+  @media (max-width: 576px) {
+    left: 0 !important;
+    width: 100% !important;
+    bottom: 0% !important;
+    margin-top: 45px !important;
+  }
+}
+
+.custom-trainer-scroll {
+  height: 97vh !important;
+  overflow-x: hidden !important;
+  position: absolute;
+  padding: 10px;
+  left: $sidebar-spacing + 70px;
+  max-width: 93%;
+  width: 93%;
+}
+
+@media (max-width: 576px) {
+  .custom-trainer-scroll {
+    position: absolute;
+    margin: 12px;
+    overflow-x: hidden;
+    width: 95%;
+    max-width: 100%;
+    margin-top: 49px;
+    left: 0;
+    right: 0;
+  }
+
+  .trainerinfo{
+    padding: 5px;
+  }
+}
+
+.custom-landing-page-trainer-details {
+  height: 97vh !important;
+  overflow-x: hidden !important;
+  position: absolute;
+  padding: 10px;
+  max-width: 100% !important;
+  width: 96% !important;
+
+  @media (max-width: 576px) {
+    margin: 10px;
+    padding: 4px;
+    left: 0;
+    right: 0;
+    width: 97% !important;
+    overflow-x: hidden !important;
+  }
+}

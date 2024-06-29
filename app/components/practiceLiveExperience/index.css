@@ -1,0 +1,81 @@
+.guide-note-container {
+    position: absolute;
+    z-index: 12 !important;
+    background-color: #000080;
+    width: 250px;
+    border-radius: 10px;
+    border: 1px solid #00008059;
+    padding: 5px 10px;
+    opacity: 0;
+    transition: all 0.8s ease-in-out;
+}
+.guide-note-container h4 {
+    color : #fff !important;
+    margin : 5px 0  !important;
+    font-size: 13px !important;
+}
+.guide-note-container p {
+    color : #fff !important;
+    margin : 0px  !important;
+}
+.cross-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #000080;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    position: absolute;
+    top: -10px;
+    /* right: -10px; */
+}
+.triangle-left {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-right: 15px solid #000080;
+    border-bottom: 10px solid transparent;
+    left: -15px;
+    top: 8px;
+}
+
+.triangle-down {
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: 7px;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 20px solid #000080;
+    bottom: -20px;
+}
+
+.triangle-right {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-left: 21px solid #000080;
+    border-bottom: 15px solid transparent;
+    top: 7px;
+    right: -21px;
+}
+
+.triangle-up {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-bottom: 16px solid #000080;
+    top: -16px;
+    left: 7px;
+
+}
+.call-action-buttons{
+    bottom: -12px !important;
+}

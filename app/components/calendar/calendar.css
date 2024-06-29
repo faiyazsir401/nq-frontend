@@ -1,0 +1,20 @@
+.calendar-container.month-view .fc .fc-daygrid-body-unbalanced .fc-daygrid-day-events {
+  min-height: 2em;
+  max-height: 75px !important;
+  position: relative;
+  overflow-y: auto;
+  /* scrollbar-width: thin; */
+  scrollbar-width: none;
+  padding: '5px 0';
+  /* scrollbar-color: #888 #e0e0e0; */
+}
+
+.calendar-container.month-view tbody tr td {
+  /* height: 120px; */
+}
+
+.calendar-container .fc-daygrid-body-unbalanced .fc-daygrid-day-events{
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+

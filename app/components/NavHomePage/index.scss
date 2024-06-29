@@ -1,0 +1,561 @@
+#navHomePageCenterContainer {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+
+  .nav-link {
+    background-color: whitesmoke !important;
+    color: black !important;
+    border-radius: 0 !important;
+    min-width: 100px;
+    font-size: 13px !important;
+  }
+
+  .theme-tab.nav-tabs {
+    justify-content: space-around !important;
+  }
+
+  .nav-link:hover,
+  .activelink {
+    color: white !important;
+    background-color: #000080 !important;
+    border-radius: 0 !important;
+  }
+
+  .nav.nav-tabs {
+    flex-wrap: nowrap;
+    // overflow: auto;
+  }
+
+  .nav-tabs.nav-link {
+    border-radius: 0;
+  }
+
+
+
+}
+
+.theme-tab.sub-nav {
+  border: 0;
+}
+
+.There {
+  display: flex;
+}
+
+.Hourly-up {
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
+// .Hourly-rate {
+//   font-size: 15px;
+//   margin: auto;
+// }
+
+.col-7.col-sm-6.col-md-7.col-lg-8.col-xl-9.card-trainer {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.form-control.Freind.email {
+  width: 25%;
+}
+
+.preview-image {
+  display: flex;
+  min-height: 150px;
+  min-width: 80px;
+  position: relative;
+}
+
+.Trainer-box-1 {
+  margin: 5px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border: 0;
+  border-radius: 10px !important;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 10px;
+  gap: 10px;
+  max-width: 100%;
+  min-width: 100%;
+}
+
+.my-box-name {
+  width: 300px;
+  height: 300px;
+  border-color: #000080;
+  align-items: center;
+  border-width: 1em;
+  border: darkgray;
+
+
+
+}
+
+
+
+.container-raj {
+  // Set the overall width and margin for the container
+  width: 100px;
+  height: 100px;
+  // margin: 10px auto; // Center the container horizontally
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // Define a border for the container
+  // border: 1px solid #b4bbd1;
+  border-radius: 50%;
+  padding: 10px;
+  // background-color: rgb(0, 0, 128); // Add some space inside the border
+}
+
+.text-box-raj {
+  // Style the inner text box
+
+
+  // Assuming you want a single-line text input
+  display: inline-block;
+  width: 100%;
+  font-weight: bold;
+  text-align: center;
+  // You can customize font styles here
+  font-size: 40px;
+  color: white;
+}
+
+.card-body.upload {
+  width: 20%;
+  padding: 0;
+  margin: 5px;
+
+}
+
+.Upload-body {}
+
+.Up-box-1 {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.Up-box-2 {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  margin-top: 10px;
+  padding: 8px;
+
+}
+
+.Up-box-3 {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  margin-top: 10px;
+  padding: 8px;
+}
+
+#navHomePageCenterContainer.nav-link:active {
+  background-color: white;
+}
+
+// .col-lg-4{
+//  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+//   border: 1px solid black;
+//   border-radius: 10px !important;
+// }
+.selected-course {
+  border: 2px solid #007bff;
+  /* Change the color as needed */
+}
+
+#navstudent {
+
+
+
+  // min-height: 500px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  .nav-link {
+    background-color: whitesmoke !important;
+    color: black !important;
+    border-radius: 0 !important;
+    min-width: 100px;
+  }
+
+  .theme-tab.nav-tabs {
+    justify-content: space-around !important;
+  }
+
+  .nav-link:hover,
+  .activelink {
+    color: white !important;
+    background-color: #000080 !important;
+    border-radius: 0 !important;
+  }
+
+  .nav.nav-tabs {
+    flex-wrap: nowrap;
+    // overflow: auto;
+  }
+
+  .nav-tabs.nav-link {
+    border-radius: 0;
+  }
+
+
+
+}
+
+.theme-tab.sub-nav {
+  border: 0;
+}
+
+.There {
+  display: flex;
+}
+
+.Hourly-up {
+  display: flex;
+  width: 100%;
+  position: relative;
+}
+
+.Hourly-rate {
+  font-size: 15px;
+  margin: auto;
+}
+
+.col-7.col-sm-6.col-md-7.col-lg-8.col-xl-9.card-trainer {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.form-control.Freind.email {
+  width: 25%;
+}
+
+.preview-image {
+  display: flex;
+  min-height: 150px;
+  min-width: 80px;
+  position: relative;
+}
+
+.Trainer-box-1 {
+  margin: 5px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border: 0;
+  border-radius: 10px !important;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 10px;
+  gap: 10px;
+  max-width: 100%;
+  min-width: 100%;
+}
+
+.card-body.upload {
+  width: 20%;
+  padding: 0;
+  margin: 5px;
+
+}
+
+.Upload-body {}
+
+.Up-box-1 {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.Up-box-2 {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  margin-top: 10px;
+  padding: 8px;
+
+}
+
+.Up-box-3 {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  margin-top: 10px;
+  padding: 8px;
+}
+
+#navstudent.nav-link:active {
+  background-color: white;
+}
+
+// .col-lg-4{
+//  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+//   border: 1px solid black;
+//   border-radius: 10px !important;
+// }
+.selected-course {
+  border: 2px solid #007bff;
+  /* Change the color as needed */
+}
+
+
+
+
+#settings {
+  // max-width: 80% !important;
+  padding: 0px 20px;
+  padding-bottom: 50px;
+}
+
+.trainer-card {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+  // border: 2px solid red;
+  // width: 300px;
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+
+  h4 {
+    font-size: "12px";
+    font-weight: 400;
+    margin: 2px;
+    line-height: 1.2;
+    color: rgb(243, 243, 243);
+  }
+
+  .instant {
+    margin-top: 2px;
+    background: red;
+    border: 1px solid white;
+    border-radius: 4px;
+    padding: 2px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); // Example of text shadow
+
+    h5 {
+      font-size: "6px";
+      font-weight: 500;
+      line-height: 1.2;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); // Example of text shadow
+
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  .card-info {
+    h4 {
+      font-size: 10px;
+    }
+  }
+
+  .instant {
+
+    h5 {
+      font-size: 8px;
+      font-weight: 500;
+    }
+  }
+
+
+}
+
+.locker_slider {
+  display: flex;
+  justify-content: center;
+  width: 95% !important;
+  align-self: center;
+  align-items: center;
+}
+
+@media(max-width: 599px) {
+
+  .locker_slider {
+    display: flex;
+    justify-content: center;
+    width: 90% !important;
+    align-self: center;
+    align-items: center;
+  }
+
+  .nav-link {
+    background-color: whitesmoke !important;
+    color: black !important;
+    border-radius: 0 !important;
+    min-width: 100px;
+    font-size: 13px !important;
+    margin-top: 15px;
+  }
+
+  @media(max-width: 475px) {
+    .locker_slider {
+      width: 82% !important;
+    }
+
+    .slick-prev:before, .slick-next:before {
+      font-family: "slick";
+      font-size: 20px;
+      line-height: 1;
+      color: #0c0404;
+      opacity: 0.75;
+      -webkit-font-smoothing: antialiased;
+      /* margin-top: 25px; */
+      position: relative;
+      top: 18px;
+  }
+  }
+
+}
+
+
+@media(max-width: 767px) {
+  #navHomePageCenterContainer {
+    min-height: auto;
+  }
+
+  .Image-Division {
+    margin-right: 1px !important;
+  }
+
+  #Nav-Tab-Home {
+    width: 74% !important;
+  }
+
+  .nav-item {
+    min-width: 100% !important; // Added this for Session issue if there UI will effectted then need to change
+    // min-width: 222px !important; 
+    margin-right: 4px !important;
+  }
+
+  .nav.nav-tabs {
+    overflow-x: auto !important;
+  }
+
+  #Home-page-vid {
+    width: 114px !important;
+    // height: 40px !important;
+  }
+
+  #settings {
+    max-width: 80% !important;
+  }
+
+  #notification {
+    max-width: 85% !important;
+  }
+
+  .notificationClass {}
+
+  #files {
+    max-width: 85% !important;
+  }
+
+  // .custom-mobile-menu.active {
+  //   left: 50px !important;
+  // }
+  .Hourly-rate {
+    font-size: 12px;
+    margin: auto;
+  }
+
+
+  .transaction-table {
+    maxHeight: '70vh'
+  }
+
+  .slick-slider .slick-list {
+    transform: translate3d(0, 0, 0);
+    height: 80px !important;
+    margin-top: 5px;
+  }
+
+
+  @media(max-width: 475px) {
+    // .nav-item {
+    //   min-width: 152px !important;
+    //   margin-right: 4px !important;
+    // }
+  }
+
+}
+
+
+
+@media(max-width: 480px) {
+  .Hourly-up {
+    display: flex;
+    width: 95%;
+    padding-left: 15px;
+    position: relative;
+
+    h3 {
+      font-size: 10px;
+    }
+  }
+
+  .Change-up-button {
+    label {
+      font-size: 10px;
+    }
+
+    .btn {
+      padding: 10px;
+    }
+  }
+
+  .apps-content#files {
+    max-width: 100% !important;
+    padding: 5px;
+  }
+
+  .notification span {
+    padding-top: 0;
+    padding-bottom: 2px;
+    display: inline-block;
+    font-size: 14px;
+
+  }
+
+  .notification h5 {
+    font-size: 12px;
+  }
+
+  .notification p {
+    font-size: 10px;
+  }
+
+  #settings {
+    max-width: 95% !important;
+  }
+
+  .custom-trainer-slots-booking-table thead th,
+  .table thead th {
+    text-align: center;
+    min-width: 90px;
+    padding: 5px 10px;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .custom-trainer-slots-booking-table thead th,
+  .table td {
+    font-size: 9px;
+    font-weight: 600;
+  }
+
+}
+
+@media (min-width: 1024px) and (max-width: 1500px) {
+  #navHomePageCenterContainer .navMinStyle {
+    padding: 7px 10px !important;
+  }
+}

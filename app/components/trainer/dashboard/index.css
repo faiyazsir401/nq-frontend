@@ -1,0 +1,151 @@
+/* .video-container .download-delete{
+  opacity: '0';
+  display: none !important;
+} */
+/* .video-container:hover .download-delete{
+  opacity: '0.85';
+  display: block !important;
+  
+} */
+.hover-video .download-delete{
+  /* opacity: '0'; */
+  display: none !important;
+}
+.hover-video:hover .download-delete{
+  /* opacity: '0.85'; */
+  display: block !important;
+  
+}
+
+
+.video-container2 .download-delete{
+  /* opacity: '0'; */
+  display: none !important;
+}
+.video-container2:hover .download-delete{
+  /* opacity: '0.85'; */
+  display: block !important;
+  
+}
+
+.switch-user-video{
+  position: relative;
+  width: 100%;
+  height : 500px;
+}
+
+.switch-clips-container{
+  position: absolute !important;
+  right: -35%;
+  /* top: 50%; */
+  /* top : 260px; */
+  top : 277px;
+  width: 270px;
+}
+
+.switch-clips-container-for-mobile{
+  position: absolute !important;
+  right: -30%;
+  width: 140px;
+  height: 80px;
+}
+
+.clips-svg.svg{
+  height : '6px !important';
+}
+
+@media (max-width: 700px) {
+  .clipBoxStyle {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .videoStyle {
+    width: 100% !important;
+  }
+}
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 7px 0;
+  font-size: 12px;
+  line-height: 1.428571429;
+  border-radius: 15px;
+}
+
+.divider {
+  margin-bottom: 48px !important;
+}
+
+.scs {
+  position: absolute !important;
+  right: -35%;
+  /* top: 46%; */
+  top : 245px ;
+  width: 270px
+}
+
+.scs2 {
+  position: absolute !important;
+  right: -35%;
+  /* top: 55px; */
+  top: 79px;
+  width: 270px;
+}
+
+.scs2-mobile {
+  position: absolute !important;
+  top: 55px;
+  right: -30%;
+  width: 140px !important;
+  height: 80px;
+}
+
+@media (max-width: 768px) {
+  .scs2 {
+    position: relative !important;
+    right: 0%;
+    top: 0%;
+    width: 250px !important;
+  }
+
+  @media (max-width: 425px) {
+    .scs2 {
+      position: relative !important;
+      right: 0%;
+      top: 50%;
+      width: 250px !important;
+    }
+  }
+}
+
+
+
+.clipBoxStyle {
+  display: flex;
+  gap: 10px;
+}
+
+.videoStyle {
+  width: 35vw;
+  max-height: 300px;
+  height: 100%;
+}
+
+/* .calendar-container {
+  margin: 30px;
+} */
+
+.calendar-container .fc-prev-button span,
+.calendar-container .fc-next-button span {
+  color: white;
+  font-weight: 600;
+}
+
+.sub-item {
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+}

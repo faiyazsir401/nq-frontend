@@ -1,0 +1,7 @@
+.visually-hidden{
+    display: none !important;
+}
+
+.spinner.text-primary {
+    color: #000080 !important;
+}

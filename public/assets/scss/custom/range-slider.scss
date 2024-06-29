@@ -1,0 +1,219 @@
+// // .range-slider-container {
+// //   // height: 100vh;
+// //   display: flex;
+// //   align-items: center;
+// //   justify-content: center;
+// // }
+
+// .range-slider {
+//   position: relative;
+//   width: 100%;
+// }
+
+// .slider__track,
+// .slider__range,
+// .slider__left-value,
+// .slider__right-value {
+//   position: absolute;
+// }
+
+// .slider__track,
+// .slider__range {
+//   border-radius: 3px;
+//   height: 5px;
+// }
+
+// .slider__track {
+//   background-color: #ced4da;
+//   width: 100%;
+//   z-index: 1;
+// }
+
+// .slider__range {
+//   background-color: gray;
+//   z-index: 2;
+// }
+
+// .slider__left-value,
+// .slider__right-value {
+//   color: #dee2e6;
+//   font-size: 12px;
+//   margin-top: 20px;
+// }
+
+// .slider__left-value {
+//   left: 6px;
+// }
+
+// .slider__right-value {
+//   right: -4px;
+// }
+
+// /* Removing the default appearance */
+// .thumb,
+// .thumb::-webkit-slider-thumb {
+//   -webkit-appearance: none;
+//   -webkit-tap-highlight-color: transparent;
+// }
+
+// .thumb {
+//   pointer-events: none;
+//   position: absolute;
+//   height: 0;
+//   width: 200px;
+//   outline: none;
+// }
+
+// .thumb--left {
+//   width: 96%;
+//   z-index: 3;
+// }
+
+// .thumb--right {
+//   width: 96%;
+//   z-index: 4;
+// }
+
+// /* For Chrome browsers */
+// .thumb::-webkit-slider-thumb {
+//   background-color: #f1f5f7;
+//   border: none;
+//   border-radius: 50%;
+//   box-shadow: 0 0 1px 1px #ced4da;
+//   cursor: pointer;
+//   height: 18px;
+//   width: 18px;
+//   margin-top: 4px;
+//   pointer-events: all;
+//   position: relative;
+// }
+
+// /* For Firefox browsers */
+// .thumb::-moz-range-thumb {
+//   background-color: #f1f5f7;
+//   border: none;
+//   border-radius: 50%;
+//   box-shadow: 0 0 1px 1px #ced4da;
+//   cursor: pointer;
+//   height: 18px;
+//   width: 18px;
+//   margin-top: 4px;
+//   pointer-events: all;
+//   position: relative;
+// }
+
+// .time-range-success {
+//   @extend .slider__range;
+//   background: green !important;
+// }
+// .time-range-danger {
+//   @extend .slider__range;
+//   background: red !important;
+// }
+
+// .default-range-slider {
+//   @extend .slider__range;
+//   background: rgba(0, 0, 0, 0.03) !important;
+// }
+
+/* CustomRangePicker.module.css */
+
+.custom-range-picker {
+  position: relative;
+  width: 100%;
+  height: 18px;
+  /* Increased height to accommodate time labels */
+  background-color: #059862;
+  //  rgba(0, 0, 0, 0.03);
+  filter: contrast(1.5);
+  border-radius: 20px;
+  // border-radius: 20px 0px 0px 20px;
+  // border: 1px solid gray;
+  cursor: pointer;
+  /* Ensure the range stays within the container */
+  pointer-events: auto;
+  /* Allow clicking on the range */
+}
+
+.unavailable {
+  /* background-color: red; */
+}
+
+.start-range,
+.end-range {
+  position: absolute;
+  top: 0;
+  width: 10px;
+  /* Adjust the width of the markers */
+  height: 100%;
+  z-index: 1;
+  /* Ensure the markers are above the slots */
+}
+
+.start-range {
+  width: 20px;
+  /* Adjust the size of the circle */
+  height: 20px;
+  /* Adjust the size of the circle */
+  background-color: $primary-color;
+  /* Set the circle color */
+  border-radius: 50%;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /* Center it horizontally */
+}
+
+.end-range {
+  width: 20px;
+  /* Adjust the size of the circle */
+  height: 20px;
+  /* Adjust the size of the circle */
+  background-color: $primary-color;
+  /* Set the circle color */
+  border-radius: 50%;
+  /* Make it a circle */
+  position: absolute;
+  right: 0;
+  /* Position it at the beginning of the line */
+  top: 50%;
+  /* Center it vertically */
+  transform: translate(-50%, -50%);
+  /* Center it horizontally */
+}
+
+.slot {
+  position: absolute;
+  height: 100%;
+  background-color: red;
+  opacity: 1;
+  border-top-right-radius: 20px;
+  /* Border radius for the top right corner */
+  border-bottom-right-radius: 20px;
+  /* Border radius for the bottom right corner */
+  z-index: 0;
+}
+
+.time-label {
+  position: absolute;
+  top: 40px;
+  /* Adjust top position for time labels */
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #333;
+  z-index: 2;
+  /* Ensure time labels are above markers */
+  white-space: nowrap;
+  /* Prevent labels from wrapping */
+}
+
+/* Ensure labels stay within the content */
+.time-label::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}

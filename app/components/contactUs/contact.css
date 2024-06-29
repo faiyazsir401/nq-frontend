@@ -1,0 +1,33 @@
+.custom-list{
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    transition: all 0.3s linear;
+}
+.form-header{
+    text-align: center !important;
+    color: #000080;
+    font-size: 22px;
+
+}
+.custom-list:hover{
+    color: #000080;
+    font-size: 16.5px;
+}
+.form-container input, select, textarea{
+    border : 1px solid #000080 !important;
+}
+.form-container label{
+    color: #000080;
+    font-weight: 500;
+}
+input {
+    outline: none !important;
+}
+.form-btn{
+    padding: 9px 40px !important ;
+}
+.btn-container{
+    display: flex;
+    justify-content: flex-end;
+}

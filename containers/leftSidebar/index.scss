@@ -1,0 +1,120 @@
+.sidebar-top .menu-name {
+    margin: 0px;
+    margin-top: 10px;
+    color: black;
+    font-weight: 500;
+
+}
+
+.card-body.change-number.Home {
+    padding: 20px;
+    width: 99%;
+    margin: 3px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+
+#left-nav-wrapper.left-nav-wrapper {
+    position: fixed;
+    z-index: 9999;
+
+    aside {
+        background-color: white;
+    }
+
+    .collapse-left-drawer-icon {
+        position: absolute;
+        top: 17vh;
+        background: #000080;
+        border-radius: 50px;
+        width: 30px;
+        height: 30px;
+        color: white;
+        z-index: 9999;
+        cursor: pointer;
+    }
+
+    @media (max-width: 450px) {
+        .collapse-left-drawer-icon {
+            top: 13vh;
+            width: 25px;
+            height: 25px;
+        
+        }    
+    }
+}
+
+.Sub-nav-trainer {
+    background-color: #000080;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+
+    .menu-container {
+        display: flex;
+        justify-content: flex-start;
+        gap: 40px;
+        align-items: center;
+        width: 100%;
+        height: fit-content;
+        margin: auto;
+        text-align: center;
+    }
+
+    p {
+
+        margin: auto;
+        color: white;
+        font-weight: 500;
+    }
+
+    p:hover {
+        border-bottom: 2px solid #4caf50;
+        color: #4caf50;
+        /* Change to the desired color and style */
+    }
+}
+ @media (max-width: 768px) {
+    .Image-Division{
+        width: 12vw !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .Recommended{
+        display: block !important;
+    }
+    .recent-slider.slider-container.recent-chat{
+        max-width: 70% !important;
+        margin: auto !important;
+        padding: 0 !important;
+    }
+    #dashboard{
+        max-width: 82% !important;
+        margin: 10px auto !important;
+        }
+
+  }
+
+  .Image-Division{
+    max-width: 100px;
+    min-width: 100px;
+    max-height: 100px;
+    min-height: 100px;
+    margin-bottom:10px;
+    margin-right:10px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 576px) {
+    .Image-Division{
+        max-width: 80px;
+        min-width: 80px;
+        max-height: 70px;
+        min-height: 70px;
+        margin-bottom:10px;
+        margin-right:10px;
+        cursor: pointer;
+      }
+
+  }

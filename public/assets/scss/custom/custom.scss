@@ -1,0 +1,1006 @@
+@import "./dropdown.scss";
+@import "./slider.scss";
+@import "./why_choose_us.scss";
+@import "./landing.scss";
+@import "./range-slider.scss";
+@import "./tabs.scss";
+
+$sidebar-width-left: 105px;
+$navbar-height-top: 85px;
+$canvas-z-index: 8;
+
+.react-datepicker-popper {
+  z-index: 12 !important;
+}
+
+.trainee-dashboard {
+  // position: absolute !important;
+  display: flex;
+  justify-content: center;
+  width: -webkit-fill-available;
+}
+
+.parent-container {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+// modal view css
+.react-strap-modal-full {
+  height: 100% !important;
+  max-width: 100% !important;
+  margin-top: 0% !important;
+  overflow: hidden !important;
+
+  .modal-content {
+    height: 100vh !important;
+  }
+}
+
+//grid view css
+.cardimg {
+  width: 136px;
+  height: 128px;
+  border-radius: 15px;
+}
+
+.rating {
+  justify-content: flex-end !important;
+}
+
+@media (min-width: 576px) {
+  //   .cardimg {
+  //     width: 90% !important; /* Cover full viewport height */
+
+  //   }
+  //   .rating{
+  //     justify-content: start !important;
+  //   }
+  .col-sm-6 {
+    padding-left: 40px;
+  }
+}
+
+@media (min-width: 768px) {
+  .cardimg {
+    width: 100% !important;
+  }
+
+  .rating {
+    justify-content: flex-end !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .rating {
+    justify-content: end !important;
+  }
+}
+
+@media (max-width: 1392px) {
+  .col-xl-2 {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+  }
+}
+
+.custom-card {
+  // min-width: 99% !important;
+  // width: 89vw !important;
+  margin-top: 18px !important;
+}
+
+.custom-react-strap-modal-full {
+  height: 97vh !important;
+  max-width: 100% !important;
+  margin-top: 0% !important;
+
+  .modal-content {
+    height: 100vh !important;
+    overflow-x: auto !important;
+  }
+}
+
+@media (min-width: 720px) and (max-width: 1280px) {
+  .custom-react-strap-modal-full {
+    height: 100vh !important;
+    /* Cover full viewport height */
+    max-height: 100%;
+    /* Limit to the parent's height, if necessary */
+    overflow-x: hidden;
+    /* Hide horizontal overflow */
+  }
+}
+
+.custom-trainer-details-scroll {
+  height: 90vh !important;
+  min-height: 90vh !important;
+  overflow-x: auto;
+}
+
+.model-tablet-view {
+  height: 84vh !important;
+  overflow-x: auto;
+}
+
+// call view css
+
+::placeholder {
+  color: gray !important;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: gray !important;
+}
+
+::-ms-input-placeholder {
+  color: gray !important;
+}
+
+.full-height {
+  height: 100vh !important;
+}
+
+.call-action-buttons {
+  // position: absolute !important;
+  // bottom: 0;
+  // left: 0;
+  // right: 0;
+  text-align: center;
+}
+
+.video-canvas {
+  /* height: 480px !important;
+    width: 640px!important; */
+}
+
+.canvas-container {
+  /* width: 100% !important; */
+}
+
+.remote-user {
+  position: inherit;
+  width: 100%;
+  /* Set the width of the parent container to 100% */
+  height: 100%;
+  /* Set the height of the parent container to 100% */
+}
+
+// .canvas-print,
+// .bg-video {
+//   position: absolute;
+//   width: 100%; /* Set the width of the canvas and video to 100% of their parent container */
+//   height: 100%; /* Set the height of the canvas and video to 100% of their parent container */
+//   top: 0;
+//   left: 0;
+// }
+
+
+
+// .canvas-print {
+//   left: $sidebar-width-left + 55px !important;
+// }
+
+.bg-video {
+  position: absolute;
+  left: $sidebar-width-left;
+  top: $navbar-height-top - 55px;
+  width: 90vw;
+  top: 5%;
+  height: 90vh;
+}
+
+// .bg-video {
+//   object-fit: cover; /* Maintain aspect ratio; cover entire area even if it means cutting off parts of the video */
+//   height: 104vh;
+// }
+
+.canvas-print {
+  z-index: $canvas-z-index !important;
+}
+
+#end-user-video {
+  height: 250px;
+  width: 250px;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.bottom-0 {
+  bottom: 0 !important;
+}
+
+.right-2 {
+  right: 2px !important;
+}
+
+.z-50 {
+  z-index: $canvas-z-index;
+}
+
+.rounded {
+  border-radius: 20px;
+}
+
+.flex {
+  display: flex;
+}
+
+.bottom-0 {
+  bottom: 0px;
+}
+
+.left-21 {
+  left: 10%;
+}
+
+.items-center {
+  align-items: center;
+}
+
+//   for small screen
+@media only screen and (max-width: 600px) {
+  #end-user-video {
+    height: 150px;
+    width: 150px;
+  }
+
+  .bg-video {
+    left: 20px;
+  }
+
+
+  .left-21 {
+    left: 15%;
+    bottom: 6%;
+  }
+}
+
+
+//   for small screen
+@media only screen and (max-width: 920px) {
+  #end-user-video {
+    height: 150px;
+    width: 150px;
+  }
+
+  .bg-video {
+    left: $sidebar-width-left + 10px !important;
+  }
+
+
+  .left-21 {
+    left: 15%;
+    bottom: 6%;
+  }
+}
+
+.no-user-joined {
+  top: 30px;
+  font-size: 20px;
+  z-index: $canvas-z-index;
+  background: white;
+  padding: 20px;
+}
+
+.videoBg {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+}
+
+@media (min-aspect-ratio: 16/9) {}
+
+@media (max-aspect-ratio: 16/9) {}
+
+// video {
+// object-fit: fill;
+// transform: rotateY(180deg);
+// -webkit-transform: rotateY(180deg);
+/* Safari and Chrome */
+// -moz-transform: rotateY(180deg);
+/* Firefox */
+// }
+
+.all-0 {
+  position: absolute;
+  top: 5px;
+  bottom: 10;
+  left: 0px;
+  right: 0;
+}
+
+.left-90 {
+  left: 90px !important;
+}
+
+.ml-5px {
+  margin-left: 1px !important;
+}
+
+.chat-main {
+  overflow: auto;
+}
+
+.tab-pane {
+  overflow: auto;
+}
+
+.bottom-10 {
+  bottom: 10px;
+}
+
+// slider CSS
+
+.recent-slider {
+  padding: 20px $sidebar-spacing 0 0;
+
+
+  .recent-box {
+    position: relative !important;
+
+    .dot-btn {
+      position: absolute !important;
+      bottom: 25px !important;
+      right: 15px !important;
+    }
+
+    .recent-profile {
+      height: 200px !important;
+      width: 100% !important;
+      border-radius: $radious20 !important;
+      position: relative !important;
+      transition: all 0.3s ease !important;
+
+      // img {
+      // 	height: 110px !important;
+      // 	width: 100% !important;
+      // }
+      h6 {
+        position: absolute !important;
+        color: $white !important;
+        bottom: 10px !important;
+        left: 15px !important;
+        font-weight: 500 !important;
+        text-transform: capitalize !important;
+      }
+
+      &::before {
+        content: "" !important;
+        left: 0 !important;
+        top: 0 !important;
+        position: absolute !important;
+        height: 200px !important;
+        width: 100% !important;
+        border-radius: 15px !important;
+        box-shadow: inset 0px -25px 40px 6px rgba(0, 0, 0, 0.8) !important;
+      }
+    }
+  }
+}
+
+slick-slider .slick-list,
+.slick-slider .slick-track {
+  // transform: translateZ(0) !important;
+}
+
+.slick-list {
+  height: auto;
+}
+
+.slider-container {
+  // max-width: 100vw;
+  width: 80vw;
+  // overflow: hidden;
+  // z-index: 100;
+}
+
+// canvas menu bar
+.canvas-menus {
+  background-color: white;
+  left: $sidebar-width-left + 35px;
+  position: fixed;
+  top: 18%;
+  // bottom: 0%;
+  // transform: translate(-50%, -50%);
+  margin: 0 auto;
+  z-index: $canvas-z-index + 1;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  max-height: 70vh;
+  overflow: auto;
+
+  // width: 70px;
+  @media (max-width: 576px) {
+    left: 12px;
+  }
+}
+
+.creationBarItem {
+  // width: 52px;
+  -ms-flex-flow: column nowrap;
+  flex-flow: column nowrap;
+  pointer-events: auto;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+  box-shadow: 0px 2px 10px rgba(5, 0, 56, 0.08);
+  background-color: #ffffff;
+  border-radius: 4px;
+  box-sizing: border-box;
+  padding: 2px;
+}
+
+.CreationBarCustomizable {
+  pointer-events: auto;
+  display: block;
+}
+
+// .color-picker {
+//   z-index: $canvas-z-index + 10;
+//   position: absolute;
+// }
+
+// .react-tiny-popover-container {
+//   z-index: $canvas-z-index + 99999 !important;
+// }
+.react-tiny-popover-container {
+  z-index: $canvas-z-index + 999 !important;
+}
+
+.rotate-90 {
+  rotate: 90deg;
+}
+
+.mediumRating {
+  color: orange;
+}
+
+.trainer-slider {
+  position: absolute;
+  top: 80vh;
+  left: 16%;
+}
+
+.sidebar-full-width {
+  width: 95vw !important;
+}
+
+.accordion {
+  margin-bottom: 15px !important;
+}
+
+.carousel-indicators button {
+  display: none;
+}
+
+.custom-trainer-details-scroll-bar {
+  margin: 30px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 93%;
+}
+
+// booking sections
+.bookings {
+  padding: 30px;
+  width: 90%;
+  overflow: auto;
+}
+
+// video call
+.video_call {
+  // margin: 30px;
+  // width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* Ensures padding and border are included in the element's total width and height */
+}
+
+.star-container {
+  display: inline-block;
+  padding: 5px;
+  border-radius: 50%;
+}
+
+.star-svg {
+  fill: #ffc436;
+}
+
+.accordion-header {
+  max-width: 100%;
+  width: 100vw;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  display: none;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.custom-card {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  background: #fff;
+  transition: all 0.5s ease;
+  user-select: none;
+  z-index: 10;
+  overflow: hidden;
+
+  @media (max-width: 576px) {
+    width: 96% !important;
+  }
+}
+
+.custom-card:hover {
+  color: #fff;
+  transform: scale(1.025);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 5px 10px;
+}
+
+@media only screen and (max-width: 1280px) and (min-width: 800px) {
+  .trainer-details {
+    margin-left: 36px;
+  }
+
+  .close {
+    margin-right: 31px;
+  }
+
+  .arrowRight {
+    margin-left: 46px;
+  }
+}
+
+.image-gallery-content .image-gallery-slide .image-gallery-image {
+  max-height: 40vh !important;
+}
+
+.image-gallery-left-nav .image-gallery-svg,
+.image-gallery-right-nav .image-gallery-svg {
+  height: 38px !important;
+  color: black !important;
+  width: 60px !important;
+}
+
+.custom-react-gallery-carousel {
+  position: absolute;
+  z-index: 20;
+  color: black;
+}
+
+.image-gallery-description {
+  width: 60% !important;
+  position: absolute !important;
+  left: 20% !important;
+  top: 60% !important;
+  min-height: 24% !important;
+  text-align: center !important;
+  color: white !important;
+}
+
+.sidebar-full-width {
+  overflow-x: hidden !important;
+}
+
+.custom-block-height {
+  // height: 180vh !important;
+  height: 120vh !important;
+  overflow-y: auto !important;
+  scroll-behavior: smooth !important;
+
+  @media (max-width: 576px) {
+    overflow-y: auto !important;
+    scroll-behavior: smooth !important;
+    top: 95px !important;
+  }
+}
+
+// dashboard logo image width & height
+
+.custom-image {
+  width: 70px !important;
+  height: 95px !important;
+}
+
+.height-max-content {
+  height: max-content !important;
+}
+
+// body.modal-open > div[tabindex="-1"] {
+//   z-index: 4999 !important;
+// }
+
+// button margin
+@media (max-width: 576px) {
+
+  // .btn.ml-4 {
+  .btnbook {
+    margin-top: 10px !important;
+    margin-right: 15% !important;
+    margin-left: 0px !important;
+  }
+}
+
+// booking slot
+@media (max-width: 576px) {
+
+  // .btn.ml-4 {
+  .slot {
+    justify-content: end !important;
+  }
+}
+
+// alignment search
+@media (max-width: 576px) {
+  .custom-slider-search-align {
+    position: absolute !important;
+    left: 0px !important;
+    overflow-x: hidden !important;
+  }
+
+  .slick-slider .slick-track,
+  .slick-slider .slick-list {
+    height: 31vh !important;
+  }
+}
+
+// trainer-recommended
+.trainer-recommended {
+  max-width: 100%;
+}
+
+@media (min-width: 768px) {}
+
+// trainee-dashboard
+.custom-trainee-dashboard {
+  // width: 96vw !important;
+  // max-width: 100% !important;
+  // overflow-x: hidden !important;
+}
+
+// trainee dashboard
+.trainer-dashboard {
+  margin-left: 0;
+}
+
+.trainer-recommended {
+  h2{
+    margin: 30px;
+  }}
+
+@media (max-width: 576px) {
+  .trainee-dashboard {
+    position: absolute !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    left: 0% !important;
+  }
+
+  .trainer-recommended {
+    margin-left: 15px !important;
+
+    h1 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #223645;
+      margin: 0;
+    }
+    h2{
+      margin: 20px;
+    }
+
+    p {
+      font-size: 12px;
+      font-family: "Roboto", sans-serif;
+      font-weight: 400;
+      color: #647589;
+    }
+  }
+}
+
+// header image logo
+.header-image-logo {
+  max-width: 100% !important;
+  min-width: 160px !important;
+  height: auto !important;
+
+  /* Media queries for larger screens */
+  @media (min-width: 768px) {
+    width: 160px !important;
+    /* Adjust the width for tablets and larger screens */
+  }
+
+  @media (min-width: 992px) {
+    width: 200px !important;
+    /* Adjust the width for desktop screens */
+    height: 66px !important;
+  }
+
+  /* Media query for mobile screens */
+  @media (max-width: 575px) {
+    width: 160px !important;
+    height: auto !important;
+  }
+}
+
+  /* Media query for mobile screens */
+  @media (max-width: 768px) {
+    .video_call_reponsive{
+      margin-top: 40px;
+    }
+  }
+
+// auth header-text
+.header-text {
+  @media (min-width: 768px) {
+    font-size: 44px !important;
+    /* Adjust the width for tablets and larger screens */
+  }
+
+  @media (min-width: 992px) {
+    font-size: 44px !important;
+    /* Adjust the width for desktop screens */
+  }
+
+  /* Media query for mobile screens */
+  @media (max-width: 575px) {
+    font-size: 35px !important;
+  }
+}
+
+.sidebar-toggle {
+  z-index: 999999;
+  // position: absolute;
+}
+
+.custom-close-icon {
+  position: absolute !important;
+  right: 1%;
+}
+
+// for mobile
+@media (max-width: 575px) {
+  .custom-mobile-menu {
+    position: absolute;
+    width: 100vw !important;
+    left: 0% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  }
+
+  .category-content {
+    overflow-x: hidden !important;
+  }
+
+  .custom-arrow-icon {
+    position: absolute;
+    top: 55px;
+    left: 7% !important;
+  }
+
+  .custom-close-icon {
+    right: 3% !important;
+  }
+}
+
+.custom-close-icon {
+  position: absolute !important;
+  right: 1% !important;
+}
+
+.custom-arrow-icon {
+  position: absolute !important;
+  left: 7.5% !important;
+}
+
+.trainer-profile {
+  width: 348px;
+  // margin-top: 12px;
+  margin: 5px;
+  height: auto;
+  min-height: 150px;
+  min-width: 80px;
+
+  @media (max-width: 576px) {
+    width: 212px !important;
+  }
+}
+
+.trainer-profile-card {
+  border-radius: 16px !important;
+
+  color: #fff;
+
+}
+
+.welcome-text {
+  font-size: 47px;
+  font-family: "Roboto";
+  margin: 26px 0;
+  font-weight: 300;
+
+  @media (max-width: 576px) {
+    font-size: 22px !important;
+  }
+}
+
+.tag-name {
+  font-family: "Roboto";
+}
+
+.booking-text {
+  font-size: 37px;
+  font-family: "Roboto";
+  font-weight: 300;
+
+  @media (max-width: 576px) {
+    font-size: 22px !important;
+  }
+}
+
+.trainer-bookings-card {
+  border-radius: 16px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+// .slider-green {
+//   background-color: green !important;
+// }
+
+// .slider-red {
+//   background-color: red !important;
+// }
+.rangebtn {
+  @media (min-width: 1200px) {
+    margin-left: 30px !important;
+  }
+}
+
+.card-trainer {
+  @media (max-width: 576px) {
+    margin: auto !important;
+  }
+}
+
+.button-booking {
+  @media (max-width: 539px) {
+    margin-top: 8px !important;
+    left: -8% !important;
+  }
+}
+
+.small-screen {
+  @media (max-width: 539px) {
+    display: block !important;
+  }
+}
+
+// date-picker
+.date-picker {
+  border: 1px solid black;
+  padding: 9px;
+  display: flex;
+  align-items: center;
+  margin-top: 0px;
+}
+
+// trainer-profile-review card
+
+.reviews {
+  min-height: 26vh !important;
+
+  @media (max-width: 576px) {
+    min-height: 32vh !important;
+  }
+}
+
+// profile-picture
+.profile_picture {
+  @media (max-width: 576px) {
+    margin-top: 12px !important;
+    min-height: 80px !important;
+    min-width: 92px !important;
+  }
+
+  #trainerinfo{
+h2{
+  font-size: 12px;
+}
+h3{
+  margin-top: 8px;
+}
+  }
+}
+
+//  btn_cancel
+.btn_cancel {
+  @media (max-width: 576px) {
+    margin-top: 12px;
+  }
+}
+
+.timezone_offset {
+  background: white;
+  padding: 5px;
+  border-radius: 3px;
+  border: 1px solid #d9d9d9;
+
+  @media (max-width: 576px) {
+    width: 75vw;
+  }
+}
+
+// search button height
+
+.search_button {
+  height: 58px;
+}
+
+@media (max-width: 425px) {
+  .search_button {
+    height: 30px;
+    max-width: 15px;
+    padding: 10px 25px;
+    
+    svg{
+      width: 14px;
+      height: 14px;
+      position: relative;
+      bottom: 3px;
+      right: 10px;
+    }
+  }
+ 
+}
+
+// new
+.progress {
+  width: 100%;
+  height: 20px;
+}
+
+.scoll-content {
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  width: 100%;
+}
+
+@media only screen and (max-width: 768px) {
+  #first {
+    order: 2;
+  }
+
+  #second {
+    order: 4;
+  }
+
+  #third {
+    order: 1;
+  }
+
+  #fourth {
+    order: 3;
+  }
+}
+
+.slick-slider {
+  width: 96%;
+}
