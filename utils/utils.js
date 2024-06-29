@@ -676,7 +676,7 @@ export class Utils {
   };
 
   static generateVideoURL(clip) {
-    return `https://pub-fffe76fa8765416caa3d396262faa16a.r2.dev/${clip?.file_name}`;
+    return `https://data.netqwix.com/${clip?.file_name}`;
   }
 
   static dynamicImageURL = (url) => {
@@ -724,7 +724,7 @@ export class Utils {
   };
 
   static getImageUrlOfS3 = (url) => {
-    return `https://pub-fffe76fa8765416caa3d396262faa16a.r2.dev/${url}`;
+    return `https://data.netqwix.com/${url}`;
   };
 
   static blobToFile = (blob, fileName, fileType) => {

@@ -8,4 +8,4 @@ export const LABELS = {
 };
 
 // export const awsS3Url = "https://netquix.s3.ap-south-1.amazonaws.com"
-export const awsS3Url = "https://pub-fffe76fa8765416caa3d396262faa16a.r2.dev/";
+export const awsS3Url = "https://data.netqwix.com/";
