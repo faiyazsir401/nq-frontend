@@ -21,6 +21,9 @@ import { useMediaQuery } from "../../../hook/useMediaQuery";
 import CropImage from "./crop-modal";
 import { getS3SignUrlForProfile, pushProfilePhotoToS3 } from "../../common/common.api";
 
+const ASPECT_RATIO = 1;
+const MIN_DIMENSION = 150;
+
 const UserInfoCard = () => {
   const { userInfo, accountType } = useAppSelector(authState);
   const [isEditing, setIsEditing] = useState(false);
@@ -45,6 +48,8 @@ const UserInfoCard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [croppedImage, setCroppedImage] = useState(null);
   const [progress, setProgress] = useState(0);
+
+  console.log(displayedImage)
 
   useEffect(() => {
     getMeAsync();
@@ -98,9 +103,28 @@ const UserInfoCard = () => {
   };
 
   const handlePictureChange = (e) => {
-    const selectedFile = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      const imageElement = new Image();
+      const imageUrl = reader.result?.toString() || "";
+      imageElement.src = imageUrl;
+
+      imageElement.addEventListener("load", (e) => {
+        // if (error) setError("");
+        const { naturalWidth, naturalHeight } = e.currentTarget;
+        if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
+          // setError("Image must be at least 150 x 150 pixels.");
+          return setSelectedImage("");
+        }
+      });
+      setSelectedImage(imageUrl);
+    });
+    reader.readAsDataURL(file);
+
     setIsModalOpen(true);
-    setSelectedImage(selectedFile);
   };
 
   const handleRemovePreview = () => {
@@ -109,7 +133,7 @@ const UserInfoCard = () => {
     setSelectedImage(null);
   };
 
-  const handleSavePicture = async () => {
+  const handleSavePicture = async (croppedImage) => {
     if (croppedImage) {
       const newFileObj = await Utils?.blobToFile(
         croppedImage,
@@ -135,7 +159,7 @@ const UserInfoCard = () => {
     }
   };
 
-  function successImageUpload(){
+  function successImageUpload() {
     dispatch(getMeAsync());
     setCroppedImage(null);
     setSelectedImage(null);
@@ -171,15 +195,6 @@ const UserInfoCard = () => {
     }
   }, [profile]);
 
-  function getImageUrl(imageUrl) {
-    if (!imageUrl) {
-      return null; 
-    }
-
-    const hasHttp = /^(blob:http|blob:https):\/\//i.test(imageUrl);
-  
-    return hasHttp ? imageUrl : Utils.getImageUrlOfS3(imageUrl);
-  }
 
   return (
     <>
@@ -196,33 +211,29 @@ const UserInfoCard = () => {
             transition: 'all 0.6s linear'
           }}
         >
-          {croppedImage ? (
-            <>
-              <button
-                className="icon-btn btn-sm btn-outline-light close-apps pointer position-absolute"
-                style={{ right: '0px', top : '0px', color: '#000080' }}
-                onClick={handleRemovePreview}
-              >
-                <X />
-              </button>
-            </>
-          ) : null}
 
-          <img
-            src={Utils.getImageUrlOfS3(displayedImage) || "/assets/images/demoUser.png"}
-            alt="trainer_image"
-            className="rounded"
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-              borderRadius: "50%",
-              transition: 'all 0.6s linear'
-            }}
-            onError={(e) => {
-              e.target.src = "/assets/images/demoUser.png";
-            }}
-          />
+          {!croppedImage ? (
+            <img
+              src={displayedImage?.startsWith("blob:")
+                ? displayedImage
+                : Utils.getImageUrlOfS3(displayedImage) || "/assets/images/demoUser.png"}
+              alt="trainer_image"
+              className="rounded"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                borderRadius: "50%",
+                transition: 'all 0.6s linear'
+              }}
+              onError={(e) => {
+                e.target.src = "/assets/images/demoUser.png";
+              }}
+            />
+          ) : (
+            <span>Uploading... </span>
+          )}
+
 
         </div>
         <div className="">
@@ -283,15 +294,7 @@ const UserInfoCard = () => {
                 onChange={handlePictureChange}
               />
             </>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-success btn-sm"
-              onClick={handleSavePicture}
-            >
-              Save Picture
-            </button>
-          )}
+          ) : null}
         </div>
       </div>
       <CropImage
@@ -301,6 +304,7 @@ const UserInfoCard = () => {
         croppedImage={croppedImage}
         setCroppedImage={setCroppedImage}
         setDisplayedImage={setDisplayedImage}
+        handleSavePicture={handleSavePicture}
       />
     </>
   );

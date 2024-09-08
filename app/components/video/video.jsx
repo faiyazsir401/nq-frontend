@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useRef,
   useState,
-  useLayoutEffect,
+  useLayoutEffect
 } from "react";
 import { EVENTS } from "../../../helpers/events";
 import { SocketContext } from "../socket";
@@ -60,8 +60,12 @@ import { useMediaQuery } from "../../hook/useMediaQuery";
 import PermissionModal from "./PermissionModal";
 import { getInitials } from "../../../utils/videoCall";
 import Timer from "./Timer";
-import { isMobile } from "react-device-detect";
+import { isMobile } from 'react-device-detect';
 import OrientationModal from "../modalComponent/OrientationModal";
+import MobileDetect from 'mobile-detect';
+import { isIOS } from 'react-device-detect';
+import Script from 'next/script'
+import LazyVideo from "./LazyVideo";
 
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
@@ -96,6 +100,7 @@ export const HandleVideoCall = ({
   session_end_time,
   bIndex,
 }) => {
+
   //  console.log(toUser , fromUser , 'toUserFromUser')
   // const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
@@ -119,6 +124,8 @@ export const HandleVideoCall = ({
     mousedown: false,
   };
   const [selectedClips, setSelectedClips] = useState([]);
+
+  // console.log("selectedClips============>", selectedClips)
 
   const selectedVideoRef1 = useRef(null);
   const selectedVideoRef2 = useRef(null);
@@ -186,18 +193,31 @@ export const HandleVideoCall = ({
   const width768 = useMediaQuery(768);
   const [isTooltipShow, setIsTooltipShow] = useState(true);
   const [modal, setModal] = useState(false);
+  const [showThumbnailForFirstVideo, setShowThumbnailForFirstVideo] = useState(true);
+  const [showThumbnailForTwoVideo, setShowThumbnailForTwoVideo] = useState(true);
   const timeDifference = Timer(session_end_time);
-  const errorHandling = (err) => toast.error(err);
+  const errorHandling = (err) => toast.error(err)
+
+
+
+  /**
+   * In feature if crossOrigin="anonymous" is requre Future considerations.
+   * If you plan to implement features that involve manipulating video data (e.g., capturing frames, applying filters), you might need to re-enable crossOrigin.
+   * If you move your video hosting to a different domain in the future, you might need to reconsider CORS settings.
+   */
+
+  // const needsCrossOrigin = videoUrl.startsWith('https://different-domain.com');
 
   let height = window.innerHeight;
 
+
   function setInitialPinnedUser() {
     if (height < 500) {
-      setIsPinned(true);
+      setIsPinned(true)
       if (accountType === AccountType.TRAINER) {
-        setPinnedUser("user-video-1");
+        setPinnedUser("user-video-1")
       } else {
-        setPinnedUser("user-video-2");
+        setPinnedUser("user-video-2")
       }
     }
   }
@@ -210,8 +230,8 @@ export const HandleVideoCall = ({
   }
 
   useEffect(() => {
-    setInitialPinnedUser();
-  }, []);
+    setInitialPinnedUser()
+  }, [])
 
   // console.log("=========",height,  height < 500, {pinnedUser, isPinned})
   useLayoutEffect(() => {
@@ -219,11 +239,11 @@ export const HandleVideoCall = ({
       let width = window.innerWidth;
       let height = window.innerHeight;
       if (width > height == false) {
-        console.log("=========if block");
-        setModal(true);
+        // console.log("=========if block")
+        setModal(true)
       } else {
-        console.log("=========else block");
-        setModal(false);
+        // console.log("=========else block")
+        setModal(false)
       }
     };
 
@@ -232,14 +252,14 @@ export const HandleVideoCall = ({
     };
 
     // Add event listener for orientation change
-    window.addEventListener("resize", handleOrientationChange);
+    window.addEventListener('resize', handleOrientationChange);
 
     // Call updateOrientation once initially
     updateOrientation();
 
     // Clean up the event listener when the component unmounts
     return () => {
-      window.removeEventListener("resize", handleOrientationChange);
+      window.removeEventListener('resize', handleOrientationChange);
     };
   }, [isMobile]);
 
@@ -298,11 +318,11 @@ export const HandleVideoCall = ({
           .map((chunk) => {
             // Assuming chunk is already a Buffer or Uint8Array, no conversion needed
             if (chunk) {
-              console.log("Chunk type:", typeof chunk);
+              // console.log("Chunk type:", typeof chunk);
               return chunk;
             } else {
               // Handle invalid chunk data here
-              console.log("Invalid chunk data:", chunk);
+              // console.log("Invalid chunk data:", chunk);
               return null; // or handle differently as needed
             }
           })
@@ -313,9 +333,9 @@ export const HandleVideoCall = ({
           const chunkData = { data: chunkBuffers };
           socket.emit("chunk", chunkData);
           // Handle the recorded data here (in chunks array)
-          console.log("Data:", chunkBuffers);
+          // console.log("Data:", chunkBuffers);
         } else {
-          console.log("No valid chunks to send");
+          // console.log("No valid chunks to send");
         }
 
         // Clear chunks array for next interval
@@ -367,7 +387,7 @@ export const HandleVideoCall = ({
         audio: true,
       });
 
-      console.log("Media stream obtained:", stream);
+      // console.log("Media stream obtained:", stream);
 
       // Update state and UI
       setPermissionModal(false);
@@ -381,14 +401,21 @@ export const HandleVideoCall = ({
       videoRef.current.srcObject = stream;
 
       // Create a new Peer instance
+      // const peer = new Peer(fromUser._id, {
+      //   config: {
+      //     iceServers: [
+      //       {
+      //         username: "netqwixSTURN",
+      //         credential: "testing@123",
+      //         url: "turn:turn.netqwix.com",
+      //       },
+      //     ],
+      //   },
+      // });
+
       const peer = new Peer(fromUser._id, {
         config: {
           iceServers: [
-            // {
-            //   username: "netqwixSTURN",
-            //   credential: "testing@123",
-            //   url: "turn:turn.netqwix.com",
-            // },
             { urls: "stun:stun.cloudflare.com:3478" },
             {
               username:
@@ -412,41 +439,40 @@ export const HandleVideoCall = ({
 
       // Handle Peer events
       peer.on("open", (id) => {
-        console.log("Peer connection opened with ID:", id);
+        // console.log("Peer connection opened with ID:", id);
         socket.emit("ON_CALL_JOIN", {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
         });
       });
 
       peer.on("error", (error) => {
-        console.error("Peer error:", error);
+        // console.error("Peer error:", error);
       });
 
       peer.on("call", (call) => {
-        console.log("Incoming call received:", call);
+        // console.log("Incoming call received:", call);
         call.answer(stream);
 
         call.on("stream", (remoteStream) => {
-          console.log("Remote stream received:", remoteStream);
+          // console.log("Remote stream received:", remoteStream);
           setIsTraineeJoined(true);
           setDisplayMsg({ showMsg: false, msg: "" });
           setRemoteStream(remoteStream);
         });
       });
 
-      console.log("Call setup complete.");
+      // console.log("Call setup complete.");
     } catch (err) {
-      console.error("Media permission error:", err);
+      // console.error("Media permission error:", err);
       setPermissionModal(true);
-      errorHandling(
-        "Please allow media permission to microphone and camera for video call..."
-      );
+      errorHandling("Please allow media permission to microphone and camera for video call...");
     }
   };
 
+
   //NOTE -  Initiate outgoing connection
   let connectToPeer = (peer, peerId) => {
-    console.log(`Connecting to ${peerId}...`);
+    // console.log(`Connecting to ${peerId}...`);
 
     // let conn = peer.connect(peerId);
     // conn.on('data', (data) => {
@@ -461,7 +487,7 @@ export const HandleVideoCall = ({
     if (!(videoRef && videoRef?.current)) return;
     let call = peer.call(peerId, videoRef?.current?.srcObject);
     call.on("stream", (remoteStream) => {
-      console.log(`setting remoteStream for 2nd user here ---- `);
+      // console.log(`setting remoteStream for 2nd user here ---- `);
       setDisplayMsg({ showMsg: false, msg: "" });
       setIsTraineeJoined(true);
       remoteVideoRef.current.srcObject = remoteStream;
@@ -483,13 +509,13 @@ export const HandleVideoCall = ({
   const listenSocketEvents = () => {
     // once user joins the call
     socket.on("ON_CALL_JOIN", ({ userInfo }) => {
-      console.log(
-        ` end user join --- `,
-        userInfo,
-        peerRef.current,
-        fromUser,
-        toUser
-      );
+      // console.log(
+      //   ` end user join --- `,
+      //   userInfo,
+      //   peerRef.current,
+      //   fromUser,
+      //   toUser
+      // );
       const { to_user, from_user } = userInfo;
       if (!(peerRef && peerRef.current)) return;
       connectToPeer(peerRef.current, from_user);
@@ -497,17 +523,17 @@ export const HandleVideoCall = ({
 
     // Handle signaling events from the signaling server
     socket.on(EVENTS.VIDEO_CALL.ON_OFFER, (offer) => {
-      console.log(` -- on OFFER --`);
+      // console.log(` -- on OFFER --`);
       peerRef.current?.signal(offer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ANSWER, (answer) => {
-      console.log(` -- on answer --`);
+      // console.log(` -- on answer --`);
       peerRef.current?.signal(answer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, (candidate) => {
-      console.log(` -- on ICE candidate --`);
+      // console.log(` -- on ICE candidate --`);
       peerRef.current?.signal(candidate);
     });
 
@@ -537,7 +563,7 @@ export const HandleVideoCall = ({
       // }
     });
 
-    socket.on(EVENTS.EMIT_DRAWING_CORDS, ({ strikes }) => {
+    socket.on(EVENTS.EMIT_DRAWING_CORDS, ({ strikes , canvasSize }) => {
       const canvas = canvasRef.current;
       const context = canvas?.getContext("2d");
       if (!context || !canvas) return;
@@ -545,8 +571,11 @@ export const HandleVideoCall = ({
       const image = new Image();
       image.src = URL.createObjectURL(blob);
       image.onload = () => {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0);
+         const { width, height } = canvasSize;
+      const scaleX = canvas.width / width;
+      const scaleY = canvas.height / height;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(image, 0, 0, width * scaleX, height * scaleY);
       };
     });
 
@@ -577,9 +606,27 @@ export const HandleVideoCall = ({
     });
   };
 
+
+  const adjustCanvasSize = () => {
+   const canvas = canvasRef.current;
+    if (canvas) {
+      const ratio = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * ratio;
+      canvas.height = canvas.offsetHeight * ratio;
+      const context = canvas.getContext('2d');
+      context.scale(ratio, ratio);
+    }
+  };
+
+   useEffect(() => {
+    adjustCanvasSize();
+    window.addEventListener('resize', adjustCanvasSize);
+    return () => window.removeEventListener('resize', adjustCanvasSize);
+  }, []);
+
   // NOTE - call end
   const cutCall = () => {
-    console.log(`--- cut call --- `);
+    // console.log(`--- cut call --- `);
     stopRecording();
     cleanupFunction();
     if (isTraineeJoined && AccountType.TRAINER === accountType) {
@@ -657,7 +704,8 @@ export const HandleVideoCall = ({
         feedStatus: isFeedStopped,
       });
     }
-  }, [isTraineeJoined]);
+  }, [isTraineeJoined])
+
 
   const setupAudioMixing = async () => {
     const audioContext = new AudioContext();
@@ -676,7 +724,7 @@ export const HandleVideoCall = ({
     } else {
       // Handle the case where remoteStream is null or has no audio tracks
       // This might involve logging an error, setting a default track, or some other fallback
-      console.error("remoteStream is null or has no audio tracks.");
+      // console.error("remoteStream is null or has no audio tracks.");
       // Optionally, return or continue with additional logic here
       // For example, you might want to only process local audio if remote audio is unavailable
     }
@@ -700,6 +748,7 @@ export const HandleVideoCall = ({
     // Return the mixed audio stream from the destination
     return destination.stream;
   };
+
 
   useEffect(() => {
     const video = videoRef.current;
@@ -728,7 +777,9 @@ export const HandleVideoCall = ({
       );
       if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
       strikes.push(savedPos);
-      const mousePos = getMosuePositionOnCanvas(event);
+      // const mousePos = getMosuePositionOnCanvas(event);
+      const mousePos = event.type.includes('touchstart') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
+      console.log('...mousePos...',mousePos)
       context.strokeStyle = canvasConfigs.sender.strokeStyle;
       context.lineWidth = canvasConfigs.sender.lineWidth;
       context.lineCap = "round";
@@ -742,7 +793,7 @@ export const HandleVideoCall = ({
     const findDistance = () => {
       let dis = Math.sqrt(
         Math.pow(currPos.x - startPos.x, 2) +
-          Math.pow(currPos.y - startPos.y, 2)
+        Math.pow(currPos.y - startPos.y, 2)
       );
       return dis;
     };
@@ -869,7 +920,8 @@ export const HandleVideoCall = ({
     const draw = (event) => {
       event.preventDefault();
       if (!isDrawing || !context || !state.mousedown) return;
-      const mousePos = getMosuePositionOnCanvas(event);
+      // const mousePos = getMosuePositionOnCanvas(event);
+      const mousePos = event.type.includes('touchmove') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
       currPos = { x: mousePos?.x, y: mousePos.y };
 
       if (selectedShape) {
@@ -878,7 +930,7 @@ export const HandleVideoCall = ({
         drawShapes();
         context.stroke();
       } else {
-        console.log(`--- drawing ---- `);
+        // console.log(`--- drawing ---- `);
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
         context.lineCap = "round";
@@ -890,7 +942,7 @@ export const HandleVideoCall = ({
     const stopDrawing = (event) => {
       event.preventDefault();
       if (state.mousedown) {
-        console.log(`--- stop drawing ---- `);
+        // console.log(`--- stop drawing ---- `);
         sendStopDrawingEvent();
         isDrawing = false;
         state.mousedown = false;
@@ -901,9 +953,10 @@ export const HandleVideoCall = ({
     // allowing trainer to draw
     if (canvas && accountType === AccountType.TRAINER) {
       // for mobile
-      canvas.addEventListener("touchstart", startDrawing);
-      canvas.addEventListener("touchmove", draw);
-      canvas.addEventListener("touchend", stopDrawing);
+     canvas.addEventListener("touchstart", startDrawing, { passive: false });
+    canvas.addEventListener("touchmove", draw, { passive: false });
+    canvas.addEventListener("touchend", stopDrawing, { passive: false });
+    // canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
       // for web
       canvas.addEventListener("mousedown", startDrawing);
       canvas.addEventListener("mousemove", draw);
@@ -940,6 +993,18 @@ export const HandleVideoCall = ({
     // }
   };
 
+  const getTouchPos = (touchEvent) => {
+        const canvas = canvasRef.current;
+    var rect = canvas.getBoundingClientRect();
+    var x = touchEvent?.changedTouches[0]?.clientX - rect?.left;
+    var y = touchEvent?.changedTouches[0]?.clientY - rect?.top;
+    return {
+        x: x || 0,
+        y: y || 0,
+    };
+};
+
+
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
@@ -950,17 +1015,20 @@ export const HandleVideoCall = ({
   const sendDrawEvent = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    const { width, height } = canvas;
+
     canvas.toBlob((blob) => {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (!(event && event.target)) return;
         const binaryData = event.target.result;
-        console.log(`emit draw event---`);
+        // console.log(`emit draw event---`);
         socket.emit(EVENTS.DRAW, {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
           // storedEvents,
           // canvasConfigs,
           strikes: binaryData,
+          canvasSize: { width, height }
         });
       };
       reader.readAsArrayBuffer(blob);
@@ -989,12 +1057,11 @@ export const HandleVideoCall = ({
     //NOTE -  manually close the peer connections
     for (let conns in peerRef.current.connections) {
       peerRef.current.connections[conns].forEach((conn, index, array) => {
-        console.log(
-          `closing ${conn.connectionId} peerConnection (${index + 1}/${
-            array.length
-          })`,
-          conn.peerConnection
-        );
+        // console.log(
+        //   `closing ${conn.connectionId} peerConnection (${index + 1}/${array.length
+        //   })`,
+        //   conn.peerConnection
+        // );
         conn.peerConnection.close();
 
         //NOTE - close it using peerjs methods
@@ -1132,7 +1199,7 @@ export const HandleVideoCall = ({
       trainer: fromUser?._id,
       trainee: toUser?._id,
     });
-    console.log(res, "set screenshot data for session");
+    // console.log(res, "set screenshot data for session");
     setScreenShots(res?.data?.reportData);
     setReportObj({ title: res?.data?.title, topic: res?.data?.description });
   };
@@ -1160,7 +1227,7 @@ export const HandleVideoCall = ({
       ctx.clearRect(0, 0, w, h); // clean the canvas
       return true;
     } catch (e) {
-      console.log(e);
+      // console.log(e);
     }
   }
 
@@ -1168,8 +1235,7 @@ export const HandleVideoCall = ({
     setIsTooltipShow(false);
     setIsScreenShotModelOpen(false);
     if (selectedClips?.length) {
-      if (selectedClips.length === 1)
-        captureVideo("video-canvas-1", "selected-video-1");
+      if (selectedClips.length === 1) captureVideo("video-canvas-1", "selected-video-1");
       else if (selectedClips.length === 2) {
         captureVideo("video-canvas-1", "selected-video-1");
         captureVideo("video-canvas-2", "selected-video-2");
@@ -1185,8 +1251,6 @@ export const HandleVideoCall = ({
     const Pause2 = document.querySelector(".Pause2");
     const progress1 = document.querySelector(".progress1");
     const progress2 = document.querySelector(".progress2");
-    // const scs = document.querySelector('.scs');
-    // const scs2 = document.querySelector('.scs2');
 
     const userVideo1 = document.getElementById("user-video-1");
     const userVideo2 = document.getElementById("user-video-2");
@@ -1194,13 +1258,13 @@ export const HandleVideoCall = ({
     const ChevronRight = document.getElementById("ChevronRight");
     const Timer = document.getElementById("sessionEndTime");
     const ssTooltip = document.querySelector(".custom-tooltip-hh");
-    console.log(ssTooltip, "ssTooltip");
+    // console.log(ssTooltip, 'ssTooltip')
     if (ssTooltip) {
       ssTooltip.style.transition = "opacity 1s";
-      ssTooltip.style.visibility = "hidden";
-      ssTooltip.style.display = "none";
+      ssTooltip.style.visibility = 'hidden';
+      ssTooltip.style.display = 'none';
       ssTooltip.style.opacity = "0";
-      ssTooltip.style.zIndex = "-1";
+      ssTooltip.style.zIndex = '-1';
     }
 
     //NOTE - Hide elements with a smooth transition
@@ -1273,14 +1337,8 @@ export const HandleVideoCall = ({
     //   progress2.style.transition = 'opacity 1s'
     //   progress2.style.opacity = '0';
     // }
-    // if(scs){
-    //   scs.style.transition = 'opacity 1s'
-    //   scs.style.opacity = '0';
-    // }
-    // if(scs2){
-    //   scs2.style.transition = 'opacity 1s'
-    //   scs2.style.opacity = '0';
-    // }
+
+
 
     html2canvas(targetElement, { type: "png" }).then(async (canvas) => {
       // document.body.appendChild(canvas);
@@ -1296,10 +1354,10 @@ export const HandleVideoCall = ({
       setIsTooltipShow(true);
       if (ssTooltip) {
         ssTooltip.style.transition = "opacity 1s";
-        ssTooltip.style.visibility = "visible";
-        ssTooltip.style.display = "inline";
+        ssTooltip.style.visibility = 'visible';
+        ssTooltip.style.display = 'inline';
         ssTooltip.style.opacity = "1";
-        ssTooltip.style.zIndex = "999";
+        ssTooltip.style.zIndex = '999';
       }
       if (creationBarItem) {
         creationBarItem.style.transition = "opacity 1s";
@@ -1353,14 +1411,8 @@ export const HandleVideoCall = ({
         Timer.style.transition = "opacity 1s";
         Timer.style.opacity = "1";
       }
-      // if(scs){
-      //   scs.style.transition = 'opacity 1s'
-      //   scs.style.opacity = '1';
-      // }
-      // if(scs2){
-      //   scs2.style.transition = 'opacity 1s'
-      //   scs2.style.opacity = '1';
-      // }
+
+
 
       var res = await screenShotTake({
         sessions: id,
@@ -1404,6 +1456,9 @@ export const HandleVideoCall = ({
     });
   };
 
+
+
+
   async function afterSucessUploadImageOnS3() {
     var result = await getReport({
       sessions: id,
@@ -1432,16 +1487,17 @@ export const HandleVideoCall = ({
     "(min-width: 768px) and (min-width: 1024px)"
   );
 
+
   //SECTION - selected Clips and swapping the videos
   //NOTE -  listening both selected clips and swapped videos with single event by type
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ type, videos, mainScreen }) => {
     if (type === "clips") {
-      console.log(videos, "videos");
+      // console.log(videos, "videos");
       setSelectedClips(videos);
       if (videos?.length) {
-        resetInitialPinnedUser();
+        resetInitialPinnedUser()
       } else {
-        setInitialPinnedUser();
+        setInitialPinnedUser()
       }
     } else {
       setPinnedUser(mainScreen);
@@ -1468,6 +1524,7 @@ export const HandleVideoCall = ({
     emitVideoSelectEvent("clips", selectedClips, pinnedUser);
   }, [selectedClips?.length]);
 
+
   socket.on(
     EVENTS.ON_VIDEO_PLAY_PAUSE,
     ({ isPlayingAll, number, isPlaying1, isPlaying2 }) => {
@@ -1492,6 +1549,7 @@ export const HandleVideoCall = ({
     }
   );
 
+
   //NOTE -  Video Time Update listen
   socket.on(EVENTS.ON_VIDEO_TIME, ({ clickedTime, number }) => {
     if (selectedVideoRef1.current) {
@@ -1502,6 +1560,17 @@ export const HandleVideoCall = ({
 
   //NOTE -  Video Time Update emit
   const emitVideoTimeEvent = (clickedTime, number) => {
+
+    if (isPlaying.isPlaying1) {
+      setIsPlaying(prev => ({ ...prev, isPlaying1: false }));
+    }
+    if (isPlaying.isPlaying1) {
+      setIsPlaying(prev => ({ ...prev, isPlaying2: false }));
+    }
+    if (isPlaying.isPlayingAll) {
+      setIsPlaying(prev => ({ ...prev, isPlayingAll: false }));
+    }
+
     socket?.emit(EVENTS.ON_VIDEO_TIME, {
       userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
       clickedTime,
@@ -1515,7 +1584,9 @@ export const HandleVideoCall = ({
 
   const globalProgressBarToggler = (e) => {
     setVideoController(!videoController);
+
   };
+
   const handleGlobalProgressBarChange = (e) => {
     const { value } = e.target;
     const maxTime = Math.max(
@@ -1539,13 +1610,32 @@ export const HandleVideoCall = ({
   };
 
   const togglePlay = (num) => {
+
+    if (num === 'one' && showThumbnailForFirstVideo) {
+      setShowThumbnailForFirstVideo(false)
+    }
+
+    if (num === 'two' && showThumbnailForTwoVideo) {
+      setShowThumbnailForTwoVideo(false)
+    }
+
+    if (num === 'all') {
+      if (showThumbnailForFirstVideo) {
+        setShowThumbnailForFirstVideo(false)
+      }
+
+      if (showThumbnailForTwoVideo) {
+        setShowThumbnailForTwoVideo(false)
+      }
+    }
+
     var temp = isPlaying;
     temp.number = num;
     if (
       selectedVideoRef1?.current?.currentTime ===
-        selectedVideoRef1?.current?.duration &&
+      selectedVideoRef1?.current?.duration &&
       selectedVideoRef2?.current?.currentTime ===
-        selectedVideoRef2?.current?.duration
+      selectedVideoRef2?.current?.duration
     ) {
       selectedVideoRef1.current.currentTime = 0;
       emitVideoTimeEvent(0, "one");
@@ -1584,6 +1674,7 @@ export const HandleVideoCall = ({
     setIsPlaying({ ...temp });
   };
 
+
   // console.log("video time--------->",videoTime)
   const handleTimeUpdate = (videoRef, progressBarRef, number) => {
     if (progressBarRef?.current) {
@@ -1593,10 +1684,9 @@ export const HandleVideoCall = ({
     if (videoRef.current.duration === videoRef.current.currentTime) {
       togglePlay(number);
       videoRef.current.currentTime = 0;
-      emitVideoTimeEvent(0, number);
+      emitVideoTimeEvent(0, number)
     }
-    const remainingTime =
-      videoRef.current.duration - videoRef.current.currentTime;
+    const remainingTime = videoRef.current.duration - videoRef.current.currentTime;
 
     setVideoTime((prevVideoTime) => ({
       ...prevVideoTime,
@@ -1607,20 +1697,17 @@ export const HandleVideoCall = ({
       ).padStart(2, "0")}`,
       [`remainingTime${number}`]: `${String(
         Math?.floor(remainingTime / 60)
-      ).padStart(2, "0")}:${String(Math?.floor(remainingTime % 60)).padStart(
-        2,
-        "0"
-      )}`,
+      ).padStart(2, "0")}:${String(
+        Math?.floor(remainingTime % 60)
+      ).padStart(2, "0")}`,
     }));
   };
 
   // Usage for first video
-  const handleTimeUpdate1 = () =>
-    handleTimeUpdate(selectedVideoRef1, progressBarRef, 1);
+  const handleTimeUpdate1 = () => handleTimeUpdate(selectedVideoRef1, progressBarRef, 1);
 
   // Usage for second video
-  const handleTimeUpdate2 = () =>
-    handleTimeUpdate(selectedVideoRef2, progressBarRef2, 2);
+  const handleTimeUpdate2 = () => handleTimeUpdate(selectedVideoRef2, progressBarRef2, 2);
 
   const handleProgressBarClick = (e, number) => {
     var clickedTime;
@@ -1635,12 +1722,12 @@ export const HandleVideoCall = ({
         progressBarRef2?.current.getAttribute("max");
       selectedVideoRef2.current.currentTime = clickedTime;
     }
-    emitVideoTimeEvent(clickedTime, number);
+    emitVideoTimeEvent(clickedTime, number)
   };
 
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
-    console.log(clickedTime, "handleProgressBarChange");
+    // console.log(clickedTime, "handleProgressBarChange");
     if (number === "one") {
       selectedVideoRef1.current.currentTime = clickedTime;
     } else {
@@ -1674,7 +1761,7 @@ export const HandleVideoCall = ({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      const bookingsElement = document.getElementById("bookings");
+      const bookingsElement = document.getElementById('bookings');
       if (bookingsElement) {
         canvas.width = bookingsElement.clientWidth;
         canvas.height = bookingsElement.clientHeight;
@@ -1700,7 +1787,7 @@ export const HandleVideoCall = ({
         };
         reader.readAsDataURL(blob);
       } catch (error) {
-        console.error("Error fetching or converting image:", error);
+        // console.error("Error fetching or converting image:", error);
       }
     }
 
@@ -1772,14 +1859,14 @@ export const HandleVideoCall = ({
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
           const percentCompleted = (loaded / total) * 100;
-          console.log("percentCompletedpercentCompleted", percentCompleted);
+          // console.log("percentCompletedpercentCompleted", percentCompleted);
         },
       })
       .then((response) => {
-        console.log(response);
+        // console.log(response);
       })
       .catch((error) => {
-        console.error("Error:", error);
+        // console.error("Error:", error);
       });
   }
 
@@ -1812,8 +1899,9 @@ export const HandleVideoCall = ({
     setIsOpenCrop(false);
   };
 
+
   const renderCallActionButtons = () => {
-    console.log("code:0.0.2" + session_end_time);
+    // console.log("code:0.0.2" + session_end_time);
     return (
       <div className="call-action-buttons z-50 my-3 ">
         <Tooltip
@@ -1822,9 +1910,9 @@ export const HandleVideoCall = ({
           trigger="mouseenter"
         >
           <div
-            className={`icon-btn ${isMuted ? "btn-danger" : "btn-light"} ${
-              mediaQuery.matches ? "btn-xl" : "btn-sm"
-            } button-effect mic`}
+            className={`icon-btn ${isMuted ? "btn-danger" : "btn-light"} ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+              } button-effect mic`}
+            style={{height: '4vw',width: '4vw'}}
             onClick={() => {
               // if (remoteVideoRef && remoteVideoRef.current) {
               //   socket.emit(EVENTS.VIDEO_CALL.MUTE_ME, {
@@ -1859,13 +1947,13 @@ export const HandleVideoCall = ({
           trigger="mouseenter"
         >
           <div
-            className={`icon-btn btn-light  button-effect ${
-              mediaQuery.matches ? "btn-xl" : "btn-sm"
-            } ml-3`}
+            className={`icon-btn btn-light  button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+              } ml-3`}
+              style={{height: '4vw',width: '4vw'}}
             onClick={() => {
-              console.log("outside of local stream  statement");
+              // console.log("outside of local stream  statement");
               if (localStream) {
-                console.log("inside of local stream  statement");
+                // console.log("inside of local stream  statement");
                 localStream.getVideoTracks().forEach((track) => {
                   track.enabled = !track.enabled; // Toggle camera state
                 });
@@ -1912,9 +2000,9 @@ export const HandleVideoCall = ({
 
         <Tooltip title={"End Call"} position="bottom" trigger="mouseenter">
           <div
-            className={`icon-btn btn-danger button-effect ${
-              mediaQuery.matches ? "btn-xl" : "btn-sm"
-            }  ml-3`}
+            className={`icon-btn btn-danger button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+              }  ml-3`}
+                style={{height: '4vw',width: '4vw'}}
             onClick={() => {
               setCallEnd(true);
               cutCall();
@@ -1937,13 +2025,12 @@ export const HandleVideoCall = ({
             <div
               className={
                 !maxMin
-                  ? `icon-btn btn-light  button-effect  ${
-                      mediaQuery.matches ? "btn-xl" : "btn-sm"
-                    }  ml-3`
-                  : `icon-btn btn-danger  button-effect  ${
-                      mediaQuery.matches ? "btn-xl" : "btn-sm"
-                    }  ml-3`
+                  ? `icon-btn btn-light  button-effect  ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+                  }  ml-3`
+                  : `icon-btn btn-danger  button-effect  ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+                  }  ml-3`
               }
+                style={{height: '4vw',width: '4vw'}}
               onClick={() => {
                 // socket.emit(EVENTS.ON_VIDEO_SHOW, {
                 //   userInfo: { from_user: fromUser._id, to_user: toUser._id },
@@ -1969,9 +2056,9 @@ export const HandleVideoCall = ({
             trigger="mouseenter"
           >
             <div
-              className={`icon-btn btn-light  button-effect ${
-                mediaQuery.matches ? "btn-xl" : "btn-sm"
-              } ml-3`}
+              className={`icon-btn btn-light  button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+                } ml-3`}
+        style={{height: '4vw',width: '4vw'}}
               onClick={globalProgressBarToggler}
             >
               {/* {isPlaying?.isPlayingAll ? <PauseCircle /> : <PlayCircle />} */}
@@ -1990,11 +2077,11 @@ export const HandleVideoCall = ({
             className="custom-tooltip-hh"
           >
             <div
-              className={`icon-btn btn-light button-effect ${
-                mediaQuery.matches ? "btn-xl" : "btn-sm"
-              } ml-3`}
+              className={`icon-btn btn-light button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+                } ml-3`}
+           style={{height: '4vw',width: '4vw'}}
               onClick={() => {
-                setIsTooltipShow(false);
+                setIsTooltipShow(false)
                 setTimeout(() => {
                   takeScreenshot();
                 }, 30);
@@ -2010,9 +2097,9 @@ export const HandleVideoCall = ({
         {accountType === AccountType.TRAINER ? (
           <Tooltip title={"Game Plans"} position="bottom" trigger="mouseenter">
             <div
-              className={`icon-btn btn-light  button-effect ${
-                mediaQuery.matches ? "btn-xl" : "btn-sm"
-              } ml-3`}
+              className={`icon-btn btn-light  button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
+                } ml-3`}
+           style={{height: '4vw',width: '4vw'}}
               onClick={showReportData}
             >
               <FilePlus />
@@ -2092,344 +2179,1307 @@ export const HandleVideoCall = ({
     marginLeft: isPinned ? "0px !important" : "-15px",
   };
 
-  return (
-    <React.Fragment>
-      <OrientationModal isOpen={modal} />
-      <canvas
-        ref={canvasRef}
-        id="drawing-canvas"
-        width={document.getElementById("bookings")?.clientWidth}
-        height={document.getElementById("bookings")?.clientHeight}
-        className="canvas-print absolute all-0"
-        style={{ left: 0, top: 0, width: "100%", height: "100%" }}
-      />
-      <div
-        className="row"
-        style={{ height: "100%", display: "flex", alignItems: "center" }}
-      >
-        {/* 1 */}
-        {accountType === AccountType.TRAINER ? (
-          <div className="col-lg-1 col-md-1 col-sm-12 z-50">
-            <div>
-              <CanvasMenuBar
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-                setSketchPickerColor={(rgb) => {
-                  setSketchPickerColor(rgb);
-                }}
-                undoDrawing={() => {
-                  undoDrawing(
-                    {
-                      coordinates: storedLocalDrawPaths.sender,
-                      theme: canvasConfigs.sender,
-                    },
-                    {
-                      coordinates: storedLocalDrawPaths.receiver,
-                      theme: {
-                        lineWidth: canvasConfigs.receiver.lineWidth,
-                        strokeStyle: canvasConfigs.receiver.strokeStyle,
+
+  const handlePlayClick = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(error => {
+        // console.error('Playback failed:', error);
+        // Implement a user-friendly message or fallback here
+      });
+    }
+  };
+
+
+  function canPlayVideo(videoUrl) {
+    // Create a video element to test compatibility
+    const video = document.createElement('video');
+
+    // Check if the browser supports the video element
+    if (typeof video.canPlayType === 'function') {
+      // Extract the file extension from the URL
+      const fileExtension = videoUrl.split('.').pop().toLowerCase();
+
+      // Define MIME types based on common video extensions
+      const mimeTypes = {
+        'mp4': 'video/mp4',
+        'webm': 'video/webm',
+        'ogg': 'video/ogg',
+        'quicktime': 'video/quicktime'
+      };
+
+      // Get the MIME type based on the file extension
+      const mimeType = mimeTypes[fileExtension] || '';
+
+      // Check if the browser can play this video type
+      if (video.canPlayType(mimeType)) {
+        // console.log(`This browser can play ${fileExtension} videos`);
+        return true;
+      } else {
+        // console.warn(`This browser cannot play ${fileExtension} videos`);
+        return false;
+      }
+    } else {
+      // console.warn('Video playback is not supported in this browser');
+      return false;
+    }
+  }
+
+  // Usage
+  // const videoUrl = "https://example.com/video.mp4";
+  // if (canPlayVideo(videoUrl)) {
+  //   // Load and play the video
+  // } else {
+  //   // Show alternative content or message
+  // }
+
+  // if (canPlayVideo(videoUrl)) {
+  //   // Load and play the video
+  // } else {
+  //   // Show alternative content or message
+  // }
+// console.log('..pinnedUser...',pinnedUser)
+
+  if ((isIOS == true && isMobile == true)||isMobile == true) {
+    return (
+      <React.Fragment>
+        <Script
+          src="https://vjs.zencdn.net/7.20.3/video.min.js"
+          strategy="lazyOnload"
+        />
+        <OrientationModal isOpen={modal} />
+        <canvas
+          ref={canvasRef}
+          id="drawing-canvas"
+          width={document.getElementById("bookings")?.clientWidth}
+          height={document.getElementById("bookings")?.clientHeight}
+          className="canvas-print absolute all-0"
+          style={{ left: 0, top: 0, width: "100%", height: "100%" }}
+        />
+        <div
+          className="row"
+          style={{ height: "100%", display: "flex", alignItems: "center" }}
+        >
+          {/* 1 */}
+          {accountType === AccountType.TRAINER ? (
+            <div className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', }}>
+              <div>
+                <CanvasMenuBar
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  setSketchPickerColor={(rgb) => {
+                    setSketchPickerColor(rgb);
+                  }}
+                  undoDrawing={() => {
+                    undoDrawing(
+                      {
+                        coordinates: storedLocalDrawPaths.sender,
+                        theme: canvasConfigs.sender,
                       },
-                    }
-                  );
-                }}
-                sketchPickerColor={sketchPickerColor}
-                canvasConfigs={canvasConfigs}
-                setCanvasConfigs={(config) => {
-                  canvasConfigs = config;
-                }}
-                drawShapes={(shapeType) => {
-                  selectedShape = shapeType;
-                }}
-                refreshDrawing={() => {
-                  // deleting the canvas drawing
-                  storedLocalDrawPaths.sender = [];
-                  storedLocalDrawPaths.receiver = [];
-                  clearCanvas();
-                  sendClearCanvasEvent();
-                }}
-                selectedClips={selectedClips}
-                setSelectedClips={setSelectedClips}
-                toUser={toUser}
-                isCanvasMenuNoteShow={isCanvasMenuNoteShow}
-                setIsCanvasMenuNoteShow={setIsCanvasMenuNoteShow}
-                setMicNote={setMicNote}
-                setClipSelectNote={setClipSelectNote}
-                clipSelectNote={clipSelectNote}
-                setCountClipNoteOpen={setCountClipNoteOpen}
-                resetInitialPinnedUser={resetInitialPinnedUser}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="col-lg-1 col-md-6 col-sm-12 "></div>
-        )}
-
-        {/* 2 */}
-
-        {
-          <div
-            className="col-lg-8 col-md-8 col-sm-12 "
-            id="third"
-            style={{
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-evenly",
-              flexDirection: "column",
-              // top: height < 500 ? "-63px" : ""
-            }}
-          >
-            {displayMsg?.msg ? (
-              <div
-                className="no-user-joined font-weight-bold text-center"
-                style={{
-                  margin: displayMsg?.msg ? (width500 ? "0px" : "10px") : "",
-                  zIndex: displayMsg?.msg ? 8 : 1,
-                  fontSize: width500 ? "14px" : "20px",
-                }}
-              >
-                {displayMsg?.msg}
+                      {
+                        coordinates: storedLocalDrawPaths.receiver,
+                        theme: {
+                          lineWidth: canvasConfigs.receiver.lineWidth,
+                          strokeStyle: canvasConfigs.receiver.strokeStyle,
+                        },
+                      }
+                    );
+                  }}
+                  sketchPickerColor={sketchPickerColor}
+                  canvasConfigs={canvasConfigs}
+                  setCanvasConfigs={(config) => {
+                    canvasConfigs = config;
+                  }}
+                  drawShapes={(shapeType) => {
+                    selectedShape = shapeType;
+                  }}
+                  refreshDrawing={() => {
+                    // deleting the canvas drawing
+                    storedLocalDrawPaths.sender = [];
+                    storedLocalDrawPaths.receiver = [];
+                    clearCanvas();
+                    sendClearCanvasEvent();
+                  }}
+                  selectedClips={selectedClips}
+                  setSelectedClips={setSelectedClips}
+                  toUser={toUser}
+                  isCanvasMenuNoteShow={isCanvasMenuNoteShow}
+                  setIsCanvasMenuNoteShow={setIsCanvasMenuNoteShow}
+                  setMicNote={setMicNote}
+                  setClipSelectNote={setClipSelectNote}
+                  clipSelectNote={clipSelectNote}
+                  setCountClipNoteOpen={setCountClipNoteOpen}
+                  resetInitialPinnedUser={resetInitialPinnedUser}
+                />
               </div>
-            ) : null}
+            </div>
+          ) : (
+            <div className="" style={{width:'10px'}}></div>
+          )}
 
-            {selectedClips?.length ? (
-              <div
-                className={
-                  isPinned
-                    ? accountType === AccountType.TRAINER
-                      ? pinnedUser === "user-video-1"
-                        ? height < 500
-                          ? "switch-clips-container-for-mobile"
-                          : "switch-clips-container"
-                        : height < 500
-                        ? "scs2-mobile"
-                        : "scs2"
-                      : accountType === AccountType.TRAINEE &&
-                        pinnedUser === "user-video-1"
-                      ? height < 500
-                        ? "scs2-mobile"
-                        : "scs2"
-                      : height < 500
-                      ? "switch-clips-container-for-mobile"
-                      : "switch-clips-container"
-                    : "row"
-                }
-                style={{
-                  zIndex: isPinned ? "999" : "auto",
-                  backgroundColor: isPinned ? "#353535" : "",
-                  borderRadius: isPinned ? "20px" : "",
-                  padding: isPinned ? "5px" : "",
-                }}
-                onClick={() => {
-                  if (accountType === AccountType.TRAINER) {
-                    emitVideoSelectEvent("swap", selectedClips, null);
-                    setPinnedUser(null);
-                    setIsPinned(false);
-                  }
-                }}
-              >
+          {/* 2 */}
+
+          {
+            <div
+              className= {isIOS == true ? "col-lg-8 col-md-9 col-sm-8 important-margin" : "col-lg-8 col-md-8 col-sm-8 important-margin"}
+              id="third"
+              style={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-evenly",
+                flexDirection: "column",
+                alignSelf: 'baseline',
+                // top: height < 500 ? "-63px" : ""
+              }}
+            >
+              {displayMsg?.msg ? (
                 <div
-                  className="row"
-                  style={
-                    mediaQuery.matches
-                      ? selectedClips?.length === 1
-                        ? isOnlyOneVideo
-                        : isTwoVideos
-                      : {}
-                  }
+                  className="no-user-joined font-weight-bold text-center"
+                  style={{
+                    margin: displayMsg?.msg ? (width500 ? "0px" : "10px") : "",
+                    zIndex: displayMsg?.msg ? 8 : 1,
+                    fontSize: width500 ? "14px" : "20px",
+                  }}
                 >
-                  {selectedClips.length && selectedClips[0] ? (
-                    <div
-                      className="col-lg-6 col-md-6 col-sm-6 col-xs-12"
-                      style={{
-                        // padding: "1px !important",
-                        height: "100%",
-                        paddingRight: 0,
-                      }}
-                    >
-                      <video
-                        crossOrigin="anonymous"
-                        id="selected-video-1"
+                  {displayMsg?.msg}
+                </div>
+              ) : null}
+
+              {selectedClips?.length ? (
+                <div
+                  className={
+                    isPinned
+                      ? accountType === AccountType.TRAINER
+                        ? pinnedUser === "user-video-1"
+                          ? height < 500 ? "switch-clips-container-for-mobile_1" : "switch-clips-container_1"
+                          : height < 500 ? "scs2-mobile_1" : "scs2_1"
+                        : accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"
+                          ? height < 500 ? "scs2-mobile_1" : "scs2_1"
+                          : height < 500 ? "switch-clips-container-for-mobile_1" : "switch-clips-container_1"
+                      : "row"
+                  }
+                  style={{
+                    zIndex: isPinned ? "999" : "auto",
+                    backgroundColor: isPinned ? "#353535" : "",
+                    borderRadius: isPinned ? "20px" : "",
+                    padding: isPinned ? "0px" : "5px",
+                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? '50px' : !isPinned && selectedClips?.length ? '10px':'50px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '65px' : !isPinned && selectedClips?.length ? '10px':'50px',
+                    top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
+                      // trainee
+                      isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
+                    overflow: 'hidden',
+                     height:
+                      !isPinned && selectedClips?.length ? "35vw" : '12vw',
+                     width: !isPinned && selectedClips?.length ? '100%' :''
+
+                  }}
+                  onClick={() => {
+                    if (accountType === AccountType.TRAINER) {
+                      emitVideoSelectEvent("swap", selectedClips, null);
+                      setPinnedUser(null);
+                      setIsPinned(false);
+                    }
+                  }}
+                >
+               <div
+                    className="row"
+                    style={{
+                      ...(mediaQuery.matches
+                        ? selectedClips?.length === 1
+                          ? isOnlyOneVideo
+                          : isTwoVideos
+                        : {}),
+                      // height: '100%',
+                      width: '100%',
+                      margin: ' 0',
+                      // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "30vw" :"34.5vw",
+                      height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "30vw" :"30vw",
+                    }}
+                  >
+                    {selectedClips.length && selectedClips[0] ? (
+                      <div
+                        className="col-lg-6 col-md-6 col-sm-6 col-xs-12"
                         style={{
-                          height: isPinned ? "100%" : "34.5vw",
-                          // width: "inherit",
-                          // borderRadius: 10,
-                          width: "100%",
-                          objectFit: "cover",
+                          // padding: "1px !important",
+                          height: "100%",
+                          padding: 0,
                         }}
-                        ref={selectedVideoRef1}
-                        onTimeUpdate={handleTimeUpdate1}
                       >
-                        <source
+
+
+                        <LazyVideo
+                          id="selected-video-1"
+                          style={{
+                            marginLeft:accountType === AccountType.TRAINER && !isPinned ?'10%':'0%',
+                            // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
+                            height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"28vw",
+                          width: accountType === AccountType.TRAINER && !isPinned ?"90%":'100%',
+                            objectFit: "cover",
+                          }}
+                          ref={selectedVideoRef1}
+                          onTimeUpdate={handleTimeUpdate1}
+                          poster={Utils?.generateThumbnailURL(selectedClips[0])}
                           src={Utils?.generateVideoURL(selectedClips[0])}
-                          type="video/mp4"
                         />
-                      </video>
-                      <canvas id="video-canvas-1" hidden></canvas>
-                      {accountType === AccountType.TRAINER &&
-                        !videoController &&
-                        !isPinned && (
-                          <>
-                            <div
+                        <canvas id="video-canvas-1" hidden></canvas>
+                        {accountType === AccountType.TRAINER &&
+                          !videoController &&
+                          !isPinned && (
+                            <>
+                              <div
                               className="Pause"
-                              style={{
-                                position: "relative",
-                                zIndex: 10,
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              <div>
-                                <p style={{ margin: 0, marginRight: "10px" }}>
-                                  {videoTime?.currentTime1}
-                                </p>{" "}
-                              </div>
-                              <div className="external-control-bar">
-                                <button
+                                style={{
+                                  position: "relative",
+                                  zIndex: 10,
+                                  display: "flex",
+                                  // justifyContent: "center",
+                                  alignItems: "center",
+                                  height: '5vw',
+                                }}
+                              >
+                                <div>
+                                  <p style={{ margin: 0, marginRight: "10px",fontSize: 'calc(12px + 1*(100vw - 320px) / 1600)'}}>
+                                    {videoTime?.currentTime1}
+                                  </p>{" "}
+                                </div>
+                                <div className="external-control-bar">
+                                  <button
                                   className="btn btn-primary px-1 py-1 my-3 mr-2"
                                   onClick={() => togglePlay("one")}
-                                >
-                                  {isPlaying?.isPlaying1 ? (
-                                    <Pause
-                                      style={{ verticalAlign: "middle" }}
-                                    />
-                                  ) : (
-                                    <Play style={{ verticalAlign: "middle" }} />
-                                  )}
-                                </button>
-                              </div>
-                              {/* <progress
-                            className="progress"
-                            ref={progressBarRef}
-                            value="0"
-                            max={
-                              selectedVideoRef1.current
-                                ? selectedVideoRef1.current.duration
-                                : 100
-                            }
-                            onClick={(e) => handleProgressBarClick(e, "one")}
-                          /> */}
+                                  style={{minWidth:'0px'}}
+                                  >
+                                    {isPlaying?.isPlaying1 ? (
+                                      <Pause
+                                        style={{ verticalAlign: "middle" ,height:'2vw'}}
+                                      />
+                                    ) : (
+                                      <Play style={{ verticalAlign: "middle" ,height:'2vw' }} />
+                                    )}
+                                  </button>
+                                </div>
 
-                              {/* UI changed of video time slider and made it on onChange effect  */}
+                                {/* UI changed of video time slider and made it on onChange effect  */}
+
                               <input
-                                type="range"
-                                // className="progress"
-                                ref={progressBarRef}
-                                step="0.01"
-                                value={
-                                  selectedVideoRef1.current?.currentTime || 0
-                                }
-                                max={selectedVideoRef1.current?.duration || 100}
-                                onChange={(e) =>
-                                  handleProgressBarChange(e, "one")
-                                }
-                              />
-                              <div>
-                                <p
-                                  style={{
-                                    margin: 0,
-                                    marginLeft: "10px",
-                                    fontSize: "16px",
-                                  }}
-                                >
-                                  {videoTime?.remainingTime1}
-                                </p>{" "}
+                                className="wid-mid"
+                              id="vid_id"
+                                  type="range"
+                                  ref={progressBarRef}
+                                  step="0.01"
+                                  value={
+                                    selectedVideoRef1.current?.currentTime || 0
+                                  }
+                                  max={selectedVideoRef1.current?.duration || 100}
+                                  onChange={(e) =>
+                                    handleProgressBarChange(e, "one")
+                                  }
+                                />
+                                <div>
+                                  <p
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "10px",
+                                     fontSize: 'calc(12px + 1*(100vw - 320px) / 1600)'
+                                    }}
+                                  >
+                                    {videoTime?.remainingTime1}
+                                  </p>{" "}
+                                </div>
                               </div>
-                            </div>
-                            {/* commented volume rannge  for now */}
-                            {/* <div
-                          className="progress1"
+                            </>
+                          )}
+                      </div>
+                    ) : null}
+                    {selectedClips.length && selectedClips[1] ? (
+                      <div
+                        className="col-lg-6 col-md-6 col-sm-6 col-xs-12"
+                        style={{
+                          // padding: "1px",
+                          height: "100%",
+                          padding: 0,
+                        }}
+                      >
+
+
+                        <LazyVideo
+                          id="selected-video-2"
+                          style={{
+                            // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
+                            height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"28vw",
+                             width: accountType === AccountType.TRAINER && !isPinned ?"90%":'100%',
+                            objectFit: "cover",
+                          }}
+                          ref={selectedVideoRef2}
+                          onTimeUpdate={handleTimeUpdate2}
+                          poster={Utils?.generateThumbnailURL(selectedClips[1])}
+                          src={Utils?.generateVideoURL(selectedClips[1])}
+                        />
+                        <canvas id="video-canvas-2" hidden></canvas>
+                        {accountType === AccountType.TRAINER &&
+                          !videoController &&
+                          !isPinned && (
+                            <>
+                              <div
+                                className="Pause2"
+                                style={{
+                                  position: "relative",
+                                  zIndex: 10,
+                                  display: "flex",
+                                  // justifyContent: "center",
+                                  alignItems: "center",
+                                  height: '5vw',
+                                }}
+                              >
+                                <div>
+                                  <p style={{ margin: 0, marginRight: "10px",fontSize: 'calc(12px + 1*(100vw - 320px) / 1600)'}}>
+                                    {videoTime?.currentTime2}
+                                  </p>{" "}
+                                </div>
+                                <div className="external-control-bar">
+                                  <button
+                                    className="btn btn-primary px-1 py-1 my-3 mr-2 "
+                                  onClick={() => togglePlay("two")}
+                                     style={{minWidth:'0px'}}
+                                  >
+                                    {isPlaying?.isPlaying2 ? (
+                                      <Pause
+                                        style={{ verticalAlign: "middle"  ,height:'2vw'}}
+                                      />
+                                    ) : (
+                                      <Play style={{ verticalAlign: "middle" ,height:'2vw' }} />
+                                    )}
+                                  </button>
+                                </div>
+
+                                {/* UI changed of video time slider and made it on onChange effect  */}
+                                <input
+                                type="range"
+                                 id="vid_id"
+                                   className="wid-mid"
+                                  // className="progress"
+                                  ref={progressBarRef2}
+                                  step="0.01"
+                                  value={
+                                    selectedVideoRef2.current?.currentTime || 0
+                                  }
+                                  max={selectedVideoRef2.current?.duration || 100}
+                                  onChange={(e) =>
+                                    handleProgressBarChange(e, "two")
+                                  }
+                                />
+                                <div>
+                                  <p style={{ margin: 0, marginLeft: "10px" }}>
+                                    {videoTime?.remainingTime2}
+                                  </p>{" "}
+                                </div>
+                              </div>
+                              {/* commented volume rannge  for now */}
+
+                            </>
+                          )}
+                      </div>
+                    ) : null}
+                  </div>
+                  {accountType === AccountType.TRAINER &&
+                    videoController &&
+                    !isPinned && (
+                      <>
+                        <div
+                          className="Pause"
                           style={{
                             position: "relative",
                             zIndex: 10,
                             display: "flex",
-                            justifyContent: "space-between",
+                            justifyContent: "center",
                             alignItems: "center",
+                            marginInline: "auto",
+                            width: '100%',
+                            height: '3vw'
                           }}
                         >
-                          <div>
-                            <p style={{ margin: 0, marginRight: "10px" }}>
-                              Volume
-                            </p>{" "}
+                          <div className="external-control-bar">
+                            <button
+                            className="btn btn-primary px-1 py-1 my-3 mr-2"
+                             style={{minWidth:'0px'}}
+                              onClick={() => togglePlay("all")}
+                            >
+                              {isPlaying?.isPlayingAll ? (
+                                <Pause style={{ verticalAlign: "middle" }} />
+                              ) : (
+                                <Play style={{ verticalAlign: "middle" }} />
+                              )}
+                            </button>
                           </div>
                           <input
-                            className="progress"
-                            ref={volumeInputRef}
                             type="range"
-                            min="0"
-                            max="1"
-                            step="0.1"
-                            value={volume}
-                            onChange={handleVolumeChange}
+                            ref={globalProgressBarRef}
+                            step="0.01"
+                            value={
+                              (selectedVideoRef1.current?.currentTime || 0) >
+                                (selectedVideoRef2.current?.currentTime || 0)
+                                ? selectedVideoRef1.current?.currentTime || 0
+                                : selectedVideoRef2.current?.currentTime || 0
+                            }
+                            max={
+                              (selectedVideoRef1.current?.duration || 0) >
+                                (selectedVideoRef2.current?.duration || 0)
+                                ? selectedVideoRef1.current?.duration || 0
+                                : selectedVideoRef2.current?.duration || 0
+                            }
+                            onChange={handleGlobalProgressBarChange}
+                            style={{ width: "450px" }}
                           />
-                        </div> */}
-                          </>
-                        )}
-                    </div>
-                  ) : null}
-                  {selectedClips.length && selectedClips[1] ? (
-                    <div
-                      className="col-lg-6 col-md-6 col-sm-6 col-xs-12"
+                        </div>
+                      </>
+                    )}
+                </div>
+              ) : null}
+
+              {/* Timer  */}
+              <div
+                id="sessionEndTime"
+                style={{
+                  position: "absolute",
+                  top: width768 ? (!displayMsg?.msg ? "1%" : "20px") : "3%",
+                  right: "-15vw",
+                  zIndex: 999,
+                  width: displayMsg?.msg ? '100%' :''
+                }}
+              >
+                <div
+                  className={displayMsg?.msg ? 'text-center-displayMsg' : "text-center"}
+                  style={{
+                    display: "flex",
+                    fontSize: "12px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: 'column',
+                  }}
+                >
+                  <h3 style={{fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)'}}>Time remaining</h3>
+                  <h2 style={{fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)'}}> {timeDifference}</h2>
+                </div>
+              </div>
+
+              {/* User Video 1 */}
+
+              <div
+                id="user-video-1"
+                className={
+                  !selectedClips.length &&
+                    isPinned &&
+                    ((accountType === AccountType.TRAINER &&
+                      pinnedUser === "user-video-2") ||
+                      (accountType === AccountType.TRAINEE &&
+                        pinnedUser === "user-video-1"))
+                    ? // pinnedUser === "user-video-2"
+                    "scs2_1"
+                    : !selectedClips.length &&
+                      isPinned &&
+                      // pinnedUser === "user-video-1"
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-1") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-2"))
+                      ? "switch-user-video"
+                      : selectedClips.length &&
+                        isPinned &&
+                        selectedClips.length &&
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-2"))
+                        ? "switch-user-video"
+                        : selectedClips?.length !== 0 && mediaQuery.matches
+                          ? "scs_1"
+                          : ""
+                }
+                style={{
+                  zIndex:
+                    !selectedClips.length &&
+                      isPinned &&
+                      // pinnedUser === "user-video-2"
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? "999"
+                      : selectedClips?.length &&
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser !== "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser !== "user-video-2")) &&
+                        isPinned
+                        ? 999
+                        : selectedClips?.length && !pinnedUser && !isPinned
+                          ? 999
+                          : "auto",
+                  width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '30%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '30%' : selectedClips.length && !isPinned ? '30% ' : '',
+                  height:
+                   accountType === AccountType.TRAINER && selectedClips.length &&
+                      isPinned && pinnedUser === "user-video-1" ? "35vw" :
+                    !selectedClips.length &&
+                      isPinned &&
+                      // pinnedUser === "user-video-2"
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? height < 500 ? "12vw" : "12vw"
+                      : selectedClips?.length === 0 ||
+                        (accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-1") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-2")
+                        ? width500
+                          ? "380px"
+                          : height < 500 ? "35vw" : "500px"
+                        : height < 500 ? "12vw" : "12vw",
+                  marginTop: accountType === AccountType.TRAINER ?
+                    displayMsg?.msg  ? "0px" :
+                      isPinned && pinnedUser === "user-video-1" ? '10px' :
+                        selectedClips?.length && isPinned && pinnedUser === "user-video-2" ? '50px' : '50px'
+                    :
+                    // trainee
+                    displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "0px" : displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" :
+                      isPinned && pinnedUser === "user-video-2" ? '10px':
+                      selectedClips.length && isPinned && pinnedUser === "user-video-1" ? '65px' :  isPinned && pinnedUser === "user-video-1"? '50px': "50px",
+                  top:
+                  accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "110px" : accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" :  accountType === AccountType.TRAINEE && isPinned && pinnedUser === "user-video-1"? '' :
+                    isPinned ?
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-1") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-2"))
+                        ? "0% !important"
+                        // ? height < 500 ? "50px" : "0% !important"
+                        : (accountType === AccountType.TRAINER &&
+                          pinnedUser !== "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser !== "user-video-2") ||
+                          pinnedUser === null
+                          ? "45% !important"
+                          : "50%" :
+                      "",
+
+                  // position: displayMsg?.msg || isRemoteVideoOff ? "relative" : height < 500 ? pinnedUser === "user-video-1" ? "relative" : "absolute" : "relative",
+                  position: height < 500 ? ((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) ? "relative" : "absolute" : "relative",
+
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-30%" : "",
+                }}
+                onClick={() => {
+                  if (accountType === AccountType.TRAINER) {
+                    if (pinnedUser === "user-video-1") {
+                      emitVideoSelectEvent("swap", selectedClips, null);
+                      setIsPinned(false);
+                      setPinnedUser(null);
+                    } else {
+                      emitVideoSelectEvent("swap", selectedClips, "user-video-1");
+                      setIsPinned(true);
+                      setPinnedUser("user-video-1");
+                    }
+                  }
+                }}
+              >
+                <video
+                  ref={remoteVideoRef}
+                  playsInline
+                  autoPlay
+                  style={{
+                    width: "100%",
+                    position: accountType === AccountType.TRAINER ? pinnedUser === "user-video-1" ? "relative" : "absolute" : pinnedUser === "user-video-2" ? "relative" : "absolute",
+                    top: "0",
+                    height:
+                      !selectedClips.length &&
+                        isPinned &&
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-2") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-1"))
+                        ? height < 500 ? "12vw" : "12vw"
+                        : selectedClips?.length === 0 ||
+                          (accountType === AccountType.TRAINER &&
+                            pinnedUser === "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-2")
+                          ? width500
+                            ? "35vw"
+                            : height < 500 ? "35vw" : "35vw"
+                          : height < 500 ? "12vw" : "12vw",
+                    objectFit: "cover",
+                    borderRadius: "20px",
+                  }}
+                  id="end-user-video"
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    left: "0",
+                    right: "0",
+                    bottom: "0",
+                    width: "100%",
+                    // height: "100%",
+                    height:
+                      !selectedClips.length &&
+                        isPinned &&
+                        // pinnedUser === "user-video-2"
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-2") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-1"))
+                        ? height < 500 ? "12vw" : "12vw"
+                        : selectedClips?.length === 0 ||
+                          (accountType === AccountType.TRAINER &&
+                            pinnedUser === "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-2")
+                          ? width500
+                            ? "380px"
+                            : height < 500 ? "100%" : "500px"
+                          : height < 500 ? "12vw" : "12vw",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgb(53,53,53)",
+                    borderRadius: "20px",
+                    display:
+                      displayMsg?.msg || isRemoteVideoOff ? "flex" : "none",
+                  }}
+                >
+                  {toUser?.profile_picture ? (
+                    <img
+                      src={Utils.getImageUrlOfS3(toUser?.profile_picture)}
+                      srcset=""
                       style={{
-                        // padding: "1px",
-                        height: "100%",
-                        paddingLeft: 0,
+                        width: height < 500 ? "60px" : "100px",
+                        height: height < 500 ? "60px" : "100px",
+                        borderRadius: "50%",
+                      }}
+                    // className="container-raj"
+                    />
+                  ) : (
+                    <div
+                      className="container-raj "
+                      style={{
+                        backgroundColor: Utils.charBasedColors(
+                          Utils.capitalizeFirstChar(toUser.fullname)
+                        ),
                       }}
                     >
-                      <video
-                        crossOrigin="anonymous"
-                        id="selected-video-2"
+                      <h1 className="text-box-raj">
+                        {" "}
+                        {getInitials(toUser?.fullname)}
+                      </h1>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* User Video 2 */}
+
+              <div
+                id="user-video-2"
+                className={
+                  !selectedClips.length &&
+                    isPinned &&
+                    // pinnedUser === "user-video-2"
+                    ((accountType === AccountType.TRAINER &&
+                      pinnedUser === "user-video-2") ||
+                      (accountType === AccountType.TRAINEE &&
+                        pinnedUser === "user-video-1"))
+                    ? "switch-user-video"
+                    : selectedClips.length &&
+                      isPinned &&
+                      selectedClips.length &&
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? "switch-user-video"
+                      : mediaQuery.matches
+                        ? "scs2_1"
+                        : ""
+                }
+                style={{
+                  zIndex:
+                    isPinned &&
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? "auto"
+                      : 999,
+                  width: !isPinned ? '30%  ' : accountType === AccountType.TRAINER ? isPinned && pinnedUser === "user-video-2" ? '' : '30% ' : isPinned && pinnedUser === "user-video-1" ? '' : '30%',
+                  marginTop:accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '10px': accountType === AccountType.TRAINEE && isPinned && pinnedUser === "user-video-1" ? '10px' :accountType === AccountType.TRAINEE && displayMsg?.msg && isPinned &&
+                    pinnedUser === "user-video-1" ? '0px' :displayMsg?.msg && isPinned &&
+                    pinnedUser === "user-video-2" ? '0px' : accountType === AccountType.TRAINER ? isPinned &&
+                      pinnedUser === "user-video-2" ? '50px' : ''
+                    :
+                    // trainee
+                    !isPinned && selectedClips?.length ? '50px' :
+                      pinnedUser === "user-video-2" ? "" : "50px",
+
+                  top: accountType === AccountType.TRAINER ? "" :
+                    // trainee
+                    !isPinned && selectedClips?.length ? '0px' : ''
+                  ,
+                  height:accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '35vw':
+                    isPinned &&
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? width500
+                        ? "35vw"
+                        : height < 500 ? "35vw" : "35vw"
+                      : width500
+                        ? "12vw"
+                        : height < 500 ? "12vw" : "12vw",
+                  // top :  selectedClips.length > 0 ?  "10% !important" : "20%"
+                  top: accountType === AccountType.TRAINEE && displayMsg?.msg && isPinned &&
+                    pinnedUser === "user-video-2" ? '110px' : displayMsg?.msg && isPinned &&
+                      pinnedUser === "user-video-1" ? '110px' : displayMsg?.msg && isPinned &&
+                        pinnedUser === "user-video-2" ? "0px" :
+                    accountType === AccountType.TRAINEE && !isPinned && selectedClips?.length ? '0px' :
+                      isPinned && !(height < 500) ?
+                        ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1"))
+                          ? "0% !important"
+                          : (accountType === AccountType.TRAINER && pinnedUser !== "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser !== "user-video-1") || pinnedUser === null
+                            ? "10% !important" : "20%"
+                        : height < 500 ? !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) ? "50px" : "" : "",
+
+                  position: height < 500 ?
+                    ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2")
+                      || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
+                    ) ?
+                      "relative" : "absolute" : "relative",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-30%" : "",
+                }}
+                onClick={() => {
+                  if (accountType === AccountType.TRAINER) {
+                    if (pinnedUser === "user-video-2") {
+                      emitVideoSelectEvent("swap", selectedClips, null);
+                      setIsPinned(false);
+                      setPinnedUser(null);
+                    } else {
+                      emitVideoSelectEvent("swap", selectedClips, "user-video-2");
+                      setIsPinned(true);
+                      setPinnedUser("user-video-2");
+                    }
+                  }
+                }}
+              >
+                <video
+                  id="end-user-video"
+                  playsInline
+                  muted
+                  style={{
+                    position: accountType === AccountType.TRAINER ? pinnedUser === "user-video-2" ? "relative" : "absolute" : pinnedUser === "user-video-1" ? "relative" : "absolute",
+                    top: "0",
+                    width: "100%",
+                    height:
+                      isPinned &&
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-2") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-1"))
+                        ? width500
+                          ? "380px"
+                          : height < 500 ? "100%" : "500px"
+                        : width500
+                          ? "150px"
+                          : height < 500 ? "12vw" : "12vw",
+                    objectFit: "cover",
+                    borderRadius: "20px",
+                  }}
+                  ref={videoRef}
+                  autoPlay
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "0%",
+                    left: "0%",
+                    right: "0%",
+                    bottom: "0%",
+                    width: "100%",
+                    // height: "100%",
+                    height:
+                      isPinned &&
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-2") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-1"))
+                        ? width500
+                          ? "380px"
+                          : height < 500 ? "100%" : "500px"
+                        : width500
+                          ? "150px"
+                          : height < 500 ? "12vw" : "12vw",
+                    display: isFeedStopped ? "flex" : "none",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgb(53,53,53)",
+                    borderRadius: "20px",
+                  }}
+                >
+                  {fromUser.profile_picture ? (
+                    <img
+                      src={Utils.getImageUrlOfS3(fromUser.profile_picture)}
+                      srcset=""
+                      // className="container-raj"
+                      style={{
+                        width: height < 500 ? "60px" : "100px",
+                        height: height < 500 ? "60px" : "100px",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className="container-raj"
+                      style={{
+                        backgroundColor: Utils.charBasedColors(
+                          Utils.capitalizeFirstChar(fromUser.fullname)
+                        ),
+                      }}
+                    >
+                      <h1 className="text-box-raj">
+                        {" "}
+                        {getInitials(fromUser.fullname)}
+                      </h1>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {renderCallActionButtons()}
+            </div>
+          }
+
+          <ReportModal
+            currentReportData={{
+              session: id,
+              trainer: fromUser?._id,
+              trainee: toUser?._id,
+            }}
+            isOpenReport={isOpenReport}
+            setIsOpenReport={setIsOpenReport}
+            screenShots={screenShots}
+            setScreenShots={setScreenShots}
+            // setScreenShots={setScreenShot}
+            reportObj={reportObj}
+            setReportObj={setReportObj}
+            isClose={isClose}
+            isTraineeJoined={isTraineeJoined}
+            isCallEnded={isCallEnded}
+          />
+
+          <Modal isOpen={isModelOpen}>
+            <ModalHeader>
+              <h2>Recording</h2>
+            </ModalHeader>
+            <ModalBody>
+              <div className="row">
+                <Button
+                  className="mx-3 mt-1"
+                  color="primary"
+                  onClick={() => {
+                    startRecording();
+                    setIsModelOpen(false);
+                  }}
+                >
+                  Start Recording
+                </Button>
+                <Button
+                  className="mx-3 mt-1"
+                  color="primary"
+                  onClick={() => {
+                    setIsModelOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </ModalBody>
+          </Modal>
+        </div>
+        {isScreenShotModelOpen && (
+          <ScreenShotDetails
+            screenShotImages={screenShots}
+            setScreenShotImages={setScreenShots}
+            setIsOpenDetail={setIsScreenShotModelOpen}
+            currentReportData={{
+              session: id,
+              trainer: fromUser?._id,
+              trainee: toUser?._id,
+            }}
+            reportObj={reportObj}
+          />
+        )}
+
+        <PermissionModal isOpen={permissionModal} />
+      </React.Fragment>
+    );
+  } else {
+    return (
+      <React.Fragment>
+        <Script
+          src="https://vjs.zencdn.net/7.20.3/video.min.js"
+          strategy="lazyOnload"
+        />
+        <OrientationModal isOpen={modal} />
+        <canvas
+          ref={canvasRef}
+          id="drawing-canvas"
+          width={document.getElementById("bookings")?.clientWidth}
+          height={document.getElementById("bookings")?.clientHeight}
+          className="canvas-print absolute all-0"
+          style={{ left: 0, top: 0, width: "100%", height: "100%" }}
+        />
+        <div
+          className="row"
+          style={{ height: "100%", display: "flex", alignItems: "center" }}
+        >
+          {/* 1 */}
+          {accountType === AccountType.TRAINER ? (
+            <div className="col-lg-1 col-md-1 col-sm-2 z-50"
+              // style={{ flex: '0 0 9px', width: '9px', }}
+            >
+              <div>
+                <CanvasMenuBar
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  setSketchPickerColor={(rgb) => {
+                    setSketchPickerColor(rgb);
+                  }}
+                  undoDrawing={() => {
+                    undoDrawing(
+                      {
+                        coordinates: storedLocalDrawPaths.sender,
+                        theme: canvasConfigs.sender,
+                      },
+                      {
+                        coordinates: storedLocalDrawPaths.receiver,
+                        theme: {
+                          lineWidth: canvasConfigs.receiver.lineWidth,
+                          strokeStyle: canvasConfigs.receiver.strokeStyle,
+                        },
+                      }
+                    );
+                  }}
+                  sketchPickerColor={sketchPickerColor}
+                  canvasConfigs={canvasConfigs}
+                  setCanvasConfigs={(config) => {
+                    canvasConfigs = config;
+                  }}
+                  drawShapes={(shapeType) => {
+                    selectedShape = shapeType;
+                  }}
+                  refreshDrawing={() => {
+                    // deleting the canvas drawing
+                    storedLocalDrawPaths.sender = [];
+                    storedLocalDrawPaths.receiver = [];
+                    clearCanvas();
+                    sendClearCanvasEvent();
+                  }}
+                  selectedClips={selectedClips}
+                  setSelectedClips={setSelectedClips}
+                  toUser={toUser}
+                  isCanvasMenuNoteShow={isCanvasMenuNoteShow}
+                  setIsCanvasMenuNoteShow={setIsCanvasMenuNoteShow}
+                  setMicNote={setMicNote}
+                  setClipSelectNote={setClipSelectNote}
+                  clipSelectNote={clipSelectNote}
+                  setCountClipNoteOpen={setCountClipNoteOpen}
+                  resetInitialPinnedUser={resetInitialPinnedUser}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="col-lg-1 col-md-6 col-sm-2 " ></div>
+          )}
+
+          {/* 2 */}
+
+          {
+            <div
+              className="col-lg-8 col-md-8 col-sm-12 "
+              id="third"
+              style={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-evenly",
+                flexDirection: "column",
+                // top: height < 500 ? "-63px" : ""
+              }}
+            >
+              {displayMsg?.msg ? (
+                <div
+                  className="no-user-joined font-weight-bold text-center"
+                  style={{
+                    margin: displayMsg?.msg ? (width500 ? "0px" : "10px") : "",
+                    zIndex: displayMsg?.msg ? 8 : 1,
+                    fontSize: width500 ? "14px" : "20px",
+                  }}
+                >
+                  {displayMsg?.msg}
+                </div>
+              ) : null}
+
+              {selectedClips?.length ? (
+                <div
+                  className={
+                    isPinned
+                      ? accountType === AccountType.TRAINER
+                        ? pinnedUser === "user-video-1"
+                          ? height < 500 ? "switch-clips-container-for-mobile" : "switch-clips-container"
+                          : height < 500 ? "scs2-mobile" : "scs2"
+                        : accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"
+                          ? height < 500 ? "scs2-mobile" : "scs2"
+                          : height < 500 ? "switch-clips-container-for-mobile" : "switch-clips-container"
+                      : "row"
+                  }
+                  style={{
+                    zIndex: isPinned ? "999" : "auto",
+                    backgroundColor: isPinned ? "#353535" : "",
+                    borderRadius: isPinned ? "20px" : "",
+                    padding: isPinned ? "5px" : "",
+                  }}
+                  onClick={() => {
+                    if (accountType === AccountType.TRAINER) {
+                      emitVideoSelectEvent("swap", selectedClips, null);
+                      setPinnedUser(null);
+                      setIsPinned(false);
+                    }
+                  }}
+                >
+                  <div
+                    className="row"
+                    style={
+                      mediaQuery.matches
+                        ? selectedClips?.length === 1
+                          ? isOnlyOneVideo
+                          : isTwoVideos
+                        : {}
+                    }
+                  >
+                    {selectedClips.length && selectedClips[0] ? (
+                      <div
+                        className="col-lg-6 col-md-6 col-sm-6 col-xs-12"
                         style={{
-                          height: isPinned ? "100%" : "34.5vw",
-                          // width: "inherit",
-                          // borderRadius: 10,
-                          width: "100%",
-                          objectFit: "cover",
+                          // padding: "1px !important",
+                          height: "100%",
+                          paddingRight: 0,
                         }}
-                        ref={selectedVideoRef2}
-                        onTimeUpdate={handleTimeUpdate2}
                       >
-                        <source
-                          src={Utils?.generateVideoURL(selectedClips[1])}
-                          type="video/mp4"
-                        />
-                      </video>
-                      <canvas id="video-canvas-2" hidden></canvas>
-                      {accountType === AccountType.TRAINER &&
-                        !videoController &&
-                        !isPinned && (
-                          <>
-                            <div
-                              className="Pause2"
+                        {/* {
+                          showThumbnailForFirstVideo ?
+                            <img
+                              src={Utils?.generateThumbnailURL(selectedClips[0])}
+                              id="selected-video-1"
                               style={{
-                                position: "relative",
-                                zIndex: 10,
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
+                                height: isPinned ? "100%" : "34.5vw",
+                                width: "100%",
+                                objectFit: "cover",
                               }}
+                              loading="lazy"
+                            />
+                            :
+                            <video
+                              // crossOrigin="anonymous"
+                              poster={Utils?.generateThumbnailURL(selectedClips[0])}
+                              id="selected-video-1"
+                              style={{
+                                height: isPinned ? "100%" : "34.5vw",
+                                // width: "inherit",
+                                // borderRadius: 10,
+                                width: "100%",
+                                objectFit: "cover",
+                              }}
+                              ref={selectedVideoRef1}
+                              onTimeUpdate={handleTimeUpdate1}
+                              onCanPlay={() => canPlayVideo(Utils.generateVideoURL2(selectedClips[0]))}
                             >
-                              <div>
-                                <p style={{ margin: 0, marginRight: "10px" }}>
-                                  {videoTime?.currentTime2}
-                                </p>{" "}
+
+                              <source src={Utils.generateVideoURL2(selectedClips[0])} type="video/mp4" />
+                              <source src={Utils.generateVideoURL2(selectedClips[0])} type="video/webm" />
+                            </video>
+                        } */}
+
+                        <LazyVideo
+                          id="selected-video-1"
+                          style={{
+                            height: isPinned ? "100%" : "34.5vw",
+                            width: "100%",
+                            objectFit: "cover",
+                          }}
+                          ref={selectedVideoRef1}
+                          onTimeUpdate={handleTimeUpdate1}
+                          poster={Utils?.generateThumbnailURL(selectedClips[0])}
+                          src={Utils?.generateVideoURL(selectedClips[0])}
+                        />
+                        <canvas id="video-canvas-1" hidden></canvas>
+                        {accountType === AccountType.TRAINER &&
+                          !videoController &&
+                          !isPinned && (
+                            <>
+                              <div
+                                className="Pause"
+                                style={{
+                                  position: "relative",
+                                  zIndex: 10,
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <div>
+                                  <p style={{ margin: 0, marginRight: "10px" }}>
+                                    {videoTime?.currentTime1}
+                                  </p>{" "}
+                                </div>
+                                <div className="external-control-bar">
+                                  <button
+                                    className="btn btn-primary px-1 py-1 my-3 mr-2"
+                                    onClick={() => {
+                                      togglePlay("one");
+                                      handlePlayClick()
+                                    }}
+                                  >
+                                    {isPlaying?.isPlaying1 ? (
+                                      <Pause
+                                        style={{ verticalAlign: "middle" }}
+                                      />
+                                    ) : (
+                                      <Play style={{ verticalAlign: "middle" }} />
+                                    )}
+                                  </button>
+                                </div>
+
+                                {/* UI changed of video time slider and made it on onChange effect  */}
+
+                                <input
+                                  type="range"
+                                  ref={progressBarRef}
+                                  step="0.01"
+                                  value={
+                                    selectedVideoRef1.current?.currentTime || 0
+                                  }
+                                  max={selectedVideoRef1.current?.duration || 100}
+                                  onChange={(e) =>
+                                    handleProgressBarChange(e, "one")
+                                  }
+                                />
+                                <div>
+                                  <p
+                                    style={{
+                                      margin: 0,
+                                      marginLeft: "10px",
+                                      fontSize: "16px",
+                                    }}
+                                  >
+                                    {videoTime?.remainingTime1}
+                                  </p>{" "}
+                                </div>
                               </div>
-                              <div className="external-control-bar">
-                                <button
-                                  className="btn btn-primary px-1 py-1 my-3 mr-2 "
-                                  onClick={() => togglePlay("two")}
-                                >
-                                  {isPlaying?.isPlaying2 ? (
-                                    <Pause
-                                      style={{ verticalAlign: "middle" }}
-                                    />
-                                  ) : (
-                                    <Play style={{ verticalAlign: "middle" }} />
-                                  )}
-                                </button>
-                              </div>
-                              {/* <progress
+                            </>
+                          )}
+                      </div>
+                    ) : null}
+                    {selectedClips.length && selectedClips[1] ? (
+                      <div
+                        className="col-lg-6 col-md-6 col-sm-6 col-xs-12"
+                        style={{
+                          // padding: "1px",
+                          height: "100%",
+                          paddingLeft: 0,
+                        }}
+                      >
+                        {/* {
+                          showThumbnailForFirstVideo ?
+                            <img
+                              src={Utils?.generateThumbnailURL(selectedClips[1])}
+                              id="selected-video-1"
+                              style={{
+                                height: isPinned ? "100%" : "34.5vw",
+                                width: "100%",
+                                objectFit: "cover",
+                              }}
+                              loading="lazy"
+                            />
+                            :
+                            <video
+                              // crossOrigin="anonymous"
+                              id="selected-video-2"
+                              style={{
+                                height: isPinned ? "100%" : "34.5vw",
+                                // width: "inherit",
+                                // borderRadius: 10,
+                                width: "100%",
+                                objectFit: "cover",
+                              }}
+                              ref={selectedVideoRef2}
+                              onTimeUpdate={handleTimeUpdate2}
+                              poster={Utils?.generateThumbnailURL(selectedClips[1])}
+                            >
+                              <source
+                                src={Utils?.generateVideoURL(selectedClips[1])}
+                                type="video/mp4"
+                              />
+                            </video>
+                        } */}
+
+                        <LazyVideo
+                          id="selected-video-2"
+                          style={{
+                            height: isPinned ? "100%" : "34.5vw",
+                            width: "100%",
+                            objectFit: "cover",
+                          }}
+                          ref={selectedVideoRef2}
+                          onTimeUpdate={handleTimeUpdate2}
+                          poster={Utils?.generateThumbnailURL(selectedClips[1])}
+                          src={Utils?.generateVideoURL(selectedClips[1])}
+                        />
+                        <canvas id="video-canvas-2" hidden></canvas>
+                        {accountType === AccountType.TRAINER &&
+                          !videoController &&
+                          !isPinned && (
+                            <>
+                              <div
+                                className="Pause2"
+                                style={{
+                                  position: "relative",
+                                  zIndex: 10,
+                                  display: "flex",
+                                  justifyContent: "center",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <div>
+                                  <p style={{ margin: 0, marginRight: "10px" }}>
+                                    {videoTime?.currentTime2}
+                                  </p>{" "}
+                                </div>
+                                <div className="external-control-bar">
+                                  <button
+                                    className="btn btn-primary px-1 py-1 my-3 mr-2 "
+                                    onClick={() => togglePlay("two")}
+                                  >
+                                    {isPlaying?.isPlaying2 ? (
+                                      <Pause
+                                        style={{ verticalAlign: "middle" }}
+                                      />
+                                    ) : (
+                                      <Play style={{ verticalAlign: "middle" }} />
+                                    )}
+                                  </button>
+                                </div>
+                                {/* <progress
                             className="progress"
                             ref={progressBarRef2}
                             value="0"
@@ -2441,28 +3491,28 @@ export const HandleVideoCall = ({
                             onClick={(e) => handleProgressBarClick(e, "two")}
                           /> */}
 
-                              {/* UI changed of video time slider and made it on onChange effect  */}
-                              <input
-                                type="range"
-                                // className="progress"
-                                ref={progressBarRef2}
-                                step="0.01"
-                                value={
-                                  selectedVideoRef2.current?.currentTime || 0
-                                }
-                                max={selectedVideoRef2.current?.duration || 100}
-                                onChange={(e) =>
-                                  handleProgressBarChange(e, "two")
-                                }
-                              />
-                              <div>
-                                <p style={{ margin: 0, marginLeft: "10px" }}>
-                                  {videoTime?.remainingTime2}
-                                </p>{" "}
+                                {/* UI changed of video time slider and made it on onChange effect  */}
+                                <input
+                                  type="range"
+                                  // className="progress"
+                                  ref={progressBarRef2}
+                                  step="0.01"
+                                  value={
+                                    selectedVideoRef2.current?.currentTime || 0
+                                  }
+                                  max={selectedVideoRef2.current?.duration || 100}
+                                  onChange={(e) =>
+                                    handleProgressBarChange(e, "two")
+                                  }
+                                />
+                                <div>
+                                  <p style={{ margin: 0, marginLeft: "10px" }}>
+                                    {videoTime?.remainingTime2}
+                                  </p>{" "}
+                                </div>
                               </div>
-                            </div>
-                            {/* commented volume rannge  for now */}
-                            {/* <div
+                              {/* commented volume rannge  for now */}
+                              {/* <div
                           className="progress2"
                           style={{
                             position: "relative",
@@ -2488,523 +3538,470 @@ export const HandleVideoCall = ({
                             onChange={handleVolumeChange2}
                           />
                         </div> */}
-                          </>
-                        )}
-                    </div>
-                  ) : null}
-                </div>
-                {accountType === AccountType.TRAINER &&
-                  videoController &&
-                  !isPinned && (
-                    <>
-                      <div
-                        className="Pause"
-                        style={{
-                          position: "relative",
-                          zIndex: 10,
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginInline: "auto",
-                        }}
-                      >
-                        {/* <div>
+                            </>
+                          )}
+                      </div>
+                    ) : null}
+                  </div>
+                  {accountType === AccountType.TRAINER &&
+                    videoController &&
+                    !isPinned && (
+                      <>
+                        <div
+                          className="Pause"
+                          style={{
+                            position: "relative",
+                            zIndex: 10,
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginInline: "auto",
+                          }}
+                        >
+                          {/* <div>
                             <p style={{ margin: 0, marginRight: "10px" }}>
                               {videoTime?.currentTime1}
                             </p>{" "}
                           </div> */}
-                        <div className="external-control-bar">
-                          <button
-                            className="btn btn-primary px-1 py-1 my-3 mr-2"
-                            onClick={() => togglePlay("all")}
-                          >
-                            {isPlaying?.isPlayingAll ? (
-                              <Pause style={{ verticalAlign: "middle" }} />
-                            ) : (
-                              <Play style={{ verticalAlign: "middle" }} />
-                            )}
-                          </button>
-                        </div>
-                        <input
-                          type="range"
-                          ref={globalProgressBarRef}
-                          step="0.01"
-                          value={
-                            (selectedVideoRef1.current?.currentTime || 0) >
-                            (selectedVideoRef2.current?.currentTime || 0)
-                              ? selectedVideoRef1.current?.currentTime || 0
-                              : selectedVideoRef2.current?.currentTime || 0
-                          }
-                          max={
-                            (selectedVideoRef1.current?.duration || 0) >
-                            (selectedVideoRef2.current?.duration || 0)
-                              ? selectedVideoRef1.current?.duration || 0
-                              : selectedVideoRef2.current?.duration || 0
-                          }
-                          onChange={handleGlobalProgressBarChange}
-                          style={{ width: "450px" }}
-                        />
-                        {/* <div>
+                          <div className="external-control-bar">
+                            <button
+                              className="btn btn-primary px-1 py-1 my-3 mr-2"
+                              onClick={() => togglePlay("all")}
+                            >
+                              {isPlaying?.isPlayingAll ? (
+                                <Pause style={{ verticalAlign: "middle" }} />
+                              ) : (
+                                <Play style={{ verticalAlign: "middle" }} />
+                              )}
+                            </button>
+                          </div>
+                          <input
+                            type="range"
+                            ref={globalProgressBarRef}
+                            step="0.01"
+                            value={
+                              (selectedVideoRef1.current?.currentTime || 0) >
+                                (selectedVideoRef2.current?.currentTime || 0)
+                                ? selectedVideoRef1.current?.currentTime || 0
+                                : selectedVideoRef2.current?.currentTime || 0
+                            }
+                            max={
+                              (selectedVideoRef1.current?.duration || 0) >
+                                (selectedVideoRef2.current?.duration || 0)
+                                ? selectedVideoRef1.current?.duration || 0
+                                : selectedVideoRef2.current?.duration || 0
+                            }
+                            onChange={handleGlobalProgressBarChange}
+                            style={{ width: "450px" }}
+                          />
+                          {/* <div>
                             <p style={{ margin: 0, marginLeft: "10px" }}>
                               {videoTime?.remainingTime1}
                             </p>{" "}
                           </div> */}
-                      </div>
-                    </>
-                  )}
-              </div>
-            ) : null}
+                        </div>
+                      </>
+                    )}
+                </div>
+              ) : null}
 
-            {/* Timer  */}
-            <div
-              id="sessionEndTime"
-              style={{
-                position: "absolute",
-                top: width768 ? (!displayMsg?.msg ? "1%" : "10%") : "3%",
-                right: width768 ? "30%" : "-29%",
-                zIndex: 999,
-              }}
-            >
+              {/* Timer  */}
               <div
-                className="text-center"
-                style={{
-                  display: "flex",
-                  fontSize: "12px",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "column",
-                }}
-              >
-                <h3>Time remaining</h3>
-                <h2 style={{ fontSize: "18px" }}> {timeDifference}</h2>
-              </div>
-            </div>
-
-            {/* User Video 1 */}
-
-            <div
-              id="user-video-1"
-              className={
-                !selectedClips.length &&
-                isPinned &&
-                ((accountType === AccountType.TRAINER &&
-                  pinnedUser === "user-video-2") ||
-                  (accountType === AccountType.TRAINEE &&
-                    pinnedUser === "user-video-1"))
-                  ? // pinnedUser === "user-video-2"
-                    "scs2"
-                  : !selectedClips.length &&
-                    isPinned &&
-                    // pinnedUser === "user-video-1"
-                    ((accountType === AccountType.TRAINER &&
-                      pinnedUser === "user-video-1") ||
-                      (accountType === AccountType.TRAINEE &&
-                        pinnedUser === "user-video-2"))
-                  ? "switch-user-video"
-                  : selectedClips.length &&
-                    isPinned &&
-                    selectedClips.length &&
-                    ((accountType === AccountType.TRAINER &&
-                      pinnedUser === "user-video-1") ||
-                      (accountType === AccountType.TRAINEE &&
-                        pinnedUser === "user-video-2"))
-                  ? "switch-user-video"
-                  : selectedClips?.length !== 0 && mediaQuery.matches
-                  ? "scs"
-                  : ""
-              }
-              style={{
-                zIndex:
-                  !selectedClips.length &&
-                  isPinned &&
-                  // pinnedUser === "user-video-2"
-                  ((accountType === AccountType.TRAINER &&
-                    pinnedUser === "user-video-2") ||
-                    (accountType === AccountType.TRAINEE &&
-                      pinnedUser === "user-video-1"))
-                    ? "999"
-                    : selectedClips?.length &&
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser !== "user-video-1") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser !== "user-video-2")) &&
-                      isPinned
-                    ? 999
-                    : selectedClips?.length && !pinnedUser && !isPinned
-                    ? 999
-                    : "auto",
-                height:
-                  !selectedClips.length &&
-                  isPinned &&
-                  // pinnedUser === "user-video-2"
-                  ((accountType === AccountType.TRAINER &&
-                    pinnedUser === "user-video-2") ||
-                    (accountType === AccountType.TRAINEE &&
-                      pinnedUser === "user-video-1"))
-                    ? height < 500
-                      ? "80px"
-                      : ""
-                    : selectedClips?.length === 0 ||
-                      (accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-1") ||
-                      (accountType === AccountType.TRAINEE &&
-                        pinnedUser === "user-video-2")
-                    ? width500
-                      ? "380px"
-                      : height < 500
-                      ? "100%"
-                      : "500px"
-                    : height < 500
-                    ? "80px"
-                    : "",
-                marginTop: width768 ? (width500 ? "40px" : "50px") : "20px",
-                top: isPinned
-                  ? (accountType === AccountType.TRAINER &&
-                      pinnedUser === "user-video-1") ||
-                    (accountType === AccountType.TRAINEE &&
-                      pinnedUser === "user-video-2")
-                    ? "0% !important"
-                    : // ? height < 500 ? "50px" : "0% !important"
-                    (accountType === AccountType.TRAINER &&
-                        pinnedUser !== "user-video-1") ||
-                      (accountType === AccountType.TRAINEE &&
-                        pinnedUser !== "user-video-2") ||
-                      pinnedUser === null
-                    ? "45% !important"
-                    : "50%"
-                  : "",
-
-                // position: displayMsg?.msg || isRemoteVideoOff ? "relative" : height < 500 ? pinnedUser === "user-video-1" ? "relative" : "absolute" : "relative",
-                position:
-                  height < 500
-                    ? (accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-1") ||
-                      (accountType === AccountType.TRAINEE &&
-                        pinnedUser === "user-video-2")
-                      ? "relative"
-                      : "absolute"
-                    : "relative",
-
-                right:
-                  !(
-                    (accountType === AccountType.TRAINER &&
-                      pinnedUser === "user-video-1") ||
-                    (accountType === AccountType.TRAINEE &&
-                      pinnedUser === "user-video-2")
-                  ) && height < 500
-                    ? "-30%"
-                    : "",
-              }}
-              onClick={() => {
-                if (accountType === AccountType.TRAINER) {
-                  if (pinnedUser === "user-video-1") {
-                    emitVideoSelectEvent("swap", selectedClips, null);
-                    setIsPinned(false);
-                    setPinnedUser(null);
-                  } else {
-                    emitVideoSelectEvent("swap", selectedClips, "user-video-1");
-                    setIsPinned(true);
-                    setPinnedUser("user-video-1");
-                  }
-                }
-              }}
-            >
-              <video
-                ref={remoteVideoRef}
-                playsInline
-                autoPlay
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "20px",
-                }}
-                id="end-user-video"
-              />
-              <div
+                id="sessionEndTime"
                 style={{
                   position: "absolute",
-                  top: "0",
-                  left: "0",
-                  right: "0",
-                  bottom: "0",
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                  backgroundColor: "rgb(53,53,53)",
-                  borderRadius: "20px",
-                  display:
-                    displayMsg?.msg || isRemoteVideoOff ? "flex" : "none",
+                  top: width768 ? (!displayMsg?.msg ? "1%" : "10%") : "3%",
+                  right: width768 ? "30%" : "-29%",
+                  zIndex: 999,
                 }}
               >
-                {toUser?.profile_picture ? (
-                  <img
-                    src={Utils.getImageUrlOfS3(toUser?.profile_picture)}
-                    srcset=""
-                    style={{
-                      width: height < 500 ? "60px" : "100px",
-                      height: height < 500 ? "60px" : "100px",
-                      borderRadius: "50%",
-                    }}
-                    // className="container-raj"
-                  />
-                ) : (
-                  <div
-                    className="container-raj "
-                    style={{
-                      backgroundColor: Utils.charBasedColors(
-                        Utils.capitalizeFirstChar(toUser.fullname)
-                      ),
-                    }}
-                  >
-                    <h1 className="text-box-raj">
-                      {" "}
-                      {getInitials(toUser?.fullname)}
-                    </h1>
-                  </div>
-                )}
+                <div
+                  className="text-center"
+                  style={{
+                    display: "flex",
+                    fontSize: "12px",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: 'column'
+                  }}
+                >
+                  <h3>Time remaining</h3>
+                  <h2 style={{ fontSize: "18px" }}> {timeDifference}</h2>
+                </div>
               </div>
-            </div>
 
-            {/* User Video 2 */}
+              {/* User Video 1 */}
 
-            <div
-              id="user-video-2"
-              className={
-                !selectedClips.length &&
-                isPinned &&
-                // pinnedUser === "user-video-2"
-                ((accountType === AccountType.TRAINER &&
-                  pinnedUser === "user-video-2") ||
-                  (accountType === AccountType.TRAINEE &&
-                    pinnedUser === "user-video-1"))
-                  ? "switch-user-video"
-                  : selectedClips.length &&
+              <div
+                id="user-video-1"
+                className={
+                  !selectedClips.length &&
                     isPinned &&
-                    selectedClips.length &&
                     ((accountType === AccountType.TRAINER &&
                       pinnedUser === "user-video-2") ||
                       (accountType === AccountType.TRAINEE &&
                         pinnedUser === "user-video-1"))
-                  ? "switch-user-video"
-                  : mediaQuery.matches
-                  ? "scs2"
-                  : ""
-              }
-              style={{
-                zIndex:
-                  isPinned &&
-                  ((accountType === AccountType.TRAINER &&
-                    pinnedUser === "user-video-2") ||
-                    (accountType === AccountType.TRAINEE &&
-                      pinnedUser === "user-video-1"))
-                    ? "auto"
-                    : 999,
-
-                marginTop: "20px",
-                height:
-                  isPinned &&
-                  ((accountType === AccountType.TRAINER &&
-                    pinnedUser === "user-video-2") ||
-                    (accountType === AccountType.TRAINEE &&
-                      pinnedUser === "user-video-1"))
-                    ? width500
-                      ? "380px"
-                      : height < 500
-                      ? "100%"
-                      : "500px"
-                    : width500
-                    ? "150px"
-                    : height < 500
-                    ? "80px"
-                    : "",
-                // top :  selectedClips.length > 0 ?  "10% !important" : "20%"
-                top:
-                  isPinned && !(height < 500)
-                    ? (accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                      (accountType === AccountType.TRAINEE &&
-                        pinnedUser === "user-video-1")
-                      ? "0% !important"
-                      : (accountType === AccountType.TRAINER &&
-                          pinnedUser !== "user-video-2") ||
+                    ? // pinnedUser === "user-video-2"
+                    "scs2"
+                    : !selectedClips.length &&
+                      isPinned &&
+                      // pinnedUser === "user-video-1"
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-1") ||
                         (accountType === AccountType.TRAINEE &&
-                          pinnedUser !== "user-video-1") ||
-                        pinnedUser === null
-                      ? "10% !important"
-                      : "20%"
-                    : height < 500
-                    ? !(
-                        (accountType === AccountType.TRAINER &&
-                          pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1")
-                      )
-                      ? "50px"
-                      : ""
-                    : "",
-
-                position:
-                  height < 500
-                    ? (accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                      (accountType === AccountType.TRAINEE &&
-                        pinnedUser === "user-video-1")
-                      ? "relative"
-                      : "absolute"
-                    : "relative",
-                right:
-                  !(
-                    (accountType === AccountType.TRAINER &&
-                      pinnedUser === "user-video-2") ||
-                    (accountType === AccountType.TRAINEE &&
-                      pinnedUser === "user-video-1")
-                  ) && height < 500
-                    ? "-30%"
-                    : "",
-              }}
-              onClick={() => {
-                if (accountType === AccountType.TRAINER) {
-                  if (pinnedUser === "user-video-2") {
-                    emitVideoSelectEvent("swap", selectedClips, null);
-                    setIsPinned(false);
-                    setPinnedUser(null);
-                  } else {
-                    emitVideoSelectEvent("swap", selectedClips, "user-video-2");
-                    setIsPinned(true);
-                    setPinnedUser("user-video-2");
-                  }
+                          pinnedUser === "user-video-2"))
+                      ? "switch-user-video"
+                      : selectedClips.length &&
+                        isPinned &&
+                        selectedClips.length &&
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser === "user-video-2"))
+                        ? "switch-user-video"
+                        : selectedClips?.length !== 0 && mediaQuery.matches
+                          ? "scs"
+                          : ""
                 }
-              }}
-            >
-              <video
-                id="end-user-video"
-                playsInline
-                muted
-                // className="rounded "
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "20px",
+                  zIndex:
+                    !selectedClips.length &&
+                      isPinned &&
+                      // pinnedUser === "user-video-2"
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? "999"
+                      : selectedClips?.length &&
+                        ((accountType === AccountType.TRAINER &&
+                          pinnedUser !== "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser !== "user-video-2")) &&
+                        isPinned
+                        ? 999
+                        : selectedClips?.length && !pinnedUser && !isPinned
+                          ? 999
+                          : "auto",
+                  height:
+                    !selectedClips.length &&
+                      isPinned &&
+                      // pinnedUser === "user-video-2"
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? height < 500 ? "80px" : ""
+                      : selectedClips?.length === 0 ||
+                        (accountType === AccountType.TRAINER &&
+                          pinnedUser === "user-video-1") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-2")
+                        ? width500
+                          ? "380px"
+                          : height < 500 ? "100%" : "500px"
+                        : height < 500 ? "80px" : "",
+                  marginTop: width768 ? (width500 ? "40px" : "50px") : "20px",
+                  top:
+                    isPinned ?
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-1") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-2"))
+                        ? "0% !important"
+                        // ? height < 500 ? "50px" : "0% !important"
+                        : (accountType === AccountType.TRAINER &&
+                          pinnedUser !== "user-video-1") ||
+                          (accountType === AccountType.TRAINEE &&
+                            pinnedUser !== "user-video-2") ||
+                          pinnedUser === null
+                          ? "45% !important"
+                          : "50%" :
+                      "",
+
+                  // position: displayMsg?.msg || isRemoteVideoOff ? "relative" : height < 500 ? pinnedUser === "user-video-1" ? "relative" : "absolute" : "relative",
+                  position: height < 500 ? ((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) ? "relative" : "absolute" : "relative",
+
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-30%" : "",
                 }}
-                ref={videoRef}
-                autoPlay
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  top: "0%",
-                  left: "0%",
-                  right: "0%",
-                  bottom: "0%",
-                  width: "100%",
-                  height: "100%",
-                  display: isFeedStopped ? "flex" : "none",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgb(53,53,53)",
-                  borderRadius: "20px",
+                onClick={() => {
+                  if (accountType === AccountType.TRAINER) {
+                    if (pinnedUser === "user-video-1") {
+                      emitVideoSelectEvent("swap", selectedClips, null);
+                      setIsPinned(false);
+                      setPinnedUser(null);
+                    } else {
+                      emitVideoSelectEvent("swap", selectedClips, "user-video-1");
+                      setIsPinned(true);
+                      setPinnedUser("user-video-1");
+                    }
+                  }
                 }}
               >
-                {fromUser.profile_picture ? (
-                  <img
-                    src={Utils.getImageUrlOfS3(fromUser.profile_picture)}
-                    srcset=""
+                <video
+                  ref={remoteVideoRef}
+                  playsInline
+                  autoPlay
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "20px",
+                  }}
+                  id="end-user-video"
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "0",
+                    left: "0",
+                    right: "0",
+                    bottom: "0",
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    backgroundColor: "rgb(53,53,53)",
+                    borderRadius: "20px",
+                    display:
+                      displayMsg?.msg || isRemoteVideoOff ? "flex" : "none",
+                  }}
+                >
+                  {toUser?.profile_picture ? (
+                    <img
+                      src={Utils.getImageUrlOfS3(toUser?.profile_picture)}
+                      srcset=""
+                      style={{
+                        width: height < 500 ? "60px" : "100px",
+                        height: height < 500 ? "60px" : "100px",
+                        borderRadius: "50%",
+                      }}
                     // className="container-raj"
-                    style={{
-                      width: height < 500 ? "60px" : "100px",
-                      height: height < 500 ? "60px" : "100px",
-                      borderRadius: "50%",
-                    }}
-                  />
-                ) : (
-                  <div
-                    className="container-raj"
-                    style={{
-                      backgroundColor: Utils.charBasedColors(
-                        Utils.capitalizeFirstChar(fromUser.fullname)
-                      ),
-                    }}
-                  >
-                    <h1 className="text-box-raj">
-                      {" "}
-                      {getInitials(fromUser.fullname)}
-                    </h1>
-                  </div>
-                )}
+                    />
+                  ) : (
+                    <div
+                      className="container-raj "
+                      style={{
+                        backgroundColor: Utils.charBasedColors(
+                          Utils.capitalizeFirstChar(toUser.fullname)
+                        ),
+                      }}
+                    >
+                      <h1 className="text-box-raj">
+                        {" "}
+                        {getInitials(toUser?.fullname)}
+                      </h1>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {renderCallActionButtons()}
-          </div>
-        }
+              {/* User Video 2 */}
 
-        <ReportModal
-          currentReportData={{
-            session: id,
-            trainer: fromUser?._id,
-            trainee: toUser?._id,
-          }}
-          isOpenReport={isOpenReport}
-          setIsOpenReport={setIsOpenReport}
-          screenShots={screenShots}
-          setScreenShots={setScreenShots}
-          // setScreenShots={setScreenShot}
-          reportObj={reportObj}
-          setReportObj={setReportObj}
-          isClose={isClose}
-          isTraineeJoined={isTraineeJoined}
-          isCallEnded={isCallEnded}
-        />
+              <div
+                id="user-video-2"
+                className={
+                  !selectedClips.length &&
+                    isPinned &&
+                    // pinnedUser === "user-video-2"
+                    ((accountType === AccountType.TRAINER &&
+                      pinnedUser === "user-video-2") ||
+                      (accountType === AccountType.TRAINEE &&
+                        pinnedUser === "user-video-1"))
+                    ? "switch-user-video"
+                    : selectedClips.length &&
+                      isPinned &&
+                      selectedClips.length &&
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? "switch-user-video"
+                      : mediaQuery.matches
+                        ? "scs2"
+                        : ""
+                }
+                style={{
+                  zIndex:
+                    isPinned &&
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? "auto"
+                      : 999,
 
-        <Modal isOpen={isModelOpen}>
-          <ModalHeader>
-            <h2>Recording</h2>
-          </ModalHeader>
-          <ModalBody>
-            <div className="row">
-              <Button
-                className="mx-3 mt-1"
-                color="primary"
+                  marginTop: "20px",
+                  height:
+                    isPinned &&
+                      ((accountType === AccountType.TRAINER &&
+                        pinnedUser === "user-video-2") ||
+                        (accountType === AccountType.TRAINEE &&
+                          pinnedUser === "user-video-1"))
+                      ? width500
+                        ? "380px"
+                        : height < 500 ? "100%" : "500px"
+                      : width500
+                        ? "150px"
+                        : height < 500 ? "80px" : "",
+                  // top :  selectedClips.length > 0 ?  "10% !important" : "20%"
+                  top:
+                    isPinned && !(height < 500) ?
+                      ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1"))
+                        ? "0% !important"
+                        : (accountType === AccountType.TRAINER && pinnedUser !== "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser !== "user-video-1") || pinnedUser === null
+                          ? "10% !important" : "20%"
+                      : height < 500 ? !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) ? "50px" : "" : "",
+
+                  position: height < 500 ?
+                    ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2")
+                      || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
+                    ) ?
+                      "relative" : "absolute" : "relative",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-30%" : "",
+                }}
                 onClick={() => {
-                  startRecording();
-                  setIsModelOpen(false);
+                  if (accountType === AccountType.TRAINER) {
+                    if (pinnedUser === "user-video-2") {
+                      emitVideoSelectEvent("swap", selectedClips, null);
+                      setIsPinned(false);
+                      setPinnedUser(null);
+                    } else {
+                      emitVideoSelectEvent("swap", selectedClips, "user-video-2");
+                      setIsPinned(true);
+                      setPinnedUser("user-video-2");
+                    }
+                  }
                 }}
               >
-                Start Recording
-              </Button>
-              <Button
-                className="mx-3 mt-1"
-                color="primary"
-                onClick={() => {
-                  setIsModelOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
-          </ModalBody>
-        </Modal>
-      </div>
-      {isScreenShotModelOpen && (
-        <ScreenShotDetails
-          screenShotImages={screenShots}
-          setScreenShotImages={setScreenShots}
-          setIsOpenDetail={setIsScreenShotModelOpen}
-          currentReportData={{
-            session: id,
-            trainer: fromUser?._id,
-            trainee: toUser?._id,
-          }}
-          reportObj={reportObj}
-        />
-      )}
+                <video
+                  id="end-user-video"
+                  playsInline
+                  muted
+                  // className="rounded "
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius: "20px",
+                  }}
+                  ref={videoRef}
+                  autoPlay
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "0%",
+                    left: "0%",
+                    right: "0%",
+                    bottom: "0%",
+                    width: "100%",
+                    height: "100%",
+                    display: isFeedStopped ? "flex" : "none",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgb(53,53,53)",
+                    borderRadius: "20px",
+                  }}
+                >
+                  {fromUser.profile_picture ? (
+                    <img
+                      src={Utils.getImageUrlOfS3(fromUser.profile_picture)}
+                      srcset=""
+                      // className="container-raj"
+                      style={{
+                        width: height < 500 ? "60px" : "100px",
+                        height: height < 500 ? "60px" : "100px",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className="container-raj"
+                      style={{
+                        backgroundColor: Utils.charBasedColors(
+                          Utils.capitalizeFirstChar(fromUser.fullname)
+                        ),
+                      }}
+                    >
+                      <h1 className="text-box-raj">
+                        {" "}
+                        {getInitials(fromUser.fullname)}
+                      </h1>
+                    </div>
+                  )}
+                </div>
+              </div>
 
-      <PermissionModal isOpen={permissionModal} />
-    </React.Fragment>
-  );
+              {renderCallActionButtons()}
+            </div>
+          }
+
+          <ReportModal
+            currentReportData={{
+              session: id,
+              trainer: fromUser?._id,
+              trainee: toUser?._id,
+            }}
+            isOpenReport={isOpenReport}
+            setIsOpenReport={setIsOpenReport}
+            screenShots={screenShots}
+            setScreenShots={setScreenShots}
+            // setScreenShots={setScreenShot}
+            reportObj={reportObj}
+            setReportObj={setReportObj}
+            isClose={isClose}
+            isTraineeJoined={isTraineeJoined}
+            isCallEnded={isCallEnded}
+          />
+
+          <Modal isOpen={isModelOpen}>
+            <ModalHeader>
+              <h2>Recording</h2>
+            </ModalHeader>
+            <ModalBody>
+              <div className="row">
+                <Button
+                  className="mx-3 mt-1"
+                  color="primary"
+                  onClick={() => {
+                    startRecording();
+                    setIsModelOpen(false);
+                  }}
+                >
+                  Start Recording
+                </Button>
+                <Button
+                  className="mx-3 mt-1"
+                  color="primary"
+                  onClick={() => {
+                    setIsModelOpen(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </ModalBody>
+          </Modal>
+        </div>
+        {isScreenShotModelOpen && (
+          <ScreenShotDetails
+            screenShotImages={screenShots}
+            setScreenShotImages={setScreenShots}
+            setIsOpenDetail={setIsScreenShotModelOpen}
+            currentReportData={{
+              session: id,
+              trainer: fromUser?._id,
+              trainee: toUser?._id,
+            }}
+            reportObj={reportObj}
+          />
+        )}
+
+        <PermissionModal isOpen={permissionModal} />
+      </React.Fragment>
+    );
+  }
 };

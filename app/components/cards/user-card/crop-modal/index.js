@@ -1,197 +1,210 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useRef, useState } from "react";
+import ReactCrop, {
+  centerCrop,
+  convertToPixelCrop,
+  makeAspectCrop,
+} from "react-image-crop";
 import { Modal } from "reactstrap";
-import { MdOutlineRotate90DegreesCcw } from "react-icons/md";
-import ReactCrop, { centerCrop, convertToPixelCrop, makeAspectCrop } from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
 
-function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
-  return centerCrop(
-    makeAspectCrop(
+const ASPECT_RATIO = 1;
+const MIN_DIMENSION = 150;
+
+const setCanvasPreview = (
+  image, // HTMLImageElement
+  canvas, // HTMLCanvasElement
+  crop // PixelCrop
+) => {
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    throw new Error("No 2d context");
+  }
+
+  // devicePixelRatio slightly increases sharpness on retina devices
+  // at the expense of slightly slower render times and needing to
+  // size the image back down if you want to download/upload and be
+  // true to the images natural size.
+  const pixelRatio = window.devicePixelRatio;
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+
+  canvas.width = Math.floor(crop.width * scaleX * pixelRatio);
+  canvas.height = Math.floor(crop.height * scaleY * pixelRatio);
+
+  ctx.scale(pixelRatio, pixelRatio);
+  ctx.imageSmoothingQuality = "high";
+  ctx.save();
+
+  const cropX = crop.x * scaleX;
+  const cropY = crop.y * scaleY;
+
+  // Move the crop origin to the canvas origin (0,0)
+  ctx.translate(-cropX, -cropY);
+  ctx.drawImage(
+    image,
+    0,
+    0,
+    image.naturalWidth,
+    image.naturalHeight,
+    0,
+    0,
+    image.naturalWidth,
+    image.naturalHeight
+  );
+
+  ctx.restore();
+};
+
+const ImageCropper = ({ image: imgSrc, isModalOpen, setIsModalOpen, setCroppedImage, setDisplayedImage, handleSavePicture }) => {
+  const imgRef = useRef(null);
+  const previewCanvasRef = useRef(null);
+  const [crop, setCrop] = useState();
+
+  const createBlobFromCanvas = (canvas) => {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Canvas is empty"));
+        }
+      }, "image/png");
+    });
+  };
+
+  const handleCreateBlob = async () => {
+    try {
+      const blob = await createBlobFromCanvas(previewCanvasRef.current);
+      console.log(blob);
+
+      const bloburl = URL.createObjectURL(blob);
+      handleSavePicture(blob);
+
+
+      setCroppedImage(blob);
+      setDisplayedImage(bloburl);
+      setIsModalOpen(false);
+
+      // You can now use the blob, e.g., upload it or display it
+    } catch (error) {
+      console.error("Error creating blob:", error);
+    }
+  };
+
+  const onImageLoad = (e) => {
+    const { width, height } = e.currentTarget;
+    const cropWidthInPercent = (MIN_DIMENSION / width) * 100;
+
+    const crop = makeAspectCrop(
       {
         unit: "%",
-        width: 90,
+        width: cropWidthInPercent,
       },
-      aspect,
-      mediaWidth,
-      mediaHeight
-    ),
-    mediaWidth,
-    mediaHeight
-  );
-}
-
-const CropImage = ({ image, isModalOpen, setIsModalOpen, setCroppedImage, setDisplayedImage }) => {
-  const imgRef = useRef(null);
-  const [crop, setCrop] = useState();
-  const [rotation, setRotation] = useState(0);
-  const [aspect, setAspect] = useState(16 / 9);
-  const [completedCrop, setCompletedCrop] = useState();
-  
-  async function showCroppedImage() {
-    const image = imgRef.current;
-    if (!image || !completedCrop) {
-      throw new Error('Crop canvas does not exist');
-    }
-
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-
-    const offscreen = new OffscreenCanvas(
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY
+      ASPECT_RATIO,
+      width,
+      height
     );
-    const ctx = offscreen.getContext('2d');
-    if (!ctx) {
-      throw new Error('No 2d context');
-    }
-    
-    // Apply rotation to the canvas
-  ctx.translate(offscreen.width / 2, offscreen.height / 2);
-  ctx.rotate((rotation * Math.PI) / 180);
-  ctx.translate(-offscreen.width / 2, -offscreen.height / 2);
-
-    ctx.drawImage(
-      image,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      offscreen.width,
-      offscreen.height
-    );
-
-    const blob = await offscreen.convertToBlob({
-      type: 'image/png',
-    });
-
-    const bloburl = URL.createObjectURL(blob);
-    setDisplayedImage(bloburl);
-    setCroppedImage(blob);
-    setIsModalOpen(false);
-    setRotation(0)
-  }
+    const centeredCrop = centerCrop(crop, width, height);
+    setCrop(centeredCrop);
+  };
 
   const onClose = () => {
     setIsModalOpen(false);
     setCroppedImage(null);
-    setRotation(0)
+    // setRotation(0)
   };
-
-  const handleRotation = () => {
-    setRotation((rotation + 90) % 360);
-  };
-
-  function onImageLoad(e) {
-    // if (aspect) {
-    //   const { width, height } = e.currentTarget;
-    //   setCrop(centerAspectCrop(width, height, aspect));
-    // }
-
-    if (aspect) {
-      const { width, height } = e.currentTarget;
-      const cropWidth = Math.min(width, height * aspect);
-      const cropHeight = Math.min(height, width / aspect);
-      const x = (width - cropWidth) / 2;
-      const y = (height - cropHeight) / 2;
-      setCrop({ unit: "%", x, y, width: cropWidth, height: cropHeight });
-    }
-  }
-
-  useEffect(() => {
-    if (aspect) {
-      setAspect(undefined);
-    } else {
-      if (imgRef.current) {
-        const { width, height } = imgRef.current;
-        const newCrop = centerAspectCrop(width, height, 16 / 9);
-        setCrop(newCrop);
-        setCompletedCrop(convertToPixelCrop(newCrop, width, height));
-      }
-    }
-  }, [imgRef]);
 
   return (
     <Modal isOpen={isModalOpen} centered>
-      {image && (
+      {imgSrc && (
         <div>
           <ReactCrop
-          crop={crop}
-          onChange={(_, percentCrop) => setCrop(percentCrop)}
-          onComplete={(c) => setCompletedCrop(c)}
-          aspect={aspect}
-          style={{
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          
-          <img
-            ref={imgRef}
-            alt="Crop me"
-            src={URL.createObjectURL(image)}
-            style={{ transform: `rotate(${rotation}deg)`  , objectFit : 'contain', height: "80vh"}}
-            onLoad={onImageLoad}
-          />
-        </ReactCrop>
+            crop={crop}
+            onChange={(pixelCrop, percentCrop) => setCrop(percentCrop)}
+            circularCrop
+            keepSelection
+            aspect={ASPECT_RATIO}
+            minWidth={MIN_DIMENSION}
+          >
+            <img
+              ref={imgRef}
+              src={imgSrc}
+              alt="Upload"
+              style={{ maxHeight: "70vh" }}
+              onLoad={onImageLoad}
+            />
+          </ReactCrop>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "10px",
+              marginTop: "10px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                border: "1px solid red",
+                color: "#fff",
+                backgroundColor: "red",
+                borderRadius: "8px",
+                padding: "8px 15px",
+                fontSize: "12px",
+                outline: "none",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              style={{
+                border: "1px solid green",
+                color: "#fff",
+                backgroundColor: "green",
+                borderRadius: "8px",
+                padding: "8px 15px",
+                fontSize: "12px",
+                outline: "none",
+              }}
+              onClick={() => {
+                setCanvasPreview(
+                  imgRef.current, // HTMLImageElement
+                  previewCanvasRef.current, // HTMLCanvasElement
+                  convertToPixelCrop(
+                    crop,
+                    imgRef.current.width,
+                    imgRef.current.height
+                  )
+                );
+                const dataUrl = previewCanvasRef.current.toDataURL();
+
+                console.log("dataUrl=====>", dataUrl)
+
+                handleCreateBlob();
+              }}
+            >
+              Save
+            </button>
+          </div>
         </div>
       )}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "10px",
-          marginTop: "10px",
-        }}
-      >
-        <button
-          type="button"
-          onClick={onClose}
+      {crop && (
+        <canvas
+          ref={previewCanvasRef}
+          className="mt-4"
           style={{
-            border: "1px solid red",
-            color: "#fff",
-            backgroundColor: "red",
-            borderRadius: "8px",
-            padding: "8px 15px",
-            fontSize: "12px",
-            outline: "none",
+            display: "none",
+            border: "1px solid black",
+            objectFit: "contain",
+            width: 150,
+            height: 150,
           }}
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleRotation}
-          style={{
-            backgroundColor: "transparent",
-            border: "none",
-            outline: "none",
-            color: "#000",
-            fontSize: "25px",
-          }}
-        >
-          <MdOutlineRotate90DegreesCcw />
-        </button>
-        <button
-          type="button"
-          onClick={showCroppedImage}
-          style={{
-            border: "1px solid green",
-            color: "#fff",
-            backgroundColor: "green",
-            borderRadius: "8px",
-            padding: "8px 15px",
-            fontSize: "12px",
-            outline: "none",
-          }}
-        >
-          Done
-        </button>
-      </div>
+        />
+      )}
     </Modal>
   );
 };
-
-export default CropImage;
+export default ImageCropper;

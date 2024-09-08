@@ -110,9 +110,9 @@ export const CanvasMenuBar = ({
     <div style={{ margin: "1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
-        style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
+        // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable">
+        <div className="CreationBarCustomizable" style={{height:' 85vh',overflow: 'auto'}}>
           <span></span>
           {/* free hand */}
           <span>
@@ -562,7 +562,7 @@ export const CanvasMenuBar = ({
           }}
         />
       )}
-       
+
       {/* ------------------------------ ------------------ -----------------------------*/}
 
       <Modal
@@ -678,6 +678,7 @@ export const CanvasMenuBar = ({
                                       }}
                                     >
                                       <video
+                                        poster={Utils?.generateThumbnailURL(clp)}
                                         style={{
                                           // border: `${sld ? "2px" : "0px"} solid green`,
                                           // width: "98%",
@@ -769,6 +770,7 @@ export const CanvasMenuBar = ({
                                       }}
                                     >
                                       <video
+                                        poster={Utils?.generateThumbnailURL(clp?.clips)}
                                         style={{
                                           // border: `${sld ? "2px" : "0px"} solid green`,
                                           // width: "98%",
@@ -820,7 +822,7 @@ export const CanvasMenuBar = ({
                                 (val) => val?._id === clp?._id
                               );
                               return (
-                                clp?.file_name ? 
+                                clp?.file_name ?
                                 <div
                                   key={index}
                                   className={`col-3 p-1`}
@@ -888,7 +890,7 @@ export const CanvasMenuBar = ({
       )}
           </>
 
-          
+
         }
       />
     </div>

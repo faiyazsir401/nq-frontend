@@ -247,7 +247,7 @@ const Bookings = ({ accountType = null }) => {
           isMeetingDone,
           isUpcomingSession,
           ratings,
-          booking_index, 
+          booking_index,
           trainee_clips,
           selectedClips,
           setSelectedClips,
@@ -324,7 +324,7 @@ const Bookings = ({ accountType = null }) => {
         </span>
         {status === BookedSession.canceled && isMeetingDone && (
           <button
-            className="btn btn-danger button-effect btn-sm ml-4 btn_css"
+            className="btn btn-danger button-effect btn-sm ml-2 btn_css"
             type="button"
             style={{
               cursor:
@@ -343,7 +343,7 @@ const Bookings = ({ accountType = null }) => {
         !isStartButtonEnabled &&
         !isMeetingDone ? (
           <button
-            className={`btn btn-success button-effect btn-sm mr-4 btn_css`}
+            className={`btn btn-success button-effect btn-sm mr-2 btn_css`}
             type="button"
             onClick={() => {
               const payload = {
@@ -566,7 +566,7 @@ const Bookings = ({ accountType = null }) => {
                 {status !== BookedSession.canceled && (
                   <React.Fragment>
                     <button
-                      className="btn btn-success button-effect btn-sm mr-4 btn_cancel"
+                      className="btn btn-success button-effect btn-sm mr-2 btn_cancel"
                       type="button"
                       onClick={() => {
                         if (trainee_clips?.length > 0)
@@ -579,7 +579,7 @@ const Bookings = ({ accountType = null }) => {
                     </button>
                     {status === BookedSession.booked ? (
                       <button
-                        className="btn btn-dark button-effect btn-sm mr-4 btn_cancel"
+                        className="btn btn-dark button-effect btn-sm mr-2 btn_cancel"
                         type="button"
                         style={{
                           cursor:
@@ -591,7 +591,7 @@ const Bookings = ({ accountType = null }) => {
                       </button>
                     ) : (
                       <button
-                        className="btn btn-primary button-effect btn-sm mr-4 "
+                        className="btn btn-primary button-effect btn-sm mr-2 "
                         type="button"
                         style={{
                           cursor:
@@ -796,7 +796,7 @@ const Bookings = ({ accountType = null }) => {
                 )}
                 {status === BookedSession.confirmed && (
                   <button
-                    className="btn btn-primary button-effect btn-sm mr-4 "
+                    className="btn btn-primary button-effect btn-sm mr-2 "
                     type="button"
                     disabled={!isStartButtonEnabled}
                     style={{

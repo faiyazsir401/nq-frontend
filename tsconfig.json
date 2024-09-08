@@ -30,7 +30,7 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/auth/forgetPassword/index.jsx"
-  ],
+, "next.config.js"  ],
   "exclude": [
     "node_modules"
   ]

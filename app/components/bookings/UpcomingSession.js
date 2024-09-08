@@ -71,7 +71,7 @@ const UpcomingSession = ({ accountType = null }) => {
     );
   });
 
-  const addTraineeClipInBookedSession = async () => {
+  const addTraineeClipInBookedSession = async (selectedClips) => {
     const payload = {
       id: isOpenID,
       trainee_clip: selectedClips?.map((val) => val?._id),

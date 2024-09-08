@@ -232,7 +232,6 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
           <div className={`block-content ${!cl?.show ? "d-none" : "d-flex flex-wrap"}`}>
             {/* Render videos with session data */}
             {cl?.report.map((clp, index) => {
-              console.log("clp=====", clp , index+1);
               // return  !clp.reportData ?
               return clp.hasOwnProperty("reportData") ?
                 <div className={`col-4`} key={index} style={{ whiteSpace: "nowrap" }}>
@@ -247,7 +246,7 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                     </div>
                     <div style={{ marginBottom: "5px" }}>
                       <dd
-                        className="ml-3 video-container2"
+                        className="video-container2"
                         style={{ cursor: "pointer", textAlign: "center" }}
                         onClick={() => {
                           if (accountType === "Trainer") {
@@ -265,10 +264,13 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                           <img
                               src={Utils.getImageUrlOfS3(clp?.reportData[0]?.imageUrl)}
                               alt={clp?.reportData[0]?.title}
-                              style={{ width: "100%", height: "150px" , position: "relative" }}
-                            // onError={(e) => {
-                            //     e.target.src = '/icons/FileSee.png';  // Set default image on error
-                            //   }}
+                              style={{ 
+                                width: "100%",
+                                 height: "150px",
+                                  position: "relative",
+                                   objectFit: "contain",
+                                  minWidth: "110px",
+                                 }}
                             />
                             <div
                             className="download-delete"

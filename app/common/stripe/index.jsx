@@ -39,7 +39,7 @@ const CheckoutForm = ({clientSecret, handlePaymentSuccess, extraContent = <></>}
       elements,
       clientSecret,
       confirmParams: {
-        return_url: 'https://netquix-ui.vercel.app/dashboard',
+        return_url: process.env.NEXT_PUBLIC_BASE_URL ?? 'https://netquix-ui.vercel.app/dashboard',
       },
       redirect: 'if_required'
     });

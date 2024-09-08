@@ -270,32 +270,11 @@ const NavHomePageCenterContainer = () => {
                 )
             )}
           </Nav> : <Nav tabs style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-            {/* <div className="locker_slider">
-              <Slider {...settings}>
-                {allTabs?.map(
-                  (el) =>
-                    el?.accessBy?.includes(accountType) && (
-                      <NavItem key={el.value}>
-                        <NavLink
-                          className={
-                            activeTab === el?.value
-                              ? "activelink sub-item"
-                              : "sub-item"
-                          }
-                          onClick={() => toggleTab(el?.value)}
-                        >
-                          {el?.name}
-                        </NavLink>
-                      </NavItem>
-                    )
-                )}
-              </Slider>
-            </div> */}
 
             <div className="theme-tab">
               <Nav tabs>
                 <div className="row mb-2" >
-                  <div className="col text-center" >
+                  <div className="col text-center" style={{flexBasis: "auto"}} >
                     <NavItem className="ml-1 text-center">
                       <NavLink
                         className={`button-effect ${activeTab === "myClips" ? "activelink" : ""
@@ -307,7 +286,7 @@ const NavHomePageCenterContainer = () => {
                       </NavLink>
                     </NavItem>
                   </div>
-                  <div className="col text-center">
+                  <div className="col text-center" style={{flexBasis: "auto"}}>
                     <NavItem className="ml-1">
                       {accountType === "Trainer" && <NavLink
                         className={`button-effect ${activeTab === "schedule" ? "activelink" : ""}`}
@@ -320,7 +299,7 @@ const NavHomePageCenterContainer = () => {
                   </div>
                   {/* </div>
                 <div className="row" style={{ width: '100%', alignItems: 'center', margin: "0px" }}> */}
-                  <div className="col" >
+                  <div className="col" style={{flexBasis: "auto"}}>
                     <NavItem className="ml-1">
                       <NavLink
                         className={`button-effect ${activeTab === "upcomingLesson" ? "activelink" : ""
@@ -332,7 +311,7 @@ const NavHomePageCenterContainer = () => {
                       </NavLink>
                     </NavItem>
                   </div>
-                  <div className="col text-right" >
+                  <div className="col text-right" style={{flexBasis: "auto"}}>
 
                     <NavItem className="ml-1">
                       <NavLink

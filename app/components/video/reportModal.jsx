@@ -365,8 +365,17 @@ const reportModal = ({
                       console.log(sst , 'resport sst')
                       console.log('ggg', `${awsS3Url}${sst?.imageUrl}`)
                       return <>
-                        <div className="col-md-6 col-sm-12 col-xs-12 p-2" style={{ position: "relative" }}>
-                          <img style={{ width: "100%", height: "100%",  maxHeight: "280px", border: "1px solid #ced4da", marginTop: "10px" }}
+                        <div className="col-md-6 col-sm-12 col-xs-12 p-2 mb-2" style={{ position: "relative", border: "1px solid #ced4da" }}>
+                          <img 
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              maxHeight: "280px",
+                              // border: "1px solid #ced4da",
+                              marginTop: "10px",
+                              objectFit: "contain",
+                              maxHeight: "340px",
+                            }}
                             src={`${awsS3Url}${sst?.imageUrl}`}
                             alt="Screen Shot"
                           />

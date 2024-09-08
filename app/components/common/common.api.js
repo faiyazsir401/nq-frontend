@@ -157,6 +157,24 @@ export const getS3SignUrlForProfile = async (payload) => {
   }
 };
 
+export const generateThumbnailURL = async (payload) => {
+  try {
+    const response = await axiosInstance({
+      method: "POST",
+      url: `https://6d3e-59-99-53-84.ngrok-free.app/common/generate-thumbnail`,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    return response;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export async function pushProfilePhotoToS3(
   presignedUrl,
   uploadPhoto,

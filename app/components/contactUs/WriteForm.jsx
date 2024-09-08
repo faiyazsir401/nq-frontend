@@ -63,7 +63,7 @@ const WriteForm = ({ isOpen, setIsWriteFormOpen }) => {
   });
 
   return (
-    <Modal isOpen={isOpen}>
+    <Modal isOpen={isOpen} className="react-strap-modal-full">
       <div
         style={{
           display: "flex",
@@ -84,81 +84,83 @@ const WriteForm = ({ isOpen, setIsWriteFormOpen }) => {
         />
       </div>
       <h3 className="form-header">Contact Us</h3>
-      <form onSubmit={formik.handleSubmit} className="form-container">
-        <ModalBody>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              className="form-control"
-              {...formik.getFieldProps("name")}
-            />
-            {formik.touched.name && formik.errors.name && (
-              <div className="text-danger">{formik.errors.name}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="form-control"
-              {...formik.getFieldProps("email")}
-            />
-            {formik.touched.email && formik.errors.email && (
-              <div className="text-danger">{formik.errors.email}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="phone">Phone</label>
-            <input
-              type="text"
-              id="phone"
-              name="phone"
-              className="form-control"
-              value={formik.values.phone}
-              onChange={(e) => {
-                const newValue = e.target.value.replace(/\D/, "");
+      <form onSubmit={formik.handleSubmit} className="form-container centered-form">
+        <ModalBody style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ width: '100%', maxWidth: '500px' }}>
+            <div className="form-group">
+              <label htmlFor="name">Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                className="form-control"
+                {...formik.getFieldProps("name")}
+              />
+              {formik.touched.name && formik.errors.name && (
+                <div className="text-danger">{formik.errors.name}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="form-control"
+                {...formik.getFieldProps("email")}
+              />
+              {formik.touched.email && formik.errors.email && (
+                <div className="text-danger">{formik.errors.email}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="phone">Phone</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                className="form-control"
+                value={formik.values.phone}
+                onChange={(e) => {
+                  const newValue = e.target.value.replace(/\D/, "");
 
-                if (!isNaN(newValue) && newValue.length <= 10) {
-                  formik.setFieldValue("phone", newValue);
-                }
-              }}
-            />
-            {formik.touched.phone && formik.errors.phone && (
-              <div className="text-danger">{formik.errors.phone}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="name">Subject</label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              className="form-control"
-              {...formik.getFieldProps("subject")}
-            />
-            {formik.touched.subject && formik.errors.subject && (
-              <div className="text-danger">{formik.errors.subject}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="desc">Description</label>
-            <textarea
-              id="desc"
-              name="desc"
-              className="form-control"
-              {...formik.getFieldProps("desc")}
-            />
-            {formik.touched.desc && formik.errors.desc && (
-              <div className="text-danger">{formik.errors.desc}</div>
-            )}
+                  if (!isNaN(newValue) && newValue.length <= 10) {
+                    formik.setFieldValue("phone", newValue);
+                  }
+                }}
+              />
+              {formik.touched.phone && formik.errors.phone && (
+                <div className="text-danger">{formik.errors.phone}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="name">Subject</label>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                className="form-control"
+                {...formik.getFieldProps("subject")}
+              />
+              {formik.touched.subject && formik.errors.subject && (
+                <div className="text-danger">{formik.errors.subject}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="desc">Description</label>
+              <textarea
+                id="desc"
+                name="desc"
+                className="form-control"
+                {...formik.getFieldProps("desc")}
+              />
+              {formik.touched.desc && formik.errors.desc && (
+                <div className="text-danger">{formik.errors.desc}</div>
+              )}
+            </div>
           </div>
         </ModalBody>
-        <ModalFooter className="btn-container">
+        <ModalFooter className="btn-container" style={{ display: 'flex', justifyContent: 'center' }}>
           <Button
             type="submit"
             color="primary"

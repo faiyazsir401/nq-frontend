@@ -51,6 +51,7 @@ const TraineeRenderBooking = ({
   handleAddRatingModelState,
   accountType,
   activeTabs,
+  start_time
 }) => {
   const { scheduledMeetingDetails, addRatingModel } =
     useAppSelector(bookingsState);
@@ -67,6 +68,7 @@ const TraineeRenderBooking = ({
     !isCurrentDateBefore &&
     !isStartButtonEnabled &&
     status !== BookedSession.booked &&
+    Utils.compairDateGraterOrNot(start_time) &&
     !isCompleted;
 
   const handleClick = () => {
@@ -108,7 +110,7 @@ const TraineeRenderBooking = ({
         )}
       {canShowRatingButton && status !== BookedSession.canceled ? (
         <button
-          className={`btn btn-success button-effect btn-sm mr-4 my-1`}
+          className={`btn btn-success button-effect btn-sm mr-2 my-1`}
           type="button"
           onClick={() => {
             const payload = {
@@ -134,7 +136,7 @@ const TraineeRenderBooking = ({
               {status !== BookedSession.canceled && (
                 <React.Fragment>
                   <button
-                    className="btn btn-success button-effect btn-sm mr-4 btn_cancel my-1"
+                    className="btn btn-success button-effect btn-sm mr-2 btn_cancel my-1"
                     type="button"
                     onClick={() => {
                       if (trainee_clips?.length > 0)
@@ -147,7 +149,7 @@ const TraineeRenderBooking = ({
                   </button>
                   {status === BookedSession.booked ? (
                     <button
-                      className="btn btn-dark button-effect btn-sm mr-4 btn_cancel my-1"
+                      className="btn btn-dark button-effect btn-sm mr-2 btn_cancel my-1"
                       type="button"
                       style={{
                         cursor:
@@ -159,7 +161,7 @@ const TraineeRenderBooking = ({
                     </button>
                   ) : (
                     <button
-                      className="btn btn-primary button-effect btn-sm mr-4 my-1"
+                      className="btn btn-primary button-effect btn-sm mr-2 my-1"
                       type="button"
                       style={{
                         cursor:
@@ -186,7 +188,7 @@ const TraineeRenderBooking = ({
               )}
               {status === BookedSession.confirmed && (
                 <button
-                  className="btn btn-primary button-effect btn-sm mr-4"
+                  className="btn btn-primary button-effect btn-sm mr-2 my-1"
                   type="button"
                   disabled={!isStartButtonEnabled}
                   style={{

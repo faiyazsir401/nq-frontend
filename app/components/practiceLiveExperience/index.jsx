@@ -9,11 +9,8 @@ import React, {
 } from "react";
 import { EVENTS } from "../../../helpers/events";
 import { SocketContext } from "../socket";
-import { Popover } from "react-tiny-popover";
 import _debounce from "lodash/debounce";
 import { Tooltip } from "react-tippy";
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile } from "@ffmpeg/util";
 import {
   MicOff,
   PauseCircle,
@@ -24,40 +21,19 @@ import {
   Pause,
   Aperture,
   FilePlus,
-  X,
-  Trash2,
-  Crop,
-  Video,
-  VideoOff,
 } from "react-feather";
 import { AccountType, SHAPES, topNavbarOptions } from "../../common/constants";
 import { CanvasMenuBar } from "../video/canvas.menubar";
 import { toast } from "react-toastify";
-import { max, set } from "lodash";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import html2canvas from "html2canvas";
-import CustomModal from "../../common/modal";
-// import CropImage from "./cropimage";
-import jsPDF from "jspdf";
-import { getS3SignPdfUrl } from "../video/video.api";
-import axios from "axios";
-import {
-  createReport,
-  cropImage,
-  getReport,
-  getS3SignUrl,
-  getSaveSessionS3SignUrl,
-  removeImage,
-  screenShotTake,
-} from "../videoupload/videoupload.api";
 import ReportModal from "../video/reportModal";
 import { Utils } from "../../../utils/utils";
-import { awsS3Url } from "../../../utils/constant";
 import ScreenShotDetails from "../video/screenshotDetails";
 import { FaLock, FaUnlock } from "react-icons/fa";
 import { getInitials, demoSessionEndTime } from "../../../utils/videoCall";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { authState, getMeAsync, authAction } from "../auth/auth.slice";
+import { authState, authAction } from "../auth/auth.slice";
 import GuideModal from "./GuideModal";
 import "./index.css";
 import Notes from "./Notes";
@@ -87,6 +63,7 @@ let strikes = [];
 let extraStream;
 let localVideoRef;
 let Peer;
+
 export default function PracticeLiveExperience({
   id,
   accountType = AccountType.TRAINER,
@@ -97,7 +74,7 @@ export default function PracticeLiveExperience({
   bIndex,
   closeLeftSide,
 }) {
-  const ffmpegRef = useRef(new FFmpeg());
+
   const videoRef = useRef(null);
   const remoteVideoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -128,7 +105,6 @@ export default function PracticeLiveExperience({
     mousedown: false,
   };
   const [selectedClips, setSelectedClips] = useState([]);
-  const [progressRange, setProgressRange] = useState(0);
   const [isRemoteVideoOff, setRemoteVideoOff] = useState(false);
   const [isPlaying, setIsPlaying] = useState({
     isPlayingAll: false,
@@ -146,30 +122,18 @@ export default function PracticeLiveExperience({
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
   const [isOpenReport, setIsOpenReport] = useState(false);
-  const [isOpenCrop, setIsOpenCrop] = useState(false);
   const [screenShots, setScreenShots] = useState([]);
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
-  const [reportArr, setReportArr] = useState([]);
-  const [selectImage, setSelectImage] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [volume2, setVolume2] = useState(1);
-  const volumeInputRef = useRef(null);
-  const volumeInputRef2 = useRef(null);
 
   const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [recordedChunks, setRecordedChunks] = useState([]);
-  // const [screenStream, setScreenStream] = useState(null);
 
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [timeoutReached, setTimeoutReached] = useState(false);
   const [timeDifference, setTimeDifference] = useState("");
   const [screenStream, setScreenStream] = useState(null);
 
   const [isCallEnded, setIsCallEnded] = useState(false);
   const [micStream, setMicStream] = useState(null);
 
-  const [isModelOpen, setIsModelOpen] = useState(false);
   const [isScreenShotModelOpen, setIsScreenShotModelOpen] = useState(false);
 
   const [isPinned, setIsPinned] = useState(false);
@@ -198,12 +162,20 @@ export default function PracticeLiveExperience({
   const [pauseVideoNote, setPauseVideoNote] = useState(false);
   const [videoSliderNote, setVideoSliderNote] = useState(false);
   const [globalPauseVideoNote, setGlobalPauseVideoNote] = useState(false);
-  const [globalVideoSliderNote, setGlobalVideoSliderNote] = useState(false);
   const [clipSelectNote, setClipSelectNote] = useState(false);
   const [gamePlanModalNote, setGamePlanModalNote] = useState(false);
   const [countGamePlanModal, setCountGamePlanModal] = useState(true);
   const [timerNote, setTimerNote] = useState(false);
-  // NOTE - calculate the demo session end time
+
+  let height = window.innerHeight;
+
+  function resetInitialPinnedUser() {
+    if (height < 500) {
+      setIsPinned(false);
+      setPinnedUser(null);
+    }
+  }
+
 
   useEffect(() => {
     if (screenStream) {
@@ -240,10 +212,6 @@ export default function PracticeLiveExperience({
           });
         setLocalStream(stream);
         setRemoteStream(stream);
-        // setDisplayMsg({
-        //   showMsg: true,
-        //   msg: `Waiting for ${toUser?.fullname}  to join...`,
-        // });
 
         videoRef.current.srcObject = stream;
         remoteVideoRef.current.srcObject = stream;
@@ -258,15 +226,13 @@ export default function PracticeLiveExperience({
   };
 
   const handleOffline = () => {
-    // stopRecording();
-    // socket.emit("chunksCompleted");
   };
 
   const handelTabClose = async () => {
     mediaRecorder?.stop();
     setRecording(false);
-    // socket.emit("chunksCompleted");
   };
+
   useEffect(() => {
     if (toUser) {
       console.log("toUser", toUser);
@@ -277,11 +243,6 @@ export default function PracticeLiveExperience({
       const endTime = demoSessionEndTime();
       setSessionEndTime(endTime);
       setIsGuideModalOpen(true);
-      // listenSocketEvents();
-      // initializeLocalStates();
-      // window.addEventListener("offline", handleOffline);
-
-      // window.addEventListener("beforeunload", handelTabClose);
 
       return () => {
         window.removeEventListener("beforeunload", handelTabClose);
@@ -307,7 +268,6 @@ export default function PracticeLiveExperience({
         );
 
         let timeDifference;
-        let isOver = false;
 
         if (now < endTime) {
           const timeUntilTimeout = endTime.getTime() - now.getTime();
@@ -345,7 +305,6 @@ export default function PracticeLiveExperience({
         }
 
         setTimeDifference(timeDifference);
-        // setIsOverTime(isOver);
       };
 
       const pad = (num) => {
@@ -362,124 +321,8 @@ export default function PracticeLiveExperience({
     }
   }, [sessionEndTime]);
 
-  const setupAudioMixing = async () => {
-    const audioContext = new AudioContext();
-
-    // Get the local audio track from the localStream
-    const localAudioStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-    });
-    setMicStream(localAudioStream); // Assuming setMicStream is a function defined elsewhere
-    const localAudioTrack = localAudioStream.getAudioTracks()[0];
-
-    // Check if remoteStream exists and has audio tracks before accessing
-    let remoteAudioTrack;
-    if (remoteStream && remoteStream.getAudioTracks().length > 0) {
-      remoteAudioTrack = remoteStream.getAudioTracks()[0];
-    } else {
-      // Handle the case where remoteStream is null or has no audio tracks
-      // This might involve logging an error, setting a default track, or some other fallback
-      console.error("remoteStream is null or has no audio tracks.");
-      // Optionally, return or continue with additional logic here
-      // For example, you might want to only process local audio if remote audio is unavailable
-    }
-
-    // Create audio nodes for the local audio track. If remoteAudioTrack is undefined,
-    // skip creating or connecting the remote source to avoid errors.
-    const localSource = audioContext.createMediaStreamSource(
-      new MediaStream([localAudioTrack])
-    );
-    const destination = audioContext.createMediaStreamDestination();
-    localSource.connect(destination);
-
-    if (remoteAudioTrack) {
-      // Create and connect the audio node for the remote audio track only if it exists
-      const remoteSource = audioContext.createMediaStreamSource(
-        new MediaStream([remoteAudioTrack])
-      );
-      remoteSource.connect(destination);
-    }
-
-    // Return the mixed audio stream from the destination
-    return destination.stream;
-  };
-
-  const startRecording = async () => {
-    // setRecording(true);
-    // const data = {
-    // 	sessions: id,
-    // 	trainer: toUser?._id,
-    // 	trainee: fromUser?._id,
-    // 	user_id: fromUser?._id,
-    // 	trainee_name: fromUser?.fullname,
-    // 	trainer_name: toUser?.fullname,
-    // };
-    // socket.emit("videoUploadData", data);
-    // const mixedAudioStream = await setupAudioMixing();
-    // const screenStr = await navigator.mediaDevices.getDisplayMedia({
-    // 	video: true,
-    // 	preferCurrentTab: true,
-    // });
-    // setScreenStream(screenStr);
-    // const screenVideoTrack = screenStr.getVideoTracks()[0];
-    // const combinedStream = new MediaStream([
-    // 	screenVideoTrack,
-    // 	...mixedAudioStream.getAudioTracks(),
-    // ]);
-    // const mediaRecorder = new MediaRecorder(combinedStream);
-    // let chunks = [];
-    // mediaRecorder.ondataavailable = (event) => {
-    // 	if (event.data.size > 0) {
-    // 		chunks.push(event.data);
-    // 	}
-    // };
-    // setInterval(function () {
-    // 	// Check if the MediaRecorder is recording
-    // 	if (mediaRecorder.state === "recording") {
-    // 		// Request data if available
-    // 		mediaRecorder.requestData();
-    // 		const chunkBuffers = chunks
-    // 			.map((chunk) => {
-    // 				// Assuming chunk is already a Buffer or Uint8Array, no conversion needed
-    // 				if (chunk) {
-    // 					console.log("Chunk type:", typeof chunk);
-    // 					return chunk;
-    // 				} else {
-    // 					// Handle invalid chunk data here
-    // 					console.log("Invalid chunk data:", chunk);
-    // 					return null; // or handle differently as needed
-    // 				}
-    // 			})
-    // 			.filter(Boolean); // Remove null entries
-    // 		// Send only if there are valid chunkBuffers
-    // 		if (chunkBuffers.length > 0) {
-    // 			const chunkData = { data: chunkBuffers };
-    // 			socket.emit("chunk", chunkData);
-    // 			// Handle the recorded data here (in chunks array)
-    // 			console.log("Data:", chunkBuffers);
-    // 		} else {
-    // 			console.log("No valid chunks to send");
-    // 		}
-    // 		// Clear chunks array for next interval
-    // 		chunks = [];
-    // 	}
-    // }, 1000);
-    // mediaRecorder.onstop = () => {
-    // 	socket.emit("chunksCompleted");
-    // };
-    // mediaRecorder.start();
-    // setMediaRecorder(mediaRecorder);
-  };
-
   const stopRecording = () => {
-    // if (mediaRecorder) {
-    // 	mediaRecorder.stop();
-    // 	setRecording(false);
-    // }
-    // if (screenStream) {
-    // 	screenStream.getTracks().forEach((track) => track.stop());
-    // 	setScreenStream(null);
-    // }
+
   };
 
   useEffect(() => {
@@ -500,11 +343,17 @@ export default function PracticeLiveExperience({
       event.preventDefault();
       isDrawing = true;
       if (!context) return;
+      // savedPos = context?.getImageData(
+      //   0,
+      //   0,
+      //   1501,
+      //   731
+      // );
       savedPos = context?.getImageData(
         0,
         0,
-        document.getElementById("practice-live-session")?.clientWidth,
-        document.getElementById("practice-live-session")?.clientHeight
+        document.getElementById("bookings")?.clientWidth,
+        document.getElementById("bookings")?.clientHeight
       );
       if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
       strikes.push(savedPos);
@@ -698,37 +547,6 @@ export default function PracticeLiveExperience({
     };
   }, [canvasRef]);
 
-  // useMemo(() => {
-  // 	if (
-  // 		remoteVideoRef.current &&
-  // 		remoteStream &&
-  // 		!remoteVideoRef.current.srcObject
-  // 	) {
-  // 		remoteVideoRef.current.srcObject = remoteStream;
-  // 		accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
-  // 	}
-
-  // 	return () => {
-  // 		cutCall();
-  // 	};
-  // }, [remoteStream]);
-
-  // useEffect(() => {
-  // 	if (
-  // 		remoteStream &&
-  // 		remoteVideoRef.current &&
-  // 		!remoteVideoRef.current.srcObject
-  // 	) {
-  // 		remoteVideoRef.current.srcObject = remoteStream;
-  // 		accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
-  // 	}
-  // }, [remoteStream]);
-
-  const initializeLocalStates = () => {
-    strikes = [];
-    localVideoRef = null;
-    selectedShape = null;
-  };
 
   const cutCall = () => {
     stopRecording();
@@ -739,73 +557,6 @@ export default function PracticeLiveExperience({
       closeLeftSide()
     }
     // isClose();
-  };
-
-  const listenSocketEvents = () => {
-    // once user joins the call
-    // socket.on("ON_CALL_JOIN", ({ userInfo }) => {
-    // 	const { to_user, from_user } = userInfo;
-    // 	if (!(peerRef && peerRef.current)) return;
-    // 	connectToPeer(peerRef.current, from_user);
-    // });
-    // // Handle signaling events from the signaling server
-    // socket.on(EVENTS.VIDEO_CALL.ON_OFFER, (offer) => {
-    // 	console.log(` -- on OFFER --`);
-    // 	peerRef.current?.signal(offer);
-    // });
-    // socket.on(EVENTS.VIDEO_CALL.ON_ANSWER, (answer) => {
-    // 	console.log(` -- on answer --`);
-    // 	peerRef.current?.signal(answer);
-    // });
-    // socket.on(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, (candidate) => {
-    // 	console.log(` -- on ICE candidate --`);
-    // 	peerRef.current?.signal(candidate);
-    // });
-    // socket.on(EVENTS.ON_CLEAR_CANVAS, () => {
-    // 	clearCanvas();
-    // });
-    // socket.on(EVENTS.VIDEO_CALL.STOP_FEED, ({ feedStatus }) => {
-    // 	setRemoteVideoOff(feedStatus);
-    // 	console.log(
-    // 		feedStatus, "setRemoteVideoOff"
-    // 	);
-    // });
-    // socket.on(EVENTS.EMIT_DRAWING_CORDS, ({ strikes }) => {
-    // 	const canvas = canvasRef.current;
-    // 	const context = canvas?.getContext("2d");
-    // 	if (!context || !canvas) return;
-    // 	const blob = new Blob([strikes]);
-    // 	const image = new Image();
-    // 	image.src = URL.createObjectURL(blob);
-    // 	image.onload = () => {
-    // 		context.clearRect(0, 0, canvas.width, canvas.height);
-    // 		context.drawImage(image, 0, 0);
-    // 	};
-    // });
-    // socket.on(EVENTS.ON_UNDO, ({ sender, receiver }) => {
-    // 	storedLocalDrawPaths.receiver = [];
-    // 	storedLocalDrawPaths.sender = [];
-    // 	storedLocalDrawPaths.sender = receiver;
-    // 	storedLocalDrawPaths.receiver = sender;
-    // 	undoDrawing(
-    // 		{ coordinates: sender, theme: canvasConfigs.receiver },
-    // 		{
-    // 			coordinates: receiver,
-    // 			theme: {
-    // 				lineWidth: canvasConfigs.sender.lineWidth,
-    // 				strokeStyle: canvasConfigs.sender.strokeStyle,
-    // 			},
-    // 		},
-    // 		false
-    // 	);
-    // });
-    // socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
-    // 	setDisplayMsg({
-    // 		showMsg: true,
-    // 		msg: `${toUser?.fullname} left the meeting, redirecting back to home screen in 5 seconds...`,
-    // 	});
-    // 	cleanupFunction();
-    // });
   };
 
   const getMosuePositionOnCanvas = (event) => {
@@ -829,17 +580,6 @@ export default function PracticeLiveExperience({
     context.clearRect(0, 0, canvas.width, canvas.height);
   };
   // Initiate outgoing connection
-  let connectToPeer = (peer, peerId) => {
-    if (!(videoRef && videoRef?.current)) return;
-    let call = peer.call(peerId, videoRef?.current?.srcObject);
-    call.on("stream", (remoteStream) => {
-      console.log(`setting remoteStream for 2nd user here ---- `);
-      setDisplayMsg({ showMsg: false, msg: "" });
-      remoteVideoRef.current.srcObject = remoteStream;
-      setRemoteStream(remoteStream);
-      accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
-    });
-  };
 
   const sendDrawEvent = () => {
     const canvas = canvasRef.current;
@@ -993,17 +733,6 @@ export default function PracticeLiveExperience({
     if (removeLastCoordinate) {
       sendEmitUndoEvent();
     }
-  };
-
-  const getReportData = async () => {
-    var res = await getReport({
-      sessions: id,
-      trainer: fromUser?._id,
-      trainee: toUser?._id,
-    });
-    console.log(res, "set screenshot data for session");
-    setScreenShots(res?.data?.reportData);
-    setReportObj({ title: res?.data?.title, topic: res?.data?.description });
   };
 
   const showReportData = async () => {
@@ -1211,24 +940,6 @@ export default function PracticeLiveExperience({
         Timer.style.transition = "opacity 1s";
         Timer.style.opacity = "1";
       }
-      //   var res = await screenShotTake({
-      //     sessions: id,
-      //     trainer: fromUser?._id,
-      //     trainee: toUser?._id,
-      //   });
-      //   const blob = await fetch(dataUrl).then((res) => {
-      //     res.blob();
-      //   });
-      //   if (res?.data?.url) {
-      //     var result = await getReport({
-      //       sessions: id,
-      //       trainer: fromUser?._id,
-      //       trainee: toUser?._id,
-      //     });
-      //     setScreenShots(result?.data?.reportData);
-      //     setIsScreenShotModelOpen(true);
-      //     pushProfilePhotoToS3(res?.data?.url, blob);
-      //   }
 
       setTimeout(() => {
         toast.success("The screenshot taken successfully.", {
@@ -1238,33 +949,11 @@ export default function PracticeLiveExperience({
     });
   };
 
-  async function pushProfilePhotoToS3(presignedUrl, uploadPhoto) {
-    const myHeaders = new Headers({ "Content-Type": "image/*" });
-    await axios.put(presignedUrl, uploadPhoto, {
-      headers: myHeaders,
-    });
-
-    const v = document.getElementById("selected-video-1");
-    if (v) v.style.backgroundImage = "";
-    const v2 = document.getElementById("selected-video-2");
-    if (v2) v2.style.backgroundImage = "";
-    return true;
-  }
-
-  const uploadVideoToS3Bucket = async (blob) => {
-    const formData = new FormData();
-    formData.append("file", blob);
-    formData.append("upload_preset", "video_upload");
-    const response = await axios.post(
-      "https://api.cloudinary.com/v1_1/dq7bq9j3d/video/upload",
-      formData
-    );
-    return response.data.secure_url;
-  };
-
   const mediaQuery = window.matchMedia(
     "(min-width: 768px) and (min-width: 1024px)"
   );
+
+  const mediaQueryMain = window.matchMedia("(min-width: 992px)");
 
   const renderCallActionButtons = () => {
     console.log("code:0.0.2" + sessionEndTime);
@@ -1339,14 +1028,6 @@ export default function PracticeLiveExperience({
                 } ml-3`}
               onClick={() => {
                 if (localStream) {
-                  // localStream.getVideoTracks().forEach((track) => {
-                  // 	track.enabled = !track.enabled; // Toggle camera state
-                  // });
-
-                  // socket.emit(EVENTS.VIDEO_CALL.STOP_FEED, {
-                  // 	userInfo: { from_user: fromUser._id, to_user: toUser._id },
-                  // 	feedStatus: !isFeedStopped,
-                  // });
                   setIsFeedStopped(!isFeedStopped);
                 }
               }}
@@ -1377,9 +1058,6 @@ export default function PracticeLiveExperience({
         </div>
 
         <div style={{ position: "relative", zIndex : '9' }}>
-
-
-
           <Tooltip title={"End Call"} position="bottom" trigger="mouseenter">
             <div
               className={`icon-btn btn-danger button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
@@ -1412,8 +1090,6 @@ export default function PracticeLiveExperience({
         </div>
 
         <div style={{ position: "relative", zIndex : '9' }}>
-
-
           {!displayMsg?.showMsg && accountType === AccountType.TRAINER && (
             <Tooltip
               title={
@@ -1626,135 +1302,6 @@ export default function PracticeLiveExperience({
             </Button>
           </ModalFooter>
         </Modal>
-        {/* {micNote && (
-          <Notes
-            isOpen={micNote}
-            onClose={setMicNote}
-            title={"Mic"}
-            desc={
-              "Tap the mic icon to mute or unmute your voice during the conversation."
-            }
-            style={{
-              top: "-129px",
-              left: "9px",
-            }}
-            triangle={"triangle-down"}
-            nextFunc={() => {
-              setMicNote(false);
-              setvideoNote(true);
-            }}
-          />
-        )} */}
-        {/* {videoNote && (
-          <Notes
-            isOpen={videoNote}
-            onClose={setvideoNote}
-            title={"Camera"}
-            desc={
-              "To manage your camera, just tap the camera icon to toggle it on or off during the conversation."
-            }
-            style={{
-              top: "-148px",
-              left: "85px",
-            }}
-            triangle={"triangle-down"}
-            nextFunc={() => {
-              setvideoNote(false);
-              setCallEndNote(true);
-            }}
-          />
-        )} */}
-        {/* {callEndNote && (
-          <Notes
-            isOpen={callEndNote}
-            onClose={setCallEndNote}
-            title={"End Call"}
-            desc={"To end your call, just tap the red 'End Call' button."}
-            style={{
-              top: "-131px",
-              left: "160px",
-            }}
-            triangle={"triangle-down"}
-            nextFunc={() => {
-              setCallEndNote(false);
-              setClipNote(true);
-            }}
-          />
-        )} */}
-        {/* {clipNote && (
-          <Notes
-            isOpen={clipNote}
-            onClose={setClipNote}
-            title={"Clips"}
-            desc={"Share your Clips."}
-            style={{
-              top: "-112px",
-              left: "238px",
-            }}
-            triangle={"triangle-down"}
-            nextFunc={() => {
-              setClipNote(false);
-              if (selectedClips.length) {
-                setLockNote(true);
-              } else {
-                setScreenshotNote(true);
-              }
-            }}
-          />
-        )} */}
-        {/* {lockNote && (
-          <Notes
-            isOpen={lockNote}
-            onClose={setLockNote}
-            title={"Lock"}
-            desc={"Enter focus mode."}
-            style={{
-              top: "-112px",
-              left: "315px",
-            }}
-            triangle={"triangle-down"}
-            nextFunc={() => {
-              setLockNote(false);
-              setScreenshotNote(true);
-            }}
-          />
-        )} */}
-        {/* {screenshotNote && (
-          <Notes
-            isOpen={screenshotNote}
-            onClose={setScreenshotNote}
-            title={"ScreenShot"}
-            desc={"Take a snip or screenshot."}
-            style={{
-              top: "-112px",
-              left: selectedClips?.length ? "389px" : "311px",
-            }}
-            triangle={"triangle-down"}
-            nextFunc={() => {
-              setScreenshotNote(false);
-              setGamePlanNote(true);
-            }}
-          />
-        )} */}
-        {/* {gamePlanNote && (
-          <Notes
-            isOpen={gamePlanNote}
-            onClose={setGamePlanNote}
-            title={"Game Plans"}
-            desc={
-              "Explore various game strategies and tactics to enhance your gameplay experience."
-            }
-            style={{
-              top: "-147px",
-              left: selectedClips?.length ? "464px" : "389px",
-            }}
-            triangle={"triangle-down"}
-            nextFunc={() => {
-              setGamePlanNote(false);
-              //   setUserVideo1Note(true);
-            }}
-          />
-        )} */}
       </div>
     );
   };
@@ -1776,6 +1323,7 @@ export default function PracticeLiveExperience({
       setLockNote(false);
     }
   };
+
   const handleGlobalProgressBarChange = (e) => {
     const { value } = e.target;
     const maxTime = Math.max(
@@ -1843,6 +1391,7 @@ export default function PracticeLiveExperience({
     });
     setIsPlaying({ ...temp });
   };
+
   const emitVideoTimeEvent = (clickedTime, number) => {
     socket?.emit(EVENTS.ON_VIDEO_TIME, {
       userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
@@ -1919,27 +1468,6 @@ export default function PracticeLiveExperience({
     });
   };
 
-  const handleProgressBarClick = (e, number) => {
-    var clickedTime;
-    if (number === "one") {
-      clickedTime =
-        (e?.nativeEvent?.offsetX / progressBarRef?.current?.offsetWidth) *
-        progressBarRef?.current.getAttribute("max");
-      selectedVideoRef1.current.currentTime = clickedTime;
-    } else {
-      clickedTime =
-        (e?.nativeEvent?.offsetX / progressBarRef2?.current?.offsetWidth) *
-        progressBarRef2?.current.getAttribute("max");
-      selectedVideoRef2.current.currentTime = clickedTime;
-    }
-
-    // socket?.emit(EVENTS?.ON_VIDEO_TIME, {
-    //   userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-    //   clickedTime: clickedTime,
-    //   number: number,
-    // });
-  };
-
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
     console.log(clickedTime, "handleProgressBarChange");
@@ -1948,137 +1476,6 @@ export default function PracticeLiveExperience({
     } else {
       selectedVideoRef2.current.currentTime = clickedTime;
     }
-
-    // socket?.emit(EVENTS?.ON_VIDEO_TIME, {
-    //   userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-    //   clickedTime: clickedTime,
-    //   number: number,
-    // });
-  };
-  const handleVolumeChange = () => {
-    // Update the video volume based on the input value (0 to 1)
-    const newVolume = parseFloat(volumeInputRef.current.value);
-    selectedVideoRef1.current.volume = newVolume;
-    setVolume(newVolume); // Update state
-  };
-
-  const handleVolumeChange2 = () => {
-    // Update the video volume based on the input value (0 to 1)
-    const newVolume = parseFloat(volumeInputRef2.current.value);
-    selectedVideoRef2.current.volume = newVolume;
-    setVolume2(newVolume); // Update state
-  };
-
-  //   useEffect(() => {
-  //     setScreenShot();
-  //   }, [screenShots?.length]);
-
-  //   const setScreenShot = async () => {
-  //     var newReportImages = [];
-
-  //     for (let index = 0; index < screenShots?.length; index++) {
-  //       const element = screenShots[index];
-  //       try {
-  //         const response = await fetch(`${awsS3Url}${element?.imageUrl}`);
-  //         const blob = await response.blob();
-  //         const reader = new FileReader();
-  //         reader.onloadend = () => {
-  //           const base64data = reader.result.split(",")[1];
-  //           newReportImages[index] = {
-  //             ...element,
-  //             imageUrl: `data:image/jpeg;base64,${base64data}`,
-  //           };
-  //         };
-  //         reader.readAsDataURL(blob);
-  //       } catch (error) {
-  //         console.error("Error fetching or converting image:", error);
-  //       }
-  //     }
-
-  //     setReportArr([...newReportImages]);
-  //   };
-
-  var pdf = new jsPDF();
-
-  const generatePDF = async () => {
-    const content = document.getElementById("report-pdf");
-    content.style.removeProperty("display");
-
-    html2canvas(content, { type: "png" }).then(async (canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-
-      // Calculate the width of the page
-      var pageWidth = pdf.internal.pageSize.width;
-
-      // Calculate the aspect ratio of the canvas
-      var aspectRatio = canvas.width / canvas.height;
-
-      // Calculate the height to maintain the aspect ratio
-      var imgHeight = pageWidth / aspectRatio;
-
-      // Add the canvas as an image to the PDF
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-      // pdf.save('yourDocument.pdf');
-
-      // Get the data URL of the PDF
-      const generatedPdfDataUrl = pdf.output("dataurlstring");
-
-      // Convert data URL to Blob
-      const byteCharacters = atob(generatedPdfDataUrl.split(",")[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const pdfBlob = new Blob([new Uint8Array(byteNumbers)], {
-        type: "application/pdf",
-      });
-
-      // Create a File from the Blob
-      const pdfFile = new File([pdfBlob], "generated_pdf.pdf", {
-        type: "application/pdf",
-      });
-
-      var link = await createUploadLink();
-      if (link) pushProfilePDFToS3(link, pdfFile);
-
-      content.style.display = "none";
-
-      var res = await createReport({
-        sessions: id,
-        trainer: fromUser?._id,
-        trainee: toUser?._id,
-        title: reportObj?.title,
-        topic: reportObj?.topic,
-        reportData: screenShots,
-      });
-      setIsOpenReport(false);
-    });
-  };
-
-  async function pushProfilePDFToS3(presignedUrl, uploadPdf) {
-    const myHeaders = new Headers({ "Content-Type": "application/pdf" });
-    axios
-      .put(presignedUrl, uploadPdf, {
-        headers: myHeaders,
-        onUploadProgress: (progressEvent) => {
-          const { loaded, total } = progressEvent;
-          const percentCompleted = (loaded / total) * 100;
-          console.log("percentCompletedpercentCompleted", percentCompleted);
-        },
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }
-
-  const createUploadLink = async () => {
-    var payload = { session_id: id };
-    const data = await getS3SignPdfUrl(payload);
-    if (data?.url) return data?.url;
-    else return "";
   };
 
   const isOnlyOneVideo = {
@@ -2097,15 +1494,39 @@ export default function PracticeLiveExperience({
     marginLeft: isPinned ? "0px !important" : "-15px",
   };
 
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const bookingsElement = document.getElementById('bookings');
+      if (bookingsElement) {
+        canvas.width = bookingsElement.clientWidth;
+        canvas.height = bookingsElement.clientHeight;
+      }
+    }
+  }, []);
+
   return (
-    <React.Fragment>
+    <div
+          id="bookings"
+          className={
+            mediaQueryMain.matches
+              ? "video_call custom-scroll position-relative"
+              : "custom-scroll scoll-content position-relative"
+          }
+          onScroll={() => {
+            if (configs.sidebar.isMobileMode) {
+              dispatch(isSidebarToggleEnabled(true));
+            }
+            return;
+          }}
+        >
       <section id="practice-live-session">
         <canvas
           ref={canvasRef}
           id="drawing-canvas"
-          width={document.getElementById("practice-live-session")?.clientWidth}
+          width={document.getElementById("bookings")?.clientWidth}
           height={
-            document.getElementById("practice-live-session")?.clientHeight
+            document.getElementById("bookings")?.clientHeight
           }
           className="canvas-print absolute all-0"
           style={{ left: 0, top: 0, width: "100%", height: "100%" }}
@@ -2162,6 +1583,7 @@ export default function PracticeLiveExperience({
                 setClipSelectNote={setClipSelectNote}
                 clipSelectNote={clipSelectNote}
                 setCountClipNoteOpen={setCountClipNoteOpen}
+                resetInitialPinnedUser={resetInitialPinnedUser}
               />
             </div>
           </div>
@@ -2935,7 +2357,6 @@ export default function PracticeLiveExperience({
         setIsOpenReport={setIsOpenReport}
         screenShots={screenShots}
         setScreenShots={setScreenShots}
-        // setScreenShots={setScreenShot}
         reportObj={reportObj}
         setReportObj={setReportObj}
         isClose={() => { }}
@@ -2968,6 +2389,6 @@ export default function PracticeLiveExperience({
         noteOpen={setUserVideo1Note}
         setGuideTour={setGuideTour}
       />
-    </React.Fragment>
+    </div>
   );
 }

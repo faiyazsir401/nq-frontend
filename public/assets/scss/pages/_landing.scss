@@ -72,6 +72,8 @@
 // landing btn starat //
 .btn {
   border: none;
+  min-width: 62px;
+  justify-content: center;
 }
 
 .app-btn {
@@ -1801,7 +1803,7 @@ footer {
 }
 
 /*=====================
-    animation 
+    animation
   ==========================*/
 @-webkit-keyframes slidemain {
   0% {

@@ -74,6 +74,11 @@ const Dashboard = () => {
   };
 
   const { height, width } = useWindowDimensions();
+  const [isRotatedInitally, setIsRotatedInitally] = useState(false);
+  useEffect(() => {
+    if (height < width) setIsRotatedInitally(true)
+  }, [height, width])
+
   const getNavbarTabs = () => {
     switch (topNavbarActiveTab) {
       case topNavbarOptions?.HOME: {
@@ -105,7 +110,7 @@ const Dashboard = () => {
         );
       }
       case topNavbarOptions?.MEETING_ROOM: {
-        return meetingRoom( height, width );
+        return meetingRoom( height, width, isRotatedInitally );
       }
       default:
         break;

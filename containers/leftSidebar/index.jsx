@@ -244,6 +244,9 @@ const Index = (props) => {
     let customSidebarContentBooking = document.querySelector(".custom-sidebar-content-booking");
     let lockerDrawer = document.querySelector(".custom-mobile-menu.active")
     let isNotification = document.querySelector(".custom-mobile-notification-css")
+    let isContact = document.querySelector(".custom-mobile-contact-css")
+    let isAbout = document.querySelector(".custom-mobile-about-css")
+    let isCommunity = document.querySelector(".custom-mobile-community-css")
     let isSetting = document.querySelector(".custom-mobile-setting-css")
     let istransaction = document.querySelector(".custom-mobile-transaction-css")
     let isfile = document.querySelector(".custom-mobile-file-css")
@@ -318,10 +321,18 @@ const Index = (props) => {
       if (isMobile) {
         getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '55px' : '0px';
         getNavbarTabs?.style?.setProperty('width', openCloseToggleSideNav ? 'calc(100vw - 55px)' : '100vw', 'important');
-
         if (openCloseToggleSideNav) {
           isNotification?.style?.setProperty('margin-left', '55px', '');
           isNotification?.style?.setProperty('max-width', 'calc(100vw - 20px)', '');
+
+          isContact?.style?.setProperty('margin-left', '40px', '');
+          isContact?.style?.setProperty('max-width', 'calc(100vw - 20px)', '');
+
+          isAbout?.style?.setProperty('margin-left', '40px', '');
+          isAbout?.style?.setProperty('max-width', 'calc(100vw - 20px)', '');
+
+          isCommunity?.style?.setProperty('margin-left', '40px', '');
+          isCommunity?.style?.setProperty('max-width', 'calc(100vw - 20px)', '');
 
           isSetting?.style?.setProperty('margin-left', '55px', '');
           isSetting?.style?.setProperty('max-width', 'calc(100vw - 20px)', '');
@@ -335,6 +346,15 @@ const Index = (props) => {
           isNotification?.style?.setProperty('margin-left', '10px', '');
           isNotification?.style?.setProperty('max-width', 'calc(100vw - 10px)', '');
 
+          isContact?.style?.setProperty('margin-left', '10px', '');
+          isContact?.style?.setProperty('max-width', 'calc(100vw - 10px)', '');
+
+          isAbout?.style?.setProperty('margin-left', '10px', '');
+          isAbout?.style?.setProperty('max-width', 'calc(100vw - 10px)', '');
+
+          isCommunity?.style?.setProperty('margin-left', '10px', '');
+          isCommunity?.style?.setProperty('max-width', 'calc(100vw - 10px)', '');
+
           isSetting?.style?.setProperty('margin-left', '10px', '');
           isSetting?.style?.setProperty('max-width', 'calc(100vw - 10px)', '');
 
@@ -347,7 +367,7 @@ const Index = (props) => {
 
       } else {
         getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '105px' : '25px';
-        getNavbarTabs?.style?.setProperty('width',openCloseToggleSideNav ? 'calc(100vw - 125px)': 'calc(100vw - 25px)');
+        getNavbarTabs?.style?.setProperty('width',openCloseToggleSideNav ? 'calc(100vw - 55px)': 'calc(100vw - 25px)');
 
       }
     }
@@ -775,7 +795,7 @@ const Index = (props) => {
 
                   {/* Practice Session */}
 
-                  <li>
+                  {/* <li>
                     <Tooltip
                       title="Practice Session"
                       position="top-end"
@@ -790,9 +810,8 @@ const Index = (props) => {
                         <i class="fa fa-object-group" aria-hidden="true" />
                       </NavLink>
                     </Tooltip>
-                    {/* </div> */}
                     <p className="menu-name">Practice Session</p>
-                  </li>
+                  </li> */}
                 </>}
 
                 <li>
@@ -807,6 +826,13 @@ const Index = (props) => {
                     </NavLink>
                   </Tooltip>
                   <p className="menu-name" style={{ color: "black", fontWeight: "500" }}>Logout</p>
+                </li>
+
+                <li>
+                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}></p>
+                </li>
+                <li>
+                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}></p>
                 </li>
               </ul>
               {/* <ul className="sidebar-bottom">
@@ -977,7 +1003,7 @@ const Index = (props) => {
                   className={`${activeTab === "my_community"
                     ? "custom-mobile-menu"
                     : ""
-                    } sidebar-full-width custom-mobile-transaction-css`}
+                    } sidebar-full-width custom-mobile-community-css`}
                 >
                   <MyCommunitySideBar
                     smallSideBarToggle={smallSideBarToggle}
@@ -993,7 +1019,7 @@ const Index = (props) => {
                   className={`${activeTab === "about_us"
                     ? "custom-mobile-menu"
                     : ""
-                    } sidebar-full-width custom-mobile-transaction-css`}
+                    } sidebar-full-width custom-mobile-about-css`}
                 >
                   <AboutUsSideBar
                     smallSideBarToggle={smallSideBarToggle}
@@ -1004,17 +1030,17 @@ const Index = (props) => {
                 {/* Contact Us */}
 
                 <TabPane
-                  tabId="contact_us"
-                  className={`${activeTab === "contact_us"
-                    ? "custom-mobile-menu"
-                    : ""
-                    } sidebar-full-width custom-mobile-transaction-css`}
-                >
-                  <ContactUSSideBar
+                    tabId="contact_us"
+                    className={`${activeTab === "contact_us"
+                      ? "custom-mobile-menu"
+                      : ""
+                      } custom-mobile-contact-css`}
+                  >
+                    <ContactUSSideBar
                     smallSideBarToggle={smallSideBarToggle}
                     tab={activeTab}
                     ActiveTab={setActiveTab} />
-                </TabPane>
+                  </TabPane>
 
                 {/* Practice Session */}
 

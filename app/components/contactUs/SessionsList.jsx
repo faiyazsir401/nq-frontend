@@ -16,7 +16,8 @@ const SessionsList = ({onClose}) => {
          <div
       style={{
         display : 'flex',
-        justifyContent : 'flex-start'
+        justifyContent: 'flex-start',
+        marginLeft:'20px'
       }}
       >
       <FaArrowLeftLong

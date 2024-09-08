@@ -350,6 +350,7 @@
           padding-top: 15px;
           height: 100%;
           overflow: auto;
+          overflow-x: clip;
           align-items: center;
           padding-bottom: 70px;
 
@@ -386,8 +387,8 @@
       }
     }
 
-    
-    
+
+
   }
 }
 
@@ -992,7 +993,7 @@
         min-width: 70px;
         animation: fadeInLeft 300ms ease-in-out;
         padding-bottom: 20px;
-      }    
+      }
   }
   }
 }

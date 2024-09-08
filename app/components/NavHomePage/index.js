@@ -67,7 +67,7 @@ const NavHomePage = () => {
 
       {/* top  baaner */}
 
-      {accountType === AccountType.TRAINEE && onlineUsers && Object.values(onlineUsers)?.length && <div
+      {accountType === AccountType.TRAINEE && onlineUsers && Object.values(onlineUsers)?.length ? <div
         className="banner"
       >
         <h1>Coaches online <span>Now!</span></h1>
@@ -90,7 +90,7 @@ const NavHomePage = () => {
 
 
 
-      </div>}
+      </div> : null}
 
 
       <div className="row"

@@ -332,6 +332,7 @@ const FileSection = (props) => {
                         >
                           <Tooltip title={clp?.title} position="top" trigger="mouseenter">
                             <video className="Sidebar-video"
+                              poster={Utils?.generateThumbnailURL(clp)}
                               style={{
                                 position: "relative",
                                 height: "180px",
@@ -747,10 +748,12 @@ const FileSection = (props) => {
                   <div className={`block-content ${!cl?.show ? "d-none" : "d-flex flex-wrap"}`}>
                     {cl?.report.map((clp, index) => (
                       <div className={`col-6`} key={index} style={{ whiteSpace: "nowrap" }}>
-                        <div className="ml-3" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                        <div
+                          // className="ml-3" 
+                          style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                           <div style={{ marginBottom: "5px" }}>
                             <dd
-                              className="ml-3"
+                              // className="ml-3"
                               style={{ cursor: "pointer", textAlign: "center" }}
                               onClick={() => {
                                 if (accountType === "Trainer") {
@@ -770,12 +773,21 @@ const FileSection = (props) => {
                               <img
                                 src={Utils.getImageUrlOfS3(clp?.reportData[0]?.imageUrl)}
                                 alt={clp?.reportData[0]?.title}
-                                style={{ width: "12vw", height: "100px", position: "relative", marginLeft: '50px' }}
+                                style={{
+                                  // width: "12vw",
+                                  // height: "100px",
+                                  position: "relative",
+                                  // marginLeft: '50px',
+                                  height: "100%",
+                                  width: "100%",
+                                  objectFit: "contain",
+                                  maxHeight: "120px"
+                                }}
                               />
                               {accountType === "Trainer" ? "" : ""}
                             </dd>
                           </div>
-                          <div>
+                          <div className="ml-3" style={{ fontSize: "10px" }}>
                             <dd>{index + 1}. {accountType === "Trainer" ? "Trainee" : "Trainer"} : <strong>{clp?.[accountType === "Trainer" ? "trainee" : "trainer"]?.fullname}</strong></dd>
                           </div>
                         </div>

@@ -42,10 +42,10 @@ const StripePaymentContent = ({
 
   const getMyClips = async () => {
     var res = await myClips({});
-    dispatch(getScheduledMeetingDetailsAsync());
+    // dispatch(getScheduledMeetingDetailsAsync());
     setClips(res?.data);
   };
-  const addTraineeClipInBookedSession = async () => {
+  const addTraineeClipInBookedSession = async (selectedClips) => {
     const payload = {
       id: newBookingData?._id,
       trainee_clip: selectedClips?.map((val) => val?._id),
@@ -114,7 +114,18 @@ const StripePaymentContent = ({
                       transaction?.intent?.result?.application_fee_amount / 100,
                   };
                   dispatch(bookSessionAsync(payload));
+
+                  // Refecting the current Booking 
+
+                  dispatch(
+                    getScheduledMeetingDetailsAsync({
+                      status: "upcoming",
+                    })
+                  );
+
+                   // Redirecting to the Booking tab
                   dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
+
                   setBookSessionPayload({});
                   if(trainer){
                     sendNotifications({

@@ -679,6 +679,16 @@ export class Utils {
     return `https://data.netqwix.com/${clip?.file_name}`;
   }
 
+  static generateVideoURL2(clip) {
+  //  const mp4FileName = clip.file_name.replace('.quicktime', '.mp4');
+  // return `https://data.netqwix.com/${mp4FileName}`
+  return `https://data.netqwix.com/${clip?.file_name}`;
+  }
+
+  static generateThumbnailURL(clip) {
+    return `https://data.netqwix.com/${clip?.thumbnail}`;
+  }
+
   static dynamicImageURL = (url) => {
     let updatedURL = url?.toString()?.split("public")[1];
     if (updatedURL === undefined) {
@@ -805,4 +815,13 @@ export class Utils {
       return then.format("YYYY-MM-DD"); // Default format for older dates
     }
   };
+
+  static compairDateGraterOrNot = (date) => {
+    const givenDate = moment(date);
+    const givenDatePlusOneMinute = givenDate.clone().add(1, 'minutes');
+    const currentDate = moment();
+
+    const isCurrentDateGreater = currentDate.isAfter(givenDatePlusOneMinute);
+    return isCurrentDateGreater;
+  }
 }

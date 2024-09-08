@@ -7,6 +7,7 @@ import { authState } from "../auth/auth.slice";
 import { useAppSelector, useAppDispatch } from "../../store";
 import { Utils } from "../../../utils/utils";
 import { userConcernAsync } from "./contactus.slice";
+import { isIOS } from 'react-device-detect';
 const ReportForm = ({
   isOpen,
   setIsReportFormOpen,
@@ -77,7 +78,7 @@ const ReportForm = ({
   });
 
   return (
-    <Modal isOpen={isOpen}>
+    <Modal isOpen={isOpen} className="react-strap-modal-full">
       <div
         style={{
           display: "flex",
@@ -98,163 +99,166 @@ const ReportForm = ({
         />
       </div>
       <h3 className="form-header">Report Form</h3>
-      <div
-        style={{
-          marginTop: "16px",
-        }}
-      >
-        <div
-          className="row"
-          style={{
-            marginLeft: "0px",
-            marginRight: "0px",
-          }}
-        >
-          <div className="col">
-            <dl className="row ml-1 mb-0">
-              <dd>Trainer :</dd>
-              <dt className="ml-1">{bookingInfo?.trainer}</dt>
-            </dl>
-          </div>
-          <div className="col">
-            <dl className="row mb-0">
-              <dd className="ml-3">Trainee :</dd>
-              <dt className="ml-1">{bookingInfo?.trainee}</dt>
-            </dl>
-          </div>
-        </div>
-        <div
-          className="row"
-          style={{
-            marginLeft: "0px",
-            marginRight: "0px",
-          }}
-        >
-          <div className="col">
-            <dl className="row ml-1 mb-0">
-              <dd>Date :</dd>
-              <dt className="ml-1">
-                {Utils.getDateInFormat(bookingInfo?.date)}
-              </dt>
-            </dl>
-          </div>
-          <div className="col">
-            <dl className="row mb-0">
-              <dd className="ml-3">Time Durations :</dd>
-              <dt className="ml-1">{`${bookingInfo?.startTime} - ${bookingInfo?.endTime}`}</dt>
-            </dl>
-          </div>
-        </div>
-      </div>
-      <form onSubmit={formik.handleSubmit} className="form-container">
-        <ModalBody>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              className="form-control"
-              {...formik.getFieldProps("name")}
-            />
-            {formik.touched.name && formik.errors.name && (
-              <div className="text-danger">{formik.errors.name}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="form-control"
-              {...formik.getFieldProps("email")}
-            />
-            {formik.touched.email && formik.errors.email && (
-              <div className="text-danger">{formik.errors.email}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="phone">Phone</label>
-            <input
-              type="text"
-              id="phone"
-              name="phone"
-              className="form-control"
-              value={formik.values.phone}
-              onChange={(e) => {
-                const newValue = e.target.value.replace(/\D/, "");
 
-                if (!isNaN(newValue) && newValue.length <= 10) {
-                  formik.setFieldValue("phone", newValue);
-                }
+      <form onSubmit={formik.handleSubmit} className="form-container centered-form">
+        <ModalBody style={{ display: 'flex', justifyContent: 'center', }}>
+          <div style={{ width: '100%', maxWidth: '500px' }}>
+            <div
+              style={{
+                marginTop: "16px",
               }}
-            />
-            {formik.touched.phone && formik.errors.phone && (
-              <div className="text-danger">{formik.errors.phone}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="reason">Reasons</label>
-            <select
-              id="reason"
-              name="reason"
-              className="form-control"
-              {...formik.getFieldProps("reason")}
             >
-              <option value="">Select</option>
-              <option value="Technical issue">Technical issue</option>
-              <option value="Request for Refund">Request for Refund</option>
-            </select>
-            {formik.touched.reason && formik.errors.reason && (
-              <div className="text-danger">{formik.errors.reason}</div>
-            )}
-          </div>
-          {
-            formik.values.reason === "Technical issue" ?
-              <div className="form-group">
-                <label htmlFor="reason">Related to refund</label>
-                <select
-                  id="is_releted_to_refund"
-                  name="is_releted_to_refund"
-                  className="form-control"
-                  {...formik.getFieldProps("is_releted_to_refund")}
-                >
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-                {formik.touched.is_releted_to_refund && formik.errors.is_releted_to_refund && (
-                  <div className="text-danger">{formik.errors.is_releted_to_refund}</div>
-                )}
-              </div> : null
-          }
-          <div className="form-group">
-            <label htmlFor="name">Subject</label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              className="form-control"
-              {...formik.getFieldProps("subject")}
-            />
-            {formik.touched.subject && formik.errors.subject && (
-              <div className="text-danger">{formik.errors.subject}</div>
-            )}
-          </div>
-          <div className="form-group">
-            <label htmlFor="desc">Description</label>
-            <textarea
-              id="desc"
-              name="desc"
-              className="form-control"
-              {...formik.getFieldProps("desc")}
-            />
-            {formik.touched.desc && formik.errors.desc && (
-              <div className="text-danger">{formik.errors.desc}</div>
-            )}
+              <div
+                className="row"
+                style={{
+                  marginLeft: "0px",
+                  marginRight: "0px",
+                }}
+              >
+                <div className="col">
+                  <dl className="row ml-1 mb-0">
+                    <dd>Trainer :</dd>
+                    <dt className="ml-1">{bookingInfo?.trainer}</dt>
+                  </dl>
+                </div>
+                <div className="col">
+                  <dl className="row mb-0">
+                    <dd className="ml-3">Trainee :</dd>
+                    <dt className="ml-1">{bookingInfo?.trainee}</dt>
+                  </dl>
+                </div>
+              </div>
+              <div
+                className="row"
+                style={{
+                  marginLeft: "0px",
+                  marginRight: "0px",
+                }}
+              >
+                <div className="col">
+                  <dl className="row ml-1 mb-0">
+                    <dd>Date :</dd>
+                    <dt className="ml-1">
+                      {Utils.getDateInFormat(bookingInfo?.date)}
+                    </dt>
+                  </dl>
+                </div>
+                <div className="col">
+                  <dl className="row mb-0">
+                    <dd className="ml-3">Time Durations :</dd>
+                    <dt className="ml-1">{`${bookingInfo?.startTime} - ${bookingInfo?.endTime}`}</dt>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="name">Name</label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                className="form-control"
+                {...formik.getFieldProps("name")}
+              />
+              {formik.touched.name && formik.errors.name && (
+                <div className="text-danger">{formik.errors.name}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="form-control"
+                {...formik.getFieldProps("email")}
+              />
+              {formik.touched.email && formik.errors.email && (
+                <div className="text-danger">{formik.errors.email}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="phone">Phone</label>
+              <input
+                type="text"
+                id="phone"
+                name="phone"
+                className="form-control"
+                value={formik.values.phone}
+                onChange={(e) => {
+                  const newValue = e.target.value.replace(/\D/, "");
+
+                  if (!isNaN(newValue) && newValue.length <= 10) {
+                    formik.setFieldValue("phone", newValue);
+                  }
+                }}
+              />
+              {formik.touched.phone && formik.errors.phone && (
+                <div className="text-danger">{formik.errors.phone}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="reason">Reasons</label>
+              <select
+                id="reason"
+                name="reason"
+                className="form-control"
+                {...formik.getFieldProps("reason")}
+              >
+                <option value="">Select</option>
+                <option value="Technical issue">Technical issue</option>
+                <option value="Request for Refund">Request for Refund</option>
+              </select>
+              {formik.touched.reason && formik.errors.reason && (
+                <div className="text-danger">{formik.errors.reason}</div>
+              )}
+            </div>
+            {
+              formik.values.reason === "Technical issue" ?
+                <div className="form-group">
+                  <label htmlFor="reason">Related to refund</label>
+                  <select
+                    id="is_releted_to_refund"
+                    name="is_releted_to_refund"
+                    className="form-control"
+                    {...formik.getFieldProps("is_releted_to_refund")}
+                  >
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                  {formik.touched.is_releted_to_refund && formik.errors.is_releted_to_refund && (
+                    <div className="text-danger">{formik.errors.is_releted_to_refund}</div>
+                  )}
+                </div> : null
+            }
+            <div className="form-group">
+              <label htmlFor="name">Subject</label>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                className="form-control"
+                {...formik.getFieldProps("subject")}
+              />
+              {formik.touched.subject && formik.errors.subject && (
+                <div className="text-danger">{formik.errors.subject}</div>
+              )}
+            </div>
+            <div className="form-group">
+              <label htmlFor="desc">Description</label>
+              <textarea
+                id="desc"
+                name="desc"
+                className="form-control"
+                {...formik.getFieldProps("desc")}
+              />
+              {formik.touched.desc && formik.errors.desc && (
+                <div className="text-danger">{formik.errors.desc}</div>
+              )}
+            </div>
           </div>
         </ModalBody>
-        <ModalFooter className="btn-container">
+        <ModalFooter className="btn-container" style={{ display: 'flex', justifyContent: 'center',paddingBottom: isIOS ? '30%': '20px' }}>
           <Button
             type="submit"
             color="primary"

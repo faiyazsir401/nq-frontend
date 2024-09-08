@@ -32,7 +32,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const [selectedVideo, setSelectedVideo] = useState("");
   const [reportsData, setReportsData] = useState([]);
   const { sidebarLockerActiveTab, accountType } = useAppSelector(authState);
-  const {  masterData } = useAppSelector(masterState).master;
+  const { masterData } = useAppSelector(masterState).master;
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const width500 = useMediaQuery(500);
@@ -160,7 +160,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
         {clips?.length ? (
           sortedClips?.map((cl, ind) => (
             <div className={`collapse-block ${!cl?.show ? "" : "open"}`}>
-              <h5 className="block-title" onClick={() => {}}>
+              <h5 className="block-title" onClick={() => { }}>
                 {cl?._id}
                 <label className="badge badge-primary sm ml-2">
                   {cl?.clips?.length}
@@ -173,9 +173,9 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                     display: "flex",
                     flexWrap: "wrap",
                     width: width500 ? "100%" : "",
-                    alignItems:"center",
-                    justifyContent:"center",
-                    gap:"5px",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "5px",
                   }}
                 >
                   {cl?.clips?.map((clp, index) => (
@@ -199,14 +199,14 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         className="hover-video"
                       >
                         <h5
-                        class="d-inline-block text-truncate"
+                          class="d-inline-block text-truncate"
                           style={{
                             textAlign: "center",
                             paddingBottom: "4px",
                             paddingTop: "2px",
                           }}
                         >
-                         {clp?.title.length > 5 ? `${clp.title.slice(0, 5)}...` : clp.title}
+                          {clp?.title.length > 5 ? `${clp.title.slice(0, 5)}...` : clp.title}
                         </h5>
                         <Tooltip
                           title={clp?.title}
@@ -215,6 +215,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         >
                           <video
                             id="Home-page-vid"
+                            poster={Utils?.generateThumbnailURL(clp)}
                             style={{
                               position: "relative",
                               height: "180px",

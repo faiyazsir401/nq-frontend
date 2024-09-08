@@ -35,6 +35,7 @@ $canvas-z-index: 8;
 
   .modal-content {
     height: 100vh !important;
+    overflow: auto;
   }
 }
 
@@ -958,7 +959,7 @@ h3{
     height: 30px;
     max-width: 15px;
     padding: 10px 25px;
-    
+
     svg{
       width: 14px;
       height: 14px;
@@ -967,7 +968,7 @@ h3{
       right: 10px;
     }
   }
- 
+
 }
 
 // new

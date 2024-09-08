@@ -41,6 +41,7 @@ const TrainerRenderBooking = ({
   setStartMeeting,
   handleAddRatingModelState,
   updateParentState,
+  start_time,
 }) => {
   const { scheduledMeetingDetails, addRatingModel } =
     useAppSelector(bookingsState);
@@ -108,7 +109,7 @@ const TrainerRenderBooking = ({
       <br />
       {status === BookedSession.canceled && isMeetingDone && (
         <button
-          className="btn btn-danger button-effect btn-sm ml-4 my-1"
+          className="btn btn-danger button-effect btn-sm ml-2 my-1"
           type="button"
           style={{
             cursor:
@@ -125,9 +126,10 @@ const TrainerRenderBooking = ({
       !isCurrentDateBefore &&
       status === BookedSession.confirmed &&
       !isStartButtonEnabled &&
+      Utils.compairDateGraterOrNot(start_time) &&
       !isMeetingDone ? (
         <button
-          className={`btn btn-success button-effect btn-sm mr-4`}
+          className={`btn btn-success button-effect btn-sm mr-2 my-1`}
           type="button"
           onClick={() => {
             const payload = {

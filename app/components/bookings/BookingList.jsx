@@ -85,9 +85,9 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     var timeZones = response.data;
     const ianaTimeZone = utcOffset
       ? timeZones.find(
-          (tz) =>
-            moment.tz(tz).utcOffset() === moment.duration(utcOffset).asMinutes()
-        )
+        (tz) =>
+          moment.tz(tz).utcOffset() === moment.duration(utcOffset).asMinutes()
+      )
       : "";
     // console.log("=====>ianaTimeZone", ianaTimeZone, utcOffset)
     setUserTimeZone(
@@ -155,7 +155,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
-  const addTraineeClipInBookedSession = async () => {
+  const addTraineeClipInBookedSession = async (selectedClips) => {
     const payload = {
       id: isOpenID,
       trainee_clip: selectedClips?.map((val) => val?._id),
@@ -163,7 +163,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     dispatch(addTraineeClipInBookedSessionAsync(payload));
     dispatch(removeNewBookingData());
     setIsOpen(false);
-    setIsModalOpen(false);
+    // setIsModalOpen(false);
   };
 
   const handleAddRatingModelState = (data) => {
@@ -238,6 +238,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
               setBIndex(value);
             }}
             activeTabs={activeTabs}
+            start_time={start_time}
           />
         );
       case AccountType.TRAINEE:
@@ -274,6 +275,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             }}
             accountType={AccountType.TRAINEE}
             activeTabs={activeTabs}
+            start_time={start_time}
           />
         );
       default:
@@ -364,7 +366,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
-  const renderVideoCall = (height, width) => height > width ?
+  const renderVideoCall = (height, width, isRotatedInitally) => height > width && !isRotatedInitally ?
     <OrientationModal isOpen={true} /> :
     <StartMeeting
       id={startMeeting.id}
@@ -384,7 +386,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       }}
     />
 
-  meetingRoom = (height, width) => {
+  meetingRoom = (height, width, isRotatedInitally) => {
     return (
       <div>
         {" "}
@@ -402,7 +404,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             return;
           }}
         >
-          {renderVideoCall(height, width)}
+          {renderVideoCall(height, width, isRotatedInitally)}
         </div>
       </div>
     );
@@ -437,7 +439,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         }
         isOpen={addRatingModel.isOpen}
         id={addRatingModel._id}
-        // width={"50%"}
+      // width={"50%"}
       />
     );
   };
