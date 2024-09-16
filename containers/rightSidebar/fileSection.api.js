@@ -4,7 +4,7 @@ export const myClips = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/get-clips`,
+      url: `/common/get-clips`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -21,7 +21,7 @@ export const deleteClip = async(payload) => {
   try {
     const response = await axiosInstance({
       method: "DELETE",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/delete-clip/${payload.id}`,
+      url: `/common/delete-clip/${payload.id}`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -37,7 +37,7 @@ export const deleteSavedSession = async(payload) => {
   try {
     const response = await axiosInstance({
       method: "DELETE",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/delete-saved-session/${payload.id}`,
+      url: `/common/delete-saved-session/${payload.id}`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -54,7 +54,7 @@ export const traineeClips = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/trainee-clips`,
+      url: `/common/trainee-clips`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export const reports = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/report/get-all`,
+      url: `/report/get-all`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +90,7 @@ export const deleteReports = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "DELETE",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/report/delete-report/${payload.id}`,
+      url: `/report/delete-report/${payload.id}`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -109,7 +109,7 @@ export const shareClips = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/share-clips`,
+      url: `/user/share-clips`,
       data: payload,
       headers: {
         "Content-Type": "application/json",

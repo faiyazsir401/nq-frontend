@@ -5,7 +5,7 @@ import { LOCAL_STORAGE_KEYS } from "./constants";
 export const checkSlot = async (payload) => {
   try {
     const response = await axiosInstance({
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainee/check-slot`,
+      url: `/trainee/check-slot`,
       method: "post",
       data: payload,
       headers: {

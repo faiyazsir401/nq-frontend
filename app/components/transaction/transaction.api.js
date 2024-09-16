@@ -6,7 +6,7 @@ export const getTransactionSliceData = async () => {
   try {
     const response = await axiosInstance({
       method: "get",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/booking-list-by-id`,
+      url: `/user/booking-list-by-id`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

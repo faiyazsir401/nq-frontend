@@ -4,7 +4,7 @@ export const userConcern = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/raise-concern`,
+      url: `/user/raise-concern`,
       data: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export const writeUs = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/write-us`,
+      url: `/user/write-us`,
       data: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",

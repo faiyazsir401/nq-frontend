@@ -4,7 +4,7 @@ export const getS3SignUrl = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/video-upload-url`,
+      url: `/common/video-upload-url`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -21,7 +21,7 @@ export const getSaveSessionS3SignUrl = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/saved-sessions-upload-url`,
+      url: `/common/saved-sessions-upload-url`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const getAllSavedSessions = async () => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/get-all-saved-sessions`,
+      url: `/common/get-all-saved-sessions`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -56,7 +56,7 @@ export const screenShotTake = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/report/add-image`,
+      url: `/report/add-image`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export const getReport = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/report/get`,
+      url: `/report/get`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export const removeImage = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/report/remove-image`,
+      url: `/report/remove-image`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export const cropImage = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/report/crop-image`,
+      url: `/report/crop-image`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -134,7 +134,7 @@ export const createReport = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/report`,
+      url: `/report`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
