@@ -9,3 +9,5 @@ export const LABELS = {
 
 // export const awsS3Url = "https://netquix.s3.ap-south-1.amazonaws.com"
 export const awsS3Url = "https://data.netqwix.com/";
+
+export const MY_CLIPS_LABEL_LIMIT= 10

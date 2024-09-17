@@ -20,6 +20,7 @@ import { useMediaQuery } from "../../../hook/useMediaQuery";
 import "../../trainer/dashboard/index.css";
 import { commonState, getClipsAsync } from "../../../common/common.slice";
 import { masterState } from "../../master/master.slice";
+import { MY_CLIPS_LABEL_LIMIT } from "../../../../utils/constant";
 
 const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
@@ -206,7 +207,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                             paddingTop: "2px",
                           }}
                         >
-                          {clp?.title.length > 5 ? `${clp.title.slice(0, 5)}...` : clp.title}
+                          {clp?.title.length > MY_CLIPS_LABEL_LIMIT ? `${clp.title.slice(0, MY_CLIPS_LABEL_LIMIT)}...` : clp.title}
                         </h5>
                         <Tooltip
                           title={clp?.title}
