@@ -516,7 +516,7 @@ const TrainerSessionInfo = ({
                       marginTop: "-16px",
                     }}
                   ></div>
-                  <span className="text-success">Online</span>
+                  <span className="text-success">Online Now</span>
                 </div>
               ) : (
                 <div

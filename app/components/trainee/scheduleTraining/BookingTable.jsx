@@ -478,16 +478,19 @@ const BookingTable = ({
             {/* Banner styles */}
             <div style={{ display: "flex", alignItems: "center", width : '100%' }}>
               {" "}
-              {/* <span
+              <h2
                 style={{
                   fontSize: "1.2rem",
                   fontWeight: "bold",
-                  color: "#28a745",
+                  // color: "#28a745",
+                  marginRight:"auto",
+                  marginLeft:"auto",
+                  marginBottom:10
                 }}
               >
-                Trainer is Online
-              </span> */}
-              <button
+                Book Instant Lesson
+              </h2>
+              {/* <button
                 style={{
                   backgroundColor: "#28a745",
                   color: "#fff",
@@ -500,7 +503,7 @@ const BookingTable = ({
                 }}
               >
                 Trainer is Online
-              </button>
+              </button> */}
             </div>
             <div style={{ display: "flex", alignItems: "center" ,  width : '100%' }}>
               {" "}
