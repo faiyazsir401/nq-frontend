@@ -2637,6 +2637,7 @@ export const HandleVideoCall = ({
               ) : null}
 
               {/* Timer  */}
+              {isTraineeJoined &&
               <div
                 id="sessionEndTime"
                 style={{
@@ -2661,7 +2662,7 @@ export const HandleVideoCall = ({
                   <h2 style={{ fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)' }}> {timeDifference}</h2>
                 </div>
               </div>
-
+}
               {/* User Video 1 */}
 
               <div
@@ -2865,7 +2866,7 @@ export const HandleVideoCall = ({
                         style={{
                           width: height < 500 ? "60px" : "100px",
                           height: height < 500 ? "60px" : "100px",
-
+                          borderRadius:"5%"
                         }}
                       // className="container-raj"
                       />
@@ -3059,7 +3060,7 @@ export const HandleVideoCall = ({
                         style={{
                           width: height < 500 ? "60px" : "100px",
                           height: height < 500 ? "60px" : "100px",
-
+                          borderRadius:"5%"  
                         }}
                       // className="container-raj"
                       />
@@ -3140,6 +3141,7 @@ export const HandleVideoCall = ({
           </Modal>
         </div>
         {isScreenShotModelOpen && (
+          
           <ScreenShotDetails
             screenShotImages={screenShots}
             setScreenShotImages={setScreenShots}
@@ -3640,6 +3642,7 @@ export const HandleVideoCall = ({
               ) : null}
 
               {/* Timer  */}
+              {isTraineeJoined &&
               <div
                 id="sessionEndTime"
                 style={{
@@ -3662,7 +3665,7 @@ export const HandleVideoCall = ({
                   <h3>Time remaining</h3>
                   <h2 style={{ fontSize: "18px" }}> {timeDifference}</h2>
                 </div>
-              </div>
+              </div>}
 
               {/* User Video 1 */}
 
@@ -3820,7 +3823,7 @@ export const HandleVideoCall = ({
                         style={{
                           width: height < 500 ? "60px" : "100px",
                           height: height < 500 ? "60px" : "100px",
-
+                          borderRadius:"5%"
                         }}
                       // className="container-raj"
                       />
@@ -3974,7 +3977,7 @@ export const HandleVideoCall = ({
                         style={{
                           width: height < 500 ? "60px" : "100px",
                           height: height < 500 ? "60px" : "100px",
-
+                          borderRadius:"5%"
                         }}
                       // className="container-raj"
                       />

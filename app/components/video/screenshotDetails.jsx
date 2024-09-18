@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { awsS3Url } from "../../../utils/constant";
 import { createReport } from "../videoupload/videoupload.api";
+import Modal from "../../common/modal";
 function ScreenShotDetails({
   setIsOpenDetail,
   screenShotImages,
@@ -22,22 +23,26 @@ function ScreenShotDetails({
   }
 
   return (
+
     <>
       <div
         className="ss-popup"
         style={{
           position: "absolute",
-          bottom: "7px",
-          right: "2%",
-          maxWidth: "250px",
+
+          top:"40%",
+          right: "45%",
+          maxWidth: "400px",
           width: "40%",
           minWidth: "250px",
-          height: "auto",
-          border: "2px solid rgb(0, 0, 128)",
-          padding: "3px",
+          height: "auto ",
+          // border: "2px solid rgb(0, 0, 128)",
+          padding: "20px",
           // borderRadius: "8px",
           zIndex: "1000",
-          background: "white"
+          borderRadius:"3%",
+          background: "rgba(255, 255, 255, 0.3)", /* Translucent white background */
+          backdropFilter: "blur(10px)" , /* Apply blur effect */
         }}
       >
         <div
