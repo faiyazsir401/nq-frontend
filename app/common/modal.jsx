@@ -27,7 +27,7 @@ const Modal = ({
         width,
         height,
         overflow: overflowHidden ? "hidden" : null,
-        marginTop:overflowHidden ? "0vh" : "10vh",
+
         minHeight: minHeight ? "100vh" : null,
       }}
     >
