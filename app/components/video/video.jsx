@@ -3146,6 +3146,7 @@ export const HandleVideoCall = ({
             screenShotImages={screenShots}
             setScreenShotImages={setScreenShots}
             setIsOpenDetail={setIsScreenShotModelOpen}
+            isOpenDetail={isScreenShotModelOpen}
             currentReportData={{
               session: id,
               trainer: fromUser?._id,
@@ -4062,6 +4063,7 @@ export const HandleVideoCall = ({
             screenShotImages={screenShots}
             setScreenShotImages={setScreenShots}
             setIsOpenDetail={setIsScreenShotModelOpen}
+            isOpenDetail={isScreenShotModelOpen}
             currentReportData={{
               session: id,
               trainer: fromUser?._id,
