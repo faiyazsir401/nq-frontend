@@ -270,8 +270,13 @@ const Index = (props) => {
 
     if (gettrainer) {
       if (isMobile) {
-        gettrainer?.style?.setProperty('left', openCloseToggleSideNav ? '56px' : '0px', 'important');
-        gettrainer.style?.setProperty('max-width', 'calc(100vw - 0px)', ''); // Set max-width to calc(100vw - 105px)
+        gettrainer?.style?.setProperty('margin', '0px', 'important');
+        gettrainer?.style?.setProperty('margin-top', '20px', 'important');
+
+        gettrainer?.style?.setProperty('padding', '0px', 'important');
+
+        gettrainer?.style?.setProperty('left', openCloseToggleSideNav ? '52px' : '0px', 'important');
+        gettrainer.style?.setProperty('max-width', openCloseToggleSideNav ? 'calc(100vw - 60px)': 'calc(100vw - 0px)'); // Set max-width to calc(100vw - 105px)
       }
     }
 
