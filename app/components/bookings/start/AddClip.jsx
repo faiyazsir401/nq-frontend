@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-// import Modal from '../../../common/modal';
+import Modal from '../../../common/modal';
 import { useAppDispatch } from '../../../store';
 import { traineeAction } from '../../trainee/trainee.slice';
 import { Utils } from '../../../../utils/utils';
 import { X } from 'react-feather';
-import { Button, Modal, ModalBody } from 'reactstrap';
+import { Button } from 'reactstrap';
 
 
 const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedClips, shareFunc }) => {
@@ -14,8 +14,7 @@ const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedCl
   const { removeNewBookingData } = traineeAction;
 
   return (
-    <Modal isOpen={isOpen} className="react-strap-modal-full">
-      <ModalBody style={{ display: 'flex', justifyContent: 'center' }}>
+    <Modal isOpen={isOpen} element={
       <div>
           <div className="theme-title">
             <div className="media">
@@ -106,76 +105,64 @@ const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedCl
               <></>
             )}
             <div style={{ marginTop: "30px" }}></div>
-            {clips?.length ? (
-              clips?.map((cl, ind) => (
-                <div
-                  className={`collapse-block ${cl?.show ? "" : "open"
-                    }`}
-                >
-                  <h5 className="block-title pb-0">
-                    {" "}
-                    {cl?._id}
-                    <label className="badge badge-primary sm ml-2">
-                      {cl?.clips?.length}
-                    </label>
-                  </h5>
-                  <div>
-                    <div className="row d-flex justify-content-center">
-                      {cl?.clips.map((clp, index) => {
-                        var sld = selectedClipsCopy.find(
-                          (val) => val?._id === clp?._id
-                        );
-                        return (
-                          <div
-                            key={index}
-                            className={`col-4 `}
-                            style={{ borderRadius: 5, }}
-                            onClick={() => {
-                              if (
-                                !sld &&
-                                selectedClipsCopy?.length < 2
-                              ) {
-                                setSelectedClipsCopy( prev => [
-                                  ...prev,clp
-                                ]);
-                              }
-                            }}
-                          >
-                            <video
-                              poster={Utils.generateThumbnailURL(clp)}
-                              style={{
-                                border: `${sld ? "4px solid green" : "4px solid #b4bbd1"}`,
-                                height: "180px",
-                                width: "100% !important",
-                                borderRadius: "5px",
-                                objectFit: "cover",
-                              }}
-                            >
-                              <source
-                                src={Utils?.generateVideoURL(clp)}
-                                type="video/mp4"
-                              />
-                            </video>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <>
-                <div
+            <div
+  className='d-flex'
+  style={{
+    gap: 10,
+    overflowX: 'auto', // Enables horizontal scrolling
+    whiteSpace: 'nowrap', // Prevents wrapping of child elements
+    height: '200px', // Adjust height as necessary
+  }}
+>
+  {clips?.length ? (
+    clips.map((cl, ind) => (
+      <div
+        key={ind} // Added key for the outer div
+        className={`d-inline ${cl?.show ? "" : "open"}`}
+        style={{
+          display: 'inline-block', // Keeps items in a row
+        }}
+      >
+        <div className='d-flex' style={{ gap: 10 }}>
+          {cl?.clips.map((clp, index) => {
+            const sld = selectedClipsCopy.find(
+              (val) => val?._id === clp?._id
+            );
+            return (
+              <div
+                key={index}
+                style={{ borderRadius: 5 }}
+                onClick={() => {
+                  if (!sld && selectedClipsCopy?.length < 2) {
+                    setSelectedClipsCopy((prev) => [...prev, clp]);
+                  }
+                }}
+              >
+                <video
+                  poster={Utils.generateThumbnailURL(clp)}
                   style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginTop: "40px",
+                    border: `${sld ? "4px solid green" : "4px solid #b4bbd1"}`,
+                    height: "180px",
+                    width: "300px", // Fixed width for consistent sizing
+                    borderRadius: "5px",
+                    objectFit: "cover",
                   }}
                 >
-                  <h5 className="block-title"> No Data Found</h5>
-                </div>
-              </>
-            )}
+                  <source
+                    src={Utils?.generateVideoURL(clp)}
+                    type="video/mp4"
+                  />
+                </video>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    ))
+  ) : (
+    <></>
+  )}
+</div>
           </div>
           {clips?.length ? (
             <div className="d-flex justify-content-around w-100 p-3">
@@ -193,8 +180,10 @@ const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedCl
             <></>
           )}
         </div>
-      </ModalBody>
-    </Modal>
+    }/>
+      
+      
+
   )
 }
 

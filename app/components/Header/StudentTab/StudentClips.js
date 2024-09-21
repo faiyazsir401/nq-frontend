@@ -262,7 +262,7 @@ const StudentClips = ({ activeCenterContainerTab }) => {
 
             <Modal
                 isOpen={isOpenPlayVideo}
-                allowFullWidth={true}
+                // allowFullWidth={true}
                 element={
                     <>
                         <div className="d-flex flex-column align-items-center p-3 justify-content-center h-100">
