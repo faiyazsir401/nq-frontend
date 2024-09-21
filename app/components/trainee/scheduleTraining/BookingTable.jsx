@@ -575,6 +575,7 @@ const BookingTable = ({
       />
       <Modal
         isOpen={showTransactionModal}
+        allowFullWidth={true}
         element={
           <StripePaymentContent
             transaction={transaction}
