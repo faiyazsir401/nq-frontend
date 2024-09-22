@@ -25,7 +25,7 @@ const StartMeeting = ({
   const mediaQuery = window.matchMedia("(min-width: 768px)");
 
   return (
-    <div className={mediaQuery.matches ? "mr-3 full-height" : "mr-3"}>
+    <div className={mediaQuery.matches ? "mr-3 " : "mr-3"}>
       <HandleVideoCall
         id={id}
         isClose={isClose}

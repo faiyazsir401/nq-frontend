@@ -191,6 +191,8 @@ export const HandleVideoCall = ({
   const [permissionModal, setPermissionModal] = useState(true);
   const width500 = useMediaQuery(500);
   const width768 = useMediaQuery(768);
+  const width900 = useMediaQuery(900);
+
   const [isTooltipShow, setIsTooltipShow] = useState(true);
   const [modal, setModal] = useState(false);
   const [showThumbnailForFirstVideo, setShowThumbnailForFirstVideo] = useState(true);
@@ -2336,9 +2338,9 @@ export const HandleVideoCall = ({
                 <div
                   className="no-user-joined font-weight-bold text-center"
                   style={{
-                    margin: displayMsg?.msg ? (width500 ? "0px" : "10px") : "",
+                    margin: displayMsg?.msg ? (width900 ? "0px" : "10px") : "",
                     zIndex: displayMsg?.msg ? 8 : 1,
-                    fontSize: width500 ? "14px" : "20px",
+                    fontSize: width900 ? "14px" : "20px",
                   }}
                 >
                   {displayMsg?.msg}
@@ -2929,7 +2931,7 @@ export const HandleVideoCall = ({
                           pinnedUser === "user-video-1"))
                       ? "auto"
                       : 999,
-                  width: !isPinned ? '30%  ' : accountType === AccountType.TRAINER ? isPinned && pinnedUser === "user-video-2" ? '' : '30% ' : isPinned && pinnedUser === "user-video-1" ? '' : '30%',
+                  width: !isPinned ? '25%  ' : accountType === AccountType.TRAINER ? isPinned && pinnedUser === "user-video-2" ? '' : '25%' : isPinned && pinnedUser === "user-video-1" ? '' : '30%',
                   marginTop: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '10px' : accountType === AccountType.TRAINEE && isPinned && pinnedUser === "user-video-1" ? '10px' : accountType === AccountType.TRAINEE && displayMsg?.msg && isPinned &&
                     pinnedUser === "user-video-1" ? '0px' : displayMsg?.msg && isPinned &&
                       pinnedUser === "user-video-2" ? '0px' : accountType === AccountType.TRAINER ? isPinned &&
@@ -2973,7 +2975,7 @@ export const HandleVideoCall = ({
                       || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
                     ) ?
                       "relative" : "absolute" : "relative",
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-30%" : "",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-24%" : "",
                 }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
@@ -3257,9 +3259,9 @@ export const HandleVideoCall = ({
                 <div
                   className="no-user-joined font-weight-bold text-center"
                   style={{
-                    margin: displayMsg?.msg ? (width500 ? "0px" : "10px") : "",
+                    margin: displayMsg?.msg ? (width900 ? "0px" : "10px") : "",
                     zIndex: displayMsg?.msg ? 8 : 1,
-                    fontSize: width500 ? "14px" : "20px",
+                    fontSize: width900 ? "14px" : "20px",
                   }}
                 >
                   {displayMsg?.msg}
