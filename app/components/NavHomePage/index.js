@@ -17,6 +17,8 @@ const NavHomePage = () => {
   const [progress, setProgress] = useState(0);
   const width2000 = useMediaQuery(2000);
   const width1200 = useMediaQuery(1200);
+  const width900 = useMediaQuery(900);
+
   const width600 = useMediaQuery(700);
   const { accountType, onlineUsers } = useAppSelector(authState);
 
@@ -61,7 +63,7 @@ const NavHomePage = () => {
       },
     ],
   };
-
+  console.log('width600',width600)
   return (
     <div className="container-fluid">
 
@@ -114,6 +116,7 @@ const NavHomePage = () => {
             padding: "0px",
             height: "100%",
             display: width1200 || width600 ? "flex" : "block",
+            gap:width600 ?"30px":"0px"
           }}
 
         >
@@ -143,6 +146,7 @@ const NavHomePage = () => {
               }  ${!width1200 ? "my-3" : ""}`}
             style={{
               height: width1200 ? "100%" : "calc(100% - 400px)",
+              
             }}
           >
             {/* <div className={`card trainer-profile-card Home-main-Cont ${width1200 ? "max-height-280px" : ""}`} style={{ width: "100%", color: "black", maxHeight: (width1200 && accountType === AccountType?.TRAINER) ? '350px' : (width1200 && accountType !== AccountType?.TRAINER) ? '280px' : '' }}>
@@ -151,7 +155,7 @@ const NavHomePage = () => {
                             </div>
                         </div> */}
             <div
-              className={`card trainer-profile-card Home-main-Cont mt-4`}
+              className={`card trainer-profile-card Home-main-Cont `}
               style={{ width: "100%", color: "black", height: "100%" }}
             >
               <div
@@ -202,7 +206,7 @@ const NavHomePage = () => {
                 ? "col-sm-3"
                 : ""
             }`}
-          style={{ width: "auto !important", padding: "0px", margin: "auto 0" }}
+          style={{ width: "auto !important", padding: "0px",marginTop:"5px"}}
         >
           <div
             className={`${width600
@@ -213,9 +217,12 @@ const NavHomePage = () => {
                   ? "col-sm-12"
                   : ""
               } my-3`}
+              style={{
+                padding:width600?"0px":"0px 15px"
+              }}
           >
             <div
-              className="card trainer-profile-card Home-main-Cont mt-4"
+              className="card trainer-profile-card Home-main-Cont "
               style={{ height: "100%", width: "100%" }}
             >
               <div className="card-body">
@@ -233,6 +240,9 @@ const NavHomePage = () => {
                   ? "col-sm-12"
                   : ""
               } my-3`}
+              style={{
+                padding:width600?"0px":"0px 15px"
+              }}
           >
             <div
               className="card trainer-profile-card Home-main-Cont"
@@ -273,6 +283,9 @@ const NavHomePage = () => {
                   ? "col-sm-12"
                   : ""
               } my-3`}
+              style={{
+                padding:width600?"0px":"0px 15px"
+              }}
           >
             <div
               className="card trainer-profile-card Home-main-Cont"
@@ -293,6 +306,9 @@ const NavHomePage = () => {
                   ? "col-sm-12"
                   : ""
               } my-3`}
+              style={{
+                padding:width600?"0px":"0px 15px"
+              }}
           >
             <div
               className="card trainer-profile-card Home-main-Cont"
