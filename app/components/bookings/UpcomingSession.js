@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { useState, useEffect } from "react";
 import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 import { bookingButton, not_data_for_booking } from "../../common/constants";
@@ -16,6 +16,8 @@ import { useMediaQuery } from "../../hook/useMediaQuery";
 import { myClips } from "../../../containers/rightSidebar/fileSection.api";
 import AddClip from "./start/AddClip";
 import { authState } from "../auth/auth.slice";
+import { isMobile } from "react-device-detect";
+import OrientationModal from "../modalComponent/OrientationModal";
 
 const UpcomingSession = ({ accountType = null }) => {
   const dispatch = useAppDispatch();
@@ -81,76 +83,112 @@ const UpcomingSession = ({ accountType = null }) => {
     setIsOpen(false);
   };
 
-  return (
-    <>
-      <div>
-        <h2 className="d-flex justify-content-center p-3">Session</h2>
-        <div
-          className="card rounded"
-          style={{
-            maxWidth: width768 ? "100%" : "50%",
-            width: "auto",
-            margin: "auto",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div className="card-body">
-            <Nav tabs>
-              {bookingButton.map((tabName, index) => (
-                <NavItem key={`bookings_tabs${index}`}>
-                  <NavLink
-                    className={`${classnames({
-                      active: activeTabs === tabName,
-                    })} ${
-                      activeTabs === tabName ? "text-primary" : "text-dark"
-                    } text-capitalize`}
-                    onClick={() => handleChangeBookingTab(tabName)}
-                    style={{ fontSize: "13px" }}
-                  >
-                    {tabName}
-                  </NavLink>
-                </NavItem>
-              ))}
-            </Nav>
-            <TabContent activeTab={activeTabs}>
-              {
-                Array(bookingButton.length).fill().map((_, index) => <TabPane tabId={bookingButton[index]}>
-                {activeTabs && scheduledMeetingDetails.length > 0 ? (
-                  <BookingList key={`${activeTabs}_${index}`} bookings={scheduledMeetingDetails} activeTabs={activeTabs}/>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      marginTop: "40px",
-                    }}
-                  >
-                    <h5 className="block-title">
-                      {not_data_for_booking[activeTabs]}
-                    </h5>
-                  </div>
-                )}
-              </TabPane>)
-              }
-            </TabContent>
+  const [modal, setModal] = useState(false);
+
+  useLayoutEffect(() => {
+    const updateOrientation = () => {
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      if (width > height == false) {
+        // console.log("=========if block")
+        setModal(true)
+      } else {
+        // console.log("=========else block")
+        setModal(false)
+      }
+    };
+
+    const handleOrientationChange = () => {
+      updateOrientation();
+    };
+
+    // Add event listener for orientation change
+    window.addEventListener('resize', handleOrientationChange);
+
+    // Call updateOrientation once initially
+    updateOrientation();
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+    };
+  }, [isMobile]);
+
+  if(modal){
+    return <OrientationModal isOpen={modal}/>
+  }else{
+    return (
+      <>
+        <div>
+          <h2 className="d-flex justify-content-center p-3">Session</h2>
+          <div
+            className="card rounded"
+            style={{
+              maxWidth: width768 ? "100%" : "50%",
+              width: "auto",
+              margin: "auto",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div className="card-body">
+              <Nav tabs>
+                {bookingButton.map((tabName, index) => (
+                  <NavItem key={`bookings_tabs${index}`}>
+                    <NavLink
+                      className={`${classnames({
+                        active: activeTabs === tabName,
+                      })} ${
+                        activeTabs === tabName ? "text-primary" : "text-dark"
+                      } text-capitalize`}
+                      onClick={() => handleChangeBookingTab(tabName)}
+                      style={{ fontSize: "13px" }}
+                    >
+                      {tabName}
+                    </NavLink>
+                  </NavItem>
+                ))}
+              </Nav>
+              <TabContent activeTab={activeTabs}>
+                {
+                  Array(bookingButton.length).fill().map((_, index) => <TabPane tabId={bookingButton[index]}>
+                  {activeTabs && scheduledMeetingDetails.length > 0 ? (
+                    <BookingList key={`${activeTabs}_${index}`} bookings={scheduledMeetingDetails} activeTabs={activeTabs}/>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        marginTop: "40px",
+                      }}
+                    >
+                      <h5 className="block-title">
+                        {not_data_for_booking[activeTabs]}
+                      </h5>
+                    </div>
+                  )}
+                </TabPane>)
+                }
+              </TabContent>
+            </div>
           </div>
         </div>
-      </div>
-
-      <AddClip
-        isOpen={isOpen}
-        onClose={() => {
-          setIsOpen(false);
-          dispatch(removeNewBookingData());
-        }}
-        trainer={trainer[0]?.trainer_info?.fullname}
-        selectedClips={selectedClips}
-        setSelectedClips={setSelectedClips}
-        clips={clips}
-        shareFunc={addTraineeClipInBookedSession}
-      />
-    </>
-  );
+  
+        <AddClip
+          isOpen={isOpen}
+          onClose={() => {
+            setIsOpen(false);
+            dispatch(removeNewBookingData());
+          }}
+          trainer={trainer[0]?.trainer_info?.fullname}
+          selectedClips={selectedClips}
+          setSelectedClips={setSelectedClips}
+          clips={clips}
+          shareFunc={addTraineeClipInBookedSession}
+        />
+      </>
+    );
+  }
+ 
 };
 export default UpcomingSession;
