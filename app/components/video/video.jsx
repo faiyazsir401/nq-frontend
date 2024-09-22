@@ -2975,7 +2975,7 @@ export const HandleVideoCall = ({
                       || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
                     ) ?
                       "relative" : "absolute" : "relative",
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-24%" : "",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-22%" : "",
                 }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
