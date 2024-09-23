@@ -838,6 +838,7 @@ const FileSection = (props) => {
 
       <Modal
         isOpen={isOpenPDF}
+        allowFullWidth={true}
         element={
           <>
             <div className="container media-gallery portfolio-section grid-portfolio ">

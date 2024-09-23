@@ -298,6 +298,7 @@ const reportModal = ({
   return <>
     <Modal
       isOpen={isOpenReport}
+      allowFullWidth={true}
       element={
         <>
           <div id="generate-report" className="container media-gallery portfolio-section grid-portfolio">
