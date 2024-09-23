@@ -1905,7 +1905,7 @@ export const HandleVideoCall = ({
   const renderCallActionButtons = () => {
     // console.log("code:0.0.2" + session_end_time);
     return (
-      <div className="call-action-buttons z-50 my-3 ">
+      <div className="call-action-buttons z-50 my-3 " >
         <Tooltip
           title={isMuted ? "Unmute" : "Mute"}
           position="bottom"
@@ -2374,7 +2374,7 @@ export const HandleVideoCall = ({
                     overflow: 'hidden',
                     height:
                       !isPinned && selectedClips?.length ? "35vw" : '12vw',
-                    width: !isPinned && selectedClips?.length ? '100%' : ''
+                    width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
                   onClick={() => {
@@ -2646,7 +2646,7 @@ export const HandleVideoCall = ({
                 style={{
                   position: "absolute",
                   top: width768 ? (!displayMsg?.msg ? "1%" : "20px") : "3%",
-                  right: "-15vw",
+                  right: "-125px",
                   zIndex: 999,
                   width: displayMsg?.msg ? '100%' : ''
                 }}
@@ -2719,7 +2719,7 @@ export const HandleVideoCall = ({
                         : selectedClips?.length && !pinnedUser && !isPinned
                           ? 999
                           : "auto",
-                  width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '30%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '30%' : selectedClips.length && !isPinned ? '30% ' : '',
+                  width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '25%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '25%' : selectedClips.length && !isPinned ? '25% ' : '',
                   height:
                     accountType === AccountType.TRAINER && selectedClips.length &&
                       isPinned && pinnedUser === "user-video-1" ? "35vw" :
@@ -2770,7 +2770,7 @@ export const HandleVideoCall = ({
                   // position: displayMsg?.msg || isRemoteVideoOff ? "relative" : height < 500 ? pinnedUser === "user-video-1" ? "relative" : "absolute" : "relative",
                   position: height < 500 ? ((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) ? "relative" : "absolute" : "relative",
 
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-30%" : "",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-140px" : "",
                 }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
@@ -2932,7 +2932,7 @@ export const HandleVideoCall = ({
                           pinnedUser === "user-video-1"))
                       ? "auto"
                       : 999,
-                  width: !isPinned ? '25%  ' : accountType === AccountType.TRAINER ? isPinned && pinnedUser === "user-video-2" ? '' : '25%' : isPinned && pinnedUser === "user-video-1" ? '' : '30%',
+                  width: !isPinned ? '25%  ' : accountType === AccountType.TRAINER ? isPinned && pinnedUser === "user-video-2" ? '' : '25%' : isPinned && pinnedUser === "user-video-1" ? '' : '25%',
                   marginTop: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '10px' : accountType === AccountType.TRAINEE && isPinned && pinnedUser === "user-video-1" ? '10px' : accountType === AccountType.TRAINEE && displayMsg?.msg && isPinned &&
                     pinnedUser === "user-video-1" ? '0px' : displayMsg?.msg && isPinned &&
                       pinnedUser === "user-video-2" ? '0px' : accountType === AccountType.TRAINER ? isPinned &&
@@ -2976,7 +2976,7 @@ export const HandleVideoCall = ({
                       || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
                     ) ?
                       "relative" : "absolute" : "relative",
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-15vw" : "",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-140px" : "",
                 }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
@@ -3763,7 +3763,7 @@ export const HandleVideoCall = ({
                   // position: displayMsg?.msg || isRemoteVideoOff ? "relative" : height < 500 ? pinnedUser === "user-video-1" ? "relative" : "absolute" : "relative",
                   position: height < 500 ? ((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) ? "relative" : "absolute" : "relative",
 
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-30%" : "",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-140px" : "",
                 }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
@@ -3918,7 +3918,7 @@ export const HandleVideoCall = ({
                       || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
                     ) ?
                       "relative" : "absolute" : "relative",
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-30%" : "",
+                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-140px" : "",
                 }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
