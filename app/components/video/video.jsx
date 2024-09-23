@@ -2077,6 +2077,7 @@ export const HandleVideoCall = ({
             position="bottom"
             trigger="mouseenter"
             className="custom-tooltip-hh"
+            disabled={width900}
           >
             <div
               className={`icon-btn btn-light button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
@@ -2959,8 +2960,8 @@ export const HandleVideoCall = ({
                         : height < 500 ? "12vw" : "12vw",
                   // top :  selectedClips.length > 0 ?  "10% !important" : "20%"
                   top: accountType === AccountType.TRAINEE && displayMsg?.msg && isPinned &&
-                    pinnedUser === "user-video-2" ? '110px' : displayMsg?.msg && isPinned &&
-                      pinnedUser === "user-video-1" ? '110px' : displayMsg?.msg && isPinned &&
+                    pinnedUser === "user-video-2" ? width900 ?'20px':'110px' : displayMsg?.msg && isPinned &&
+                      pinnedUser === "user-video-1" ? width900 ?'20px':'110px' : displayMsg?.msg && isPinned &&
                         pinnedUser === "user-video-2" ? "0px" :
                     accountType === AccountType.TRAINEE && !isPinned && selectedClips?.length ? '0px' :
                       isPinned && !(height < 500) ?
