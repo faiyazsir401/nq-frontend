@@ -34,7 +34,7 @@ const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedCl
           </div>
           <div className="container media-gallery portfolio-section grid-portfolio ">
             <h2 className="my-5">
-              Feel free to share upto 2 clips with the{" "}
+              Feel free to share up to 2 clips with the{" "}
               {trainer}
             </h2>
             {selectedClipsCopy?.length ? (

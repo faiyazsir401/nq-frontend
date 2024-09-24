@@ -120,7 +120,7 @@ const UpcomingSession = ({ accountType = null }) => {
     return (
       <>
         <div>
-          <h2 className="d-flex justify-content-center p-3">Session</h2>
+          <h2 className="d-flex justify-content-center p-3">Sessions</h2>
           <div
             className="card rounded"
             style={{

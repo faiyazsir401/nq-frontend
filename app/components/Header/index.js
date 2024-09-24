@@ -14,7 +14,7 @@ const menuItems = [
   { label: 'My Locker', value: topNavbarOptions?.HOME, topNavbarTab: topNavbarOptions?.HOME, accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER] },
   { label: 'My Uploads', value: 'file', leftSideBarTab: 'file', accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER] },
   // { label: 'Upcoming Lessons', value: "scheduleTraining", leftSideBarTab: leftSideBarOptions?.SCHEDULE_TRAINING, accessBy: [] },
-  { label: 'Book Lessons', value: topNavbarOptions?.BOOK_LESSON, topNavbarTab: topNavbarOptions?.BOOK_LESSON, accessBy: [AccountType?.TRAINEE,] },
+  { label: 'Book Trainer', value: topNavbarOptions?.BOOK_LESSON, topNavbarTab: topNavbarOptions?.BOOK_LESSON, accessBy: [AccountType?.TRAINEE,] },
   // { label: 'Upcoming Lessons', value: "scheduleTraining", leftSideBarTab: leftSideBarOptions?.SCHEDULE_TRAINING, accessBy: [AccountType?.TRAINEE] },
   { label: 'Students', value: 'Student', topNavbarTab: topNavbarOptions?.STUDENT, accessBy: [AccountType?.TRAINER] },
   { label: 'Upcoming Sessions', value: 'Upcoming Session', topNavbarTab: topNavbarOptions?.UPCOMING_SESSION, accessBy: [AccountType?.TRAINER] },
