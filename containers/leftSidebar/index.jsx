@@ -73,7 +73,7 @@ const Index = (props) => {
   const { sidebarActiveTab, sidebarModalActiveTab, topNavbarActiveTab, onlineUsers } = useAppSelector(authState);
   const [width, setWidth] = useState(0);
   const [opentour, setopentour] = useState(true);
-  let [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState(null);
   const [mode, setMode] = useState(false);
   const router = useRouter();
   const [size, setSize] = useState([0, 0]);
@@ -165,12 +165,8 @@ const Index = (props) => {
   };
 
   useEffect(() => {
-    setActiveTab(sidebarActiveTab === leftSideBarOptions?.TOPNAVBAR ? topNavbarActiveTab : sidebarActiveTab);
-  }, [sidebarActiveTab, topNavbarActiveTab])
-
-  useEffect(() => {
-    setActiveTab(sidebarModalActiveTab);
-  }, [sidebarModalActiveTab])
+    setActiveTab(topNavbarOptions?.HOME);
+  }, [topNavbarOptions])
 
   const TogglTab = (value) => {
     alert(`clicked ${tab}`)
@@ -407,6 +403,7 @@ const Index = (props) => {
 
   const width1000 = useMediaQuery(1000)
 
+  console.log("activeTab",activeTab,topNavbarOptions?.HOME)
   return (
     <Fragment>
       {/* <AppListSection
@@ -480,7 +477,7 @@ const Index = (props) => {
                   <NavLink id="sidebar-item-home"
                     className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.HOME ? "active" : ""
                       }`}
-                    onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)) }}
+                    onClick={() => {setActiveTab(topNavbarOptions?.HOME); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)) }}
                   >
                     <i className="fa fa-home" />
                   </NavLink>
@@ -491,12 +488,12 @@ const Index = (props) => {
                 {accountType === AccountType.TRAINEE && <li>
 
                   <NavLink id="sidebar-item-booking"
-                    className={`icon-btn btn-light button-effect ${activeTab === leftSideBarOptions.SCHEDULE_TRAINING
+                    className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.UPCOMING_SESSION
                       ? "active"
                       : ""
                       }`}
                     // onClick={() => TogglTab(leftSideBarOptions.SCHEDULE_TRAINING)}
-                    onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
+                    onClick={() => {setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
                   >
                     <i className="fa fa-calendar" />
                   </NavLink>
@@ -508,7 +505,7 @@ const Index = (props) => {
                   <NavLink id="sidebar-item-locker"
                     className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.BOOK_LESSON ? "active" : ""
                       }`}
-                    onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON)) }}
+                    onClick={() => {setActiveTab(topNavbarOptions?.BOOK_LESSON); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON)) }}
                     data-intro=""
                   >
                     {activeTab === topNavbarOptions?.BOOK_LESSON
@@ -632,7 +629,7 @@ const Index = (props) => {
                   <NavLink id="sidebar-item-upcoming"
                     className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.UPCOMING_SESSION ? "active" : ""
                       }`}
-                    onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
+                    onClick={() => {setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
                     data-intro=""
                   >
                     {activeTab === topNavbarOptions?.UPCOMING_SESSION

@@ -1981,7 +1981,7 @@ export default function PracticeLiveExperience({
               }}
             >
               <div className="text-center" style={{ marginBottom: "5px" }}>
-                <h3>Time remaining</h3>
+                {/* <h3>Time remaining</h3> */}
                 <h2 style={{ fontSize: "20px" }}> {timeDifference}</h2>
               </div>
               
