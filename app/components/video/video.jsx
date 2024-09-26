@@ -2661,7 +2661,7 @@ export const HandleVideoCall = ({
                     flexDirection: 'column',
                   }}
                 >
-                  {/* <h3 style={{ fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)' }}>Time remaining</h3> */}
+                  <h3 style={{ fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)' }}>Time remaining</h3>
                   <h2 style={{ fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)' }}> {timeDifference}</h2>
                 </div>
               </div>
