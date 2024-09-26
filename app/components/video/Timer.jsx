@@ -34,6 +34,7 @@ const Timer = (session_end_time) => {
       if(hours === 0){
          formattedTimeDifference =`${isBeforeEndTime ? "" : "-"}${paddedMinutes}:${paddedSeconds}`;
       }
+      
 
       console.log("formattedTimeDifference",formattedTimeDifference)
       setTimeDifference(formattedTimeDifference);
