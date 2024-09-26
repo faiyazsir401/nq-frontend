@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import Modal from '../../../common/modal';
 import { useAppDispatch } from '../../../store';
 import { traineeAction } from '../../trainee/trainee.slice';
@@ -6,16 +6,16 @@ import { Utils } from '../../../../utils/utils';
 import { X } from 'react-feather';
 import { Button } from 'reactstrap';
 
+const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedClips, shareFunc }) => {
 
-const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedClips, shareFunc }) => {
-
-  const [selectedClipsCopy, setSelectedClipsCopy] = useState([])
+  const [selectedClipsCopy, setSelectedClipsCopy] = useState([]);
   const dispatch = useAppDispatch();
   const { removeNewBookingData } = traineeAction;
 
   return (
     <Modal isOpen={isOpen} element={
       <div>
+        <div className='d-flex flex-row-reverse'>
           <div className="theme-title">
             <div className="media">
               <div className="media-body media-body text-right">
@@ -26,143 +26,78 @@ const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedCl
                     dispatch(removeNewBookingData());
                   }}
                 >
-                  {" "}
-                  <X />{" "}
+                  <X />
                 </div>
               </div>
             </div>
           </div>
           <div className="container media-gallery portfolio-section grid-portfolio ">
-            <h2 className="my-5">
+            <h2 className="my-3 mb-4">
               Feel free to share up to 2 clips with the{" "}
               {trainer}
             </h2>
-            {selectedClipsCopy?.length ? (
-              <div>
-                <h5 className="block-title p-0">
-                  {" "}
-                  Selected Clips
-                  <label className="badge badge-primary sm ml-2">
-                    {selectedClipsCopy?.length}
-                  </label>
-                </h5>
-                <div className={`block-content`}>
-                  <div className="row d-flex justify-content-center">
-                    {selectedClipsCopy?.map((clp) => (
-                      <div
-                        key={clp?._id}
-                        style={{
-                          borderRadius: 5,
-                          position: "relative",
-                          border: "1px solid #ebebeb",
-                          marginLeft: "15px",
-                        }}
-                        className={`col-4`}
-                      >
-                        <video
-                          poster={Utils.generateThumbnailURL(clp)}
-                          style={{
-                            height: "180px",
-                            width: "100% !important",
-                            border: "4px solid #b4bbd1",
-                            borderRadius: "5px",
-                            objectFit: "cover",
-                          }}
-                        >
-                          <source
-                            src={Utils?.generateVideoURL(clp)}
-                            type="video/mp4"
-                          />
-                        </video>
-                        <span
-                          style={{
-                            position: "absolute",
-                            right: -5,
-                            top: -3,
-                            cursor: "pointer",
-                            background: "red",
-                            borderRadius: "50%",
-                            padding: "0px 6px",
-                            color: "#fff",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent the event from bubbling up
-                            const updatedVideos =
-                              selectedClipsCopy.filter(
-                                (video) => video._id !== clp?._id
+          </div>
+        </div>
+        <div className='container media-gallery portfolio-section grid-portfolio '>
+          <div
+            className='d-flex'
+            style={{
+              gap: 10,
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+              height: '200px',
+            }}
+          >
+            {clips?.length ? (
+              clips.map((cl, ind) => (
+                <div
+                  key={ind}
+                  className={`d-inline ${cl?.show ? "" : "open"}`}
+                  style={{ display: 'inline-block' }}
+                >
+                  <div className='d-flex' style={{ gap: 10 }}>
+                    {cl?.clips.map((clp, index) => {
+                      const isSelected = selectedClipsCopy.some(
+                        (val) => val?._id === clp?._id
+                      );
+                      return (
+                        <div
+                          key={index}
+                          style={{ borderRadius: 5 }}
+                          onClick={() => {
+                            if (isSelected) {
+                              // Remove clip if it's already selected
+                              setSelectedClipsCopy((prev) =>
+                                prev.filter((val) => val?._id !== clp?._id)
                               );
-                              setSelectedClipsCopy(updatedVideos);
+                            } else if (selectedClipsCopy.length < 2) {
+                              // Add clip if not selected and less than 2 selected
+                              setSelectedClipsCopy((prev) => [...prev, clp]);
+                            }
                           }}
                         >
-                          x
-                        </span>
-                      </div>
-                    ))}
+                          <video
+                            poster={Utils.generateThumbnailURL(clp)}
+                            style={{
+                              border: `${isSelected ? "4px solid green" : "4px solid #b4bbd1"}`,
+                              height: "180px",
+                              width: "300px",
+                              borderRadius: "5px",
+                              objectFit: "cover",
+                            }}
+                          >
+                            <source
+                              src={Utils?.generateVideoURL(clp)}
+                              type="video/mp4"
+                            />
+                          </video>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
-              </div>
-            ) : (
-              <></>
-            )}
-            <div style={{ marginTop: "30px" }}></div>
-            <div
-  className='d-flex'
-  style={{
-    gap: 10,
-    overflowX: 'auto', // Enables horizontal scrolling
-    whiteSpace: 'nowrap', // Prevents wrapping of child elements
-    height: '200px', // Adjust height as necessary
-  }}
->
-  {clips?.length ? (
-    clips.map((cl, ind) => (
-      <div
-        key={ind} // Added key for the outer div
-        className={`d-inline ${cl?.show ? "" : "open"}`}
-        style={{
-          display: 'inline-block', // Keeps items in a row
-        }}
-      >
-        <div className='d-flex' style={{ gap: 10 }}>
-          {cl?.clips.map((clp, index) => {
-            const sld = selectedClipsCopy.find(
-              (val) => val?._id === clp?._id
-            );
-            return (
-              <div
-                key={index}
-                style={{ borderRadius: 5 }}
-                onClick={() => {
-                  if (!sld && selectedClipsCopy?.length < 2) {
-                    setSelectedClipsCopy((prev) => [...prev, clp]);
-                  }
-                }}
-              >
-                <video
-                  poster={Utils.generateThumbnailURL(clp)}
-                  style={{
-                    border: `${sld ? "4px solid green" : "4px solid #b4bbd1"}`,
-                    height: "180px",
-                    width: "300px", // Fixed width for consistent sizing
-                    borderRadius: "5px",
-                    objectFit: "cover",
-                  }}
-                >
-                  <source
-                    src={Utils?.generateVideoURL(clp)}
-                    type="video/mp4"
-                  />
-                </video>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    ))
-  ) : (
-    <></>
-  )}
-</div>
+              ))
+            ) : null}
           </div>
           {clips?.length ? (
             <div className="d-flex justify-content-around w-100 p-3">
@@ -176,15 +111,11 @@ const AddClip = ({isOpen, onClose , trainer, selectedClips, clips, setSelectedCl
                 Share
               </Button>
             </div>
-          ) : (
-            <></>
-          )}
+          ) : null}
         </div>
-    }/>
-      
-      
-
-  )
+      </div>
+    } />
+  );
 }
 
-export default AddClip
+export default AddClip;
