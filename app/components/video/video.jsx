@@ -192,6 +192,7 @@ export const HandleVideoCall = ({
   const width500 = useMediaQuery(500);
   const width768 = useMediaQuery(768);
   const width900 = useMediaQuery(900);
+  const width1000 = useMediaQuery(1000);
 
   const [isTooltipShow, setIsTooltipShow] = useState(true);
   const [modal, setModal] = useState(false);
@@ -2077,7 +2078,7 @@ export const HandleVideoCall = ({
             position="bottom"
             trigger="mouseenter"
             className="custom-tooltip-hh"
-            disabled={width900}
+            disabled={width1000}
           >
             <div
               className={`icon-btn btn-light button-effect ${mediaQuery.matches ? "btn-xl" : "btn-sm"
