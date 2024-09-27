@@ -2340,9 +2340,9 @@ export const HandleVideoCall = ({
                 <div
                   className="no-user-joined font-weight-bold text-center"
                   style={{
-                    margin: displayMsg?.msg ? (width900 ? "0px" : "10px") : "",
+                    margin: displayMsg?.msg ? (width1000 ? "0px" : "10px") : "",
                     zIndex: displayMsg?.msg ? 8 : 1,
-                    fontSize: width900 ? "14px" : "20px",
+                    fontSize: width1000 ? "14px" : "20px",
                   }}
                 >
                   {displayMsg?.msg}
@@ -3261,9 +3261,9 @@ export const HandleVideoCall = ({
                 <div
                   className="no-user-joined font-weight-bold text-center"
                   style={{
-                    margin: displayMsg?.msg ? (width900 ? "0px" : "10px") : "",
+                    margin: displayMsg?.msg ? (width1000 ? "0px" : "10px") : "",
                     zIndex: displayMsg?.msg ? 8 : 1,
-                    fontSize: width900 ? "14px" : "20px",
+                    fontSize: width1000 ? "14px" : "20px",
                   }}
                 >
                   {displayMsg?.msg}
