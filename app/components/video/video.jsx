@@ -623,8 +623,8 @@ export const HandleVideoCall = ({
 
   useEffect(() => {
     adjustCanvasSize();
-    window.addEventListener('resize', adjustCanvasSize);
-    return () => window.removeEventListener('resize', adjustCanvasSize);
+    // window.addEventListener('resize', adjustCanvasSize);
+    // return () => window.removeEventListener('resize', adjustCanvasSize);
   }, []);
 
   // NOTE - call end
@@ -1528,29 +1528,25 @@ export const HandleVideoCall = ({
   }, [selectedClips?.length]);
 
 
-  socket.on(
-    EVENTS.ON_VIDEO_PLAY_PAUSE,
-    ({ isPlayingAll, number, isPlaying1, isPlaying2 }) => {
-      if (number === "all") {
-        if (!isPlayingAll) {
-          selectedVideoRef1?.current?.pause();
-          selectedVideoRef2?.current?.pause();
-        } else {
-          selectedVideoRef1?.current?.play();
-          selectedVideoRef2?.current?.play();
-        }
+  socket.on(EVENTS.ON_VIDEO_PLAY_PAUSE, ({ isPlayingAll, number, isPlaying1, isPlaying2 }) => {
+    const playPauseVideo = (videoRef, isPlaying) => {
+      if (videoRef?.current) {
+        isPlaying ? videoRef.current.play() : videoRef.current.pause();
       }
-      if (number === "one") {
-        if (!isPlaying1) selectedVideoRef1?.current?.pause();
-        else selectedVideoRef1?.current?.play();
-      }
-      if (number === "two") {
-        if (!isPlaying2) selectedVideoRef2?.current?.pause();
-        else selectedVideoRef2?.current?.play();
-      }
-      setIsPlaying({ isPlayingAll, number, isPlaying1, isPlaying2 });
+    };
+  
+    if (number === "all") {
+      playPauseVideo(selectedVideoRef1, isPlayingAll);
+      playPauseVideo(selectedVideoRef2, isPlayingAll);
+    } else if (number === "one") {
+      playPauseVideo(selectedVideoRef1, isPlaying1);
+    } else if (number === "two") {
+      playPauseVideo(selectedVideoRef2, isPlaying2);
     }
-  );
+  
+    setIsPlaying({ isPlayingAll, number, isPlaying1, isPlaying2 });
+  });
+  
 
 
   //NOTE -  Video Time Update listen
@@ -1680,31 +1676,38 @@ export const HandleVideoCall = ({
 
   // console.log("video time--------->",videoTime)
   const handleTimeUpdate = (videoRef, progressBarRef, number) => {
+    if (!videoRef.current) return; // Ensure videoRef is valid
+  
+    // Update progress bar value
     if (progressBarRef?.current) {
-      progressBarRef.current.value = videoRef?.current?.currentTime || 0;
+      progressBarRef.current.value = videoRef.current.currentTime || 0;
     }
-
+  
+    // Check if video has ended
     if (videoRef.current.duration === videoRef.current.currentTime) {
       togglePlay(number);
       videoRef.current.currentTime = 0;
-      emitVideoTimeEvent(0, number)
+      emitVideoTimeEvent(0, number);
     }
+  
+    // Calculate remaining time
     const remainingTime = videoRef.current.duration - videoRef.current.currentTime;
-
+  
+    // Update video time state
     setVideoTime((prevVideoTime) => ({
       ...prevVideoTime,
-      [`currentTime${number}`]: `${String(
-        Math?.floor(progressBarRef?.current?.value ?? 0 / 60)
-      ).padStart(2, "0")}:${String(
-        Math?.floor(progressBarRef?.current?.value ?? 0 % 60)
-      ).padStart(2, "0")}`,
-      [`remainingTime${number}`]: `${String(
-        Math?.floor(remainingTime / 60)
-      ).padStart(2, "0")}:${String(
-        Math?.floor(remainingTime % 60)
-      ).padStart(2, "0")}`,
+      [`currentTime${number}`]: formatTime(videoRef.current.currentTime),
+      [`remainingTime${number}`]: formatTime(remainingTime),
     }));
   };
+  
+  // Helper function to format time as MM:SS
+  const formatTime = (timeInSeconds) => {
+    const minutes = Math.floor(timeInSeconds / 60);
+    const seconds = Math.floor(timeInSeconds % 60);
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+  
 
   // Usage for first video
   const handleTimeUpdate1 = () => handleTimeUpdate(selectedVideoRef1, progressBarRef, 1);
