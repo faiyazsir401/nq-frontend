@@ -955,7 +955,7 @@ const Bookings = ({ accountType = null }) => {
   const renderRating = () => {
     return (
       <ReactStrapModal
-        // allowFullWidth={true}
+        allowFullWidth={true}
         element={
           <Ratings
             accountType={accountType}
