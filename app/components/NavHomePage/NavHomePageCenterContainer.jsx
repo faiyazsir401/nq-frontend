@@ -21,6 +21,8 @@ import { createStripeVarificationUrl, createVarificationSession } from "../commo
 import Link from "next/link";
 import Slider from "react-slick";
 import { useMediaQuery } from "../../hook/useMediaQuery";
+import OrientationModal from "../modalComponent/OrientationModal";
+import Image from "next/image";
 
 const Schedule = ({ activeCenterContainerTab }) => {
   useEffect(() => { }, [activeCenterContainerTab]);
@@ -192,7 +194,10 @@ const NavHomePageCenterContainer = () => {
 
   const isMobile = useMediaQuery(599)
 
+
+
   const toggleTab = (tabValue) => {
+ 
     if (activeTab !== tabValue) {
       setActiveTab(tabValue);
     }
@@ -210,8 +215,44 @@ const NavHomePageCenterContainer = () => {
     }
   }
 
+  const [modal,setModal] = useState(false)
+
+  useEffect(() => {
+   
+    const updateOrientation = () => {
+      
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        if (width > height == false && activeTab==="upcomingLesson") {
+          // console.log("=========if block")
+          setModal(true)
+        } else {
+          // console.log("=========else block")
+          setModal(false)
+        }
+      
+  
+    };
+
+    const handleOrientationChange = () => {
+      updateOrientation();
+    };
+
+    // Add event listener for orientation change
+    window.addEventListener('resize', handleOrientationChange);
+
+    // Call updateOrientation once initially
+    updateOrientation();
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('resize', handleOrientationChange);
+    };
+  }, [isMobile,activeTab]);
+
   return (
     <>
+     
       <div id="navHomePageCenterContainer">
         {
           userInfo?.account_type === "Trainer" && !userInfo?.is_kyc_completed ?
@@ -330,8 +371,15 @@ const NavHomePageCenterContainer = () => {
           </Nav>}
         </div>
         <div className="file-tab Nav-Home" style={{ color: "black" }}>
+
+
           <TabContent activeTab={activeTab}>
-            {allTabs?.map((el, index) => {
+           { modal?
+          <Image src={'/assets/images/rotate.png'} alt='Rotate Image' height="200" width="250" style={{
+            objectFit:"contain"
+          }} />
+          :
+            allTabs?.map((el, index) => {
               return (
                 <TabPane key={index} tabId={el?.value}>
                   {el?.component ? (

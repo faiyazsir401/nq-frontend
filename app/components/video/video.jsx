@@ -623,6 +623,21 @@ export const HandleVideoCall = ({
 
   useEffect(() => {
     adjustCanvasSize();
+    const sidebar = document.getElementById("left-nav-wrapper")
+    let getNavbarTabs = document.getElementById("get-navbar-tabs");
+    if(sidebar){
+      sidebar.style.display="none"
+      getNavbarTabs.style.marginLeft = '25px';
+        getNavbarTabs?.style?.setProperty('width', 'calc(100vw - 25px)');
+    }
+    console.log("sidebar",sidebar)
+    return ()=>{
+      if(sidebar){
+        sidebar.style.display="block"
+        getNavbarTabs.style.marginLeft ='105px';
+        getNavbarTabs?.style?.setProperty('width','calc(100vw - 55px)');
+      }
+    }
     // window.addEventListener('resize', adjustCanvasSize);
     // return () => window.removeEventListener('resize', adjustCanvasSize);
   }, []);
