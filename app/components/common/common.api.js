@@ -7,7 +7,7 @@ export const addRating = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/rating`,
+      url: `/user/rating`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -25,7 +25,7 @@ export const getScheduledMeetingDetails = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "get",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/scheduled-meetings`,
+      url: `/user/scheduled-meetings`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -45,7 +45,7 @@ export const updateBookedSessionScheduledMeeting = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/update-booked-session/${payload.id}`,
+      url: `/user/update-booked-session/${payload.id}`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export const uploadProfilePicture = async (payload) => {
     const formData = new FormData();
     formData.append("files", payload.files);
     const response = await axiosInstance({
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/upload`,
+      url: `/common/upload`,
       method: "post",
       data: formData,
       headers: {
@@ -87,7 +87,7 @@ export const addTraineeClipInBookedSession = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/add-trainee-clip/${payload.id}`,
+      url: `/user/add-trainee-clip/${payload.id}`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -107,7 +107,7 @@ export const createVarificationSession = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "PUT",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/create-verification-session`,
+      url: `/user/create-verification-session`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -125,7 +125,7 @@ export const createStripeVarificationUrl = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "PUT",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/stripe-account-verification`,
+      url: `/user/stripe-account-verification`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -143,7 +143,7 @@ export const getS3SignUrlForProfile = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "PUT",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/common/update-profile-picture`,
+      url: `/common/update-profile-picture`,
       data: payload,
       headers: {
         "Content-Type": "application/json",

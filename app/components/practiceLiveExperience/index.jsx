@@ -2375,6 +2375,7 @@ export default function PracticeLiveExperience({
           screenShotImages={screenShots}
           setScreenShotImages={setScreenShots}
           setIsOpenDetail={setIsScreenShotModelOpen}
+          isOpenDetail={isScreenShotModelOpen}
           currentReportData={{
             session: id,
             trainer: toUser?._id,

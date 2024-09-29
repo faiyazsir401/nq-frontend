@@ -5,7 +5,7 @@ export const getScheduleInventoryData = async () => {
   try {
     const response = await axiosInstance({
       method: "get",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/get-slots`,
+      url: `/trainer/get-slots`,
       headers: { Authorization: `Bearer ${Utils.getToken()}` },
     });
     return response;
@@ -19,7 +19,7 @@ export const updateSchedulingSlots = async (payload) => {
     const res = await axiosInstance({
       method: "post",
       data: payload,
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/update-slots`,
+      url: `/trainer/update-slots`,
       headers: { Authorization: `Bearer ${Utils.getToken()}` },
     });
     return res.data;

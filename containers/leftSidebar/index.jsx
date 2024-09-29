@@ -10,7 +10,7 @@ import { Fragment, useState } from "react";
 import { NavLink, TabContent, TabPane } from "reactstrap";
 import { useRouter } from "next/router";
 import "./index.scss"
-import { Tooltip } from "react-tippy";
+
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { authAction, authState } from "../../app/components/auth/auth.slice";
@@ -73,7 +73,7 @@ const Index = (props) => {
   const { sidebarActiveTab, sidebarModalActiveTab, topNavbarActiveTab, onlineUsers } = useAppSelector(authState);
   const [width, setWidth] = useState(0);
   const [opentour, setopentour] = useState(true);
-  let [activeTab, setActiveTab] = useState(null);
+  const [activeTab, setActiveTab] = useState(null);
   const [mode, setMode] = useState(false);
   const router = useRouter();
   const [size, setSize] = useState([0, 0]);
@@ -165,12 +165,8 @@ const Index = (props) => {
   };
 
   useEffect(() => {
-    setActiveTab(sidebarActiveTab === leftSideBarOptions?.TOPNAVBAR ? topNavbarActiveTab : sidebarActiveTab);
-  }, [sidebarActiveTab, topNavbarActiveTab])
-
-  useEffect(() => {
-    setActiveTab(sidebarModalActiveTab);
-  }, [sidebarModalActiveTab])
+    setActiveTab(topNavbarOptions?.HOME);
+  }, [topNavbarOptions])
 
   const TogglTab = (value) => {
     alert(`clicked ${tab}`)
@@ -270,8 +266,13 @@ const Index = (props) => {
 
     if (gettrainer) {
       if (isMobile) {
-        gettrainer?.style?.setProperty('left', openCloseToggleSideNav ? '56px' : '0px', 'important');
-        gettrainer.style?.setProperty('max-width', 'calc(100vw - 0px)', ''); // Set max-width to calc(100vw - 105px)
+        gettrainer?.style?.setProperty('margin', '0px', 'important');
+        gettrainer?.style?.setProperty('margin-top', '20px', 'important');
+
+        gettrainer?.style?.setProperty('padding', '0px', 'important');
+
+        gettrainer?.style?.setProperty('left', openCloseToggleSideNav ? '52px' : '0px', 'important');
+        gettrainer.style?.setProperty('max-width', openCloseToggleSideNav ? 'calc(100vw - 60px)' : 'calc(100vw - 0px)'); // Set max-width to calc(100vw - 105px)
       }
     }
 
@@ -367,7 +368,7 @@ const Index = (props) => {
 
       } else {
         getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '105px' : '25px';
-        getNavbarTabs?.style?.setProperty('width',openCloseToggleSideNav ? 'calc(100vw - 55px)': 'calc(100vw - 25px)');
+        getNavbarTabs?.style?.setProperty('width', openCloseToggleSideNav ? 'calc(100vw - 55px)' : 'calc(100vw - 25px)');
 
       }
     }
@@ -402,6 +403,7 @@ const Index = (props) => {
 
   const width1000 = useMediaQuery(1000)
 
+  console.log("activeTab",activeTab,topNavbarOptions?.HOME)
   return (
     <Fragment>
       {/* <AppListSection
@@ -471,76 +473,65 @@ const Index = (props) => {
           </ul> */}
               <ul className="sidebar-top">
                 <li>
-                  <Tooltip title="My Locker" position="top-end"
-                    size="small" trigger="mouseenter">
-                    <NavLink id="sidebar-item-home"
-                      className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.HOME ? "active" : ""
-                        }`}
-                      onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)) }}
-                    >
-                      <i className="fa fa-home" />
-                    </NavLink>
-                  </Tooltip>
+
+                  <NavLink id="sidebar-item-home"
+                    className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.HOME ? "active" : ""
+                      }`}
+                    onClick={() => {setActiveTab(topNavbarOptions?.HOME); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)) }}
+                  >
+                    <i className="fa fa-home" />
+                  </NavLink>
+
                   <p className="menu-name">My Locker</p>
                 </li>
 
                 {accountType === AccountType.TRAINEE && <li>
-                  <Tooltip
-                    title={
-                      accountType === AccountType.TRAINEE
-                        ? "Booking"
-                        : "Schedule Slots"
-                    }
-                    position="top"
-                    trigger="mouseenter"
+
+                  <NavLink id="sidebar-item-booking"
+                    className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.UPCOMING_SESSION
+                      ? "active"
+                      : ""
+                      }`}
+                    // onClick={() => TogglTab(leftSideBarOptions.SCHEDULE_TRAINING)}
+                    onClick={() => {setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
                   >
-                    <NavLink id="sidebar-item-booking"
-                      className={`icon-btn btn-light button-effect ${activeTab === leftSideBarOptions.SCHEDULE_TRAINING
-                        ? "active"
-                        : ""
-                        }`}
-                      // onClick={() => TogglTab(leftSideBarOptions.SCHEDULE_TRAINING)}
-                      onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
-                    >
-                      <i className="fa fa-calendar" />
-                    </NavLink>
-                  </Tooltip>
+                    <i className="fa fa-calendar" />
+                  </NavLink>
+
                   <p className="menu-name">Booking</p>
                 </li>}
                 {accountType === AccountType?.TRAINEE && <li>
-                  <Tooltip title="Book Lessons" trigger="mouseenter" position="top-end"
-                    size="small">
-                    <NavLink id="sidebar-item-locker"
-                      className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.BOOK_LESSON ? "active" : ""
-                        }`}
-                      onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON)) }}
-                      data-intro=""
-                    >
-                      {activeTab === topNavbarOptions?.BOOK_LESSON
-                        ? <img src={"../assets/images/online-lesson-white.png"} alt="Book Lesson" style={{ width: 20 }} />
-                        : <img src={"../assets/images/online-lesson.png"} alt="Book Lesson" style={{ width: 20 }} />
-                      }
 
-                    </NavLink>
-                  </Tooltip>
-                  <p className="menu-name">Book Lessons</p>
+                  <NavLink id="sidebar-item-locker"
+                    className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.BOOK_LESSON ? "active" : ""
+                      }`}
+                    onClick={() => {setActiveTab(topNavbarOptions?.BOOK_LESSON); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON)) }}
+                    data-intro=""
+                  >
+                    {activeTab === topNavbarOptions?.BOOK_LESSON
+                      ? <img src={"../assets/images/online-lesson-white.png"} alt="Book Lesson" style={{ width: 20 }} />
+                      : <img src={"../assets/images/online-lesson.png"} alt="Book Lesson" style={{ width: 20 }} />
+                    }
+
+                  </NavLink>
+
+                  <p className="menu-name">Book Trainer</p>
                 </li>}
                 <li>
-                  <Tooltip title="My Uploads" position="top-end"
-                    size="small" trigger="mouseenter">
-                    <NavLink id="sidebar-item-locker"
-                      className={`icon-btn btn-light button-effect step2 ${activeTab === "file" ? "active" : ""
-                        }`}
-                      onClick={() => ToggleTab("file")}
-                      data-intro=""
-                    >
-                      {activeTab === "file"
-                        ? <img src="../assets/images/lockers-white.png" style={{ width: 20 }} />
-                        : <img src="../assets/images/lockers.png" style={{ width: 20 }} />
-                      }
-                      {/* <i className="fa fa-lock" /> */}
-                    </NavLink>
-                  </Tooltip>
+
+                  <NavLink id="sidebar-item-locker"
+                    className={`icon-btn btn-light button-effect step2 ${activeTab === "file" ? "active" : ""
+                      }`}
+                    onClick={() => ToggleTab("file")}
+                    data-intro=""
+                  >
+                    {activeTab === "file"
+                      ? <img src="../assets/images/lockers-white.png" style={{ width: 20 }} />
+                      : <img src="../assets/images/lockers.png" style={{ width: 20 }} />
+                    }
+                    {/* <i className="fa fa-lock" /> */}
+                  </NavLink>
+
                   <p className="menu-name">My Uploads</p>
                 </li>
                 {/* <li>
@@ -634,58 +625,52 @@ const Index = (props) => {
             </li> */}
 
                 {accountType === AccountType?.TRAINER && <li>
-                  <Tooltip title="Upcoming Sessions" trigger="mouseenter" position="top-end" size="small"
-                  >
-                    <NavLink id="sidebar-item-upcoming"
-                      className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.UPCOMING_SESSION ? "active" : ""
-                        }`}
-                      onClick={() => { dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
-                      data-intro=""
-                    >
-                      {activeTab === topNavbarOptions?.UPCOMING_SESSION
-                        ? <img src={"../assets/images/online-lesson-white.png"} alt="Book Lesson" style={{ width: 20 }} />
-                        : <img src={"../assets/images/online-lesson.png"} alt="Book Lesson" style={{ width: 20 }} />
-                      }
 
-                    </NavLink>
-                  </Tooltip>
+                  <NavLink id="sidebar-item-upcoming"
+                    className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.UPCOMING_SESSION ? "active" : ""
+                      }`}
+                    onClick={() => {setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
+                    data-intro=""
+                  >
+                    {activeTab === topNavbarOptions?.UPCOMING_SESSION
+                      ? <img src={"../assets/images/online-lesson-white.png"} alt="Book Lesson" style={{ width: 20 }} />
+                      : <img src={"../assets/images/online-lesson.png"} alt="Book Lesson" style={{ width: 20 }} />
+                    }
+
+                  </NavLink>
+
                   <p className="menu-name">Upcoming Sessions</p>
                 </li>}
 
                 <li>
                   <div className={`${notifications[0]?.isRead == false ? "dot-btn dot-danger grow" : ""}`}>
-                    <Tooltip
-                      title="Notifications"
-                      position="top-end"
-                      size="small"
-                      trigger="mouseenter"
-                    >
-                      <NavLink id="sidebar-item-notification"
-                        className={`icon-btn btn-light button-effect ${activeTab === "notification" ? "active" : ""
-                          }`}
-                        onClick={() => {
 
-                          ToggleTab("notification")
-                        }}
-                      >
-                        <i className="fa fa-bell" />
-                      </NavLink>
-                    </Tooltip>
+                    <NavLink id="sidebar-item-notification"
+                      className={`icon-btn btn-light button-effect ${activeTab === "notification" ? "active" : ""
+                        }`}
+                      onClick={() => {
+
+                        ToggleTab("notification")
+                      }}
+                    >
+                      <i className="fa fa-bell" />
+                    </NavLink>
+
                   </div>
                   <p className="menu-name">Notifications</p>
                 </li>
 
                 <li>
-                  <Tooltip title="Settings" position="top" trigger="mouseenter">
-                    <NavLink id="sidebar-item-setting"
-                      className={`icon-btn btn-light button-effect step2 ${activeTab === "setting" ? "active" : ""
-                        }`}
-                      onClick={() => { ToggleTab("setting") }}
-                      data-intro="You can change settings by clicking here"
-                    >
-                      <i className="fa fa-cog" />
-                    </NavLink>
-                  </Tooltip>
+
+                  <NavLink id="sidebar-item-setting"
+                    className={`icon-btn btn-light button-effect step2 ${activeTab === "setting" ? "active" : ""
+                      }`}
+                    onClick={() => { ToggleTab("setting") }}
+                    data-intro="You can change settings by clicking here"
+                  >
+                    <i className="fa fa-cog" />
+                  </NavLink>
+
                   <p className="menu-name">Settings</p>
                 </li>
 
@@ -711,20 +696,15 @@ const Index = (props) => {
                 {/* {accountType === AccountType?.TRAINER && */}
                 <li>
                   {/* <div className="dot-btn dot-danger grow"> */}
-                  <Tooltip
-                    title="Transactions"
-                    position="top-end"
-                    size="small"
-                    trigger="mouseenter"
+
+                  <NavLink id="sidebar-item-setting"
+                    className={`icon-btn btn-light button-effect step2 ${activeTab === "transaction" ? "active" : ""
+                      }`}
+                    onClick={() => ToggleTab("transaction")}
                   >
-                    <NavLink id="sidebar-item-setting"
-                      className={`icon-btn btn-light button-effect step2 ${activeTab === "transaction" ? "active" : ""
-                        }`}
-                      onClick={() => ToggleTab("transaction")}
-                    >
-                      <i class="fa fa-exchange" aria-hidden="true" />
-                    </NavLink>
-                  </Tooltip>
+                    <i class="fa fa-exchange" aria-hidden="true" />
+                  </NavLink>
+
                   {/* </div> */}
                   <p className="menu-name">Transactions</p>
                 </li>
@@ -733,20 +713,15 @@ const Index = (props) => {
                   {/* My Community */}
 
                   <li>
-                    <Tooltip
-                      title="My Community"
-                      position="top-end"
-                      size="small"
-                      trigger="mouseenter"
+
+                    <NavLink id="sidebar-item-setting"
+                      className={`icon-btn btn-light button-effect step2 ${activeTab === "my_community" ? "active" : ""
+                        }`}
+                      onClick={() => ToggleTab("my_community")}
                     >
-                      <NavLink id="sidebar-item-setting"
-                        className={`icon-btn btn-light button-effect step2 ${activeTab === "my_community" ? "active" : ""
-                          }`}
-                        onClick={() => ToggleTab("my_community")}
-                      >
-                        <i class="fa fa-users" aria-hidden="true" />
-                      </NavLink>
-                    </Tooltip>
+                      <i class="fa fa-users" aria-hidden="true" />
+                    </NavLink>
+
                     {/* </div> */}
                     <p className="menu-name">My Community</p>
                   </li>
@@ -754,20 +729,15 @@ const Index = (props) => {
                   {/* About Us */}
 
                   <li>
-                    <Tooltip
-                      title="About Us"
-                      position="top-end"
-                      size="small"
-                      trigger="mouseenter"
+
+                    <NavLink id="sidebar-item-setting"
+                      className={`icon-btn btn-light button-effect step2 ${activeTab === "about_us" ? "active" : ""
+                        }`}
+                      onClick={() => ToggleTab("about_us")}
                     >
-                      <NavLink id="sidebar-item-setting"
-                        className={`icon-btn btn-light button-effect step2 ${activeTab === "about_us" ? "active" : ""
-                          }`}
-                        onClick={() => ToggleTab("about_us")}
-                      >
-                        <i class="fa fa-address-card" aria-hidden="true" />
-                      </NavLink>
-                    </Tooltip>
+                      <i class="fa fa-address-card" aria-hidden="true" />
+                    </NavLink>
+
                     {/* </div> */}
                     <p className="menu-name">About Us</p>
                   </li>
@@ -775,20 +745,15 @@ const Index = (props) => {
                   {/* Contact Us */}
 
                   <li>
-                    <Tooltip
-                      title="Contact Us"
-                      position="top-end"
-                      size="small"
-                      trigger="mouseenter"
+
+                    <NavLink id="sidebar-item-setting"
+                      className={`icon-btn btn-light button-effect step2 ${activeTab === "contact_us" ? "active" : ""
+                        }`}
+                      onClick={() => ToggleTab("contact_us")}
                     >
-                      <NavLink id="sidebar-item-setting"
-                        className={`icon-btn btn-light button-effect step2 ${activeTab === "contact_us" ? "active" : ""
-                          }`}
-                        onClick={() => ToggleTab("contact_us")}
-                      >
-                        <i class="fa fa-commenting-o" aria-hidden="true" />
-                      </NavLink>
-                    </Tooltip>
+                      <i class="fa fa-commenting-o" aria-hidden="true" />
+                    </NavLink>
+
                     {/* </div> */}
                     <p className="menu-name">Contact Us</p>
                   </li>
@@ -815,16 +780,16 @@ const Index = (props) => {
                 </>}
 
                 <li>
-                  <Tooltip title="Logout" position="top" trigger="mouseenter">
-                    <NavLink
-                      id="sidebar-item-logout"
-                      className="icon-btn btn-light"
-                      onClick={() => Logout()}
-                    >
-                      {" "}
-                      <i className="fa fa-power-off"> </i>
-                    </NavLink>
-                  </Tooltip>
+
+                  <NavLink
+                    id="sidebar-item-logout"
+                    className="icon-btn btn-light"
+                    onClick={() => Logout()}
+                  >
+                    {" "}
+                    <i className="fa fa-power-off"> </i>
+                  </NavLink>
+
                   <p className="menu-name" style={{ color: "black", fontWeight: "500" }}>Logout</p>
                 </li>
 
@@ -996,40 +961,40 @@ const Index = (props) => {
                     />
                   </TabPane>
 
-                {/* My Community */}
+                  {/* My Community */}
 
-                <TabPane
-                  tabId="my_community"
-                  className={`${activeTab === "my_community"
-                    ? "custom-mobile-menu"
-                    : ""
-                    } sidebar-full-width custom-mobile-community-css`}
-                >
-                  <MyCommunitySideBar
-                    smallSideBarToggle={smallSideBarToggle}
-                    tab={activeTab}
-                    ActiveTab={setActiveTab} />
+                  <TabPane
+                    tabId="my_community"
+                    className={`${activeTab === "my_community"
+                      ? "custom-mobile-menu"
+                      : ""
+                      } sidebar-full-width custom-mobile-community-css`}
+                  >
+                    <MyCommunitySideBar
+                      smallSideBarToggle={smallSideBarToggle}
+                      tab={activeTab}
+                      ActiveTab={setActiveTab} />
 
-                </TabPane>
+                  </TabPane>
 
-                {/* About Us */}
+                  {/* About Us */}
 
-                <TabPane
-                  tabId="about_us"
-                  className={`${activeTab === "about_us"
-                    ? "custom-mobile-menu"
-                    : ""
-                    } sidebar-full-width custom-mobile-about-css`}
-                >
-                  <AboutUsSideBar
-                    smallSideBarToggle={smallSideBarToggle}
-                    tab={activeTab}
-                    ActiveTab={setActiveTab} />
-                </TabPane>
+                  <TabPane
+                    tabId="about_us"
+                    className={`${activeTab === "about_us"
+                      ? "custom-mobile-menu"
+                      : ""
+                      } sidebar-full-width custom-mobile-about-css`}
+                  >
+                    <AboutUsSideBar
+                      smallSideBarToggle={smallSideBarToggle}
+                      tab={activeTab}
+                      ActiveTab={setActiveTab} />
+                  </TabPane>
 
-                {/* Contact Us */}
+                  {/* Contact Us */}
 
-                <TabPane
+                  <TabPane
                     tabId="contact_us"
                     className={`${activeTab === "contact_us"
                       ? "custom-mobile-menu"
@@ -1037,25 +1002,25 @@ const Index = (props) => {
                       } custom-mobile-contact-css`}
                   >
                     <ContactUSSideBar
-                    smallSideBarToggle={smallSideBarToggle}
-                    tab={activeTab}
-                    ActiveTab={setActiveTab} />
+                      smallSideBarToggle={smallSideBarToggle}
+                      tab={activeTab}
+                      ActiveTab={setActiveTab} />
                   </TabPane>
 
-                {/* Practice Session */}
+                  {/* Practice Session */}
 
-                <TabPane
-                  tabId="practice_session"
-                  className={`${activeTab === "practice_session"
-                    ? "custom-mobile-menu"
-                    : ""
-                    } sidebar-full-width custom-mobile-transaction-css`}
-                >
-                  <PracticeLiveExperienceSideBar
-                    smallSideBarToggle={smallSideBarToggle}
-                    tab={activeTab}
-                    ActiveTab={setActiveTab} />
-                </TabPane>
+                  <TabPane
+                    tabId="practice_session"
+                    className={`${activeTab === "practice_session"
+                      ? "custom-mobile-menu"
+                      : ""
+                      } sidebar-full-width custom-mobile-transaction-css`}
+                  >
+                    <PracticeLiveExperienceSideBar
+                      smallSideBarToggle={smallSideBarToggle}
+                      tab={activeTab}
+                      ActiveTab={setActiveTab} />
+                  </TabPane>
 
                   <TabPane
                     tabId="status"

@@ -807,7 +807,7 @@ const FileSection = (props) => {
 
       <Modal
         isOpen={isOpenPlayVideo}
-        allowFullWidth={true}
+        // allowFullWidth={true}
         element={
           <>
             <div className="d-flex flex-column align-items-center p-3 justify-content-center h-100">
@@ -838,6 +838,7 @@ const FileSection = (props) => {
 
       <Modal
         isOpen={isOpenPDF}
+        allowFullWidth={true}
         element={
           <>
             <div className="container media-gallery portfolio-section grid-portfolio ">

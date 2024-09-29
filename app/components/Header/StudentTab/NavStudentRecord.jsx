@@ -13,6 +13,7 @@ import { authState } from "../../auth/auth.slice";
 import { useAppSelector } from "../../../store";
 import Reports from "../../locker/reports";
 import MyClips from "../../locker/my-clips";
+import { useMediaQuery } from "../../../hook/useMediaQuery";
 
 const allTabs = [
   {
@@ -43,16 +44,14 @@ const NavStudentRecord = ({ trainee_id }) => {
     <>
       <div id="navstudent">
         <div className="theme-tab sub-nav">
-          <Nav tabs>
+          <Nav tabs className="d-flex" style={{gap:"5px"}}>
             {allTabs?.map(
               (el) =>
                 el?.accessBy?.includes(accountType) && (
-                  <NavItem key={el.value}>
+                  <NavItem key={el.value} className="w-100">
                     <NavLink
                       className={
-                        activeTab === el?.value
-                          ? "activelink sub-item"
-                          : "sub-item"
+                        `${activeTab === el?.value && "activelink"} sub-item`
                       }
                       onClick={() => toggleTab(el?.value)}
                     >

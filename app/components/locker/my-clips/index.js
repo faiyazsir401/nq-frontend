@@ -20,6 +20,7 @@ import { useMediaQuery } from "../../../hook/useMediaQuery";
 import "../../trainer/dashboard/index.css";
 import { commonState, getClipsAsync } from "../../../common/common.slice";
 import { masterState } from "../../master/master.slice";
+import { MY_CLIPS_LABEL_LIMIT } from "../../../../utils/constant";
 
 const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
@@ -37,7 +38,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const [selectedId, setSelectedId] = useState(null);
   const width500 = useMediaQuery(500);
   const [videoDimensions, setVideoDimensions] = useState({
-    width: "470px",
+    maxWidth: "470px",
     height: "587px",
   });
 
@@ -106,7 +107,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
       setVideoDimensions({ width: "100%", height: "70%" });
     } else {
       setVideoDimensions({
-        width: width500 ? "320px" : "470px",
+        maxWidth: width500 ? "320px" : "470px",
         height: width500 ? "350px" : "587px",
       });
     }
@@ -206,7 +207,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                             paddingTop: "2px",
                           }}
                         >
-                          {clp?.title.length > 5 ? `${clp.title.slice(0, 5)}...` : clp.title}
+                          {clp?.title.length > MY_CLIPS_LABEL_LIMIT ? `${clp.title.slice(0, MY_CLIPS_LABEL_LIMIT)}...` : clp.title}
                         </h5>
                         <Tooltip
                           title={clp?.title}
@@ -301,7 +302,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
 
       <Modal
         isOpen={isOpenPlayVideo}
-        allowFullWidth={true}
+        // allowFullWidth={true}
         element={
           <>
             <div className="d-flex flex-column align-items-center p-3 justify-content-center h-100">

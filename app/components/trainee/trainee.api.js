@@ -4,7 +4,7 @@ export const fetchTraineeWithSlots = async (params) => {
   try {
     const response = await axiosInstance({
       method: "get",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainee/get-trainers-with-slots`,
+      url: `/trainee/get-trainers-with-slots`,
       params,
       headers: {
         "Content-Type": "application/json",
@@ -23,7 +23,7 @@ export const bookSession = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainee/book-session`,
+      url: `/trainee/book-session`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export const createPaymentIntent = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/transaction/create-payment-intent`,
+      url: `/transaction/create-payment-intent`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -61,7 +61,7 @@ export const updateProfile = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainee/profile`,
+      url: `/trainee/profile`,
       data: payload,
       headers: {
         "Content-Type": "application/json",

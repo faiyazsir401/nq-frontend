@@ -226,6 +226,7 @@ const TrainersDetails = ({
       <div className="row">
         <Modal
           isOpen={showTransactionModal}
+          allowFullWidth={true}
           element={renderStripePaymentContent()}
         />
       </div>

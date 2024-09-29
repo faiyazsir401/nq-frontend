@@ -624,7 +624,7 @@ const Bookings = ({ accountType = null }) => {
                           </div>
                           <div className="container media-gallery portfolio-section grid-portfolio ">
                             <h2 className="my-5">
-                              Feel free to share upto 2 clips with the{" "}
+                              Feel free to share up to 2 clips with the{" "}
                               {trainer_info?.fullname}
                             </h2>
                             {selectedClips?.length ? (
@@ -955,7 +955,7 @@ const Bookings = ({ accountType = null }) => {
   const renderRating = () => {
     return (
       <ReactStrapModal
-        // allowFullWidth={true}
+        allowFullWidth={true}
         element={
           <Ratings
             accountType={accountType}

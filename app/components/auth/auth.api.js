@@ -4,7 +4,7 @@ export const signup = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/signup`,
+      url: `/auth/signup`,
       data: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export const login = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+      url: `/auth/login`,
       data: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export const getMe = async () => {
   try {
     const res = await axiosInstance({
       method: "get",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/me`,
+      url: `/user/me`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -54,7 +54,7 @@ export const googleLogin = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-google-login`,
+      url: `/auth/verify-google-login`,
       data: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export const forgetPassword = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/forgot-password`,
+      url: `/auth/forgot-password`,
       data: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
@@ -86,7 +86,7 @@ export const verifiedForgetPassword = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/confirm-reset-password`,
+      url: `/auth/confirm-reset-password`,
       data: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export const fetchAllLatestOnlineUsers = async () => {
   try {
       const response = await axiosInstance({
         method: "get",
-        url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/user/all-online-user`,
+        url: `/user/all-online-user`,
         headers: {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",

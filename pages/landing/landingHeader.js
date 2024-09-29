@@ -21,6 +21,7 @@ const headerArr = [
   { path: "", name: "Contact Us" },
   { path: "", name: "About Us" },
 ];
+import { useMediaQuery } from "usehooks-ts";
 
 const LandingHeader = (masterRecords) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -28,21 +29,11 @@ const LandingHeader = (masterRecords) => {
 
   const toggle = () => setDropdownOpen(!dropdownOpen);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobileScreen, setIsMobileScreen] = useState(false);
+
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const isMobileScreen = useMediaQuery("(max-width: 1200px)");
 
-  useEffect(() => {
-    const handleResize = () => {
-      const isMobileScreen = window.innerWidth < 390;
-      setIsMobileScreen(isMobileScreen);
-    };
-    window.addEventListener("resize", handleResize);
-    handleResize();
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   return (
     <React.Fragment>
@@ -57,7 +48,7 @@ const LandingHeader = (masterRecords) => {
           paddingBottom: "20px",
         }}
       >
-        <div className={`col-1 col-sm-2 col-md-1 col-lg-4`}>
+        <div className={`col-1 col-sm-1 col-md-1 col-xl-4 pr-0 pl-0`}>
           <img
             src="/assets/images/netquix_logo.png"
             alt="logo"
@@ -67,7 +58,7 @@ const LandingHeader = (masterRecords) => {
             }}
           />
         </div>
-        <div className={`col-11 col-sm-10 col-md-11 col-lg-8`}>
+        <div className={`col-11 col-sm-11 col-md-11 col-xl-8 pr-0 pl-0`}>
           <button
             className="navbar-toggler d-xl-none"
             type="button"
@@ -96,11 +87,10 @@ const LandingHeader = (masterRecords) => {
           >
             <Nav
               navbar={isMobileScreen && isMenuOpen ? true : false}
-              className={`border-0 d-flex  mr-4 navbaritem ${isMenuOpen ? "d-none" : "" // Hide the Nav when the menu is open
+              className={`border-0 d-flex   mr-4 navbaritem ${isMenuOpen ? "d-none" : "" // Hide the Nav when the menu is open
                 }`}
               style={{
-                marginLeft: isMobileScreen ? "0%" : "8%",
-                marginTop: isMobileScreen ? "25%" : "40px",
+                marginTop: isMobileScreen ? "100px" : "40px",
                 float: isMobileScreen ? "left" : "right",
                 alignItems: isMobileScreen ? "" : "end",
               }}
@@ -143,6 +133,8 @@ const LandingHeader = (masterRecords) => {
                   </NavItem>
                 );
               })}
+              <div className="d-flex gap-5">
+
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
@@ -166,7 +158,6 @@ const LandingHeader = (masterRecords) => {
                   padding: "11px",
                   marginright: "5px",
                   marginLeft: isMobileScreen ? "1px" : "5px",
-                  marginTop: isMobileScreen ? "10px" : null,
                   alignItems: "center",
                   fontSize: "14px",
                   color: "white",
@@ -176,6 +167,7 @@ const LandingHeader = (masterRecords) => {
               >
                 Login 
               </button>
+              </div>
             </Nav>
           </Collapse>
         </div>

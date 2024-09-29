@@ -4,7 +4,7 @@ export const updateDrawing = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/drawing`,
+      url: `/trainer/drawing`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export const updateProfile = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "put",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/profile`,
+      url: `/trainer/profile`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const getTrainers = async () => {
   try {
     const response = await axiosInstance({
       method: "get",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/get-trainers`,
+      url: `/trainer/get-trainers`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -56,7 +56,7 @@ export const settelReqestToBankAccount = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "POST",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/create-money-request`,
+      url: `/trainer/create-money-request`,
       data: payload,
       headers: {
         "Content-Type": "application/json",

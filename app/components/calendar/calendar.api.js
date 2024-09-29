@@ -4,7 +4,7 @@ export const getAvailability = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/get-availability`,
+      url: `/trainer/get-availability`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -22,7 +22,7 @@ export const addTrainerSlot = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/add-slot`,
+      url: `/trainer/add-slot`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -40,7 +40,7 @@ export const deleteTrainerSlot = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/delete-slot`,
+      url: `/trainer/delete-slot`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
@@ -58,7 +58,7 @@ export const updateTrainerSlot = async (payload) => {
   try {
     const res = await axiosInstance({
       method: "post",
-      url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/trainer/update-slot`,
+      url: `/trainer/update-slot`,
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",

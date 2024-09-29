@@ -421,7 +421,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   const renderRating = () => {
     return (
       <ReactStrapModal
-        // allowFullWidth={true}
+        allowFullWidth={true}
         element={
           <Ratings
             accountType={accountType}

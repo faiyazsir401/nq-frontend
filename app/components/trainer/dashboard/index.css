@@ -30,7 +30,7 @@
 
 .switch-user-video{
   position: relative;
-  width: 100%;
+  width: 90%;
   height : 500px;
 }
 
@@ -54,9 +54,9 @@
 
 .switch-clips-container-for-mobile_1{
   position: absolute !important;
-  right: -30%;
+  right: -140px;
   /* width: 140px; */
-  width: 31%;
+  width: 25%;
   height: 80px;
 }
 .switch-clips-container-for-mobile{
@@ -133,9 +133,9 @@
 .scs2-mobile_1 {
   position: absolute !important;
   top: 55px;
-  right: -30%;
+  right: -140px;
   /* width: 140px !important; */
-    width:30%;
+    width:25%;
   height: 80px;
    margin-top: 45px;
 }
