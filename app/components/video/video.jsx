@@ -257,6 +257,11 @@ export const HandleVideoCall = ({
         console.log(err)
     }
 }
+useEffect(() =>{
+  if(toUser.account_type === "Trainee" && isTraineeJoined){
+    selectTraineeClip(setSelectedClips);
+  }
+},[isTraineeJoined])
   useEffect(() => {
     setInitialPinnedUser()
   }, [])
@@ -486,9 +491,6 @@ export const HandleVideoCall = ({
           setIsTraineeJoined(true);
           setDisplayMsg({ showMsg: false, msg: "" });
           setRemoteStream(remoteStream);
-          if(toUser.account_type === "Trainee"){
-            selectTraineeClip(setSelectedClips);
-          }
         });
       });
 
@@ -499,7 +501,6 @@ export const HandleVideoCall = ({
       errorHandling("Please allow media permission to microphone and camera for video call...");
     }
   };
-
 
   //NOTE -  Initiate outgoing connection
   let connectToPeer = (peer, peerId) => {
