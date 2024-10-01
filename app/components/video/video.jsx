@@ -2199,6 +2199,7 @@ export const HandleVideoCall = ({
     width: "100%",
     marginRight: isPinned ? "0px !important" : "-15px",
     marginLeft: isPinned ? "0px !important" : "-15px",
+    marginTop: width1000 ? "0px":"20px"
   };
 
 
