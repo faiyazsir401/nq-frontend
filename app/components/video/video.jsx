@@ -2215,20 +2215,22 @@ export const HandleVideoCall = ({
   };
 
   const isOnlyOneVideo = {
-    height: isPinned ? "150px" : "77vh",
+    height: isPinned ? "150px" : "73vh",
     // width: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     marginRight: isPinned ? "0px !important" : "-15px",
     marginLeft: isPinned ? "0px !important" : "-15px",
+    paddingTop:"15px"
   };
   const isTwoVideos = {
-    height: isPinned ? "150px" : "77vh",
+    height: isPinned ? "150px" : "73vh",
     width: "100%",
     marginRight: isPinned ? "0px !important" : "-15px",
     marginLeft: isPinned ? "0px !important" : "-15px",
-    marginTop: width1000 ? "0px":"20px"
+    margin:'auto',
+    paddingTop:"15px"
   };
 
 
@@ -2422,7 +2424,7 @@ export const HandleVideoCall = ({
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
                     // overflow: 'hidden',
                     height:
-                      !isPinned && selectedClips?.length ? "77vh" : '12vw',
+                      !isPinned && selectedClips?.length ? "73vh" : '12vw',
                     width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
@@ -2771,7 +2773,7 @@ export const HandleVideoCall = ({
                   width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '25%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '25%' : selectedClips.length && !isPinned ? '25% ' : '',
                   height:
                     accountType === AccountType.TRAINER && selectedClips.length &&
-                      isPinned && pinnedUser === "user-video-1" ? "77vh" :
+                      isPinned && pinnedUser === "user-video-1" ? "73vh" :
                       !selectedClips.length &&
                         isPinned &&
                         // pinnedUser === "user-video-2"
@@ -2787,7 +2789,7 @@ export const HandleVideoCall = ({
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "380px"
-                            : height < 500 ? "77vh" : "500px"
+                            : height < 500 ? "73vh" : "500px"
                           : height < 500 ? "12vw" : "12vw",
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
@@ -2857,8 +2859,8 @@ export const HandleVideoCall = ({
                           (accountType === AccountType.TRAINEE &&
                             pinnedUser === "user-video-2")
                           ? width500
-                            ? "77vh"
-                            : height < 500 ? "77vh" : "77vh"
+                            ? "73vh"
+                            : height < 500 ? "73vh" : "73vh"
                           : height < 500 ? "12vw" : "12vw",
                     objectFit: "cover",
                     borderRadius: "20px",
@@ -2995,15 +2997,15 @@ export const HandleVideoCall = ({
                     // trainee
                     !isPinned && selectedClips?.length ? '0px' : ''
                   ,
-                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '77vh' :
+                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '73vh' :
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
                         pinnedUser === "user-video-2") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"))
                       ? width500
-                        ? "77vh"
-                        : height < 500 ? "77vh" : "77vh"
+                        ? "73vh"
+                        : height < 500 ? "73vh" : "73vh"
                       : width500
                         ? "12vw"
                         : height < 500 ? "12vw" : "12vw",
@@ -3940,7 +3942,8 @@ export const HandleVideoCall = ({
                       ? "auto"
                       : 999,
 
-                  marginTop: "20px",
+                  // marginTop: "20px",
+                  margin:'auto',
                   height:
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
