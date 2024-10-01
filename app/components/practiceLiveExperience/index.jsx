@@ -1479,7 +1479,7 @@ export default function PracticeLiveExperience({
   };
 
   const isOnlyOneVideo = {
-    height: isPinned ? "200px" : "37vw",
+    height: isPinned ? "200px" : "70vh",
     // width: "100%",
     display: "flex",
     alignItems: "center",
@@ -1488,7 +1488,7 @@ export default function PracticeLiveExperience({
     marginLeft: isPinned ? "0px !important" : "-15px",
   };
   const isTwoVideos = {
-    height: isPinned ? "200px" : "37vw",
+    height: isPinned ? "200px" : "70vh",
     width: "100%",
     marginRight: isPinned ? "0px !important" : "-15px",
     marginLeft: isPinned ? "0px !important" : "-15px",

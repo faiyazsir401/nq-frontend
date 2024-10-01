@@ -2186,7 +2186,7 @@ export const HandleVideoCall = ({
   };
 
   const isOnlyOneVideo = {
-    height: isPinned ? "150px" : "37vw",
+    height: isPinned ? "150px" : "70vh",
     // width: "100%",
     display: "flex",
     alignItems: "center",
@@ -2195,7 +2195,7 @@ export const HandleVideoCall = ({
     marginLeft: isPinned ? "0px !important" : "-15px",
   };
   const isTwoVideos = {
-    height: isPinned ? "150px" : "37vw",
+    height: isPinned ? "150px" : "70vh",
     width: "100%",
     marginRight: isPinned ? "0px !important" : "-15px",
     marginLeft: isPinned ? "0px !important" : "-15px",
@@ -2393,7 +2393,7 @@ export const HandleVideoCall = ({
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
                     overflow: 'hidden',
                     height:
-                      !isPinned && selectedClips?.length ? "35vw" : '12vw',
+                      !isPinned && selectedClips?.length ? "70vh" : '12vw',
                     width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
@@ -2742,7 +2742,7 @@ export const HandleVideoCall = ({
                   width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '25%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '25%' : selectedClips.length && !isPinned ? '25% ' : '',
                   height:
                     accountType === AccountType.TRAINER && selectedClips.length &&
-                      isPinned && pinnedUser === "user-video-1" ? "35vw" :
+                      isPinned && pinnedUser === "user-video-1" ? "70vh" :
                       !selectedClips.length &&
                         isPinned &&
                         // pinnedUser === "user-video-2"
@@ -2758,7 +2758,7 @@ export const HandleVideoCall = ({
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "380px"
-                            : height < 500 ? "35vw" : "500px"
+                            : height < 500 ? "70vh" : "500px"
                           : height < 500 ? "12vw" : "12vw",
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
@@ -2828,8 +2828,8 @@ export const HandleVideoCall = ({
                           (accountType === AccountType.TRAINEE &&
                             pinnedUser === "user-video-2")
                           ? width500
-                            ? "35vw"
-                            : height < 500 ? "35vw" : "35vw"
+                            ? "70vh"
+                            : height < 500 ? "70vh" : "70vh"
                           : height < 500 ? "12vw" : "12vw",
                     objectFit: "cover",
                     borderRadius: "20px",
@@ -2966,15 +2966,15 @@ export const HandleVideoCall = ({
                     // trainee
                     !isPinned && selectedClips?.length ? '0px' : ''
                   ,
-                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '35vw' :
+                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '70vh' :
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
                         pinnedUser === "user-video-2") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"))
                       ? width500
-                        ? "35vw"
-                        : height < 500 ? "35vw" : "35vw"
+                        ? "70vh"
+                        : height < 500 ? "70vh" : "70vh"
                       : width500
                         ? "12vw"
                         : height < 500 ? "12vw" : "12vw",
