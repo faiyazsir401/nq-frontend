@@ -814,27 +814,27 @@ export const HandleVideoCall = ({
 
     const startDrawing = (event) => {
       event.preventDefault();
-      isDrawing = true;
-      if (!context) return;
-      savedPos = context?.getImageData(
-        0,
-        0,
-        document.getElementById("bookings")?.clientWidth,
-        document.getElementById("bookings")?.clientHeight
-      );
-      if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
-      strikes.push(savedPos);
-      // const mousePos = getMosuePositionOnCanvas(event);
-      const mousePos = event.type.includes('touchstart') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
-      console.log('...mousePos...', mousePos)
-      context.strokeStyle = canvasConfigs.sender.strokeStyle;
-      context.lineWidth = canvasConfigs.sender.lineWidth;
-      context.lineCap = "round";
-      context.beginPath();
-      context.moveTo(mousePos.x, mousePos.y);
-      context.fill();
-      state.mousedown = true;
-      startPos = { x: mousePos.x, y: mousePos.y };
+        isDrawing = true;
+        if (!context) return;
+        savedPos = context?.getImageData(
+          0,
+          0,
+          document.getElementById("bookings")?.clientWidth,
+          document.getElementById("bookings")?.clientHeight
+        );
+        if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
+        strikes.push(savedPos);
+        // const mousePos = getMosuePositionOnCanvas(event);
+        const mousePos = event.type.includes('touchstart') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
+        console.log('...mousePos...', mousePos)
+        context.strokeStyle = canvasConfigs.sender.strokeStyle;
+        context.lineWidth = canvasConfigs.sender.lineWidth;
+        context.lineCap = "round";
+        context.beginPath();
+        context.moveTo(mousePos.x, mousePos.y);
+        context.fill();
+        state.mousedown = true;
+        startPos = { x: mousePos.x, y: mousePos.y };
     };
 
     const findDistance = () => {
@@ -971,7 +971,7 @@ export const HandleVideoCall = ({
       const mousePos = event.type.includes('touchmove') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
       currPos = { x: mousePos?.x, y: mousePos.y };
 
-      if (selectedShape) {
+      if (selectedShape !== SHAPES.FREE_HAND) {
         context.putImageData(savedPos, 0, 0);
         context.beginPath();
         drawShapes();

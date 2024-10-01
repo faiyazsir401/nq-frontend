@@ -151,7 +151,7 @@ export const FormateHours = {
 };
 
 export const SHAPES = {
-  FREE_HAND: null,
+  FREE_HAND: "hand",
   LINE: "line",
   CIRCLE: "circle",
   SQUARE: "square",
