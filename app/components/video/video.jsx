@@ -66,6 +66,7 @@ import MobileDetect from 'mobile-detect';
 import { isIOS } from 'react-device-detect';
 import Script from 'next/script'
 import LazyVideo from "./LazyVideo";
+import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
@@ -232,6 +233,30 @@ export const HandleVideoCall = ({
     }
   }
 
+  // selects trainee clips on load
+  async function selectTraineeClip (setter){
+    try{
+        const Response = await traineeClips({});
+        console.log('res' , Response)
+        let currentUserClips = [];
+        Response?.data?.map((user) => {
+          if(user?._id?._id == toUser?._id){
+            if(user?.clips?.length >= 2){
+              const clip1 = user.clips[user.clips.length - 1].clips;
+              const clip2 = user.clips[user.clips.length - 2].clips;
+              currentUserClips = [clip1,clip2]
+              setter(currentUserClips)
+              console.log(currentUserClips , user)
+            }
+          }  
+        })
+        // const user = Response.data.filter((user) => user)
+        // const data = [Response.data[1].clips[Response.data[1].clips.length-2].clips , Response.data[1].clips[Response.data[1].clips.length-1].clips];
+        // setter(data || [])
+    }catch(err){
+        console.log(err)
+    }
+}
   useEffect(() => {
     setInitialPinnedUser()
   }, [])
@@ -446,6 +471,7 @@ export const HandleVideoCall = ({
         socket.emit("ON_CALL_JOIN", {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
         });
+        console.log('call joined')
       });
 
       peer.on("error", (error) => {
@@ -459,6 +485,9 @@ export const HandleVideoCall = ({
         call.on("stream", (remoteStream) => {
           // console.log("Remote stream received:", remoteStream);
           setIsTraineeJoined(true);
+          if(toUser.account_type === "Trainee"){
+            selectTraineeClip(setSelectedClips);
+          }
           setDisplayMsg({ showMsg: false, msg: "" });
           setRemoteStream(remoteStream);
         });
@@ -699,7 +728,7 @@ export const HandleVideoCall = ({
   }, []);
 
   // NOTE -  end user video stream
-  useMemo(() => {
+  useMemo(async () => {
     if (
       remoteVideoRef.current &&
       remoteStream &&
@@ -707,6 +736,7 @@ export const HandleVideoCall = ({
     ) {
       remoteVideoRef.current.srcObject = remoteStream;
       accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
+    
     }
 
     return () => {
@@ -2741,7 +2771,7 @@ export const HandleVideoCall = ({
                   width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '25%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '25%' : selectedClips.length && !isPinned ? '25% ' : '',
                   height:
                     accountType === AccountType.TRAINER && selectedClips.length &&
-                      isPinned && pinnedUser === "user-video-1" ? "35vw" :
+                      isPinned && pinnedUser === "user-video-1" ? "31vw" :
                       !selectedClips.length &&
                         isPinned &&
                         // pinnedUser === "user-video-2"
@@ -2757,7 +2787,7 @@ export const HandleVideoCall = ({
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "380px"
-                            : height < 500 ? "35vw" : "500px"
+                            : height < 500 ? "31vw" : "500px"
                           : height < 500 ? "12vw" : "12vw",
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
@@ -2828,7 +2858,7 @@ export const HandleVideoCall = ({
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "35vw"
-                            : height < 500 ? "35vw" : "35vw"
+                            : height < 500 ? "31vw" : "35vw"
                           : height < 500 ? "12vw" : "12vw",
                     objectFit: "cover",
                     borderRadius: "20px",
