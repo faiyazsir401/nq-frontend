@@ -50,6 +50,9 @@
   /* top : 260px; */
   top : 277px;
   width: 270px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .switch-clips-container-for-mobile_1{

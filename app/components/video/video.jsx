@@ -66,6 +66,7 @@ import MobileDetect from 'mobile-detect';
 import { isIOS } from 'react-device-detect';
 import Script from 'next/script'
 import LazyVideo from "./LazyVideo";
+import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
@@ -232,6 +233,35 @@ export const HandleVideoCall = ({
     }
   }
 
+  // selects trainee clips on load
+  async function selectTraineeClip (setter){
+    try{
+        const Response = await traineeClips({});
+        console.log('res' , Response)
+        let currentUserClips = [];
+        Response?.data?.map((user) => {
+          if(user?._id?._id == toUser?._id){
+            if(user?.clips?.length >= 2){
+              const clip1 = user.clips[user.clips.length - 1].clips;
+              const clip2 = user.clips[user.clips.length - 2].clips;
+              currentUserClips = [clip1,clip2]
+              setter(currentUserClips)
+              console.log(currentUserClips , user)
+            }
+          }  
+        })
+        // const user = Response.data.filter((user) => user)
+        // const data = [Response.data[1].clips[Response.data[1].clips.length-2].clips , Response.data[1].clips[Response.data[1].clips.length-1].clips];
+        // setter(data || [])
+    }catch(err){
+        console.log(err)
+    }
+}
+useEffect(() =>{
+  if(toUser.account_type === "Trainee" && isTraineeJoined){
+    selectTraineeClip(setSelectedClips);
+  }
+},[isTraineeJoined])
   useEffect(() => {
     setInitialPinnedUser()
   }, [])
@@ -446,6 +476,7 @@ export const HandleVideoCall = ({
         socket.emit("ON_CALL_JOIN", {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
         });
+        console.log('call joined')
       });
 
       peer.on("error", (error) => {
@@ -455,7 +486,6 @@ export const HandleVideoCall = ({
       peer.on("call", (call) => {
         // console.log("Incoming call received:", call);
         call.answer(stream);
-
         call.on("stream", (remoteStream) => {
           // console.log("Remote stream received:", remoteStream);
           setIsTraineeJoined(true);
@@ -471,7 +501,6 @@ export const HandleVideoCall = ({
       errorHandling("Please allow media permission to microphone and camera for video call...");
     }
   };
-
 
   //NOTE -  Initiate outgoing connection
   let connectToPeer = (peer, peerId) => {
@@ -707,6 +736,7 @@ export const HandleVideoCall = ({
     ) {
       remoteVideoRef.current.srcObject = remoteStream;
       accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
+    
     }
 
     return () => {
@@ -785,27 +815,27 @@ export const HandleVideoCall = ({
 
     const startDrawing = (event) => {
       event.preventDefault();
-      isDrawing = true;
-      if (!context) return;
-      savedPos = context?.getImageData(
-        0,
-        0,
-        document.getElementById("bookings")?.clientWidth,
-        document.getElementById("bookings")?.clientHeight
-      );
-      if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
-      strikes.push(savedPos);
-      // const mousePos = getMosuePositionOnCanvas(event);
-      const mousePos = event.type.includes('touchstart') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
-      console.log('...mousePos...', mousePos)
-      context.strokeStyle = canvasConfigs.sender.strokeStyle;
-      context.lineWidth = canvasConfigs.sender.lineWidth;
-      context.lineCap = "round";
-      context.beginPath();
-      context.moveTo(mousePos.x, mousePos.y);
-      context.fill();
-      state.mousedown = true;
-      startPos = { x: mousePos.x, y: mousePos.y };
+        isDrawing = true;
+        if (!context) return;
+        savedPos = context?.getImageData(
+          0,
+          0,
+          document.getElementById("bookings")?.clientWidth,
+          document.getElementById("bookings")?.clientHeight
+        );
+        if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
+        strikes.push(savedPos);
+        // const mousePos = getMosuePositionOnCanvas(event);
+        const mousePos = event.type.includes('touchstart') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
+        console.log('...mousePos...', mousePos)
+        context.strokeStyle = canvasConfigs.sender.strokeStyle;
+        context.lineWidth = canvasConfigs.sender.lineWidth;
+        context.lineCap = "round";
+        context.beginPath();
+        context.moveTo(mousePos.x, mousePos.y);
+        context.fill();
+        state.mousedown = true;
+        startPos = { x: mousePos.x, y: mousePos.y };
     };
 
     const findDistance = () => {
@@ -942,7 +972,7 @@ export const HandleVideoCall = ({
       const mousePos = event.type.includes('touchmove') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
       currPos = { x: mousePos?.x, y: mousePos.y };
 
-      if (selectedShape) {
+      if (selectedShape !== SHAPES.FREE_HAND) {
         context.putImageData(savedPos, 0, 0);
         context.beginPath();
         drawShapes();
@@ -2186,20 +2216,22 @@ export const HandleVideoCall = ({
   };
 
   const isOnlyOneVideo = {
-    height: isPinned ? "150px" : "70vh",
+    height: isPinned ? "150px" : "73vh",
     // width: "100%",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     marginRight: isPinned ? "0px !important" : "-15px",
     marginLeft: isPinned ? "0px !important" : "-15px",
+    paddingTop:"15px"
   };
   const isTwoVideos = {
-    height: isPinned ? "150px" : "70vh",
+    height: isPinned ? "150px" : "73vh",
     width: "100%",
     marginRight: isPinned ? "0px !important" : "-15px",
     marginLeft: isPinned ? "0px !important" : "-15px",
-    marginTop: width1000 ? "0px":"20px"
+    margin:'auto',
+    paddingTop:"15px"
   };
 
 
@@ -2391,9 +2423,9 @@ export const HandleVideoCall = ({
                     top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
                       // trainee
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
-                    overflow: 'hidden',
+                    // overflow: 'hidden',
                     height:
-                      !isPinned && selectedClips?.length ? "70vh" : '12vw',
+                      !isPinned && selectedClips?.length ? "73vh" : '12vw',
                     width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
@@ -2436,7 +2468,7 @@ export const HandleVideoCall = ({
                           style={{
                             marginLeft: accountType === AccountType.TRAINER && !isPinned ? '10%' : '0%',
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" : "28vw",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "26vw" : "26vw",
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
                             objectFit: "cover",
                           }}
@@ -2529,7 +2561,7 @@ export const HandleVideoCall = ({
                           id="selected-video-2"
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" : "28vw",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "26vw" : "26vw",
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
                             objectFit: "cover",
                           }}
@@ -2742,7 +2774,7 @@ export const HandleVideoCall = ({
                   width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '25%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '25%' : selectedClips.length && !isPinned ? '25% ' : '',
                   height:
                     accountType === AccountType.TRAINER && selectedClips.length &&
-                      isPinned && pinnedUser === "user-video-1" ? "70vh" :
+                      isPinned && pinnedUser === "user-video-1" ? "73vh" :
                       !selectedClips.length &&
                         isPinned &&
                         // pinnedUser === "user-video-2"
@@ -2758,7 +2790,7 @@ export const HandleVideoCall = ({
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "380px"
-                            : height < 500 ? "70vh" : "500px"
+                            : height < 500 ? "73vh" : "500px"
                           : height < 500 ? "12vw" : "12vw",
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
@@ -2828,8 +2860,8 @@ export const HandleVideoCall = ({
                           (accountType === AccountType.TRAINEE &&
                             pinnedUser === "user-video-2")
                           ? width500
-                            ? "70vh"
-                            : height < 500 ? "70vh" : "70vh"
+                            ? "73vh"
+                            : height < 500 ? "73vh" : "73vh"
                           : height < 500 ? "12vw" : "12vw",
                     objectFit: "cover",
                     borderRadius: "20px",
@@ -2966,15 +2998,15 @@ export const HandleVideoCall = ({
                     // trainee
                     !isPinned && selectedClips?.length ? '0px' : ''
                   ,
-                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '70vh' :
+                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '73vh' :
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
                         pinnedUser === "user-video-2") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"))
                       ? width500
-                        ? "70vh"
-                        : height < 500 ? "70vh" : "70vh"
+                        ? "73vh"
+                        : height < 500 ? "73vh" : "73vh"
                       : width500
                         ? "12vw"
                         : height < 500 ? "12vw" : "12vw",
@@ -3373,7 +3405,7 @@ export const HandleVideoCall = ({
                         <LazyVideo
                           id="selected-video-1"
                           style={{
-                            height: isPinned ? "100%" : "34.5vw",
+                            height: "95%",
                             width: "100%",
                             objectFit: "cover",
                           }}
@@ -3496,7 +3528,7 @@ export const HandleVideoCall = ({
                         <LazyVideo
                           id="selected-video-2"
                           style={{
-                            height: isPinned ? "100%" : "34.5vw",
+                            height: "95%",
                             width: "100%",
                             objectFit: "cover",
                           }}
@@ -3911,7 +3943,8 @@ export const HandleVideoCall = ({
                       ? "auto"
                       : 999,
 
-                  marginTop: "20px",
+                  // marginTop: "20px",
+                  margin:'auto',
                   height:
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
