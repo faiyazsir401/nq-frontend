@@ -638,6 +638,7 @@ useEffect(() =>{
     });
   };
 
+  
 
   const adjustCanvasSize = () => {
     const canvas = canvasRef.current;
