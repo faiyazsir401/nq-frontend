@@ -185,7 +185,7 @@ export const bookingsSlice = createSlice({
         addTraineeClipInBookedSessionAsync.fulfilled,
         (state, action) => {
           state.status = "fulfilled";
-          toast.success(action.payload.message);
+          toast.success("Clips shared successfully");
         }
       )
       .addCase(
