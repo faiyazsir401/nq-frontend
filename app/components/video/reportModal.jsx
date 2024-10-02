@@ -329,7 +329,10 @@ const reportModal = ({
               !preview ?
                 <div className="theme-tab">
                   <div className="row">
-                    <div className="col-md-6 col-sm-12 col-xs-12 p-2" >
+                    <div className="col-12 d-flex flex-wrap"
+                    >
+                    {/* main title for the report */}
+                    <div className="p-2 flex-grow-1" >
                       <div className="form-group">
                         <label className="col-form-label">Title</label>
                         <input
@@ -345,8 +348,8 @@ const reportModal = ({
                         />
                       </div>
                     </div>
-
-                    <div className="col-md-6 col-sm-12 col-xs-12 p-2" >
+                     {/* main description for the report */}
+                    <div className="p-2 flex-grow-1" >
                       <div className="form-group">
                         <label className="col-form-label">Description</label>
                         <input
@@ -362,75 +365,76 @@ const reportModal = ({
                         />
                       </div>
                     </div>
+                    </div>
+
                     {screenShots?.map((sst, i) => {
                       console.log(sst , 'resport sst')
                       console.log('ggg', `${awsS3Url}${sst?.imageUrl}`)
-                      return <>
-                        <div className="col-md-6 col-sm-12 col-xs-12 p-2 mb-2" style={{ position: "relative", border: "1px solid #ced4da" }}>
-                          <img 
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              maxHeight: "280px",
-                              // border: "1px solid #ced4da",
-                              marginTop: "10px",
-                              objectFit: "contain",
-                              maxHeight: "340px",
-                            }}
-                            src={`${awsS3Url}${sst?.imageUrl}`}
-                            alt="Screen Shot"
-                          />
-                          <div style={{ position: "absolute", bottom: 0 }} >
-                            <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => {
-                              setSelectImage(sst?.imageUrl)
-                              setIsOpenCrop(true)
-                            }}>
-                              <Crop />
+                      return(
+                        <div className="col-12 d-flex flex-wrap p-4 mb-4 shadow-sm border rounded">
+                          <div className="border p-2 m-2 rounded" style={{ position: "relative",flex:1 }}>
+                            <img
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                maxHeight: "340px",
+                                minWidth:"319px",
+                                objectFit: "contain",
+                              }}
+                              src={`${awsS3Url}${sst?.imageUrl}`}
+                              alt="Screen Shot"
+                            />
+                            <div style={{ position: "absolute", bottom: 10 }} >
+                              <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => {
+                                setSelectImage(sst?.imageUrl)
+                                setIsOpenCrop(true)
+                              }}>
+                                <Crop />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="col-md-6 col-sm-12 col-xs-12 p-2" >
-                          <div className="media-body media-body text-right" >
-                            <div
-                              className="icon-btn btn-sm btn-outline-light close-apps pointer"
-                              onClick={() => {
-                                handleRemoveImage(sst?.imageUrl)
-                                // var temp = screenShots.filter((st, index) => index !== i)
-                                // setScreenShots([...temp])
-                              }}
-                            >
-                              <Trash2 />
+                          <div className="m-2" style={{flex:1}} >
+                            <div className="media-body media-body text-right" >
+                              <div
+                                className="icon-btn btn-sm btn-outline-light close-apps pointer"
+                                onClick={() => {
+                                  handleRemoveImage(sst?.imageUrl)
+                                  // var temp = screenShots.filter((st, index) => index !== i)
+                                  // setScreenShots([...temp])
+                                }}
+                              >
+                                <Trash2 />
+                              </div>
+                            </div>
+                            <div className="form-group m-0">
+                              <label className="col-form-label">Title</label>
+                              <input
+                                className="form-control"
+                                type="text"
+                                name="title"
+                                placeholder="Title"
+                                onChange={(e) => {
+                                  screenShots[i].title = e.target.value;
+                                  setScreenShots([...screenShots])
+                                }}
+                                value={screenShots[i]?.title}
+                              />
+                              <label className="col-form-label">Description</label>
+                              <textarea
+                                rows="4"
+                                className="form-control"
+                                type="text"
+                                name="description"
+                                placeholder="Description"
+                                onChange={(e) => {
+                                  screenShots[i].description = e.target.value;
+                                  setScreenShots([...screenShots])
+                                }}
+                                value={screenShots[i]?.description}
+                              />
                             </div>
                           </div>
-                          <div className="form-group">
-                            <label className="col-form-label">Title</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              name="title"
-                              placeholder="Title"
-                              onChange={(e) => {
-                                screenShots[i].title = e.target.value;
-                                setScreenShots([...screenShots])
-                              }}
-                              value={screenShots[i]?.title}
-                            />
-                            <label className="col-form-label">Description</label>
-                            <textarea
-                              rows="4"
-                              className="form-control"
-                              type="text"
-                              name="description"
-                              placeholder="Description"
-                              onChange={(e) => {
-                                screenShots[i].description = e.target.value;
-                                setScreenShots([...screenShots])
-                              }}
-                              value={screenShots[i]?.description}
-                            />
-                          </div>
-                        </div>
-                      </>
+                        </div>)
                     })}
                   </div>
                   <label style={{ color: "black", fontWeight: "500" }} className="col-form-label mt-2" htmlFor="account_type">
@@ -466,19 +470,24 @@ const reportModal = ({
                 <hr style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'black' }} />
                 {reportArr?.map((sst, i) => {
                   return <>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', alignItems: 'center' }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <img src={sst?.imageUrl} alt="image" style={{ height: '260px', width: '-webkit-fill-available', objectFit: 'cover' }} />
+                    <div className="d-flex flex-column flex-md-row align-items-center">
+                      <div className="text-center w-100 w-md-50">
+                        <img
+                          className="h-100 w-100"
+                          src={sst?.imageUrl}
+                          alt="image"
+                          style={{ maxHeight: '260px', objectFit: 'contain' }}
+                        />
                       </div>
-                      <div>
+                      <div className="text-center text-md-left w-100 w-md-50">
                         <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p>
                         <p>{screenShots[i]?.description}</p>
                       </div>
                     </div>
-                    <hr style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'black' }} />
+                    <hr className="border border-dark" />
                   </>
                 })}
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="flex-wrap flex-md-nowrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ textAlign: 'left', marginRight: '20px' }}>
                     <h2 style={{ color: "black" }}>Trainer</h2>
                     <p>{userInfo?.extraInfo?.about}</p>
