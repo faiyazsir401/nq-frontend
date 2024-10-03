@@ -371,14 +371,13 @@ const reportModal = ({
                       console.log(sst , 'resport sst')
                       console.log('ggg', `${awsS3Url}${sst?.imageUrl}`)
                       return(
-                        <div className="col-12 d-flex flex-wrap p-4 mb-4 shadow-sm border rounded">
-                          <div className="border p-2 m-2 rounded" style={{ position: "relative",flex:1 }}>
+                        <div className="col-12 d-flex flex-column flex-sm-row flex-wrap p-4 mb-4 shadow-sm border rounded">
+                          <div className="border p-2 m-md-2 rounded" style={{ position: "relative",flex:1 }}>
                             <img
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 maxHeight: "340px",
-                                minWidth:"319px",
                                 objectFit: "contain",
                               }}
                               src={`${awsS3Url}${sst?.imageUrl}`}
@@ -452,11 +451,10 @@ const reportModal = ({
             }
             <div className="theme-tab">
               <div id="report-pdf" style={{ display: "none", padding: "20px ", border: '10px solid #000080', borderColor: '#14328d' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: "center" }}>
-                  <p style={{ textTransform: 'uppercase', marginTop: '0px', fontSize: '40px', fontWeight: '600', color: "black" }}>Game Plan</p>
+                <div className="mb-2 flex-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: "center" }}>
+                  <p style={{ textTransform: 'uppercase', margin: '0px', fontSize: '40px', fontWeight: '600', color: "black" }}>Game Plan</p>
                   <div style={{ textAlign: 'right' }}>
-                    <img src="/assets/images/logo/netqwix_logo real.png" alt="Logo" style={{ width: '200px', objectFit: 'cover' }} />
-
+                    <img className="w-100" src="/assets/images/logo/netqwix_logo real.png" alt="Logo" style={{ maxWidth: '200px', objectFit: 'contain' }} />
                   </div>
                 </div>
                 <div style={{ display: "flex" }}>
@@ -493,19 +491,20 @@ const reportModal = ({
                     <p>{userInfo?.extraInfo?.about}</p>
                   </div>
                   <div>
-                    <h2 style={{ color: "black" }}>{userInfo?.fullname}</h2>
+                    <h2 className="text-nowrap" style={{ color: "black" }}>{userInfo?.fullname}</h2>
                     {/* <img src={userInfo?.profile_picture}
                           alt="John Image"
                           style={{ width: '205.8px', height: '154.4px', marginRight: "20px" }}
                         /> */}
 
                     <img
+                    className="w-100"
                       style={{
-                        width: '205.8px',
-                        height: '205.8px',
-                        marginRight: "20px",
+                        maxWidth: '205.8px',
+                        maxHeight: '205.8px',
                         marginTop: "10px",
-                        borderRadius: "8px"
+                        borderRadius: "8px",
+                        objectFit:'contain'
                       }}
                       // src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || '/assets/images/demoUser.png'}
                       src={profilePic.current || demoProfilePic.current }
@@ -523,11 +522,11 @@ const reportModal = ({
 
                   <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }}>
 
-                    <Button className="mx-3" color="primary" onClick={() => {
+                    <Button className="mx-3 px-3 px-sm-5" color="primary" onClick={() => {
                       setPreview(false)
                       hidePreview()
                       }}>Back</Button>
-                    <Button className="mx-3" color="primary" disabled={uploadPercentage} 
+                    <Button className="mx-3 px-3 px-sm-5" color="primary" disabled={uploadPercentage} 
                     onClick={() => {
                       createOrUpdateReport()
                       setIsOpenReport(false)
