@@ -21,6 +21,7 @@ import "../../trainer/dashboard/index.css";
 import { commonState, getClipsAsync } from "../../../common/common.slice";
 import { masterState } from "../../master/master.slice";
 import { MY_CLIPS_LABEL_LIMIT } from "../../../../utils/constant";
+import { AccountType } from "../../../common/constants";
 
 const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
@@ -161,12 +162,12 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
         {clips?.length ? (
           sortedClips?.map((cl, ind) => (
             <div className={`collapse-block ${!cl?.show ? "" : "open"}`}>
-              <h5 className="block-title" onClick={() => { }}>
+     {accountType !== AccountType.TRAINER && <h5 className="block-title" onClick={() => { }}>
                 {cl?._id}
                 <label className="badge badge-primary sm ml-2">
                   {cl?.clips?.length}
                 </label>
-              </h5>
+              </h5>}
               {/*  NORMAL  STRUCTURE END  */}
               <div className={`block-content ${!cl?.show ? "d-none" : ""}`}>
                 <div
