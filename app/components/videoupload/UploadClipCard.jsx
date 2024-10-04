@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from "../../store";
 import Modal from "../../common/modal";
 import { Button, Form, FormGroup, Label, Input } from "reactstrap";
 import { getS3SignUrl } from "./videoupload.api";
-import { LIST_OF_ACCOUNT_TYPE } from "../../common/constants";
+import { AccountType, LIST_OF_ACCOUNT_TYPE } from "../../common/constants";
 import { getMasterData } from "../master/master.api";
 import axios from "axios";
 import { X } from "react-feather";
@@ -15,6 +15,7 @@ import dynamic from 'next/dynamic';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import UAParser from 'ua-parser-js';
+import { useSelector } from "react-redux";
 
 const OS = {
   android: 'android',
@@ -40,6 +41,7 @@ const UploadClipCard = (props) => {
   const dispatch = useAppDispatch();
   const [progress, setProgress] = useState(0);
   const { isOpen } = useAppSelector(videouploadState);
+  const userInfo = useSelector((state) => state.auth.userInfo)
 
   const [thumbnail, setThumbnail] = useState('');
   console.log("thumbnail===================>", thumbnail)
@@ -513,6 +515,12 @@ const UploadClipCard = (props) => {
     }
   }, [isOpen]);
 
+  useEffect(() =>{
+    if(userInfo.account_type == AccountType.TRAINER){
+      setCategory(userInfo.category)
+    }
+    console.log(userInfo , 'hello')
+  },[])
   return (
     <div
       className="d-flex flex-column align-items-center justify-content-center"
@@ -530,6 +538,9 @@ const UploadClipCard = (props) => {
           onChange={(e) => setTitle(e?.target?.value)}
           value={title}
         />
+        {
+          userInfo?.account_type !== AccountType.TRAINER && 
+        <>
         <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
           Choose Category
         </label>
@@ -549,6 +560,8 @@ const UploadClipCard = (props) => {
             </option>
           ))}
         </select>
+        </>
+        }
         <div style={{ textAlign: "center" }}>
           <label className="col-form-label mt-2">
             Select a clip to upload: &nbsp;
