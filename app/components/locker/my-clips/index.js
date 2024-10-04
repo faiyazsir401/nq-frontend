@@ -183,7 +183,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                   {cl?.clips?.map((clp, index) => (
                     <div
                       key={index}
-                      className={`col-4 p-1 video-container`}
+                      className={`col-6 col-sm-4 p-1 video-container text-wrap`}
                       style={{
                         borderRadius: 5,
                       }}
@@ -201,7 +201,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         className="hover-video"
                       >
                         <h5
-                          class="d-inline-block text-truncate"
+                          class="d-block text-truncate"
                           style={{
                             textAlign: "center",
                             paddingBottom: "4px",

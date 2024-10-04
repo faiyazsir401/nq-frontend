@@ -754,7 +754,7 @@ const FileSection = (props) => {
                           <div style={{ marginBottom: "5px" }}>
                             <dd
                               // className="ml-3"
-                              style={{ cursor: "pointer", textAlign: "center" }}
+                              style={{ cursor: "pointer", textAlign: "center" , textWrap:'nowrap' }}
                               onClick={() => {
                                 if (accountType === "Trainer") {
                                   setCurrentReportData({ session: clp?.session?._id, trainer: clp?.trainer?._id, trainee: clp?.trainee?._id })
