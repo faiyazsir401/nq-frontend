@@ -519,7 +519,6 @@ const UploadClipCard = (props) => {
     if(userInfo.account_type == AccountType.TRAINER){
       setCategory(userInfo.category)
     }
-    console.log(userInfo , 'hello')
   },[])
   return (
     <div

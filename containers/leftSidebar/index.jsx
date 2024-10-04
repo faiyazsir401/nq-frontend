@@ -224,7 +224,7 @@ const Index = (props) => {
     setActiveTab("");
   };
 
-  const isMobile = useMediaQuery(450)
+  const isMobile = useMediaQuery(452)
   const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
 
   useEffect(() => {
@@ -422,14 +422,12 @@ const Index = (props) => {
           >
             {/* logo section */}
             {(width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM) && <div className="logo-warpper">
-              <Link href="/landing">
-                <img id="Net"
+              <img id="Net"
                   src="/assets/images/logo/netquix-logo.png"
                   alt="logo"
                   className="custom-image"
 
                 />
-              </Link>
             </div>}
 
 
@@ -834,9 +832,11 @@ const Index = (props) => {
                 </li>
               </ul> */}
             </div>
+            {openCloseToggleSideNav &&    
+            <ChevronLeft id="ChevronLeft" style={{ right:"-12px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(false)} />
+            }
           </aside>}
-        {openCloseToggleSideNav ?
-          <ChevronLeft id="ChevronLeft" style={{ left: isMobile ? "50" : "79px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(false)} /> :
+        {!openCloseToggleSideNav &&
           <ChevronRight id="ChevronRight" style={{ left: "0px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(true)} />}
 
 
