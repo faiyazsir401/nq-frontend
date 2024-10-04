@@ -67,6 +67,7 @@ import { isIOS } from 'react-device-detect';
 import Script from 'next/script'
 import LazyVideo from "./LazyVideo";
 import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
+import { fetchPeerConfig } from "../../../api";
 
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
@@ -445,27 +446,11 @@ useEffect(() =>{
       //     ],
       //   },
       // });
-
+      
+      const response = await fetchPeerConfig();
       const peer = new Peer(fromUser._id, {
-        config: {
-          iceServers: [
-            { urls: "stun:stun.cloudflare.com:3478" },
-            {
-              username:process.env.NEXT_PUBLIC_ICE_SERVER_USERNAME,
-              credential:
-                process.env.NEXT_PUBLIC_ICE_SERVER_credential,
-              urls: "turn:turn.cloudflare.com:3478?transport=tcp",
-            },
-            {
-              username: process.env.NEXT_PUBLIC_ICE_SERVER_USERNAME,
-              credential:
-                process.env.NEXT_PUBLIC_ICE_SERVER_credential,
-              urls: "turn:turn.cloudflare.com:3478?transport=udp",
-            },
-          ],
-        },
+        config: response.data.pepeerConfig
       });
-
       peerRef.current = peer;
 
       // Handle Peer events
@@ -663,7 +648,7 @@ useEffect(() =>{
       if(sidebar){
         sidebar.style.display="block"
         getNavbarTabs.style.marginLeft ='105px';
-        getNavbarTabs?.style?.setProperty('width','calc(100vw - 55px)');
+        getNavbarTabs?.style?.setProperty('width','calc(100vw - 70px)');
       }
     }
     // window.addEventListener('resize', adjustCanvasSize);
@@ -1386,7 +1371,7 @@ useEffect(() =>{
     // }
 
 
-
+  
     html2canvas(targetElement, { type: "png" }).then(async (canvas) => {
       // document.body.appendChild(canvas);
       // console.log("1366=======S3",{canvas})
