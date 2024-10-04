@@ -413,13 +413,14 @@ const UploadClipCard = (props) => {
       toast.error("Please select a video file.");
       return;
     }
+    let IsTrainer  = userInfo.account_type === AccountType.TRAINER; 
 
     var payload = {
       filename: selectedFile?.name,
       fileType: selectedFile?.type,
       thumbnail: thumbnail?.fileType,
       title: title,
-      category: category,
+      category: IsTrainer ? userInfo.category : category,
     };
     const data = await getS3SignUrl(payload);
 
@@ -515,11 +516,7 @@ const UploadClipCard = (props) => {
     }
   }, [isOpen]);
 
-  useEffect(() =>{
-    if(userInfo.account_type == AccountType.TRAINER){
-      setCategory(userInfo.category)
-    }
-  },[])
+
   return (
     <div
       className="d-flex flex-column align-items-center justify-content-center"
@@ -538,7 +535,7 @@ const UploadClipCard = (props) => {
           value={title}
         />
         {
-          userInfo?.account_type !== AccountType.TRAINER && 
+          userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER && 
         <>
         <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
           Choose Category
