@@ -11,7 +11,7 @@ import { getS3SignPdfUrl } from "./video.api";
 import { useAppSelector, useAppDispatch } from "../../store";
 import { authState } from "../auth/auth.slice";
 import { values } from "lodash";
-import { awsS3Url } from "../../../utils/constant";
+import { awsS3Url, notificiationTitles } from "../../../utils/constant";
 import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { SocketContext } from "../socket";
@@ -537,10 +537,11 @@ const reportModal = ({
                       isClose();
                       }
                       sendNotifications({
-                        title: "Game Plan Report",
+                        title: notificiationTitles.gamePlanReport,
                         description: `Trainer shared the gameplan. Check it in the gameplan tab`,
                         senderId: currentReportData?.trainer,
                         receiverId: currentReportData?.trainee,
+                        bookingInfo:null
                       });
 
                     }}>Save</Button>

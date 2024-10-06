@@ -21,6 +21,7 @@ import AddClip from "./start/AddClip";
 import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
+import { notificiationTitles } from "../../../utils/constant";
 
 const TraineeRenderBooking = ({
   _id,
@@ -119,11 +120,12 @@ const TraineeRenderBooking = ({
             };
             handleAddRatingModelState(payload);
             sendNotifications({
-              title: "Feedback Received",
+              title: notificiationTitles.feedBackReceived,
               description:
                 "Your trainee has submitted a new rating for your session.",
               senderId: trainee_info?._id,
               receiverId: trainer_info?._id,
+              bookingInfo:scheduledMeetingDetails[booking_index]
             });
           }}
         >
@@ -205,10 +207,11 @@ const TraineeRenderBooking = ({
                     });
 
                     sendNotifications({
-                      title: "Session Started",
+                      title: notificiationTitles.sessionStrated,
                       description: `${trainee_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
                       senderId: trainee_info?._id,
                       receiverId: trainer_info?._id,
+                      bookingInfo:scheduledMeetingDetails[booking_index]
                     });
                   }}
                 >
@@ -240,11 +243,12 @@ const TraineeRenderBooking = ({
                     });
                     updateBookedStatusApi(_id, BookedSession.canceled);
                     sendNotifications({
-                      title: "Session Cancellation",
+                      title: notificiationTitles.sessionCancelattion,
                       description:
                         "A scheduled training session has been cancelled. Please check your calendar for details.",
                       senderId: trainee_info?._id,
                       receiverId: trainer_info?._id,
+                      bookingInfo:null
                     });
                   }
                 }}

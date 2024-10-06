@@ -25,6 +25,12 @@ const initialState = {
   activeTab: "",
   sidebarTab: "",
   isMeetingLoading : false,
+  startMeeting : {
+    trainerInfo: null,
+    traineeInfo: null,
+    id: null,
+    isOpenModal: false,
+  },
 };
 
 export const addRatingAsync = createAsyncThunk(
@@ -139,6 +145,9 @@ export const bookingsSlice = createSlice({
     },
     handleSidebarTabClose: (state, action) => {
       state.sidebarTab = action.payload;
+    },
+    setStartMeeting: (state , action) =>{
+      state.startMeeting = action.payload;
     },
   },
   extraReducers: (builder) => {
