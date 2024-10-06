@@ -45,7 +45,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     id: "",
     booked_status: "",
   });
-  const { isLoading, configs } = useAppSelector(bookingsState);
+  const { isLoading, configs , startMeeting  } = useAppSelector(bookingsState);
   const { userInfo } = useAppSelector(authState);
   const mediaQuery = window.matchMedia("(min-width: 992px)");
   const [userTimeZone, setUserTimeZone] = useState(
@@ -53,6 +53,9 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   );
   const { addRating } = bookingsAction;
   const [bIndex, setBIndex] = useState(0);
+  const MeetingSetter = (payload) =>{
+    dispatch(bookingsAction.setStartMeeting(payload))
+  }
 
   useEffect(() => {
     if (userInfo?.extraInfo?.working_hours?.time_zone) {
@@ -96,12 +99,12 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         : Intl.DateTimeFormat().resolvedOptions().timeZone
     );
   };
-  const [startMeeting, setStartMeeting] = useState({
-    trainerInfo: null,
-    traineeInfo: null,
-    id: null,
-    isOpenModal: false,
-  });
+  // const [startMeeting, setStartMeeting] = useState({
+  //   trainerInfo: null,
+  //   traineeInfo: null,
+  //   id: null,
+  //   isOpenModal: false,
+  // });
 
   useEffect(() => {
     if (activeCenterContainerTab === "upcomingLesson") {
@@ -231,7 +234,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             bookedSession={bookedSession}
             setBookedSession={setBookedSession}
             tabBook={tabBook}
-            setStartMeeting={setStartMeeting}
+            setStartMeeting={MeetingSetter}
             startMeeting={startMeeting}
             handleAddRatingModelState={handleAddRatingModelState}
             updateParentState={(value) => {
@@ -267,7 +270,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             bookedSession={bookedSession}
             setBookedSession={setBookedSession}
             tabBook={tabBook}
-            setStartMeeting={setStartMeeting}
+            setStartMeeting={MeetingSetter}
             startMeeting={startMeeting}
             handleAddRatingModelState={handleAddRatingModelState}
             updateParentState={(value) => {
@@ -375,7 +378,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       trainerInfo={startMeeting.trainerInfo}
       session_end_time={scheduledMeetingDetails[bIndex]?.session_end_time}
       isClose={() => {
-        setStartMeeting({
+        MeetingSetter({
           ...startMeeting,
           id: null,
           isOpenModal: false,
@@ -417,7 +420,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       );
     }
   }, [startMeeting?.isOpenModal]);
-
+  
   const renderRating = () => {
     return (
       <ReactStrapModal
