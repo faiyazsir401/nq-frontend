@@ -6,11 +6,9 @@ import { notificiationTitles } from "../../../utils/constant";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { EVENTS } from "../../../helpers/events";
 import AppModel from "../../common/modal";
-import {
-  bookingsAction,
-  bookingsState,
-} from "../common/common.slice";
+import { bookingsAction, bookingsState, getScheduledMeetingDetailsAsync } from "../common/common.slice";
 import { authState } from "../auth/auth.slice";
+import { bookingButton } from "../../common/constants";
 
 const initialModelValue = {
   title: "",
@@ -58,19 +56,24 @@ const NotificationPopup = () => {
     switch (notification.title) {
       case notificiationTitles.newBookingRequest:
         tempObj.cta.title = ctaTitle.confirmBooking;
-
+        dispatch();
         break;
       case notificiationTitles.sessionStrated:
         tempObj.cta.title = ctaTitle.joinSession;
         break;
       case notificiationTitles.sessionConfirmation:
         tempObj.cta.title = ctaTitle.joinSession;
+        dispatch(
+          getScheduledMeetingDetailsAsync({
+            status: bookingButton[0],
+          })
+        );
         break;
       default:
         return;
     }
     tempObj.cta.call = () => {
-      dispatch(dispatch(bookingsAction.setStartMeeting(MeetingPayload)));
+      dispatch(bookingsAction.setStartMeeting(MeetingPayload));
       toggle();
     };
     tempObj.title = notification.title;
