@@ -439,7 +439,7 @@ const reportModal = ({
                   <label style={{ color: "black", fontWeight: "500" }} className="col-form-label mt-2" htmlFor="account_type">
                     {uploadPercentage ? <> Uploading... {uploadPercentage}%</> : <></>}
                   </label>
-                  <div className="d-flex justify-content-center w-100 p-3">
+                  <div className="d-flex justify-content-center w-100 p-3 mb-5">
                     <Button className="mx-3" color="primary" disabled={uploadPercentage}
                       onClick={() => { generatePDF() }}
                     // onClick={() => { getReportData().then((res) => generatePDF()) }}
@@ -520,7 +520,7 @@ const reportModal = ({
               {
                 preview ?
 
-                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }}>
+                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }} className="mb-5">
 
                     <Button className="mx-3 px-3 px-sm-5" color="primary" onClick={() => {
                       setPreview(false)
