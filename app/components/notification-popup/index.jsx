@@ -68,6 +68,7 @@ const NotificationPopup = () => {
             status: bookingButton[0],
           })
         );
+        return;
         break;
       default:
         return;
