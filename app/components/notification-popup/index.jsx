@@ -15,7 +15,7 @@ const initialModelValue = {
   description: "",
   cta: {
     title: "",
-    call: () => {},
+    call: () => { },
   },
 };
 
@@ -89,37 +89,43 @@ const NotificationPopup = () => {
   };
 
   return (
-    <div
-      style={{
-        position: "relative",
-        height: "100vh",
-        width: "100vw",
-        display: "flex",
-      }}
-    >
-      <AppModel
-        isOpen={isOpen}
-        toggle={toggle}
-        id="notification_Model_id"
-        element={
-          <>
-            {" "}
-            <Modal isOpen={isOpen} toggle={toggle}>
-              <ModalHeader>{modelObj?.title}</ModalHeader>
-              <ModalBody>{modelObj?.description}</ModalBody>
-              <ModalFooter>
-                <Button color="secondary" onClick={() => modelObj.cta.call()}>
-                  {modelObj?.cta?.title}
-                </Button>
-                <Button color="secondary" onClick={toggle}>
-                  Close
-                </Button>
-              </ModalFooter>
-            </Modal>
-          </>
-        }
-      />
-    </div>
+    isOpen ?
+      <div
+        style={{
+          position: "relative",
+          height: "100vh",
+          width: "100vw",
+          display: "flex",
+        }}
+      >
+        <AppModel
+          isOpen={isOpen}
+          toggle={toggle}
+          id="notification_Model_id"
+
+          element={
+            <>
+              {" "}
+              <Modal isOpen={isOpen} toggle={toggle} centered={true}	>
+                <ModalHeader>{modelObj?.title}</ModalHeader>
+                <ModalBody>{modelObj?.description}</ModalBody>
+                <ModalFooter>
+                  <Button color="primary" style={{
+                    background: 'green'
+                  }} onClick={() => modelObj.cta.call()}>
+                    {modelObj?.cta?.title}
+                  </Button>
+                  <Button color="secondary" style={{
+                    background: 'red'
+                  }} onClick={toggle}>
+                    Close
+                  </Button>
+                </ModalFooter>
+              </Modal>
+            </>
+          }
+        />
+      </div> : null
   );
 };
 

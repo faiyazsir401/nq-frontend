@@ -30,7 +30,7 @@ const Modal = ({
         overflow: overflowHidden ? "hidden" : null,
         minHeight: minHeight ? "100vh" : null,
       }}
-      onClick={() => toggle()}
+      onClick={() =>toggle && toggle()}
     >
       <ModalBody>{element}</ModalBody>
       <ModalFooter>{footer}</ModalFooter>
