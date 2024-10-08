@@ -239,3 +239,6 @@
 #vid_id.wid-mid{
 width: 30% !important;
 }
+.width-fit{
+  width: fit-content;
+}

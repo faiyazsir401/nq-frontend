@@ -27,6 +27,7 @@ import { HowItWorks } from "../../app/components/landing/howItWorks";
 import YourCourses from "./yourCourses";
 import { SocketContext } from "../../app/components/socket";
 import { authAction } from "../../app/components/auth/auth.slice";
+import TopTrainers from "./TopTrainers";
 
 const Landing = () => {
   const socket = useContext(SocketContext);
@@ -83,8 +84,9 @@ const Landing = () => {
       <div className="dropdown-divider"></div>
       {/* <div className="container-fluid"> */}
       <Category masterRecords={data} />
-      <Course masterRecords={data} />
-      <YourCourses />
+      {/* <Course masterRecords={data} /> */}
+      <TopTrainers masterRecords={data}/>
+      {/* <YourCourses /> */}
       <HowItWorks />
       <WhyChooseUs />
       <FooterLanding masterRecords={data} />
