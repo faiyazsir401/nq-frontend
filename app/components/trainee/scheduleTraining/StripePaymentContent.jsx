@@ -134,7 +134,7 @@ const StripePaymentContent = ({
                       description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
                       senderId: userInfo?._id,
                       receiverId: trainer?.userInfo?._id,
-                      bookingInfo:scheduledMeetingDetails[booking_index]
+                      bookingInfo:null
                     });
                   }
                 }}

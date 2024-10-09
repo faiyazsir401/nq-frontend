@@ -224,9 +224,24 @@ const Index = (props) => {
     setActiveTab("");
   };
 
-  const isMobile = useMediaQuery(452)
+  let isMobile = useMediaQuery(452)
   const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
+  
+  useEffect(() => {
+    const updateIsMobile = (event) => {
+      const isMobile = window.matchMedia(`(max-width: 452px)`).matches;
+      console.log('Is mobile changed:', isMobile);
+    };
 
+    // Add the event listener
+    window.addEventListener('orientationchange', updateIsMobile);
+
+    // Cleanup the event listener on unmount
+    return () => {
+      window.removeEventListener('orientationchange', updateIsMobile);
+    };
+  }, []);
+  
   useEffect(() => {
     // let getDashboard = document.querySelector("#get-dashboard");
     let getNavbarTabs = document.querySelector("#get-navbar-tabs");
@@ -391,7 +406,7 @@ const Index = (props) => {
 
 
     }
-  }, [openCloseToggleSideNav, sidebarModalActiveTab, sidebarActiveTab, activeTab, size])
+  }, [openCloseToggleSideNav, sidebarModalActiveTab, sidebarActiveTab, activeTab, size , isMobile])
 
   useEffect(() => {
     if (isMobile) {

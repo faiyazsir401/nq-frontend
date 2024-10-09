@@ -6,7 +6,11 @@ import { notificiationTitles } from "../../../utils/constant";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { EVENTS } from "../../../helpers/events";
 import AppModel from "../../common/modal";
-import { bookingsAction, bookingsState, getScheduledMeetingDetailsAsync } from "../common/common.slice";
+import {
+  bookingsAction,
+  bookingsState,
+  getScheduledMeetingDetailsAsync,
+} from "../common/common.slice";
 import { authState } from "../auth/auth.slice";
 import { bookingButton } from "../../common/constants";
 
@@ -15,7 +19,7 @@ const initialModelValue = {
   description: "",
   cta: {
     title: "",
-    call: () => { },
+    call: () => {},
   },
 };
 
@@ -43,8 +47,33 @@ const NotificationPopup = () => {
     }
   }, [socket, dispatch]);
 
+  const getUpcomingBookings = () => {
+    dispatch(
+      getScheduledMeetingDetailsAsync({
+        status: bookingButton[0],
+      })
+    );
+  };
   const notificationHandler = (notification) => {
     const tempObj = initialModelValue;
+
+    switch (notification.title) {
+      // case notificiationTitles.newBookingRequest:
+      //   tempObj.cta.title = ctaTitle.confirmBooking;
+      //   getUpcomingBookings();
+      //   break;
+      case notificiationTitles.sessionStrated:
+        tempObj.cta.title = ctaTitle.joinSession;
+        break;
+      case notificiationTitles.sessionConfirmation:
+        tempObj.cta.title = ctaTitle.joinSession;
+        getUpcomingBookings();
+        return;
+        break;
+      default:
+        return;
+    }
+    
     const MeetingPayload = {
       ...startMeeting,
       id: userInfo._id,
@@ -53,25 +82,6 @@ const NotificationPopup = () => {
       trainerInfo: notification?.bookingInfo?.trainer_info,
       endTime: notification?.bookingInfo?.session_end_time,
     };
-    switch (notification.title) {
-      case notificiationTitles.newBookingRequest:
-        tempObj.cta.title = ctaTitle.confirmBooking;
-        dispatch();
-        break;
-      case notificiationTitles.sessionStrated:
-        tempObj.cta.title = ctaTitle.joinSession;
-        break;
-      case notificiationTitles.sessionConfirmation:
-        tempObj.cta.title = ctaTitle.joinSession;
-        dispatch(
-          getScheduledMeetingDetailsAsync({
-            status: bookingButton[0],
-          })
-        );
-        break;
-      default:
-        return;
-    }
     tempObj.cta.call = () => {
       dispatch(bookingsAction.setStartMeeting(MeetingPayload));
       toggle();
@@ -88,45 +98,51 @@ const NotificationPopup = () => {
     SetIsOpen((prev) => !prev);
   };
 
-  return (
-    isOpen ?
-      <div
-        style={{
-          position: "relative",
-          height: "100vh",
-          width: "100vw",
-          display: "flex",
-        }}
-      >
-        <AppModel
-          isOpen={isOpen}
-          toggle={toggle}
-          id="notification_Model_id"
-
-          element={
-            <>
-              {" "}
-              <Modal isOpen={isOpen} toggle={toggle} centered={true}	>
-                <ModalHeader>{modelObj?.title}</ModalHeader>
-                <ModalBody>{modelObj?.description}</ModalBody>
-                <ModalFooter>
-                  <Button color="primary" style={{
-                    background: 'green'
-                  }} onClick={() => modelObj.cta.call()}>
-                    {modelObj?.cta?.title}
-                  </Button>
-                  <Button color="secondary" style={{
-                    background: 'red'
-                  }} onClick={toggle}>
-                    Close
-                  </Button>
-                </ModalFooter>
-              </Modal>
-            </>
-          }
-        />
-      </div> : null
-  );
+  return isOpen ? (
+    <div
+      style={{
+        position: "relative",
+        height: "100vh",
+        width: "100vw",
+        display: "flex",
+      }}
+    >
+      <AppModel
+        isOpen={isOpen}
+        toggle={toggle}
+        id="notification_Model_id"
+        element={
+          <>
+            {" "}
+            <Modal isOpen={isOpen} toggle={toggle} centered={true}>
+              <ModalHeader>{modelObj?.title}</ModalHeader>
+              <ModalBody>{modelObj?.description}</ModalBody>
+              <ModalFooter>
+                <Button
+                  color="primary"
+                  style={{
+                    background: "green",
+                  }}
+                  onClick={() => modelObj.cta.call()}
+                >
+                  {modelObj?.cta?.title}
+                </Button>
+                <Button
+                  color="secondary"
+                  style={{
+                    background: "red",
+                  }}
+                  onClick={toggle}
+                >
+                  Close
+                </Button>
+              </ModalFooter>
+            </Modal>
+          </>
+        }
+      />
+    </div>
+  ) : null;
 };
 
 export default NotificationPopup;
