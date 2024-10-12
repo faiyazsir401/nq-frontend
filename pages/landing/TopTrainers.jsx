@@ -369,6 +369,10 @@ const TopTrainers = (props) => {
     })();
   }, []);
 
+  useEffect(() =>{
+    navClickHandler(0);
+  },[allTrainers])
+
   const navClickHandler = (index) => {
     setActiveTab(index);
     setActiveCategory(filter(categories[index], allTrainers));
