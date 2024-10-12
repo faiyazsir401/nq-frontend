@@ -605,10 +605,10 @@ const Bookings = ({ accountType = null }) => {
                     <Modal
                       isOpen={isOpen}
                       element={
-                        <div>
+                        <div className="d-flex justify-content-center align-items-center" style={{height:'100vh' , width:'100vw' }}>
                           <div className="theme-title">
                             <div className="media">
-                              <div className="media-body media-body text-right">
+                              <div className="media-body media-body text-right d-flex">
                                 <div
                                   className="icon-btn btn-sm btn-outline-light close-apps pointer"
                                   onClick={() => {
