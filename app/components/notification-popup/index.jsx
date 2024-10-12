@@ -10,9 +10,11 @@ import {
   bookingsAction,
   bookingsState,
   getScheduledMeetingDetailsAsync,
+  updateBookedSessionScheduledMeetingAsync,
 } from "../common/common.slice";
 import { authState } from "../auth/auth.slice";
-import { bookingButton } from "../../common/constants";
+import { BookedSession, bookingButton } from "../../common/constants";
+import { getScheduledMeetingDetails } from "../common/common.api";
 
 const initialModelValue = {
   title: "",
@@ -33,7 +35,7 @@ const NotificationPopup = () => {
   const socket = useContext(SocketContext);
   const [modelObj, setModelObj] = useState(initialModelValue);
   const [isOpen, SetIsOpen] = useState(false);
-  const { startMeeting } = useAppSelector(bookingsState);
+  const { startMeeting , scheduledMeetingDetails} = useAppSelector(bookingsState);
   const { userInfo } = useAppSelector(authState);
 
   useEffect(() => {
@@ -47,21 +49,87 @@ const NotificationPopup = () => {
     }
   }, [socket, dispatch]);
 
-  const getUpcomingBookings = () => {
-    dispatch(
-      getScheduledMeetingDetailsAsync({
+  const getUpcomingBookings = async  () => {
+    try{
+      const response = await getScheduledMeetingDetails({
         status: bookingButton[0],
-      })
-    );
+      });
+
+      dispatch(
+        getScheduledMeetingDetailsAsync({
+          status: bookingButton[0],
+        })
+      );
+      return response.data;
+    }catch(err){
+      console.log(err)
+    }
+
   };
+
+  const updateBookedStatusApi = (_id, booked_status) => {
+
+    const updatePayload = {
+      id: _id,
+      booked_status: booked_status,
+    };
+    dispatch(updateBookedSessionScheduledMeetingAsync({status:"upcoming", updatePayload}));
+  };
+
+  const sendNotifications = (data) => {
+    socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
+  };
+
   const notificationHandler = (notification) => {
     const tempObj = initialModelValue;
 
     switch (notification.title) {
-      // case notificiationTitles.newBookingRequest:
-      //   tempObj.cta.title = ctaTitle.confirmBooking;
-      //   getUpcomingBookings();
-      //   break;
+      case notificiationTitles.newBookingRequest:
+        tempObj.cta.title = ctaTitle.confirmBooking;
+        // getUpcomingBookings();
+        // const newBooking = scheduledMeetingDetails[0];
+        // updateBookedStatusApi(newBooking._id , BookedSession.confirmed)
+        // Wrap the logic inside an async IIFE (Immediately Invoked Function Expression)
+        
+        tempObj.cta.call = () => {
+          (async () => {
+            try {
+              const bookingdata = await getUpcomingBookings();
+
+              // Access the updated state after fetching
+              const newBooking = bookingdata[0];
+              if (newBooking) {
+
+                await updateBookedStatusApi(newBooking._id, BookedSession.confirmed);
+                const MeetingPayload = {
+                  ...startMeeting,
+                  id: userInfo._id,
+                  isOpenModal: true,
+                  traineeInfo: newBooking.trainee_info,
+                  trainerInfo: newBooking.trainer_info,
+                  endTime: newBooking.session_end_time,
+                };
+
+                tempObj.cta.call = () => {
+                  dispatch(bookingsAction.setStartMeeting(MeetingPayload));
+                      sendNotifications({
+                      title: notificiationTitles.sessionStrated,
+                      description: `Trainer has Confirmed and started the session. Join the session via the upcoming sessions tab in My Locker.`,
+                      senderId: userInfo._id,
+                      receiverId: newBooking.trainee_info._id,
+                      bookingInfo:newBooking
+                    });
+                  toggle();
+                }
+              } else {
+                console.error("No new booking found.");
+              }
+            } catch (error) {
+              console.error("Error during booking confirmation:", error);
+            }
+          })();
+        };
+        break;
       case notificiationTitles.sessionStrated:
         tempObj.cta.title = ctaTitle.joinSession;
         break;
@@ -73,19 +141,26 @@ const NotificationPopup = () => {
       default:
         return;
     }
+
+
     
-    const MeetingPayload = {
-      ...startMeeting,
-      id: userInfo._id,
-      isOpenModal: true,
-      traineeInfo: notification?.bookingInfo?.trainee_info,
-      trainerInfo: notification?.bookingInfo?.trainer_info,
-      endTime: notification?.bookingInfo?.session_end_time,
-    };
-    tempObj.cta.call = () => {
-      dispatch(bookingsAction.setStartMeeting(MeetingPayload));
-      toggle();
-    };
+
+    if (notification.title !== notificiationTitles.newBookingRequest ) {
+      const MeetingPayload = {
+        ...startMeeting,
+        id: userInfo._id,
+        isOpenModal: true,
+        traineeInfo: notification?.bookingInfo?.trainee_info,
+        trainerInfo: notification?.bookingInfo?.trainer_info,
+        endTime: notification?.bookingInfo?.session_end_time,
+      };
+
+      tempObj.cta.call = () => {
+        dispatch(bookingsAction.setStartMeeting(MeetingPayload));
+        toggle();
+      };
+    }
+
     tempObj.title = notification.title;
     tempObj.description = notification.description;
     setModelObj(tempObj);
