@@ -267,6 +267,26 @@ useEffect(() =>{
     setInitialPinnedUser()
   }, [])
 
+  useEffect(() => {
+    const canvas = document.getElementById('drawing-canvas');
+
+    // Only apply the warning if the canvas element exists
+    if (canvas) {
+      const handleBeforeUnload = (event) => {
+        event.preventDefault();
+        event.returnValue = 'You are currently in a call. Are you sure you want to leave or reload? This will disconnect the call.';
+      };
+
+      // Attach the event listener for beforeunload
+      window.addEventListener('beforeunload', handleBeforeUnload);
+
+      // Cleanup the event listener when the component unmounts
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+    }
+  }, []); // Empty dependency array to run only once when component mounts
+
   // console.log("=========",height,  height < 500, {pinnedUser, isPinned})
   useLayoutEffect(() => {
     const updateOrientation = () => {
@@ -2278,6 +2298,10 @@ useEffect(() =>{
   // }
   // console.log('..pinnedUser...',pinnedUser)
 
+  useEffect(() =>{
+
+        console.log("hello" , document.getElementById("clips-container-id")?.clientX)
+  },[])
   if ((isIOS == true && isMobile == true) || isMobile == true) {
     return (
       <React.Fragment>
@@ -2289,10 +2313,10 @@ useEffect(() =>{
         <canvas
           ref={canvasRef}
           id="drawing-canvas"
-          width={document.getElementById("bookings")?.clientWidth}
-          height={document.getElementById("bookings")?.clientHeight}
+          width={document.getElementById("third")?.clientWidth}
+          height={document.getElementById("third")?.clientHeight}
           className="canvas-print absolute all-0"
-          style={{ left: 0, top: 0, width: "100%", height: "100%" }}
+          style={{ left: document.getElementById("third")?.clientX, top: document.getElementById("third")?.clientY, }}
         />
         <div
           className="row"
@@ -2300,7 +2324,7 @@ useEffect(() =>{
         >
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
-            <div className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', }}>
+            <div id="sidetoolbar" className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', }}>
               <div>
                 <CanvasMenuBar
                   isOpen={isOpen}
@@ -3209,11 +3233,30 @@ useEffect(() =>{
         <canvas
           ref={canvasRef}
           id="drawing-canvas"
-          width={document.getElementById("bookings")?.clientWidth}
-          height={document.getElementById("bookings")?.clientHeight}
-          className="canvas-print absolute all-0"
-          style={{ left: 0, top: 0, width: "100%", height: "100%" }}
+          width={document.getElementById("clips-container-id")?.clientWidth}
+          height={document.getElementById("clips-container-id")?.clientHeight}
+          style={{
+            position: 'absolute',
+            left: document.getElementById("sidetoolbar")?.clientWidth
+          }}
+          className="canvas-print"
         />
+        {/* <canvas
+          ref={canvasRef}
+          id="drawing-canvas"
+          width={document.getElementById("clips-container-id")?.clientWidth}
+          height={document.getElementById("clips-container-id")?.clientHeight}
+          className="canvas-print"
+          style={{
+            position: "absolute", // Ensure canvas is absolutely positioned
+            top: 0,
+            left: 0,
+            width: "100%", // Make the canvas fully cover the container
+            height: "100%",
+            pointerEvents: "none", // Optional: prevents interactions with the canvas itself
+            zIndex: 10000
+          }}
+        /> */}
         <div
           className="row"
           style={{ height: "100%", display: "flex", alignItems: "center" }}
@@ -3307,6 +3350,7 @@ useEffect(() =>{
 
               {selectedClips?.length ? (
                 <div
+                  id="clips-container-id"
                   className={
                     isPinned
                       ? accountType === AccountType.TRAINER
@@ -3324,6 +3368,7 @@ useEffect(() =>{
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "20px" : "",
                     padding: isPinned ? "5px" : "",
+                    position:'relative'
                   }}
                   onClick={() => {
                     if (accountType === AccountType.TRAINER) {
@@ -3333,6 +3378,7 @@ useEffect(() =>{
                     }
                   }}
                 >
+
                   <div
                     className="row"
                     style={
@@ -3399,6 +3445,7 @@ useEffect(() =>{
                           src={Utils?.generateVideoURL(selectedClips[0])}
                         />
                         <canvas id="video-canvas-1" hidden></canvas>
+    
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
                           !isPinned && (

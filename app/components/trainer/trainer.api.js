@@ -69,3 +69,16 @@ export const settelReqestToBankAccount = async (payload) => {
     throw err;
   }
 };
+
+
+export const getAllTrainers = async () => {
+  try {
+    const response = await axiosInstance({
+      method: "GET",
+      url: `/trainer/top-trainers`,
+    });
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
