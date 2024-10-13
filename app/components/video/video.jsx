@@ -655,7 +655,7 @@ useEffect(() => {
   };
 
   useEffect(() => {
-    adjustCanvasSize();
+    // adjustCanvasSize();
     const sidebar = document.getElementById("left-nav-wrapper")
     let getNavbarTabs = document.getElementById("get-navbar-tabs");
     if(sidebar){
@@ -1286,13 +1286,13 @@ useEffect(() => {
   const takeScreenshot = () => {
     setIsTooltipShow(false);
     setIsScreenShotModelOpen(false);
-    if (selectedClips?.length) {
-      if (selectedClips.length === 1) captureVideo("video-canvas-1", "selected-video-1");
-      else if (selectedClips.length === 2) {
-        captureVideo("video-canvas-1", "selected-video-1");
-        captureVideo("video-canvas-2", "selected-video-2");
-      }
-    }
+    // if (selectedClips?.length) {
+    //   if (selectedClips.length === 1) captureVideo("video-canvas-1", "selected-video-1");
+    //   else if (selectedClips.length === 2) {
+    //     captureVideo("video-canvas-1", "selected-video-1");
+    //     captureVideo("video-canvas-2", "selected-video-2");
+    //   }
+    // }
 
     const targetElement = document.body;
 
@@ -1813,16 +1813,16 @@ useEffect(() => {
     setScreenShot();
   }, [screenShots?.length]);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const bookingsElement = document.getElementById('bookings');
-      if (bookingsElement) {
-        canvas.width = bookingsElement.clientWidth;
-        canvas.height = bookingsElement.clientHeight;
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   const canvas = canvasRef.current;
+  //   if (canvas) {
+  //     const bookingsElement = document.getElementById('bookings');
+  //     if (bookingsElement) {
+  //       canvas.width = bookingsElement.clientWidth;
+  //       canvas.height = bookingsElement.clientHeight;
+  //     }
+  //   }
+  // }, []);
 
   const setScreenShot = async () => {
     var newReportImages = [];
@@ -2302,7 +2302,7 @@ useEffect(() => {
 
         console.log("hello" , document.getElementById("clips-container-id")?.clientX)
   },[])
-  if ((isIOS == true && isMobile == true) || isMobile == true) {
+  if (isIOS || isMobile) {
     return (
       <React.Fragment>
         <Script
@@ -2427,13 +2427,13 @@ useEffect(() => {
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
                     padding: isPinned ? "10px" : "5px",
-                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? '100px' : !isPinned && selectedClips?.length ? '10px' : '50px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '100px' : !isPinned && selectedClips?.length ? '10px' : '50px',
+                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '50px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '50px',
                     top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
                       // trainee
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
                     // overflow: 'hidden',
                     height:
-                      !isPinned && selectedClips?.length ? "55vh" : '12vw',
+                      !isPinned && selectedClips?.length ? (isIOS ? "55vh" : "73vh") : '12vw',
                     width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
@@ -2457,7 +2457,7 @@ useEffect(() => {
                       width: '100%',
                       margin: ' 0',
                       // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "30vw" :"34.5vw",
-                      height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "48vh" : "48vh",
+                      height: isPinned ? "100%" : accountType === AccountType.TRAINER ?   (isIOS ? "48vh" : "63vh") :   (isIOS ? "48vh" : "63vh"),
                     }}
                   >
                     {selectedClips.length && selectedClips[0] ? (
@@ -2469,14 +2469,13 @@ useEffect(() => {
                           padding: 0,
                         }}
                       >
-
-
+                       
                         <LazyVideo
                           id="selected-video-1"
                           style={{
                             marginLeft: accountType === AccountType.TRAINER && !isPinned ? '10%' : '0%',
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "45vh" : "55vh",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
                             objectFit: "cover",
                           }}
@@ -2485,7 +2484,7 @@ useEffect(() => {
                           poster={Utils?.generateThumbnailURL(selectedClips[0])}
                           src={Utils?.generateVideoURL(selectedClips[0])}
                         />
-                        <canvas id="video-canvas-1" hidden></canvas>
+                        {/* <canvas id="video-canvas-1" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
                           !isPinned && (
@@ -2569,7 +2568,7 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "45vh" : "55vh",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
                             objectFit: "cover",
                           }}
@@ -2578,7 +2577,7 @@ useEffect(() => {
                           poster={Utils?.generateThumbnailURL(selectedClips[1])}
                           src={Utils?.generateVideoURL(selectedClips[1])}
                         />
-                        <canvas id="video-canvas-2" hidden></canvas>
+                        {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
                           !isPinned && (
@@ -2782,7 +2781,7 @@ useEffect(() => {
                   width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '25%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '25%' : selectedClips.length && !isPinned ? '25% ' : '',
                   height:
                     accountType === AccountType.TRAINER && selectedClips.length &&
-                      isPinned && pinnedUser === "user-video-1" ? "52vh" :
+                      isPinned && pinnedUser === "user-video-1" ? (isIOS ? "52vh" : "73vh") :
                       !selectedClips.length &&
                         isPinned &&
                         // pinnedUser === "user-video-2"
@@ -2798,17 +2797,17 @@ useEffect(() => {
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "380px"
-                            : height < 500 ?"52vh" : "500px"
+                            : height < 500 ?(isIOS ? "52vh" : "73vh") : "500px"
                           : height < 500 ? "12vw" : "12vw",
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
                       isPinned && pinnedUser === "user-video-1" ? '10px' :
-                        selectedClips?.length && isPinned && pinnedUser === "user-video-2" ? '100px' : '100px'
+                        selectedClips?.length && isPinned && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "60px") : (isIOS ? "100px" : "60px")
                     :
                     // trainee
                     displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "0px" : displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" :
                       isPinned && pinnedUser === "user-video-2" ? '10px' :
-                        selectedClips.length && isPinned && pinnedUser === "user-video-1" ? '65px' : isPinned && pinnedUser === "user-video-1" ? '100px' : "100px",
+                        selectedClips.length && isPinned && pinnedUser === "user-video-1" ? '65px' : isPinned && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "50px") : (isIOS ? "100px" : "50px"),
                   top:
                     accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "110px" : accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" : accountType === AccountType.TRAINEE && isPinned && pinnedUser === "user-video-1" ? '' :
                       isPinned ?
@@ -2853,7 +2852,7 @@ useEffect(() => {
                   style={{
                     width: "100%",
                     position: accountType === AccountType.TRAINER ? pinnedUser === "user-video-1" ? "relative" : "absolute" : pinnedUser === "user-video-2" ? "relative" : "absolute",
-                    top: "0",
+                    top: 0,
                     height:
                       !selectedClips.length &&
                         isPinned &&
@@ -2869,7 +2868,7 @@ useEffect(() => {
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "52vh"
-                            : height < 500 ? "52vh" : "52vh"
+                            : height < 500 ? (isIOS ? "52vh" : "73vh") : "73vh"
                           : height < 500 ? "12vw" : "12vw",
                     objectFit: "cover",
                     borderRadius: "10px",
@@ -3006,15 +3005,15 @@ useEffect(() => {
                     // trainee
                     !isPinned && selectedClips?.length ? '0px' : ''
                   ,
-                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '52vh' :
+                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ?(isIOS ? "52vh" : "73vh") :
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
                         pinnedUser === "user-video-2") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"))
                       ? width500
-                        ? "52vh"
-                        : height < 500 ? "52vh" : "52vh"
+                        ? (isIOS ? "52vh" : "73vh")
+                        : height < 500 ?  (isIOS ? "52vh" : "73vh")  :  (isIOS ? "52vh" : "73vh") 
                       : width500
                         ? "12vw"
                         : height < 500 ? "12vw" : "12vw",
@@ -3058,7 +3057,7 @@ useEffect(() => {
                   muted
                   style={{
                     position: accountType === AccountType.TRAINER ? pinnedUser === "user-video-2" ? "relative" : "absolute" : pinnedUser === "user-video-1" ? "relative" : "absolute",
-                    top: "0",
+                    top: (isIOS ? "0" : accountType.trainer ? "10px" : "0"),
                     width: "100%",
                     height:
                       isPinned &&
@@ -3235,17 +3234,6 @@ useEffect(() => {
           id="drawing-canvas"
           width={document.getElementById("clips-container-id")?.clientWidth}
           height={document.getElementById("clips-container-id")?.clientHeight}
-          style={{
-            position: 'absolute',
-            left: document.getElementById("sidetoolbar")?.clientWidth
-          }}
-          className="canvas-print"
-        />
-        {/* <canvas
-          ref={canvasRef}
-          id="drawing-canvas"
-          width={document.getElementById("clips-container-id")?.clientWidth}
-          height={document.getElementById("clips-container-id")?.clientHeight}
           className="canvas-print"
           style={{
             position: "absolute", // Ensure canvas is absolutely positioned
@@ -3256,7 +3244,7 @@ useEffect(() => {
             pointerEvents: "none", // Optional: prevents interactions with the canvas itself
             zIndex: 10000
           }}
-        /> */}
+        /> 
         <div
           className="row"
           style={{ height: "100%", display: "flex", alignItems: "center" }}
@@ -3366,7 +3354,7 @@ useEffect(() => {
                   style={{
                     zIndex: isPinned ? "999" : "auto",
                     backgroundColor: isPinned ? "#353535" : "",
-                    borderRadius: isPinned ? "20px" : "",
+                    borderRadius: isPinned ? "10px" : "",
                     padding: isPinned ? "5px" : "",
                     position:'relative'
                   }}
@@ -3378,7 +3366,6 @@ useEffect(() => {
                     }
                   }}
                 >
-
                   <div
                     className="row"
                     style={
@@ -3974,7 +3961,7 @@ useEffect(() => {
                       ? "auto"
                       : 999,
 
-                  // marginTop: "20px",
+                  marginTop: (!isMobile && accountType.trainee ? "20px" : ""),
                   margin:'auto',
                   height:
                     isPinned &&
