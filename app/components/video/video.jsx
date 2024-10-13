@@ -267,24 +267,24 @@ useEffect(() =>{
     setInitialPinnedUser()
   }, [])
 
-  useEffect(() => {
-    const canvas = document.getElementById('drawing-canvas');
+useEffect(() => {
+  const canvas = document.getElementById('drawing-canvas');
 
     // Only apply the warning if the canvas element exists
-    if (canvas) {
-      const handleBeforeUnload = (event) => {
-        event.preventDefault();
+  if (canvas) {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
         event.returnValue = 'You are currently in a call. Are you sure you want to leave or reload? This will disconnect the call.';
       };
 
       // Attach the event listener for beforeunload
-      window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
       // Cleanup the event listener when the component unmounts
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-      };
-    }
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }
   }, []); // Empty dependency array to run only once when component mounts
 
   // console.log("=========",height,  height < 500, {pinnedUser, isPinned})
@@ -2782,7 +2782,7 @@ useEffect(() =>{
                   width: accountType === AccountType.TRAINER ? !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '' : '25%' : !selectedClips.length && !isPinned ? '' : isPinned && pinnedUser === "user-video-1" ? '25%' : selectedClips.length && !isPinned ? '25% ' : '',
                   height:
                     accountType === AccountType.TRAINER && selectedClips.length &&
-                      isPinned && pinnedUser === "user-video-1" ? "70vh" :
+                      isPinned && pinnedUser === "user-video-1" ? "52vh" :
                       !selectedClips.length &&
                         isPinned &&
                         // pinnedUser === "user-video-2"
@@ -2798,7 +2798,7 @@ useEffect(() =>{
                             pinnedUser === "user-video-2")
                           ? width500
                             ? "380px"
-                            : height < 500 ? "70vh" : "500px"
+                            : height < 500 ?"52vh" : "500px"
                           : height < 500 ? "12vw" : "12vw",
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
