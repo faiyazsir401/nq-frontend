@@ -2320,7 +2320,7 @@ useEffect(() => {
         />
         <div
           className="row"
-          style={{ height: "100%", display: "flex", alignItems: "center", marginTop: "env(safe-area-inset-top)"}}
+          style={{ height: "100%", display: "flex", alignItems: "center", marginTop: "env(safe-area-inset-bottom)"}}
         >
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
@@ -2433,7 +2433,7 @@ useEffect(() => {
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
                     // overflow: 'hidden',
                     height:
-                      !isPinned && selectedClips?.length ? "73vh" : '12vw',
+                      !isPinned && selectedClips?.length ? "55vh" : '12vw',
                     width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
@@ -2457,7 +2457,7 @@ useEffect(() => {
                       width: '100%',
                       margin: ' 0',
                       // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "30vw" :"34.5vw",
-                      height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "63vh" : "63vh",
+                      height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "48vh" : "48vh",
                     }}
                   >
                     {selectedClips.length && selectedClips[0] ? (
@@ -2476,7 +2476,7 @@ useEffect(() => {
                           style={{
                             marginLeft: accountType === AccountType.TRAINER && !isPinned ? '10%' : '0%',
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "63vh" : "63vh",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "45vh" : "45vh",
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
                             objectFit: "cover",
                           }}
@@ -2569,7 +2569,7 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "63vh" : "63vh",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? "45vh" : "45vh",
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
                             objectFit: "cover",
                           }}
@@ -3013,8 +3013,8 @@ useEffect(() => {
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"))
                       ? width500
-                        ? "73vh"
-                        : height < 500 ? "73vh" : "73vh"
+                        ? "52vh"
+                        : height < 500 ? "52vh" : "52vh"
                       : width500
                         ? "12vw"
                         : height < 500 ? "12vw" : "12vw",
