@@ -21,6 +21,7 @@ import {
 import { Tooltip } from "react-tippy";
 import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
+import { isIOS } from "react-device-detect";
 
 export const CanvasMenuBar = ({
   isOpen,
@@ -121,7 +122,7 @@ export const CanvasMenuBar = ({
         className="creationBarItem "
         // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{height:' 85vh',overflow: 'auto'}}>
+        <div className="CreationBarCustomizable" style={{height: isIOS? "54vh" : "70vh",overflow: 'auto'}}>
           <span></span>
           {/* free hand */}
           <span>
