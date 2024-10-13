@@ -8,7 +8,7 @@ export async function GET(req) {
         // Call Cloudflare API to generate TURN credentials
         const response = await axios.post(
             `https://rtc.live.cloudflare.com/v1/turn/keys/${TURN_KEY_ID}/credentials/generate`,
-            { ttl: 10800000 }, 
+            { ttl: 21600 }, 
             {
                 headers: {
                     Authorization: `Bearer ${TURN_KEY_API_TOKEN}`,

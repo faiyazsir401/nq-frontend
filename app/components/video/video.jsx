@@ -2868,8 +2868,8 @@ useEffect(() => {
                           (accountType === AccountType.TRAINEE &&
                             pinnedUser === "user-video-2")
                           ? width500
-                            ? "73vh"
-                            : height < 500 ? "73vh" : "73vh"
+                            ? "52vh"
+                            : height < 500 ? "52vh" : "52vh"
                           : height < 500 ? "12vw" : "12vw",
                     objectFit: "cover",
                     borderRadius: "10px",

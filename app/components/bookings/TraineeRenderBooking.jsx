@@ -192,9 +192,8 @@ const TraineeRenderBooking = ({
                 <button
                   className="btn btn-primary button-effect btn-sm mr-2 my-1"
                   type="button"
-                  disabled={!isStartButtonEnabled}
                   style={{
-                    cursor: !isStartButtonEnabled ? "not-allowed" : "pointer",
+                    cursor: "pointer",
                   }}
                   onClick={() => {
                     handleClick();
