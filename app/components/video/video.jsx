@@ -2427,7 +2427,7 @@ useEffect(() => {
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
                     padding: isPinned ? "10px" : "5px",
-                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? '60px' : !isPinned && selectedClips?.length ? '10px' : '50px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '60px' : !isPinned && selectedClips?.length ? '10px' : '50px',
+                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? '100px' : !isPinned && selectedClips?.length ? '10px' : '50px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '100px' : !isPinned && selectedClips?.length ? '10px' : '50px',
                     top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
                       // trainee
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
@@ -2803,12 +2803,12 @@ useEffect(() => {
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
                       isPinned && pinnedUser === "user-video-1" ? '10px' :
-                        selectedClips?.length && isPinned && pinnedUser === "user-video-2" ? '60px' : '60px'
+                        selectedClips?.length && isPinned && pinnedUser === "user-video-2" ? '100px' : '100px'
                     :
                     // trainee
                     displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "0px" : displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" :
                       isPinned && pinnedUser === "user-video-2" ? '10px' :
-                        selectedClips.length && isPinned && pinnedUser === "user-video-1" ? '65px' : isPinned && pinnedUser === "user-video-1" ? '60px' : "60px",
+                        selectedClips.length && isPinned && pinnedUser === "user-video-1" ? '65px' : isPinned && pinnedUser === "user-video-1" ? '100px' : "100px",
                   top:
                     accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "110px" : accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" : accountType === AccountType.TRAINEE && isPinned && pinnedUser === "user-video-1" ? '' :
                       isPinned ?
@@ -3006,7 +3006,7 @@ useEffect(() => {
                     // trainee
                     !isPinned && selectedClips?.length ? '0px' : ''
                   ,
-                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '73vh' :
+                  height: accountType === AccountType.TRAINER && isPinned && pinnedUser === "user-video-2" ? '52vh' :
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
                         pinnedUser === "user-video-2") ||
