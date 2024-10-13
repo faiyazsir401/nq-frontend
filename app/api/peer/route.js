@@ -49,13 +49,13 @@ export async function GET(req) {
         iceServers: [
             { urls: "stun:stun.cloudflare.com:3478" },
             {
-                username: process.env.ICE_SERVER_USERNAME,
-                credential: process.env.ICE_SERVER_CREDENTIAL,
+                username: 0bd0ae4ea6fe483e09f6d7ce4966f437fd7008ffc9f700bdf2c84d85e455bfbf,
+                credential: 468124559d015f287c45aa3973b7221303aa9f187405faa7b6a9007ac5419c08,
                 urls: "turn:turn.cloudflare.com:3478?transport=tcp",
             },
             {
-                username: process.env.ICE_SERVER_USERNAME,
-                credential: process.env.ICE_SERVER_CREDENTIAL,
+                username: 0bd0ae4ea6fe483e09f6d7ce4966f437fd7008ffc9f700bdf2c84d85e455bfbf,
+                credential: 468124559d015f287c45aa3973b7221303aa9f187405faa7b6a9007ac5419c08,
                 urls: "turn:turn.cloudflare.com:3478?transport=udp",
             },
         ],
