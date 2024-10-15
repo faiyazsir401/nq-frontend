@@ -2310,14 +2310,14 @@ useEffect(() => {
           strategy="lazyOnload"
         />
         <OrientationModal isOpen={modal} />
-        <canvas
+        {/* <canvas
           ref={canvasRef}
           id="drawing-canvas"
           width={document.getElementById("third")?.clientWidth}
           height={document.getElementById("third")?.clientHeight}
           className="canvas-print absolute all-0"
           style={{ left: document.getElementById("third")?.clientX, top: document.getElementById("third")?.clientY, }}
-        />
+        /> */}
         <div
           className="row"
           style={{ height: "100%", display: "flex", alignItems: "center", marginTop: "env(safe-area-inset-bottom)"}}
@@ -2407,7 +2407,14 @@ useEffect(() => {
                   {displayMsg?.msg}
                 </div>
               ) : null}
-
+              <canvas
+                ref={canvasRef}
+                id="drawing-canvas"
+                width={document.getElementById("third")?.clientWidth}
+                height={document.getElementById("third")?.clientHeight}
+                className="canvas-print absolute all-0"
+                style={{ margin: 'auto', height: (isIOS ? (isPinned ? "52vh" : "48vh") : (isPinned ? "73vh" : "66vh")), width: '90%' }}
+              />
               {selectedClips?.length ? (
                 <div
                   className={
@@ -3229,22 +3236,6 @@ useEffect(() => {
           strategy="lazyOnload"
         />
         <OrientationModal isOpen={modal} />
-        <canvas
-          ref={canvasRef}
-          id="drawing-canvas"
-          width={document.getElementById("clips-container-id")?.clientWidth}
-          height={document.getElementById("clips-container-id")?.clientHeight}
-          className="canvas-print"
-          style={{
-            position: "absolute", // Ensure canvas is absolutely positioned
-            top: 0,
-            left: 0,
-            width: "100%", // Make the canvas fully cover the container
-            height: "100%",
-            pointerEvents: "none", // Optional: prevents interactions with the canvas itself
-            zIndex: 10000
-          }}
-        /> 
         <div
           className="row"
           style={{ height: "100%", display: "flex", alignItems: "center" }}
@@ -3335,7 +3326,14 @@ useEffect(() => {
                   {displayMsg?.msg}
                 </div>
               ) : null}
-
+              <canvas
+                ref={canvasRef}
+                id="drawing-canvas"
+                width={document.getElementById("third")?.clientWidth}
+                height={"600px"}
+                className="canvas-print absolute all-0"
+                style={{ margin: 'auto', height: isPinned ? "500px" : "69vh", width: '100%' }}
+              />
               {selectedClips?.length ? (
                 <div
                   id="clips-container-id"
@@ -3431,7 +3429,7 @@ useEffect(() => {
                           poster={Utils?.generateThumbnailURL(selectedClips[0])}
                           src={Utils?.generateVideoURL(selectedClips[0])}
                         />
-                        <canvas id="video-canvas-1" hidden></canvas>
+                        {/* <canvas id="video-canvas-1" hidden></canvas> */}
     
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
@@ -3555,7 +3553,7 @@ useEffect(() => {
                           poster={Utils?.generateThumbnailURL(selectedClips[1])}
                           src={Utils?.generateVideoURL(selectedClips[1])}
                         />
-                        <canvas id="video-canvas-2" hidden></canvas>
+                        {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
                           !isPinned && (
