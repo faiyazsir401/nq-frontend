@@ -2411,7 +2411,7 @@ useEffect(() => {
                 ref={canvasRef}
                 id="drawing-canvas"
                 width={document.getElementById("third")?.clientWidth}
-                height={document.getElementById("third")?.clientHeight}
+                height={document.getElementById("drawing-canvas")?.clientHeight}
                 className="canvas-print absolute all-0"
                 style={{ margin: 'auto', height: (isIOS ? (isPinned ? "52vh" : "48vh") : (isPinned ? "73vh" : "66vh")), width: '90%' }}
               />
@@ -3330,7 +3330,7 @@ useEffect(() => {
                 ref={canvasRef}
                 id="drawing-canvas"
                 width={document.getElementById("third")?.clientWidth}
-                height={"600px"}
+                height={document.getElementById("drawing-canvas")?.clientHeight}
                 className="canvas-print absolute all-0"
                 style={{ margin: 'auto', height: isPinned ? "500px" : "69vh", width: '100%' }}
               />
