@@ -239,24 +239,13 @@ export const HandleVideoCall = ({
 
   // selects trainee clips on load
   async function selectTraineeClip (setter){
+    console.log('selected Trainee clips called , ' , startMeeting)
     try{
-        const Response = await traineeClips({});
-        console.log('res' , Response)
-        let currentUserClips = [];
-        Response?.data?.map((user) => {
-          if(user?._id?._id == toUser?._id){
-            if(user?.clips?.length >= 2){
-              const clip1 = user.clips[user.clips.length - 1].clips;
-              const clip2 = user.clips[user.clips.length - 2].clips;
-              currentUserClips = [clip1,clip2]
-              setter(currentUserClips)
-              console.log(currentUserClips , user)
-            }
-          }  
-        })
-        // const user = Response.data.filter((user) => user)
-        // const data = [Response.data[1].clips[Response.data[1].clips.length-2].clips , Response.data[1].clips[Response.data[1].clips.length-1].clips];
-        // setter(data || [])
+        if(startMeeting?.trainee_clip?.length > 0){
+          setter(startMeeting.trainee_clip)
+        }else{
+          setter([])
+        }
     }catch(err){
         console.log(err)
     }
@@ -266,6 +255,7 @@ useEffect(() =>{
     selectTraineeClip(setSelectedClips);
   }
 },[isTraineeJoined])
+
   useEffect(() => {
     setInitialPinnedUser()
   }, [])
