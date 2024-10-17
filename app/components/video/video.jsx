@@ -68,6 +68,8 @@ import Script from 'next/script'
 import LazyVideo from "./LazyVideo";
 import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 import { fetchPeerConfig } from "../../../api";
+import { bookingsState } from "../common/common.slice";
+import { useAppSelector } from "../../store";
 
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
@@ -112,6 +114,7 @@ export const HandleVideoCall = ({
     b: 19,
     a: 1,
   });
+  const { startMeeting  } = useAppSelector(bookingsState);
 
   const [remoteStream, setRemoteStream] = useState(null);
   const [localStream, setLocalStream] = useState(null);
@@ -467,12 +470,11 @@ useEffect(() => {
       //   },
       // });
       
-      const response = await fetchPeerConfig();
       const peer = new Peer(fromUser._id, {
-        config: response.data.pepeerConfig
+        config: startMeeting.iceServers
       });
       peerRef.current = peer;
-
+      
       // Handle Peer events
       peer.on("open", (id) => {
         // console.log("Peer connection opened with ID:", id);

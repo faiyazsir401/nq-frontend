@@ -108,6 +108,7 @@ const NotificationPopup = () => {
                   traineeInfo: newBooking.trainee_info,
                   trainerInfo: newBooking.trainer_info,
                   endTime: newBooking.session_end_time,
+                  iceServers: newBooking.iceServers
                 };
 
                 tempObj.cta.call = () => {
@@ -153,6 +154,7 @@ const NotificationPopup = () => {
         traineeInfo: notification?.bookingInfo?.trainee_info,
         trainerInfo: notification?.bookingInfo?.trainer_info,
         endTime: notification?.bookingInfo?.session_end_time,
+        iceServers: notification?.bookingInfo?.iceServers
       };
 
       tempObj.cta.call = () => {

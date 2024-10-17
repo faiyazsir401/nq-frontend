@@ -203,6 +203,7 @@ const TraineeRenderBooking = ({
                       isOpenModal: true,
                       traineeInfo: trainee_info,
                       trainerInfo: trainer_info,
+                      iceServers: scheduledMeetingDetails[booking_index].iceServers
                     });
 
                     sendNotifications({
