@@ -68,6 +68,8 @@ import Script from 'next/script'
 import LazyVideo from "./LazyVideo";
 import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 import { fetchPeerConfig } from "../../../api";
+import { bookingsState } from "../common/common.slice";
+import { useAppSelector } from "../../store";
 
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
@@ -112,6 +114,7 @@ export const HandleVideoCall = ({
     b: 19,
     a: 1,
   });
+  const { startMeeting  } = useAppSelector(bookingsState);
 
   const [remoteStream, setRemoteStream] = useState(null);
   const [localStream, setLocalStream] = useState(null);
@@ -236,24 +239,13 @@ export const HandleVideoCall = ({
 
   // selects trainee clips on load
   async function selectTraineeClip (setter){
+    console.log('selected Trainee clips called , ' , startMeeting)
     try{
-        const Response = await traineeClips({});
-        console.log('res' , Response)
-        let currentUserClips = [];
-        Response?.data?.map((user) => {
-          if(user?._id?._id == toUser?._id){
-            if(user?.clips?.length >= 2){
-              const clip1 = user.clips[user.clips.length - 1].clips;
-              const clip2 = user.clips[user.clips.length - 2].clips;
-              currentUserClips = [clip1,clip2]
-              setter(currentUserClips)
-              console.log(currentUserClips , user)
-            }
-          }  
-        })
-        // const user = Response.data.filter((user) => user)
-        // const data = [Response.data[1].clips[Response.data[1].clips.length-2].clips , Response.data[1].clips[Response.data[1].clips.length-1].clips];
-        // setter(data || [])
+        if(startMeeting?.trainee_clip?.length > 0){
+          setter(startMeeting.trainee_clip)
+        }else{
+          setter([])
+        }
     }catch(err){
         console.log(err)
     }
@@ -263,6 +255,7 @@ useEffect(() =>{
     selectTraineeClip(setSelectedClips);
   }
 },[isTraineeJoined])
+
   useEffect(() => {
     setInitialPinnedUser()
   }, [])
@@ -467,12 +460,11 @@ useEffect(() => {
       //   },
       // });
       
-      const response = await fetchPeerConfig();
       const peer = new Peer(fromUser._id, {
-        config: response.data.pepeerConfig
+        config: startMeeting.iceServers
       });
       peerRef.current = peer;
-
+      
       // Handle Peer events
       peer.on("open", (id) => {
         // console.log("Peer connection opened with ID:", id);

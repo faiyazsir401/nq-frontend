@@ -1,5 +1,7 @@
 import { axiosInstance } from "../../../config/axios-interceptor";
 
+import {fetchPeerConfig} from "../../../api/index"
+
 export const fetchTraineeWithSlots = async (params) => {
   try {
     const response = await axiosInstance({
@@ -21,6 +23,8 @@ export const fetchTraineeWithSlots = async (params) => {
 
 export const bookSession = async (payload) => {
   try {
+    const iceServerResponse = await fetchPeerConfig();
+    payload.iceServers = iceServerResponse.data.formattedIceServers;
     const response = await axiosInstance({
       method: "post",
       url: `/trainee/book-session`,
