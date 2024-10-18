@@ -382,7 +382,7 @@ const Index = (props) => {
         }
 
       } else {
-        getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '105px' : '25px';
+        getNavbarTabs.style.marginLeft = openCloseToggleSideNav && !document.getElementById("drawing-canvas") ? '105px' : '25px';
         getNavbarTabs?.style?.setProperty('width', openCloseToggleSideNav ? 'calc(100vw - 55px)' : 'calc(100vw - 25px)');
 
       }
