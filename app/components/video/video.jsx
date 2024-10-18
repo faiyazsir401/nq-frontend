@@ -1599,24 +1599,24 @@ useEffect(() => {
   });
 
   //NOTE -  Video Time Update emit
-  const emitVideoTimeEvent = (clickedTime, number) => {
+const emitVideoTimeEvent = (clickedTime, number) => {
 
     if (isPlaying.isPlaying1) {
-      setIsPlaying(prev => ({ ...prev, isPlaying1: false }));
-    }
+    setIsPlaying(prev => ({ ...prev, isPlaying1: false }));
+  }
     if (isPlaying.isPlaying1) {
-      setIsPlaying(prev => ({ ...prev, isPlaying2: false }));
-    }
-    if (isPlaying.isPlayingAll) {
-      setIsPlaying(prev => ({ ...prev, isPlayingAll: false }));
-    }
+    setIsPlaying(prev => ({ ...prev, isPlaying2: false }));
+  }
+  if (isPlaying.isPlayingAll) {
+    setIsPlaying(prev => ({ ...prev, isPlayingAll: false }));
+  }
 
-    socket?.emit(EVENTS.ON_VIDEO_TIME, {
-      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-      clickedTime,
-      number,
-    });
-  };
+  socket?.emit(EVENTS.ON_VIDEO_TIME, {
+    userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+    clickedTime,
+    number,
+  });
+};
 
   socket.on(EVENTS.ON_VIDEO_SHOW, ({ isClicked }) => {
     setMaxMin(isClicked);
@@ -1717,6 +1717,7 @@ useEffect(() => {
 
   // console.log("video time--------->",videoTime)
   const handleTimeUpdate = (videoRef, progressBarRef, number) => {
+    let num = number;
     if (!videoRef.current) return; // Ensure videoRef is valid
   
     // Update progress bar value
@@ -1726,7 +1727,7 @@ useEffect(() => {
   
     // Check if video has ended
     if (videoRef.current.duration === videoRef.current.currentTime) {
-      togglePlay(number);
+      togglePlay(number === 1 ? "one" : "two");
       videoRef.current.currentTime = 0;
       emitVideoTimeEvent(0, number);
     }
@@ -1775,11 +1776,11 @@ useEffect(() => {
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
     // console.log(clickedTime, "handleProgressBarChange");
-    if (number === "one") {
-      selectedVideoRef1.current.currentTime = clickedTime;
-    } else {
-      selectedVideoRef2.current.currentTime = clickedTime;
-    }
+    // if (number === "one") {
+    //   selectedVideoRef1.current.currentTime = clickedTime;
+    // } else {
+    //   selectedVideoRef2.current.currentTime = clickedTime;
+    // }
 
     socket?.emit(EVENTS?.ON_VIDEO_TIME, {
       userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
