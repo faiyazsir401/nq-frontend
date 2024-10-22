@@ -2406,7 +2406,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                 width={document.getElementById("third")?.clientWidth}
                 height={document.getElementById("drawing-canvas")?.clientHeight}
                 className="canvas-print absolute all-0"
-                style={{ margin: 'auto', height: (isIOS ? (isPinned ? "52vh" : "48vh") : (isPinned ? "73vh" : "66vh")), width: '90%' }}
+                style={{ height: (isIOS ? (isPinned ? "52vh" : "48vh") : (isPinned ? "73vh" : "66vh")), width: '100%' }}
               />
               {selectedClips?.length ? (
                 <div
@@ -2467,6 +2467,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                           // padding: "1px !important",
                           height: "100%",
                           padding: 0,
+                          margin:'auto'
                         }}
                       >
                        
@@ -2560,6 +2561,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                           // padding: "1px",
                           height: "100%",
                           padding: 0,
+                          margin:'auto'
                         }}
                       >
 
@@ -2802,7 +2804,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                   marginTop: accountType === AccountType.TRAINER ?
                     displayMsg?.msg ? "0px" :
                       isPinned && pinnedUser === "user-video-1" ? '10px' :
-                        selectedClips?.length && isPinned && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "60px") : (isIOS ? "100px" : "60px")
+                        selectedClips?.length && isPinned && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "86px") : (isIOS ? "100px" : "86px")
                     :
                     // trainee
                     displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "0px" : displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" :
