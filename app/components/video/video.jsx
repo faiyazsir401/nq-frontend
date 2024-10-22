@@ -1668,10 +1668,9 @@ const emitVideoTimeEvent = (clickedTime, number) => {
         setShowThumbnailForTwoVideo(false)
       }
     }
-    console.log(selectedVideoRef1.current)
+
     var temp = isPlaying;
     temp.number = num;
-    console.log(selectedVideoRef1 , 'hello')
     if (
       selectedVideoRef1.current && 
       selectedVideoRef1?.current?.currentTime ===
@@ -1779,7 +1778,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
-    console.log(clickedTime, "handleProgressBarChange");
+    // console.log(clickedTime, "handleProgressBarChange");
     if (number === "one") {
       selectedVideoRef1.current.currentTime = clickedTime;
     } else {
@@ -2558,7 +2557,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                           )}
                       </div>
                     ) : null}
-                    {selectedClips.length && selectedClips[1] ? (
+                    {selectedClips.length >= 2 && selectedClips[1] ? (
                       <div
                         className="col-lg-6 col-md-6 col-sm-6 col-xs-12"
                         style={{
