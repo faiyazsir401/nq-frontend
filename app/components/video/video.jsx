@@ -3952,8 +3952,9 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                       ? "auto"
                       : 999,
 
+                  marginLeft:'auto',
+                  marginRight:'auto',
                   marginTop: (!isMobile && accountType.trainee ? "20px" : ""),
-                  margin:'auto',
                   height:
                     isPinned &&
                       ((accountType === AccountType.TRAINER &&
