@@ -1592,7 +1592,7 @@ useEffect(() => {
 
   //NOTE -  Video Time Update listen
   socket.on(EVENTS.ON_VIDEO_TIME, ({ clickedTime, number }) => {
-    if (selectedVideoRef1.current) {
+    if (selectedVideoRef1?.current) {
       if (number === "one") selectedVideoRef1.current.currentTime = clickedTime;
       else selectedVideoRef2.current.currentTime = clickedTime;
     }
@@ -1668,10 +1668,12 @@ const emitVideoTimeEvent = (clickedTime, number) => {
         setShowThumbnailForTwoVideo(false)
       }
     }
-
+    console.log(selectedVideoRef1.current)
     var temp = isPlaying;
     temp.number = num;
+    console.log(selectedVideoRef1 , 'hello')
     if (
+      selectedVideoRef1.current && 
       selectedVideoRef1?.current?.currentTime ===
       selectedVideoRef1?.current?.duration &&
       selectedVideoRef2?.current?.currentTime ===
@@ -1679,7 +1681,9 @@ const emitVideoTimeEvent = (clickedTime, number) => {
     ) {
       selectedVideoRef1.current.currentTime = 0;
       emitVideoTimeEvent(0, "one");
-      selectedVideoRef2.current.currentTime = 0;
+      if(selectedVideoRef2.current){
+        selectedVideoRef2.current.currentTime = 0;
+      }
       emitVideoTimeEvent(0, "two");
     }
 
@@ -1775,12 +1779,12 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
-    // console.log(clickedTime, "handleProgressBarChange");
-    // if (number === "one") {
-    //   selectedVideoRef1.current.currentTime = clickedTime;
-    // } else {
-    //   selectedVideoRef2.current.currentTime = clickedTime;
-    // }
+    console.log(clickedTime, "handleProgressBarChange");
+    if (number === "one") {
+      selectedVideoRef1.current.currentTime = clickedTime;
+    } else {
+      selectedVideoRef2.current.currentTime = clickedTime;
+    }
 
     socket?.emit(EVENTS?.ON_VIDEO_TIME, {
       userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
