@@ -38,6 +38,23 @@ export const getRecentStudent = async () => {
     }
 };
 
+export const getRecentTrainers = async () => {
+    try {
+        const res = await axiosInstance({
+            method: "get",
+            url: `/trainee/recent-trainers`, // Assuming this is the endpoint
+            headers: {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+};
+
 
 export const getTraineeClips = async (payload) => {
     try {

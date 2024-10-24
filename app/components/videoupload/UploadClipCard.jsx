@@ -16,6 +16,8 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import UAParser from 'ua-parser-js';
 import { useSelector } from "react-redux";
+import FriendsPopup from "../pop-ups/FriendsPopUp";
+import EmailsPopup from "../pop-ups/EmailPopUp";
 
 const OS = {
   android: 'android',
@@ -31,6 +33,12 @@ const BROWSER = {
 }
 
 const parser = new UAParser();
+
+const shareWithConstants = {
+  myClips:"My Clips",
+  myFriends:"Friends",
+  newUsers:"New Users"
+}
 
 const UploadClipCard = (props) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -57,8 +65,9 @@ const UploadClipCard = (props) => {
   const ffmpegRef = useRef(null);
   const [deviceInfo, setDeviceInfo] = useState({});
   console.log("deviceInfo===================>", deviceInfo)
-
-
+  const [shareWith , setShareWith] = useState(shareWithConstants.myClips)
+  const [selectedFriends , setSelectedFriends] = useState([]);
+  const [selectedEmails ,setSelectedEmails] = useState([])
   useEffect(() => {
 
     const result = parser.getResult();
@@ -341,8 +350,8 @@ const UploadClipCard = (props) => {
       // console.log("e.target.files======>", e.target.files.length)
       const file = e.target.files[0];
 
-      const videoUrl = URL.createObjectURL(file);
-      videoRef.current.src = videoUrl;
+          const videoUrl = URL.createObjectURL(file);
+          videoRef.current.src = videoUrl;
 
       const fileSize = file?.size / 1024 / 1024; // in MiB
       if (fileSize > 150) {
@@ -353,7 +362,7 @@ const UploadClipCard = (props) => {
         setLoading(false)
       } else {
         setSelectedFile(file);
-
+  
         // *********************************************************
         if (file) {
           setVideo(file);
@@ -362,7 +371,7 @@ const UploadClipCard = (props) => {
 
         // const formData = new FormData();
         // formData.append('video', file);
-
+  
         // try {
         //   // const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/common/generate-thumbnail`, {
         //   const response = await fetch(`https://6d3e-59-99-53-84.ngrok-free.app/common/generate-thumbnail`, {
@@ -380,16 +389,16 @@ const UploadClipCard = (props) => {
         //   if (!response.ok) {
         //     throw new Error('Failed to generate thumbnail');
         //   }
-
+  
         //   const blob = await response.blob();
         //   const thumbnailUrl = URL.createObjectURL(blob);
-
+  
         //   setThumbnail({
         //     thumbnailFile: blob,
         //     dataUrl: thumbnailUrl,
         //     fileType: blob.type
         //   });
-
+  
         //   // console.log("=============>", {thumbnailUrl,blob })
         //   setThumbnail(thumbnailUrl);
         // } catch (error) {
@@ -404,38 +413,54 @@ const UploadClipCard = (props) => {
   };
 
   const handleUpload = async () => {
-    if (!selectedFile) {
-      toast.error("Please select a video file.");
+    if (shareWith === shareWithConstants.newUsers && selectedEmails.length <= 0) {
+      toast.error("Please Add Emails to Share Clips With.");
+      return;
+    } else if (shareWith === shareWithConstants.myFriends && selectedFriends.length <= 0) {
+      toast.error("Please Add Friends to Share Clips With.");
       return;
     }
-
+  
+    if (!selectedFile || selectedFile.length === 0) {
+      toast.error("Please select at least one video file.");
+      return;
+    }
+  
     if (!thumbnail?.fileType) {
-      toast.error("Please select a video file.");
+      toast.error("Please select a thumbnail.");
       return;
     }
-    let IsTrainer  = userInfo.account_type === AccountType.TRAINER; 
 
-    var payload = {
+    let IsTrainer  = userInfo.account_type === AccountType.TRAINER; 
+  
+      var payload = {
       filename: selectedFile?.name,
       fileType: selectedFile?.type,
       thumbnail: thumbnail?.fileType,
       title: title,
       category: IsTrainer ? userInfo.category : category,
-    };
-    const data = await getS3SignUrl(payload);
-
-    if (data?.url) {
+      };
+      
+      if(shareWith === shareWithConstants.myFriends){
+        payload.user_id = selectedFriends;
+      }else if(shareWith === shareWithConstants.newUsers){
+        payload.invites = selectedEmails
+      }
+      
+      const data = await getS3SignUrl(payload);
+  
+      if (data?.url) {
       await pushProfilePhotoToS3(data.url, selectedFile, 'video');
       await pushProfilePhotoToS3(data.thumbnailURL, thumbnail.thumbnailFile);
       // Create a new file input element
-      const newFileInput = document.createElement("input");
-      newFileInput.type = "file";
-      newFileInput.id = "fileUpload";
-      newFileInput.name = "file";
-      newFileInput.onchange = handleFileChange;
-      newFileInput.style.width = "67%";
+    const newFileInput = document.createElement("input");
+    newFileInput.type = "file";
+    newFileInput.id = "fileUpload";
+    newFileInput.name = "file";
+    newFileInput.onchange = handleFileChange;
+    newFileInput.style.width = "67%";
       // Replace the existing file input with the new one
-      const existingFileInput = document.getElementById("fileUpload");
+    const existingFileInput = document.getElementById("fileUpload");
       existingFileInput.parentNode.replaceChild(
         newFileInput,
         existingFileInput
@@ -516,6 +541,7 @@ const UploadClipCard = (props) => {
     }
   }, [isOpen]);
 
+  const isTrainee = userInfo.account_type === AccountType.TRAINEE;
 
   return (
     <div
@@ -558,6 +584,41 @@ const UploadClipCard = (props) => {
         </select>
         </>
         }
+          <>
+          <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
+            Share With
+          </label>
+          <select
+            disabled={progress}
+            id="account_type"
+            className="form-control"
+            name="account_type"
+            onChange={(e) => setShareWith(e?.target?.value)}
+            value={shareWith}
+          >
+            {Object.values(shareWithConstants)?.map((category_type, index) => (
+              <option key={index} value={category_type.label}>
+                {" "}
+                {category_type}
+              </option>
+            ))}
+          </select>
+          </>
+          {
+            shareWith === shareWithConstants.myFriends && 
+            <div className="d-flex flex-column align-items-center">
+            <FriendsPopup props={{buttonLabel:"Select Friends" , setSelectedFriends}}/>
+            <div>Total Friends Selected {selectedFriends.length}</div>
+            </div>
+          }
+          {
+            shareWith === shareWithConstants.newUsers && 
+            <div className="d-flex flex-column align-items-center">
+            <EmailsPopup props={{buttonLabel:"Add New Users" , setSelectedEmails}}/>
+            <div>Total Emails Selected {selectedEmails.length}</div>
+            </div>
+          }
+
         <div style={{ textAlign: "center" }}>
           <label className="col-form-label mt-2">
             Select a clip to upload: &nbsp;

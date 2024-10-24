@@ -84,6 +84,9 @@ const Dashboard = () => {
       case topNavbarOptions?.STUDENT: {
         return <StudentRecord />;
       }
+      case topNavbarOptions?.Friends: {
+        return <StudentRecord friends={true}/>;
+      }
       case topNavbarOptions?.UPCOMING_SESSION: {
         return <UpcomingSession />;
       }
