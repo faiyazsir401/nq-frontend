@@ -14,7 +14,7 @@ export const getS3SignUrl = async (payload) => {
     });
     return response.data;
   } catch (err) {
-    throw err;
+    console.error("error while posting video clip ", err);
   }
 };
 export const getSaveSessionS3SignUrl = async (payload) => {

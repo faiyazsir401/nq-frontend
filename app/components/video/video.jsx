@@ -2812,7 +2812,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                     // trainee
                     displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "0px" : displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" :
                       isPinned && pinnedUser === "user-video-2" ? '10px' :
-                        selectedClips.length && isPinned && pinnedUser === "user-video-1" ? '65px' : isPinned && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "50px") : (isIOS ? "100px" : "50px"),
+                        selectedClips.length && isPinned && pinnedUser === "user-video-1" ? '65px' : isPinned && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : (isIOS ? "100px" : "65px"),
                   top:
                     accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-2" ? "110px" : accountType === AccountType.TRAINER && displayMsg?.msg && isPinned && pinnedUser === "user-video-1" ? "0px" : accountType === AccountType.TRAINEE && isPinned && pinnedUser === "user-video-1" ? '' :
                       isPinned ?
