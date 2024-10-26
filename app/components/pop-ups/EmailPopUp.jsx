@@ -12,30 +12,56 @@ import {
 
 const EmailsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [emails, setEmails] = useState([]); // State to hold multiple email inputs
-  const [email, setEmail] = useState(''); // State to hold the current email input
+  const [emails, setEmails] = useState([]);
+  const [email, setEmail] = useState('');
 
   // Toggle the popup
   const toggle = () => setIsOpen((prev) => !prev);
 
   // Add a new email to the list
-  const addEmail = (e) => {
-    e.preventDefault();
-    if(emails.includes(email)){
+  const addEmail = (newEmail) => {
+    if (emails.includes(newEmail)) {
       alert("Email Already Entered.");
-      return
+      return;
     }
-    if (email && isValidEmail(email)) {
-      setEmails([...emails, email]);
+    if (isValidEmail(newEmail)) {
+      setEmails([...emails, newEmail]);
       setEmail(''); // Clear the input after adding
     } else {
       alert("Please enter a valid email.");
     }
   };
 
+  // Handle input change, detecting space for adding emails
+  const handleEmailChange = (e) => {
+    const input = e.target.value;
+    setEmail(input); // Update the email input state
+  };
+
+  // Handle key down events for adding or editing emails
+  const handleKeyDown = (e) => {
+    const trimmedEmail = email.trim();
+
+    if (e.key === ' ') {
+      e.preventDefault(); // Prevent space from being added in the input
+      if (trimmedEmail) {
+        addEmail(trimmedEmail); // Add the email if not empty
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
+      if (trimmedEmail) {
+        addEmail(trimmedEmail); // Add the email if not empty
+      }
+    } else if (e.key === 'Backspace' && !email && emails.length > 0) {
+      // Re-enter the last email into the input field
+      const lastEmail = emails[emails.length - 1];
+      setEmail(lastEmail);
+      setEmails(emails.slice(0, -1)); // Remove last email from the list
+    }
+  };
+
   // Remove an email from the list
-  const removeEmail = (index ,e ) => {
-    e.preventDefault();
+  const removeEmail = (index) => {
     const updatedEmails = emails.filter((_, idx) => idx !== index);
     setEmails(updatedEmails);
   };
@@ -66,35 +92,26 @@ const EmailsPopup = ({ props }) => {
       <Modal isOpen={isOpen} toggle={toggle} centered={true}>
         <ModalHeader>Add Multiple Emails</ModalHeader>
         <ModalBody>
-          <Form>
-            {/* Displaying the list of added emails */}
-            {emails.length > 0 && (
-              <ul className="mb-3">
+          <Form onSubmit={(e) => e.preventDefault()}>
+            <InputGroup className="mb-3 d-flex">
+              <div className="d-flex flex-wrap align-items-center w-100" style={{ gap: '5px', padding: '8px', border: '1px solid #ccc', borderRadius: '5px', minHeight: '40px' }}>
                 {emails.map((email, index) => (
-                  <li key={index}>
+                  <div key={index} style={{ background: '#e0e0e0', padding: '5px 10px', borderRadius: '15px', display: 'flex', alignItems: 'center' }}>
                     {email}
-                    <button className="bg-danger ml-2 px-2 rounded border-0 text-white" onClick={(e) => removeEmail(index ,e)}>
+                    <button className="bg-danger ml-2 px-2 rounded border-0 text-white" onClick={() => removeEmail(index)} style={{ marginLeft: '5px', cursor: 'pointer' }}>
                       &times;
                     </button>
-                  </li>
+                  </div>
                 ))}
-              </ul>
-            )}
-            <InputGroup className="mb-3 d-flex">
-              <Input
-                type="email"
-                value={email}
-                placeholder="Enter email address"
-                onChange={(event) => setEmail(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter') {
-                      addEmail(event)
-                  }
-                }}
-              />
-              <button className="bg-success text-white rounded border-0 px-3 ml-2" onClick={(e) => addEmail(e)}>
-                Add Email
-              </button>
+                <Input
+                  type="text"
+                  value={email}
+                  placeholder="Enter emails separated by space"
+                  onChange={handleEmailChange}
+                  onKeyDown={handleKeyDown}
+                  style={{ border: 'none', outline: 'none', minWidth: '100px' }}
+                />
+              </div>
             </InputGroup>
           </Form>
         </ModalBody>

@@ -10,19 +10,21 @@ import {
   CardImg,
   CardTitle,
 } from "reactstrap";
-import { getRecentStudent, getRecentTrainers } from "../NavHomePage/navHomePage.api";
+import {
+  getRecentStudent,
+  getRecentTrainers,
+} from "../NavHomePage/navHomePage.api";
 import { Utils } from "../../../utils/utils";
 import { useSelector } from "react-redux";
 import { AccountType } from "../../common/constants";
-
+import "./common.css"
 // Sample friend data
-
 
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
   const [friendsList, setFreinds] = useState([]);
-  const userInfo = useSelector((state) => state.auth.userInfo)
+  const userInfo = useSelector((state) => state.auth.userInfo);
 
   // Toggle the popup
   const toggle = () => setIsOpen((prev) => !prev);
@@ -46,7 +48,7 @@ const FriendsPopup = ({ props }) => {
     try {
       const response = await getRecentStudent();
       setFreinds(response?.data); // Set the fetched students in state
-      console.log("fetched data" , response.data);
+      console.log("fetched data", response.data);
     } catch (error) {
       console.log("Error fetching recent students:", error);
     }
@@ -55,7 +57,7 @@ const FriendsPopup = ({ props }) => {
   const getRecentTrainersApi = async () => {
     try {
       let res = await getRecentTrainers();
-      setFreinds(res?.data);  // Store trainers in the same state variable
+      setFreinds(res?.data); // Store trainers in the same state variable
       console.log("Recent Trainers:", res);
     } catch (error) {
       console.log(error);
@@ -63,16 +65,16 @@ const FriendsPopup = ({ props }) => {
   };
 
   useEffect(() => {
-    if(userInfo.account_type === AccountType.TRAINEE){
+    if (userInfo.account_type === AccountType.TRAINEE) {
       getRecentTrainersApi();
-    }else{
+    } else {
       fetchRecentStudents();
     }
   }, []);
 
-  useEffect(() =>{
-    props.setSelectedFriends(selectedFriends)
-  },[selectedFriends])
+  useEffect(() => {
+    props.setSelectedFriends(selectedFriends);
+  }, [selectedFriends]);
 
   return (
     <div className="d-flex flex-direction-column my-2">
@@ -84,15 +86,22 @@ const FriendsPopup = ({ props }) => {
         {props.buttonLabel}
       </button>
 
-      <Modal isOpen={isOpen} toggle={toggle} centered={true} style={{maxWidth:'700px'}}>
+      <Modal
+        isOpen={isOpen}
+        toggle={toggle}
+        centered={true}
+        style={{ maxWidth: "700px"}}
+        className="fade-model"
+      >
         <ModalHeader>Select Friends</ModalHeader>
         <ModalBody>
           <div
             style={{
               display: "flex",
-              justifyContent: "center",
+              justifyContent: "start",
               flexWrap: "wrap",
               gap: "10px",
+              alignItems:'center'
             }}
           >
             {friendsList.map((friend) => (
@@ -106,17 +115,25 @@ const FriendsPopup = ({ props }) => {
                   cursor: "pointer",
                 }}
                 onClick={() => handleSelectFriend(friend._id)}
+                className="rounded"
               >
-                <CardImg top src={Utils.getImageUrlOfS3(friend.profile_picture ) || "/assets/images/demoUser.png"} alt={'profile'} />
-                <CardBody>
-                  <CardTitle>{friend.fullname}</CardTitle>
-                  <input
-                    type="checkbox"
-                    checked={selectedFriends.includes(friend._id)}
-                    onChange={() => handleSelectFriend(friend._id)}
-                    style={{ marginTop: "5px" }}
-                  />
-                </CardBody>
+                <CardImg
+                  top
+                  style={{ minHeight: 145 }}
+                  src={
+                    Utils.getImageUrlOfS3(friend.profile_picture) ||
+                    "/assets/images/demoUser.png"
+                  }
+                  alt={"profile"}
+                />
+                <CardTitle className="text-center m-0 p-2 bg-secondary text-white">{friend.fullname}</CardTitle>
+                <input
+                  className="position-absolute"
+                  type="checkbox"
+                  checked={selectedFriends.includes(friend._id)}
+                  onChange={() => handleSelectFriend(friend._id)}
+                  style={{ marginTop: "5px" , right:'5px'}}
+                />
               </Card>
             ))}
           </div>
