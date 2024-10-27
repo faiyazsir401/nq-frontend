@@ -70,7 +70,7 @@ import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 import { fetchPeerConfig } from "../../../api";
 import { bookingsState } from "../common/common.slice";
 import { useAppSelector } from "../../store";
-
+import './common.css'
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
 let canvasConfigs = {
@@ -1809,16 +1809,19 @@ const emitVideoTimeEvent = (clickedTime, number) => {
     setScreenShot();
   }, [screenShots?.length]);
 
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (canvas) {
-  //     const bookingsElement = document.getElementById('bookings');
-  //     if (bookingsElement) {
-  //       canvas.width = bookingsElement.clientWidth;
-  //       canvas.height = bookingsElement.clientHeight;
-  //     }
-  //   }
-  // }, []);
+  useEffect(() => {
+      const navbarContainer = document.getElementById('get-navbar-tabs');
+      if (navbarContainer) {
+        navbarContainer.classList.add('temp_nav')
+      }
+
+      return ()=>{
+        const navbarContainer = document.getElementById('get-navbar-tabs');
+        if (navbarContainer) {
+        navbarContainer.classList.remove('temp_nav')
+        }
+      }
+  }, []);
 
   const setScreenShot = async () => {
     var newReportImages = [];
@@ -3236,7 +3239,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
         <OrientationModal isOpen={modal} />
         <div
           className="row"
-          style={{ height: "100%", display: "flex", alignItems: "center" }}
+          style={{ height: "100vh", display: "flex", alignItems: "center" }}
         >
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
@@ -3301,7 +3304,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
           {
             <div
-              className="col-lg-8 col-md-8 col-sm-12 "
+              className="col col-8"
               id="third"
               style={{
                 height: "100%",
@@ -3339,19 +3342,19 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                     isPinned
                       ? accountType === AccountType.TRAINER
                         ? pinnedUser === "user-video-1"
-                          ? height < 500 ? "switch-clips-container-for-mobile" : "switch-clips-container"
-                          : height < 500 ? "scs2-mobile" : "scs2"
+                          ? "switch-clips-container pb-2 pt-3"
+                          : "scs2"
                         : accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"
-                          ? height < 500 ? "scs2-mobile" : "scs2"
-                          : height < 500 ? "switch-clips-container-for-mobile" : "switch-clips-container"
+                          ? "scs2"
+                          : "switch-clips-container pb-2 pt-3"
                       : "row"
                   }
                   style={{
                     zIndex: isPinned ? "999" : "auto",
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
-                    padding: isPinned ? "5px" : "",
+                    padding: isPinned ? "15px !important" : "",
                     position:'relative'
                   }}
                   onClick={() => {
@@ -3363,12 +3366,12 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                   }}
                 >
                   <div
-                    className="row"
+                    className={`row ${pinnedUser === "user-video-1" ? "m-0 p-2" :'m-0 p-2'}`}
                     style={
                       mediaQuery.matches
                         ? selectedClips?.length === 1
-                          ? isOnlyOneVideo
-                          : isTwoVideos
+                          ? {...isOnlyOneVideo , paddingTop:'0px !important'}
+                          : {...isTwoVideos , paddingTop:'0px !important'}
                         : {}
                     }
                   >
@@ -3757,7 +3760,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                         pinnedUser === "user-video-1") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-2"))
-                      ? "switch-user-video"
+                      ? "switch-user-video w-auto"
                       : selectedClips.length &&
                         isPinned &&
                         selectedClips.length &&
@@ -3765,72 +3768,12 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                           pinnedUser === "user-video-1") ||
                           (accountType === AccountType.TRAINEE &&
                             pinnedUser === "user-video-2"))
-                        ? "switch-user-video"
+                        ? "switch-user-video w-auto"
                         : selectedClips?.length !== 0 && mediaQuery.matches
                           ? "scs"
-                          : ""
+                          : "switch-user-video w-auto"
                 }
-                style={{
-                  zIndex:
-                    !selectedClips.length &&
-                      isPinned &&
-                      // pinnedUser === "user-video-2"
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? "999"
-                      : selectedClips?.length &&
-                        ((accountType === AccountType.TRAINER &&
-                          pinnedUser !== "user-video-1") ||
-                          (accountType === AccountType.TRAINEE &&
-                            pinnedUser !== "user-video-2")) &&
-                        isPinned
-                        ? 999
-                        : selectedClips?.length && !pinnedUser && !isPinned
-                          ? 999
-                          : "auto",
-                  height:
-                    !selectedClips.length &&
-                      isPinned &&
-                      // pinnedUser === "user-video-2"
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? height < 500 ? "80px" : ""
-                      : selectedClips?.length === 0 ||
-                        (accountType === AccountType.TRAINER &&
-                          pinnedUser === "user-video-1") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-2")
-                        ? width500
-                          ? "380px"
-                          : height < 500 ? "100%" : "500px"
-                        : height < 500 ? "80px" : "",
-                  marginTop: width768 ? (width500 ? "40px" : "50px") : "20px",
-                  top:
-                    isPinned ?
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-1") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-2"))
-                        ? "0% !important"
-                        // ? height < 500 ? "50px" : "0% !important"
-                        : (accountType === AccountType.TRAINER &&
-                          pinnedUser !== "user-video-1") ||
-                          (accountType === AccountType.TRAINEE &&
-                            pinnedUser !== "user-video-2") ||
-                          pinnedUser === null
-                          ? "45% !important"
-                          : "50%" :
-                      "",
-
-                  // position: displayMsg?.msg || isRemoteVideoOff ? "relative" : height < 500 ? pinnedUser === "user-video-1" ? "relative" : "absolute" : "relative",
-                  position: height < 500 ? ((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) ? "relative" : "absolute" : "relative",
-
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-140px" : "",
-                }}
+                style={{position:'relative'}}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
                     if (pinnedUser === "user-video-1") {
@@ -3934,7 +3877,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                       pinnedUser === "user-video-2") ||
                       (accountType === AccountType.TRAINEE &&
                         pinnedUser === "user-video-1"))
-                    ? "switch-user-video"
+                    ? "switch-user-video w-auto"
                     : selectedClips.length &&
                       isPinned &&
                       selectedClips.length &&
@@ -3942,52 +3885,11 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                         pinnedUser === "user-video-2") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"))
-                      ? "switch-user-video"
+                      ? "switch-user-video w-auto"
                       : mediaQuery.matches
                         ? "scs2"
                         : ""
                 }
-                style={{
-                  zIndex:
-                    isPinned &&
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? "auto"
-                      : 999,
-
-                  marginLeft:'auto',
-                  marginRight:'auto',
-                  marginTop: (!isMobile && accountType.trainee ? "20px" : ""),
-                  height:
-                    isPinned &&
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? width500
-                        ? "380px"
-                        : height < 500 ? "100%" : "500px"
-                      : width500
-                        ? "150px"
-                        : height < 500 ? "80px" : "",
-                  // top :  selectedClips.length > 0 ?  "10% !important" : "20%"
-                  top:
-                    isPinned && !(height < 500) ?
-                      ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1"))
-                        ? "0% !important"
-                        : (accountType === AccountType.TRAINER && pinnedUser !== "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser !== "user-video-1") || pinnedUser === null
-                          ? "10% !important" : "20%"
-                      : height < 500 ? !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) ? "50px" : "" : "",
-
-                  position: height < 500 ?
-                    ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2")
-                      || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
-                    ) ?
-                      "relative" : "absolute" : "relative",
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-140px" : "",
-                }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
                     if (pinnedUser === "user-video-2") {
