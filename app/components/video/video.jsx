@@ -2323,7 +2323,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
         >
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
-            <div id="sidetoolbar" className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', }}>
+            <div id="sidetoolbar" className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', marginLeft:'7vh' }}>
               <div>
                 <CanvasMenuBar
                   isOpen={isOpen}
