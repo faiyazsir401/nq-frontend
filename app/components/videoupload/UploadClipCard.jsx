@@ -450,7 +450,13 @@ const UploadClipCard = (props) => {
       const data = await getS3SignUrl(payload);
   
       if (data?.url) {
-      await pushProfilePhotoToS3(data.url, selectedFile, 'video');
+        try{
+          await pushProfilePhotoToS3(data.url, selectedFile, 'video');
+          toast.success("Clip upload successfully.");
+        }catch(err){
+          console.log(err);
+          
+        }
       await pushProfilePhotoToS3(data.thumbnailURL, thumbnail.thumbnailFile);
       // Create a new file input element
     const newFileInput = document.createElement("input");
@@ -586,7 +592,7 @@ const UploadClipCard = (props) => {
         }
           <>
           <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
-            Share With
+            Upload To
           </label>
           <select
             disabled={progress}
@@ -667,9 +673,9 @@ const UploadClipCard = (props) => {
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-      {video && ffmpegLoaded && !thumbnail?.dataUrl && (<button onClick={trimVideo} disabled={loading}>
+      {/* {video && ffmpegLoaded && !thumbnail?.dataUrl && (<button onClick={trimVideo} disabled={loading}>
         {loading ? 'Wait Thumbnail is genrating...' : 'Create Thumbnail'}
-      </button>)}
+      </button>)} */}
 
       {/* {thumbnail && (
         <div>
