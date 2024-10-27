@@ -986,11 +986,11 @@
       }
     }
 
-    @media (max-width: 450px) {
+    @media (max-width: 454px) {
       &.on {
         transition: all 0.3s ease;
         transform: translateX(0px);
-        min-width: 70px;
+        min-width: 70px !important;
         animation: fadeInLeft 300ms ease-in-out;
         padding-bottom: 20px;
       }

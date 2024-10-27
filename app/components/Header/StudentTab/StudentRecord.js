@@ -6,10 +6,11 @@ import Modal from "../../../common/modal";
 import {
   getRecentStudent,
   getTraineeClips,
+  getRecentTrainers,  // Import new API function
 } from "../../NavHomePage/navHomePage.api";
 import { Utils } from "../../../../utils/utils";
 
-const StudentRecord = () => {
+const StudentRecord = (props) => {  // Pass props to the component
   const [accountType, setAccountType] = useState("");
   const [recentStudent, setRecentStudent] = useState([]);
   const [recentStudentClips, setRecentStudentClips] = useState([]);
@@ -27,16 +28,31 @@ const StudentRecord = () => {
     setSelectedCourseIndex(null);
   };
 
+  // Fetch data depending on whether props.friends is true
   useEffect(() => {
-    getRecentStudentApi();
+    if (props.friends) {
+      getRecentTrainersApi();  // Fetch recent trainers
+    } else {
+      getRecentStudentApi();   // Fetch recent students
+    }
     setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE));
-  }, []);
+  }, [props.friends]);  // Rerun the effect when props.friends changes
 
   const getRecentStudentApi = async () => {
     try {
       let res = await getRecentStudent();
       setRecentStudent(res?.data);
-      console.log("resresresresresresres", res);
+      console.log("Recent Students:", res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getRecentTrainersApi = async () => {
+    try {
+      let res = await getRecentTrainers();
+      setRecentStudent(res?.data);  // Store trainers in the same state variable
+      console.log("Recent Trainers:", res);
     } catch (error) {
       console.log(error);
     }
@@ -46,7 +62,7 @@ const StudentRecord = () => {
     try {
       let res = await getTraineeClips({ trainer_id: id });
       setRecentStudentClips(res?.data);
-      console.log("getTraineeClipsApi==============>", res);
+      console.log("Trainee Clips:", res);
     } catch (error) {
       console.log(error);
     }
@@ -56,7 +72,7 @@ const StudentRecord = () => {
     <div>
       <div className="col-11 ml-2">
         <div className="dot-btn dot-success mt-4"></div>
-        <h3 className="ml-1 text-uppercase mb-1"> Students </h3>
+        <h3 className="ml-1 text-uppercase mb-1"> {props.friends ? 'Trainers' : 'Students'} </h3>
       </div>
 
       <div className={`col-12`} style={{ display: "flex", flexWrap: "wrap" }}>
@@ -91,7 +107,6 @@ const StudentRecord = () => {
                 >
                   <img
                     className="card-img-top"
-                    // src={data?.profile_picture}
                     src={
                       Utils?.getImageUrlOfS3(data?.profile_picture) ||
                       "/assets/images/userdemo.png"
@@ -161,26 +176,6 @@ const StudentRecord = () => {
           </div>
         }
       />
-
-      {/* Modal */}
-      {/* {selectedstudent && (
-        <div className="modal" style={{ display: "block", alignItems: 'center' }}>
-          <div className="modal-dialog" style={{ maxWidth: "50%", margin: "auto" }}>
-            <div className="modal-content" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "15px", maxHeight: '500px', overflow: 'auto' }}>
-              <div className="modal-dialog modal-xl">
-
-              </div>
-              <button
-                className="icon-btn btn-sm btn-outline-light close-apps pointer"
-                style={{ position: "absolute", top: "0px", right: "10px" }}
-                onClick={handleCloseButtonClick}
-              >
-                <X />
-              </button>
-            </div>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 };

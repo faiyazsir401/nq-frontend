@@ -50,6 +50,9 @@
   /* top : 260px; */
   top : 277px;
   width: 270px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .switch-clips-container-for-mobile_1{
@@ -235,4 +238,7 @@
 }
 #vid_id.wid-mid{
 width: 30% !important;
+}
+.width-fit{
+  width: fit-content;
 }

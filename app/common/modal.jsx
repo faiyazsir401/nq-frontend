@@ -13,13 +13,14 @@ const Modal = ({
   overflowHidden = false,
   minHeight = false,
 }) => {
-  console.log("allowFullWidth",allowFullWidth)
+  console.log("allowFullWidth", allowFullWidth);
   return (
     <ReactStrapModal
-      className={`${allowFullWidth
-        ? "react-strap-modal-full"
-        : "custom-react-strap-modal-full"
-        } `}
+      className={`${
+        allowFullWidth
+          ? "react-strap-modal-full"
+          : "custom-react-strap-modal-full"
+      } `}
       isOpen={isOpen}
       toggle={toggle}
       key={id}
@@ -27,9 +28,9 @@ const Modal = ({
         width,
         height,
         overflow: overflowHidden ? "hidden" : null,
-
         minHeight: minHeight ? "100vh" : null,
       }}
+      onClick={() =>toggle && toggle()}
     >
       <ModalBody>{element}</ModalBody>
       <ModalFooter>{footer}</ModalFooter>

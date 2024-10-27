@@ -11,7 +11,7 @@ import { getS3SignPdfUrl } from "./video.api";
 import { useAppSelector, useAppDispatch } from "../../store";
 import { authState } from "../auth/auth.slice";
 import { values } from "lodash";
-import { awsS3Url } from "../../../utils/constant";
+import { awsS3Url, notificiationTitles } from "../../../utils/constant";
 import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { SocketContext } from "../socket";
@@ -329,7 +329,10 @@ const reportModal = ({
               !preview ?
                 <div className="theme-tab">
                   <div className="row">
-                    <div className="col-md-6 col-sm-12 col-xs-12 p-2" >
+                    <div className="col-12 d-flex flex-wrap"
+                    >
+                    {/* main title for the report */}
+                    <div className="p-2 flex-grow-1" >
                       <div className="form-group">
                         <label className="col-form-label">Title</label>
                         <input
@@ -345,8 +348,8 @@ const reportModal = ({
                         />
                       </div>
                     </div>
-
-                    <div className="col-md-6 col-sm-12 col-xs-12 p-2" >
+                     {/* main description for the report */}
+                    <div className="p-2 flex-grow-1" >
                       <div className="form-group">
                         <label className="col-form-label">Description</label>
                         <input
@@ -362,81 +365,81 @@ const reportModal = ({
                         />
                       </div>
                     </div>
+                    </div>
+
                     {screenShots?.map((sst, i) => {
                       console.log(sst , 'resport sst')
                       console.log('ggg', `${awsS3Url}${sst?.imageUrl}`)
-                      return <>
-                        <div className="col-md-6 col-sm-12 col-xs-12 p-2 mb-2" style={{ position: "relative", border: "1px solid #ced4da" }}>
-                          <img 
-                            style={{
-                              width: "100%",
-                              height: "100%",
-                              maxHeight: "280px",
-                              // border: "1px solid #ced4da",
-                              marginTop: "10px",
-                              objectFit: "contain",
-                              maxHeight: "340px",
-                            }}
-                            src={`${awsS3Url}${sst?.imageUrl}`}
-                            alt="Screen Shot"
-                          />
-                          <div style={{ position: "absolute", bottom: 0 }} >
-                            <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => {
-                              setSelectImage(sst?.imageUrl)
-                              setIsOpenCrop(true)
-                            }}>
-                              <Crop />
+                      return(
+                        <div className="col-12 d-flex flex-column flex-sm-row flex-wrap p-4 mb-4 shadow-sm border rounded">
+                          <div className="border p-2 m-md-2 rounded" style={{ position: "relative",flex:1 }}>
+                            <img
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                maxHeight: "340px",
+                                objectFit: "contain",
+                              }}
+                              src={`${awsS3Url}${sst?.imageUrl}`}
+                              alt="Screen Shot"
+                            />
+                            <div style={{ position: "absolute", bottom: 10 }} >
+                              <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => {
+                                setSelectImage(sst?.imageUrl)
+                                setIsOpenCrop(true)
+                              }}>
+                                <Crop />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="col-md-6 col-sm-12 col-xs-12 p-2" >
-                          <div className="media-body media-body text-right" >
-                            <div
-                              className="icon-btn btn-sm btn-outline-light close-apps pointer"
-                              onClick={() => {
-                                handleRemoveImage(sst?.imageUrl)
-                                // var temp = screenShots.filter((st, index) => index !== i)
-                                // setScreenShots([...temp])
-                              }}
-                            >
-                              <Trash2 />
+                          <div className="m-2" style={{flex:1}} >
+                            <div className="media-body media-body text-right" >
+                              <div
+                                className="icon-btn btn-sm btn-outline-light close-apps pointer"
+                                onClick={() => {
+                                  handleRemoveImage(sst?.imageUrl)
+                                  // var temp = screenShots.filter((st, index) => index !== i)
+                                  // setScreenShots([...temp])
+                                }}
+                              >
+                                <Trash2 />
+                              </div>
+                            </div>
+                            <div className="form-group m-0">
+                              <label className="col-form-label">Title</label>
+                              <input
+                                className="form-control"
+                                type="text"
+                                name="title"
+                                placeholder="Title"
+                                onChange={(e) => {
+                                  screenShots[i].title = e.target.value;
+                                  setScreenShots([...screenShots])
+                                }}
+                                value={screenShots[i]?.title}
+                              />
+                              <label className="col-form-label">Description</label>
+                              <textarea
+                                rows="4"
+                                className="form-control"
+                                type="text"
+                                name="description"
+                                placeholder="Description"
+                                onChange={(e) => {
+                                  screenShots[i].description = e.target.value;
+                                  setScreenShots([...screenShots])
+                                }}
+                                value={screenShots[i]?.description}
+                              />
                             </div>
                           </div>
-                          <div className="form-group">
-                            <label className="col-form-label">Title</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              name="title"
-                              placeholder="Title"
-                              onChange={(e) => {
-                                screenShots[i].title = e.target.value;
-                                setScreenShots([...screenShots])
-                              }}
-                              value={screenShots[i]?.title}
-                            />
-                            <label className="col-form-label">Description</label>
-                            <textarea
-                              rows="4"
-                              className="form-control"
-                              type="text"
-                              name="description"
-                              placeholder="Description"
-                              onChange={(e) => {
-                                screenShots[i].description = e.target.value;
-                                setScreenShots([...screenShots])
-                              }}
-                              value={screenShots[i]?.description}
-                            />
-                          </div>
-                        </div>
-                      </>
+                        </div>)
                     })}
                   </div>
                   <label style={{ color: "black", fontWeight: "500" }} className="col-form-label mt-2" htmlFor="account_type">
                     {uploadPercentage ? <> Uploading... {uploadPercentage}%</> : <></>}
                   </label>
-                  <div className="d-flex justify-content-center w-100 p-3">
+                  <div className="d-flex justify-content-center w-100 p-3 mb-5">
                     <Button className="mx-3" color="primary" disabled={uploadPercentage}
                       onClick={() => { generatePDF() }}
                     // onClick={() => { getReportData().then((res) => generatePDF()) }}
@@ -448,11 +451,10 @@ const reportModal = ({
             }
             <div className="theme-tab">
               <div id="report-pdf" style={{ display: "none", padding: "20px ", border: '10px solid #000080', borderColor: '#14328d' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: "center" }}>
-                  <p style={{ textTransform: 'uppercase', marginTop: '0px', fontSize: '40px', fontWeight: '600', color: "black" }}>Game Plan</p>
+                <div className="mb-2 flex-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: "center" }}>
+                  <p style={{ textTransform: 'uppercase', margin: '0px', fontSize: '40px', fontWeight: '600', color: "black" }}>Game Plan</p>
                   <div style={{ textAlign: 'right' }}>
-                    <img src="/assets/images/logo/netqwix_logo real.png" alt="Logo" style={{ width: '200px', objectFit: 'cover' }} />
-
+                    <img className="w-100" src="/assets/images/logo/netqwix_logo real.png" alt="Logo" style={{ maxWidth: '200px', objectFit: 'contain' }} />
                   </div>
                 </div>
                 <div style={{ display: "flex" }}>
@@ -466,37 +468,43 @@ const reportModal = ({
                 <hr style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'black' }} />
                 {reportArr?.map((sst, i) => {
                   return <>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', alignItems: 'center' }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <img src={sst?.imageUrl} alt="image" style={{ height: '260px', width: '-webkit-fill-available', objectFit: 'cover' }} />
+                    <div className="d-flex flex-column flex-md-row align-items-center">
+                      <div className="text-center w-100 w-md-50">
+                        <img
+                          className="h-100 w-100"
+                          src={sst?.imageUrl}
+                          alt="image"
+                          style={{ maxHeight: '260px', objectFit: 'contain' }}
+                        />
                       </div>
-                      <div>
+                      <div className="text-center text-md-left w-100 w-md-50">
                         <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p>
                         <p>{screenShots[i]?.description}</p>
                       </div>
                     </div>
-                    <hr style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'black' }} />
+                    <hr className="border border-dark" />
                   </>
                 })}
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="flex-wrap flex-md-nowrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ textAlign: 'left', marginRight: '20px' }}>
                     <h2 style={{ color: "black" }}>Trainer</h2>
                     <p>{userInfo?.extraInfo?.about}</p>
                   </div>
                   <div>
-                    <h2 style={{ color: "black" }}>{userInfo?.fullname}</h2>
+                    <h2 className="text-nowrap" style={{ color: "black" }}>{userInfo?.fullname}</h2>
                     {/* <img src={userInfo?.profile_picture}
                           alt="John Image"
                           style={{ width: '205.8px', height: '154.4px', marginRight: "20px" }}
                         /> */}
 
                     <img
+                    className="w-100"
                       style={{
-                        width: '205.8px',
-                        height: '205.8px',
-                        marginRight: "20px",
+                        maxWidth: '205.8px',
+                        maxHeight: '205.8px',
                         marginTop: "10px",
-                        borderRadius: "8px"
+                        borderRadius: "8px",
+                        objectFit:'contain'
                       }}
                       // src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || '/assets/images/demoUser.png'}
                       src={profilePic.current || demoProfilePic.current }
@@ -512,13 +520,13 @@ const reportModal = ({
               {
                 preview ?
 
-                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }}>
+                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }} className="mb-5">
 
-                    <Button className="mx-3" color="primary" onClick={() => {
+                    <Button className="mx-3 px-3 px-sm-5" color="primary" onClick={() => {
                       setPreview(false)
                       hidePreview()
                       }}>Back</Button>
-                    <Button className="mx-3" color="primary" disabled={uploadPercentage} 
+                    <Button className="mx-3 px-3 px-sm-5" color="primary" disabled={uploadPercentage} 
                     onClick={() => {
                       createOrUpdateReport()
                       setIsOpenReport(false)
@@ -529,10 +537,11 @@ const reportModal = ({
                       isClose();
                       }
                       sendNotifications({
-                        title: "Game Plan Report",
+                        title: notificiationTitles.gamePlanReport,
                         description: `Trainer shared the gameplan. Check it in the gameplan tab`,
                         senderId: currentReportData?.trainer,
                         receiverId: currentReportData?.trainee,
+                        bookingInfo:null
                       });
 
                     }}>Save</Button>

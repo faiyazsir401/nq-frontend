@@ -21,6 +21,7 @@ import {
 import { Tooltip } from "react-tippy";
 import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
+import { isIOS } from "react-device-detect";
 
 export const CanvasMenuBar = ({
   isOpen,
@@ -44,7 +45,7 @@ export const CanvasMenuBar = ({
   resetInitialPinnedUser,
 }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
-  const [activeTab, setActiveTab] = useState(SHAPES.FREE_HAND);
+  const [activeTab, setActiveTab] = useState(null);
   const [videoActiveTab, setAideoActiveTab] = useState("media");
   const [clips, setClips] = useState([]);
   const [traineeClip, setTraineeClips] = useState([]);
@@ -106,13 +107,22 @@ export const CanvasMenuBar = ({
     },
   ];
 
+  const menuSelector = (shapeType)=>{
+    if(shapeType !== activeTab){
+      drawShapes(shapeType);
+      setActiveTab(shapeType);
+    }else{
+      drawShapes(null);
+      setActiveTab(null);
+    }
+  }
   return (
     <div style={{ margin: "1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
         // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{height:' 85vh',overflow: 'auto'}}>
+        <div className="CreationBarCustomizable" style={{height: isIOS? "54vh" : "70vh",overflow: 'auto'}}>
           <span></span>
           {/* free hand */}
           <span>
@@ -170,8 +180,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.FREE_HAND);
-                setActiveTab(SHAPES.FREE_HAND);
+                menuSelector(SHAPES.FREE_HAND)
               }}
             >
               <Edit2 />
@@ -186,8 +195,8 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.LINE);
-                setActiveTab(SHAPES.LINE);
+                menuSelector(SHAPES.LINE)
+
               }}
             >
               <Image src="/icons/line.png" width={20} height={20} alt="line" />
@@ -202,8 +211,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.CIRCLE);
-                setActiveTab(SHAPES.CIRCLE);
+                menuSelector(SHAPES.CIRCLE)
               }}
             >
               <i className="fa fa-circle-thin" />
@@ -218,8 +226,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.SQUARE);
-                setActiveTab(SHAPES.SQUARE);
+                menuSelector(SHAPES.SQUARE)
               }}
             >
               <i className="fa fa-square-o" />
@@ -234,8 +241,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.RECTANGLE);
-                setActiveTab(SHAPES.RECTANGLE);
+                menuSelector(SHAPES.RECTANGLE)
               }}
             >
               <Image
@@ -255,8 +261,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.OVAL);
-                setActiveTab(SHAPES.OVAL);
+                menuSelector(SHAPES.OVAL)
               }}
             >
               {/* <i className="fa fa-long-arrow-right" /> */}
@@ -272,8 +277,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.TRIANGLE);
-                setActiveTab(SHAPES.TRIANGLE);
+                menuSelector(SHAPES.TRIANGLE)
               }}
             >
               <Image
@@ -293,8 +297,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.ARROW_RIGHT);
-                setActiveTab(SHAPES.ARROW_RIGHT);
+                menuSelector(SHAPES.ARROW_RIGHT)
               }}
             >
               <i className="fa fa-long-arrow-right" />
@@ -308,8 +311,7 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               onClick={() => {
-                drawShapes(SHAPES.TWO_SIDE_ARROW);
-                setActiveTab(SHAPES.TWO_SIDE_ARROW);
+                menuSelector(SHAPES.TWO_SIDE_ARROW)
               }}
             >
               <i className="fa fa-arrows-v rotate-90" />

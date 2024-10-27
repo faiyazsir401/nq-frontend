@@ -128,6 +128,7 @@ export const topNavbarOptions = {
   ABOUT_US: "aboutUs",
   CONTACT_US: "contactUs",
   STUDENT: "student",
+  Friends:"friends",
   UPCOMING_SESSION:"Upcoming Session",
   BOOK_LESSON: "bookLesson",
   MEETING_ROOM: "meetingRoom",
@@ -151,7 +152,7 @@ export const FormateHours = {
 };
 
 export const SHAPES = {
-  FREE_HAND: null,
+  FREE_HAND: "hand",
   LINE: "line",
   CIRCLE: "circle",
   SQUARE: "square",

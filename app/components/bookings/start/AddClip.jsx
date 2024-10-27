@@ -14,8 +14,8 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
 
   return (
     <Modal isOpen={isOpen} element={
-      <div>
-        <div className='d-flex flex-row-reverse'>
+      <div className='d-flex justify-content-center align-items-center flex-column' style={{width:'100vw' , height:'100vh'}}>
+        <div className='d-flex flex-row-reverse align-items-center'>
           <div className="theme-title">
             <div className="media">
               <div className="media-body media-body text-right">

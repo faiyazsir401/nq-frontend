@@ -5,7 +5,6 @@ import { useAppDispatch, useAppSelector } from "../../store";
 import { authAction, authState, getMeAsync } from "./auth.slice";
 import { getAvailability } from "../calendar/calendar.api";
 
-
 const AuthGuard = ({ children }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();

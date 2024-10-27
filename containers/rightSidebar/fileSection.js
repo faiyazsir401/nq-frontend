@@ -742,7 +742,7 @@ const FileSection = (props) => {
                       setReportsData([...temp])
                     }}
                   >
-                    <label className="badge badge-primary sm ml-2">{`${cl?._id?.day}/${cl?._id?.month}/${cl?._id?.year}`}</label>
+                    <label className="badge badge-primary sm ml-2" onClick={() => console.log(cl)}>{`${cl?._id?.month}/${cl?._id?.day}/${cl?._id?.year}`}</label>
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
                   <div className={`block-content ${!cl?.show ? "d-none" : "d-flex flex-wrap"}`}>
@@ -754,7 +754,7 @@ const FileSection = (props) => {
                           <div style={{ marginBottom: "5px" }}>
                             <dd
                               // className="ml-3"
-                              style={{ cursor: "pointer", textAlign: "center" }}
+                              style={{ cursor: "pointer", textAlign: "center" , textWrap:'nowrap' }}
                               onClick={() => {
                                 if (accountType === "Trainer") {
                                   setCurrentReportData({ session: clp?.session?._id, trainer: clp?.trainer?._id, trainee: clp?.trainee?._id })

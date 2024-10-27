@@ -224,9 +224,24 @@ const Index = (props) => {
     setActiveTab("");
   };
 
-  const isMobile = useMediaQuery(450)
+  let isMobile = useMediaQuery(452)
   const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
+  
+  useEffect(() => {
+    const updateIsMobile = (event) => {
+      const isMobile = window.matchMedia(`(max-width: 452px)`).matches;
+      console.log('Is mobile changed:', isMobile);
+    };
 
+    // Add the event listener
+    window.addEventListener('orientationchange', updateIsMobile);
+
+    // Cleanup the event listener on unmount
+    return () => {
+      window.removeEventListener('orientationchange', updateIsMobile);
+    };
+  }, []);
+  
   useEffect(() => {
     // let getDashboard = document.querySelector("#get-dashboard");
     let getNavbarTabs = document.querySelector("#get-navbar-tabs");
@@ -367,7 +382,7 @@ const Index = (props) => {
         }
 
       } else {
-        getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '105px' : '25px';
+        getNavbarTabs.style.marginLeft = openCloseToggleSideNav && !document.getElementById("drawing-canvas") ? '105px' : '25px';
         getNavbarTabs?.style?.setProperty('width', openCloseToggleSideNav ? 'calc(100vw - 55px)' : 'calc(100vw - 25px)');
 
       }
@@ -391,7 +406,7 @@ const Index = (props) => {
 
 
     }
-  }, [openCloseToggleSideNav, sidebarModalActiveTab, sidebarActiveTab, activeTab, size])
+  }, [openCloseToggleSideNav, sidebarModalActiveTab, sidebarActiveTab, activeTab, size , isMobile])
 
   useEffect(() => {
     if (isMobile) {
@@ -422,14 +437,12 @@ const Index = (props) => {
           >
             {/* logo section */}
             {(width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM) && <div className="logo-warpper">
-              <Link href="/landing">
-                <img id="Net"
+              <img id="Net"
                   src="/assets/images/logo/netquix-logo.png"
                   alt="logo"
                   className="custom-image"
 
                 />
-              </Link>
             </div>}
 
 
@@ -834,9 +847,11 @@ const Index = (props) => {
                 </li>
               </ul> */}
             </div>
+            {openCloseToggleSideNav &&    
+            <ChevronLeft id="ChevronLeft" style={{ right:"-12px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(false)} />
+            }
           </aside>}
-        {openCloseToggleSideNav ?
-          <ChevronLeft id="ChevronLeft" style={{ left: isMobile ? "50" : "79px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(false)} /> :
+        {!openCloseToggleSideNav &&
           <ChevronRight id="ChevronRight" style={{ left: "0px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(true)} />}
 
 

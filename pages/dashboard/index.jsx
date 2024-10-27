@@ -33,6 +33,7 @@ import { WebPushRegister } from "../../app/components/notifications-service/Noti
 import { getAllNotifications, notificationAction } from "../../app/components/notifications-service/notification.slice";
 import { EVENTS } from "../../helpers/events";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
+import NotificationPopup from "../../app/components/notification-popup";
 
 const Dashboard = () => {
   const socket = useContext(SocketContext);
@@ -48,13 +49,6 @@ const Dashboard = () => {
     dispatch(getAllNotifications({page : 1, limit : 10})) ;
   }, []);
 
-  useEffect(()=>{
-    if(socket){
-      socket.on(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE , (notification)=>{
-         dispatch(notificationAction.addNotification(notification))
-      })
-    }
-  },[socket])
 
   const getDashboard = () => {
     switch (accountType) {
@@ -89,6 +83,9 @@ const Dashboard = () => {
       }
       case topNavbarOptions?.STUDENT: {
         return <StudentRecord />;
+      }
+      case topNavbarOptions?.Friends: {
+        return <StudentRecord friends={true}/>;
       }
       case topNavbarOptions?.UPCOMING_SESSION: {
         return <UpcomingSession />;
@@ -168,6 +165,7 @@ const Dashboard = () => {
           <LeftSide />
           {getActiveTabs()}
         </div>
+        <NotificationPopup/>
       </SocketContext.Provider>
     </Fragment>
   );

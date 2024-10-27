@@ -234,9 +234,9 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
             {cl?.report.map((clp, index) => {
               // return  !clp.reportData ?
               return clp.hasOwnProperty("reportData") ?
-                <div className={`col-4`} key={index} style={{ whiteSpace: "nowrap" }}>
+                <div className={`col-6 col-sm-4`} key={index} style={{ whiteSpace: "nowrap" }}>
                   {/* Render video */}
-                  <div >
+                  <div className="text-wrap">
                     <div style={{ textAlign: "center" }}>
                       <dd>GAME PLAN with 
                         <div>

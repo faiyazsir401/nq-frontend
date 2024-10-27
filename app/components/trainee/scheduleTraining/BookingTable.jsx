@@ -587,8 +587,10 @@ const BookingTable = ({
           />
         }
       />
-
-      <AuthUserModal />
+  {
+    isAuthModalOpen && 
+    <AuthUserModal />
+  }
     </>
   );
 };

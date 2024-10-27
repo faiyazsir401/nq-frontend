@@ -1950,5 +1950,6 @@ footer {
     width: 100% !important;
     height:auto;
     object-fit: cover !important;
+    flex-basis: calc(50% - 5px);
   }
 }

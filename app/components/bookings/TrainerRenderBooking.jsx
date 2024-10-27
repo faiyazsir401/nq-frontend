@@ -13,6 +13,7 @@ import { Utils } from "../../../utils/utils";
 import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
+import { notificiationTitles } from "../../../utils/constant";
 
 const TrainerRenderBooking = ({
   _id,
@@ -162,10 +163,11 @@ const TrainerRenderBooking = ({
                     });
                     updateBookedStatusApi(_id, BookedSession.confirmed);
                     sendNotifications({
-                    title: "Session Confirmation",
+                    title: notificiationTitles.sessionConfirmation,
                     description: "Your upcoming training session has been confirmed.",
                     senderId: trainer_info?._id,
                     receiverId: trainee_info?._id,
+                    bookingInfo:scheduledMeetingDetails[booking_index]
                   });
                   }}
                 >
@@ -178,9 +180,8 @@ const TrainerRenderBooking = ({
                 <button
                   className={`btn btn-primary button-effect btn-sm mr-2 btn_cancel my-1`}
                   type="button"
-                  disabled={!isStartButtonEnabled}
                   style={{
-                    cursor: !isStartButtonEnabled ? "not-allowed" : "pointer",
+                    cursor:"pointer",
                   }}
                   onClick={() => {
                     handleClick();
@@ -190,13 +191,16 @@ const TrainerRenderBooking = ({
                       isOpenModal: true,
                       traineeInfo: trainee_info,
                       trainerInfo: trainer_info,
+                      iceServers: scheduledMeetingDetails[booking_index].iceServers,
+                      trainee_clip: scheduledMeetingDetails[booking_index].trainee_clips
                     });
 
                     sendNotifications({
-                      title: "Session Started",
+                      title: notificiationTitles.sessionStrated,
                       description: `${trainer_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
+                      bookingInfo:scheduledMeetingDetails[booking_index]
                     });
                   }}
                 >
@@ -228,11 +232,12 @@ const TrainerRenderBooking = ({
                     });
                     updateBookedStatusApi(_id, BookedSession.canceled);
                     sendNotifications({
-                      title: "Session Cancellation",
+                      title: notificiationTitles.sessionCancelattion,
                       description:
                         "A scheduled training session has been cancelled. Please check your calendar for details.",
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
+                      bookingInfo:null
                     });
                   }
                 }}
