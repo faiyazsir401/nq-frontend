@@ -261,9 +261,8 @@ const UploadClipCard = (props) => {
   };
 
   const generateThumbnail1 = () => {
-
     setTimeout(() => {
-
+      setLoading(true)
       if (deviceInfo?.os?.name?.toLowerCase() === OS.ios.toLowerCase()) {
         trimVideo();
       }
@@ -272,11 +271,8 @@ const UploadClipCard = (props) => {
       } else {
         generateThumbnailMacAndiOS()
       }
-
-      // setLoading(false)
-
+      setLoading(false)
     }, 3000);
-
   }
 
 
@@ -407,6 +403,7 @@ const UploadClipCard = (props) => {
         // } finally {
         // }
 
+        setLoading(false)
 
       }
     }
@@ -446,31 +443,32 @@ const UploadClipCard = (props) => {
       }else if(shareWith === shareWithConstants.newUsers){
         payload.invites = selectedEmails
       }
-      
+      setLoading(true)
       const data = await getS3SignUrl(payload);
   
       if (data?.url) {
         try{
           await pushProfilePhotoToS3(data.url, selectedFile, 'video');
+          // Create a new file input element
+          await pushProfilePhotoToS3(data.thumbnailURL, thumbnail.thumbnailFile);
+          const newFileInput = document.createElement("input");
+          newFileInput.type = "file";
+          newFileInput.id = "fileUpload";
+          newFileInput.name = "file";
+          newFileInput.onchange = handleFileChange;
+          newFileInput.style.width = "67%";
+          // Replace the existing file input with the new one
+          const existingFileInput = document.getElementById("fileUpload");
+          existingFileInput.parentNode.replaceChild(
+            newFileInput,
+            existingFileInput
+          );
           toast.success("Clip upload successfully.");
         }catch(err){
           console.log(err);
-          
+        }finally{
+          setLoading(false)
         }
-      await pushProfilePhotoToS3(data.thumbnailURL, thumbnail.thumbnailFile);
-      // Create a new file input element
-    const newFileInput = document.createElement("input");
-    newFileInput.type = "file";
-    newFileInput.id = "fileUpload";
-    newFileInput.name = "file";
-    newFileInput.onchange = handleFileChange;
-    newFileInput.style.width = "67%";
-      // Replace the existing file input with the new one
-    const existingFileInput = document.getElementById("fileUpload");
-      existingFileInput.parentNode.replaceChild(
-        newFileInput,
-        existingFileInput
-      );
     }
   };
 
@@ -501,7 +499,6 @@ const UploadClipCard = (props) => {
         setSelectedFile(null);
         setThumbnail(null);
         setVideo(null);
-        setLoading(true)
         dispatch(getClipsAsync({}));
       })
       .catch((error) => {
@@ -543,11 +540,9 @@ const UploadClipCard = (props) => {
       setTitle("");
       setCategory({});
       setSelectedFile(false);
-      setProgress(0);
     }
   }, [isOpen]);
 
-  const isTrainee = userInfo.account_type === AccountType.TRAINEE;
 
   return (
     <div
@@ -640,25 +635,18 @@ const UploadClipCard = (props) => {
           />
         </div>
       </div>
-      {progress ? (
-        <label
-          style={{ color: "black" }}
-          className="col-form-label mt-2"
-          htmlFor="account_type"
-        >
-          Uploading...
-        </label>
-      ) : !loading ? (
-        <div className="d-flex justify-content-center btn_css">
-          <Button
-            className="mx-3 btn_css"
-            color="primary"
-            onClick={handleUpload}
-          >
-            Upload
-          </Button>
-        </div>
-      ) : null}
+
+      { loading ?
+        <div style={{ color: "black" }}>loading...</div>
+      : thumbnail?.fileType && <div className="d-flex justify-content-center btn_css">
+      <Button
+        className="mx-3 btn_css"
+        color="primary"
+        onClick={() => handleUpload()}
+      >
+        Upload
+      </Button>
+    </div> }
 
       {/* <img src={thumbnailUrl} alt="thumbnail"/> */}
 
@@ -669,7 +657,7 @@ const UploadClipCard = (props) => {
       /> */}
 
       {/* <video ref={videoRef} style={{ display: 'none' }} playsInline /> */}
-      <video ref={videoRef} style={{ display: 'none' }} playsInline onLoadedMetadata={generateThumbnail1} />
+      <video ref={videoRef} style={{ display: 'none' }} playsInline onLoadedMetadata={() => generateThumbnail1()} />
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
 
