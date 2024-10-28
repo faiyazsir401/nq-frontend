@@ -198,7 +198,7 @@ const UserInfoCard = () => {
 
   return (
     <>
-      <ToastContainer />
+      {/* <ToastContainer /> */}
       <div className={`Trainer-box-1 card-body`} style={{ height: "100%" }}>
         <div
           style={{

@@ -17,9 +17,8 @@ import {
 import { Utils } from "../../../utils/utils";
 import { useSelector } from "react-redux";
 import { AccountType } from "../../common/constants";
-import "./common.css"
 // Sample friend data
-
+import './common.css'
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
@@ -91,7 +90,7 @@ const FriendsPopup = ({ props }) => {
         toggle={toggle}
         centered={true}
         style={{ maxWidth: "700px"}}
-        className="fade-model"
+        fade={true}
       >
         <ModalHeader>Select Friends</ModalHeader>
         <ModalBody>
@@ -119,7 +118,7 @@ const FriendsPopup = ({ props }) => {
               >
                 <CardImg
                   top
-                  style={{ minHeight: 145 }}
+                  style={{ minHeight: 145 , maxHeight: 145 , objectFit:"cover" }}
                   src={
                     Utils.getImageUrlOfS3(friend.profile_picture) ||
                     "/assets/images/demoUser.png"
