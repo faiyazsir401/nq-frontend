@@ -80,7 +80,6 @@ export const CanvasMenuBar = ({
       ];
     }
     setTraineeClips(arr);
-    setSelectClips([]);
   };
   const mediaQuery = window.matchMedia("(min-width: 768px)");
 

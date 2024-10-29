@@ -2185,6 +2185,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
           <ModalHeader
             toggle={() => {
               setIsOpenConfirm(false);
+              setSelectedClips([])
             }}
             close={() => <></>}
           >
