@@ -2297,10 +2297,112 @@ const emitVideoTimeEvent = (clickedTime, number) => {
   // }
   // console.log('..pinnedUser...',pinnedUser)
 
-  useEffect(() =>{
 
-        console.log("hello" , document.getElementById("clips-container-id")?.clientX)
-  },[])
+  const calculateCanvasDimensions = () => {
+    // Get video elements by their IDs
+    const video1 = document.getElementById("selected-video-1");
+    const video2 = document.getElementById("selected-video-2");
+
+    if (!video1) {
+        console.error("Video element 'selected-video-1' not found.");
+        return {};
+    }
+    // If only one clip is selected, use only video1's dimensions
+    if (selectedClips?.length && selectedClips?.length === 1 ) {
+        const rect1 = video1.getBoundingClientRect();
+        return {
+            top: rect1.top + window.scrollY,
+            left: rect1.left + window.scrollX,
+            width: rect1.width,
+            height: rect1.height,
+        };
+    }
+
+    // If both clips are selected, ensure video2 exists before proceeding
+    if (!video2) {
+        console.error("Video element 'selected-video-2' not found.");
+        return {};
+    }
+
+    // Get the bounding rectangles for both video elements
+    const rect1 = video1.getBoundingClientRect();
+    const rect2 = video2.getBoundingClientRect();
+
+    // Calculate the overlay dimensions and position
+    const top = Math.min(rect1.top, rect2.top) + window.scrollY;
+    const left = Math.min(rect1.left, rect2.left) + window.scrollX;
+    const width = rect1.width + rect2.width; // Combined width
+    const height = Math.max(rect1.height, rect2.height); // Maximum height
+
+    return {
+        top,
+        left,
+        width,
+        height,
+    };
+  };
+  
+const previousCanvasContent = useRef(null);
+  
+const updateCanvasDimensions = () => {
+  const { top, left, width, height } = calculateCanvasDimensions();
+  
+  if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      if(pinnedUser === 'user-video-1' || pinnedUser === 'user-video-2'){
+        canvas.style.display = 'none';
+        return;
+      }    
+
+      // Save the current content as an image before resizing
+      const previousContent = canvas.toDataURL();
+
+      // Get the current dimensions for calculating scale
+      const oldWidth = canvas.width;
+      const oldHeight = canvas.height;
+
+      // Resize the canvas
+      canvas.style.position = "absolute";
+      canvas.style.display = 'block'
+      canvas.style.top = `${top}px`;
+      canvas.style.left = `${left}px`;
+      canvas.width = width;
+      canvas.height = height;
+
+      // Calculate scale factors to maintain aspect ratio
+      const scaleX = width / oldWidth;
+      const scaleY = height / oldHeight;
+
+      if(pinnedUser !== 'user-video-1' && pinnedUser !== 'user-video-2'){
+        // Redraw the saved content with scaling
+        const img = new Image();
+        img.onload = () => {
+            // Apply scaling with six parameters
+            ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0); // Apply scaling with translation
+            ctx.drawImage(img, 0, 0);
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform to default
+          };
+        img.src = previousContent; // Set the source to the saved content
+      }
+
+  }
+};
+    useEffect(() => {
+        // Initial calculation of dimensions
+        updateCanvasDimensions();
+
+        // Set up resize event listener
+        window.addEventListener("resize", updateCanvasDimensions);
+
+        // Clean up the event listener on component unmount
+        return () => {
+            window.removeEventListener("resize", updateCanvasDimensions);
+        };
+    }, [selectedClips , isPinned , selectedVideoRef1 , selectedVideoRef2]); // Update when selectedClips changes
+
+    
+
   if (isIOS || isMobile) {
     return (
       <React.Fragment>
@@ -2321,6 +2423,11 @@ const emitVideoTimeEvent = (clickedTime, number) => {
           className="row"
           style={{ height: "100%", display: "flex", alignItems: "center", marginTop: "env(safe-area-inset-bottom)"}}
         >
+          <canvas
+                ref={canvasRef}
+                id="drawing-canvas"
+                className="canvas-print"
+              />
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
             <div id="sidetoolbar" className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', marginLeft:'7vh' }}>
@@ -2406,14 +2513,6 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                   {displayMsg?.msg}
                 </div>
               ) : null}
-              <canvas
-                ref={canvasRef}
-                id="drawing-canvas"
-                width={document.getElementById("third")?.clientWidth}
-                height={document.getElementById("drawing-canvas")?.clientHeight}
-                className="canvas-print absolute all-0"
-                style={{ height: (isIOS ? (isPinned ? "52vh" : "48vh") : (isPinned ? "73vh" : "66vh")), width: '100%' }}
-              />
               {selectedClips?.length ? (
                 <div
                   className={
@@ -3241,6 +3340,11 @@ const emitVideoTimeEvent = (clickedTime, number) => {
           className="row"
           style={{ height: "100vh", display: "flex", alignItems: "center" }}
         >
+            <canvas
+                ref={canvasRef}
+                id="drawing-canvas"
+                className="canvas-print"
+              />
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
             <div className="col-lg-1 col-md-1 col-sm-2 z-50"
@@ -3327,14 +3431,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                   {displayMsg?.msg}
                 </div>
               ) : null}
-              <canvas
-                ref={canvasRef}
-                id="drawing-canvas"
-                width={document.getElementById("third")?.clientWidth}
-                height={document.getElementById("drawing-canvas")?.clientHeight}
-                className="canvas-print absolute all-0"
-                style={{ margin: 'auto', height: isPinned ? "500px" : "69vh", width: '100%' }}
-              />
+            
               {selectedClips?.length ? (
                 <div
                   id="clips-container-id"
