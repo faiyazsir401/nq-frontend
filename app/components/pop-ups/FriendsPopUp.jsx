@@ -76,7 +76,7 @@ const FriendsPopup = ({ props }) => {
   }, [selectedFriends]);
 
   return (
-    <div className="d-flex flex-direction-column my-2">
+    <div className="d-flex flex-direction-column my-2  ">
       <button
         className="m-auto px-3 py-2 rounded border-0"
         color="primary"
@@ -91,6 +91,7 @@ const FriendsPopup = ({ props }) => {
         centered={true}
         style={{ maxWidth: "1440px"}}
         fade={true}
+        className="friends-modal"
       >
         <ModalBody>
           <div
