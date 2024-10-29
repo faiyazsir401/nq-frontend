@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Card,
+  CardBody,
+  CardImg,
+  CardTitle,
+} from "reactstrap";
+import {
   getRecentStudent,
   getRecentTrainers,
 } from "../NavHomePage/navHomePage.api";
@@ -7,9 +18,7 @@ import { Utils } from "../../../utils/utils";
 import { useSelector } from "react-redux";
 import { AccountType } from "../../common/constants";
 // Sample friend data
-import "./common.css";
-import Modal from "../../common/modal";
-import { Button, Card, CardImg, CardTitle } from "reactstrap";
+import './common.css'
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
@@ -79,82 +88,61 @@ const FriendsPopup = ({ props }) => {
       <Modal
         isOpen={isOpen}
         toggle={toggle}
-        element={
-          <div style={{
-         
-            height:"100%",
-            display:'flex',
-            justifyContent:"center",
-            alignItems:"center",
-            flexDirection:"column",
-            gap:"20px"
-          }}>
-            
-            <div>
-              <div
+        centered={true}
+        style={{ maxWidth: "1440px"}}
+        fade={true}
+      >
+        <ModalBody>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "start",
+              flexWrap: "wrap",
+              gap: "10px",
+              alignItems:'center',
+              justifyContent:'center'
+            }}
+          >
+            {friendsList.map((friend) => (
+              <Card
+                key={friend._id}
                 style={{
-                  display: "flex",
-                  justifyContent: "start",
-                  flexWrap: "wrap",
-                  gap: "10px",
-                  alignItems: "center",
-                  maxWidth:"800px"
+                  width: "150px",
+                  border: selectedFriends.includes(friend._id)
+                    ? "2px solid green"
+                    : "1px solid gray",
+                  cursor: "pointer",
                 }}
+                onClick={() => handleSelectFriend(friend._id)}
+                className="rounded"
               >
-                {friendsList.map((friend) => (
-                  <Card
-                    key={friend._id}
-                    style={{
-                      width: "150px",
-                      border: selectedFriends.includes(friend._id)
-                        ? "2px solid green"
-                        : "1px solid gray",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleSelectFriend(friend._id)}
-                    className="rounded"
-                  >
-                    <CardImg
-                      top
-                      style={{
-                        minHeight: 145,
-                        maxHeight: 145,
-                        objectFit: "cover",
-                      }}
-                      src={
-                        Utils.getImageUrlOfS3(friend.profile_picture) ||
-                        "/assets/images/demoUser.png"
-                      }
-                      alt={"profile"}
-                    />
-                    <CardTitle className="text-center m-0 p-2 bg-secondary text-white">
-                      {friend.fullname}
-                    </CardTitle>
-                    <input
-                      className="position-absolute"
-                      type="checkbox"
-                      checked={selectedFriends.includes(friend._id)}
-                      onChange={() => handleSelectFriend(friend._id)}
-                      style={{ marginTop: "5px", right: "5px" }}
-                    />
-                  </Card>
-                ))}
-              </div>
-            </div>
-            <div style={{
-              display:"flex",
-              gap:"10px"
-            }}>
-              <Button color="primary" onClick={confirmSelection}>
-                Confirm Selection
-              </Button>
-              <Button color="danger" onClick={toggle}>
-                Close
-              </Button>
-            </div>
+                <CardImg
+                  top
+                  style={{ minHeight: 145 , maxHeight: 145 , objectFit:"cover" }}
+                  src={
+                    Utils.getImageUrlOfS3(friend.profile_picture) ||
+                    "/assets/images/demoUser.png"
+                  }
+                  alt={"profile"}
+                />
+                <CardTitle className="text-center m-0 p-2 bg-secondary text-white">{friend.fullname}</CardTitle>
+                <input
+                  className="position-absolute"
+                  type="checkbox"
+                  checked={selectedFriends.includes(friend._id)}
+                  onChange={() => handleSelectFriend(friend._id)}
+                  style={{ marginTop: "5px" , right:'5px'}}
+                />
+              </Card>
+            ))}
           </div>
-        }
-      />
+        </ModalBody>
+        <ModalFooter className="d-flex">
+          <Button className="m-auto" color="danger" onClick={toggle}>
+            Close
+          </Button>
+        </ModalFooter>
+      </Modal>
     </div>
   );
 };
