@@ -205,7 +205,7 @@ export const HandleVideoCall = ({
   const [showThumbnailForTwoVideo, setShowThumbnailForTwoVideo] = useState(true);
   const timeDifference = Timer(session_end_time);
   const errorHandling = (err) => toast.error(err)
-
+  const [globalSliderValue ,setGlobalSliderValue] = useState(0);
 
 
   /**
@@ -1570,6 +1570,7 @@ useEffect(() => {
 
 
   socket.on(EVENTS.ON_VIDEO_PLAY_PAUSE, ({ isPlayingAll, number, isPlaying1, isPlaying2 }) => {
+
     const playPauseVideo = (videoRef, isPlaying) => {
       if (videoRef?.current) {
         isPlaying ? videoRef.current.play() : videoRef.current.pause();
@@ -1601,15 +1602,15 @@ useEffect(() => {
   //NOTE -  Video Time Update emit
 const emitVideoTimeEvent = (clickedTime, number) => {
 
-    if (isPlaying.isPlaying1) {
-    setIsPlaying(prev => ({ ...prev, isPlaying1: false }));
-  }
-    if (isPlaying.isPlaying1) {
-    setIsPlaying(prev => ({ ...prev, isPlaying2: false }));
-  }
-  if (isPlaying.isPlayingAll) {
-    setIsPlaying(prev => ({ ...prev, isPlayingAll: false }));
-  }
+  //   if (isPlaying.isPlaying1) {
+  //   setIsPlaying(prev => ({ ...prev, isPlaying1: false }));
+  // }
+  //   if (isPlaying.isPlaying2) {
+  //   setIsPlaying(prev => ({ ...prev, isPlaying2: false }));
+  // }
+  // if (isPlaying.isPlayingAll) {
+  //   setIsPlaying(prev => ({ ...prev, isPlayingAll: false }));
+  // }
 
   socket?.emit(EVENTS.ON_VIDEO_TIME, {
     userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
@@ -1624,98 +1625,141 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const globalProgressBarToggler = (e) => {
     setVideoController(!videoController);
-
+    selectedVideoRef1.current.currentTime = 0
+    selectedVideoRef2.current.currentTime = 0
+    setIsPlaying({
+      isPlayingAll: false,
+      number: "",
+      isPlaying1: false,
+      isPlaying2: false,
+    })
+    setVideoTime({
+      currentTime1: "00:00",
+      currentTime2: "00:00",
+      remainingTime1: "00:00",
+      remainingTime2: "00:00",
+    })
   };
 
   const handleGlobalProgressBarChange = (e) => {
     const { value } = e.target;
+    
+    // Calculate the maximum duration across both videos to set a global control limit
     const maxTime = Math.max(
-      selectedVideoRef1.current?.duration || 0,
-      selectedVideoRef2.current?.duration || 0
+        selectedVideoRef1.current?.duration || 0,
+        selectedVideoRef2.current?.duration || 0
     );
 
+    // Check if both videos have ended
+    const bothVideosEnded =
+        selectedVideoRef1.current?.currentTime === selectedVideoRef1.current?.duration &&
+        selectedVideoRef2.current?.currentTime === selectedVideoRef2.current?.duration;
+
+        console.log('video ended' , bothVideosEnded)
+    // Prevent re-triggering playback if both videos have ended
+    if (bothVideosEnded) {
+        // Pause both videos if they reached the end
+        selectedVideoRef1.current.pause();
+        selectedVideoRef2.current.pause();
+        
+        // Reset the isPlaying state to indicate videos are not playing
+        setIsPlaying({
+          isPlayingAll: false,
+          number: "",
+          isPlaying1: false,
+          isPlaying2: false,
+        })
+        setVideoTime({
+          currentTime1: "00:00",
+          currentTime2: "00:00",
+          remainingTime1: "00:00",
+          remainingTime2: "00:00",
+        })
+        return; // Exit the function to avoid unintentional replay
+    }
+
+    // Set the current time of each video to the slider value
     if (selectedVideoRef1.current) {
-      selectedVideoRef1.current.currentTime = value;
-      emitVideoTimeEvent(value, "one");
+        selectedVideoRef1.current.currentTime = value;
+        emitVideoTimeEvent(value, "one");
     }
-
+    
     if (selectedVideoRef2.current) {
-      selectedVideoRef2.current.currentTime = value;
-      emitVideoTimeEvent(value, "two");
+        selectedVideoRef2.current.currentTime = value;
+        emitVideoTimeEvent(value, "two");
     }
 
+    // Reset play state if the control value is zero
     if (!value) {
-      setIsPlaying({ ...isPlaying, isPlayingAll: false });
+        setIsPlaying({ ...isPlaying, isPlayingAll: false });
     }
-  };
+};
 
   const togglePlay = (num) => {
-
+    // Handle thumbnail visibility
     if (num === 'one' && showThumbnailForFirstVideo) {
-      setShowThumbnailForFirstVideo(false)
+        setShowThumbnailForFirstVideo(false);
     }
 
     if (num === 'two' && showThumbnailForTwoVideo) {
-      setShowThumbnailForTwoVideo(false)
+        setShowThumbnailForTwoVideo(false);
     }
 
     if (num === 'all') {
-      if (showThumbnailForFirstVideo) {
-        setShowThumbnailForFirstVideo(false)
-      }
-
-      if (showThumbnailForTwoVideo) {
-        setShowThumbnailForTwoVideo(false)
-      }
+        setShowThumbnailForFirstVideo(false);
+        setShowThumbnailForTwoVideo(false);
     }
 
-    var temp = isPlaying;
-    temp.number = num;
-    if (
-      selectedVideoRef1.current && 
-      selectedVideoRef1?.current?.currentTime ===
-      selectedVideoRef1?.current?.duration &&
-      selectedVideoRef2?.current?.currentTime ===
-      selectedVideoRef2?.current?.duration
-    ) {
-      selectedVideoRef1.current.currentTime = 0;
-      emitVideoTimeEvent(0, "one");
-      if(selectedVideoRef2.current){
-        selectedVideoRef2.current.currentTime = 0;
-      }
-      emitVideoTimeEvent(0, "two");
+    // Reset video time if both videos are ended
+    if (selectedVideoRef1.current && selectedVideoRef2.current) {
+        if (
+            selectedVideoRef1.current.currentTime === selectedVideoRef1.current.duration &&
+            selectedVideoRef2.current.currentTime === selectedVideoRef2.current.duration
+        ) {
+            selectedVideoRef1.current.currentTime = 0;
+            selectedVideoRef2.current.currentTime = 0;
+            emitVideoTimeEvent(0, "one");
+            emitVideoTimeEvent(0, "two");
+        }
     }
 
-    if (num === "all") {
-      if (isPlaying.isPlayingAll) {
-        selectedVideoRef1?.current?.pause();
-        selectedVideoRef2?.current?.pause();
-      } else {
-        selectedVideoRef1?.current?.play();
-        selectedVideoRef2?.current?.play();
-      }
-      temp = {
-        ...isPlaying,
-        isPlayingAll: !isPlaying.isPlayingAll,
-        isPlaying1: !isPlaying.isPlayingAll,
-        isPlaying2: !isPlaying.isPlayingAll,
-      };
-    } else if (num === "one") {
-      if (isPlaying.isPlaying1) selectedVideoRef1?.current?.pause();
-      else selectedVideoRef1?.current?.play();
-      temp = { ...isPlaying, isPlaying1: !isPlaying.isPlaying1 };
-    } else if (num === "two") {
-      if (isPlaying?.isPlaying2) selectedVideoRef2?.current?.pause();
-      else selectedVideoRef2.current.play();
-      temp = { ...isPlaying, isPlaying2: !isPlaying.isPlaying2 };
+    // Update playing state based on selected video
+    let updatedPlayingState = { ...isPlaying };
+    const toggleAll = num === "all";
+    
+    if (toggleAll) {
+        updatedPlayingState.isPlayingAll = !isPlaying.isPlayingAll;
+
+        if (updatedPlayingState.isPlayingAll) {
+            selectedVideoRef1.current?.play();
+            selectedVideoRef2.current?.play();
+        } else {
+            selectedVideoRef1.current?.pause();
+            selectedVideoRef2.current?.pause();
+        }
+    } else {
+        // Handle individual video play/pause
+        const videoRef = num === "one" ? selectedVideoRef1 : selectedVideoRef2;
+        const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
+        const isPlayingValue = updatedPlayingState[isPlayingKey];
+
+        if (isPlayingValue) {
+            videoRef.current?.pause();
+        } else {
+            videoRef.current?.play();
+        }
+        updatedPlayingState[isPlayingKey] = !isPlayingValue;
     }
 
+    // Emit the updated play state to the socket
     socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
-      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-      ...temp,
+        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+        ...updatedPlayingState,
     });
-    setIsPlaying({ ...temp });
-  };
+
+    console.log('Updated play state:', updatedPlayingState);
+    setIsPlaying(updatedPlayingState);
+};
 
 
   // console.log("video time--------->",videoTime)
@@ -1778,19 +1822,24 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
-    // console.log(clickedTime, "handleProgressBarChange");
-    if (number === "one") {
-      selectedVideoRef1.current.currentTime = clickedTime;
-    } else {
-      selectedVideoRef2.current.currentTime = clickedTime;
-    }
+    const videoRef = number === "one" ? selectedVideoRef1 : selectedVideoRef2;
+    if (videoRef.current) {
+        videoRef.current.currentTime = clickedTime;
+        
+        socket?.emit(EVENTS?.ON_VIDEO_TIME, {
+            userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+            clickedTime,
+            number,
+        });
+  }
 
-    socket?.emit(EVENTS?.ON_VIDEO_TIME, {
-      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-      clickedTime: clickedTime,
-      number: number,
-    });
-  };
+  setGlobalSliderValue(() =>{
+   return Math.max(
+      selectedVideoRef1.current?.currentTime || 0,
+      selectedVideoRef2.current?.currentTime || 0
+    )
+  })
+};
   const handleVolumeChange = () => {
     // Update the video volume based on the input value (0 to 1)
     const newVolume = parseFloat(volumeInputRef.current.value);
@@ -2637,7 +2686,7 @@ const updateCanvasDimensions = () => {
                                   ref={progressBarRef}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef1.current?.currentTime || 0
+                                    selectedVideoRef1.current?.currentTime
                                   }
                                   max={selectedVideoRef1.current?.duration || 100}
                                   onChange={(e) =>
@@ -2688,7 +2737,7 @@ const updateCanvasDimensions = () => {
                         {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
-                          !isPinned && (
+                          !isPinned && !isPlaying.isPlayingAll && (
                             <>
                               <div
                                 className="Pause2"
@@ -2731,7 +2780,7 @@ const updateCanvasDimensions = () => {
                                   ref={progressBarRef2}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef2.current?.currentTime || 0
+                                    selectedVideoRef2.current?.currentTime 
                                   }
                                   max={selectedVideoRef2.current?.duration || 100}
                                   onChange={(e) =>
@@ -2786,18 +2835,17 @@ const updateCanvasDimensions = () => {
                             ref={globalProgressBarRef}
                             step="0.01"
                             value={
-                              (selectedVideoRef1.current?.currentTime || 0) >
-                                (selectedVideoRef2.current?.currentTime || 0)
-                                ? selectedVideoRef1.current?.currentTime || 0
-                                : selectedVideoRef2.current?.currentTime || 0
+                              globalSliderValue
                             }
                             max={
-                              (selectedVideoRef1.current?.duration || 0) >
-                                (selectedVideoRef2.current?.duration || 0)
-                                ? selectedVideoRef1.current?.duration || 0
-                                : selectedVideoRef2.current?.duration || 0
+                              Math.max(
+                                selectedVideoRef1.current?.duration || 0,
+                                selectedVideoRef2.current?.duration || 0
+                              )
                             }
-                            onChange={handleGlobalProgressBarChange}
+                            onChange={(e) =>
+                              handleGlobalProgressBarChange(e)
+                            }
                             style={{ width: "450px" }}
                           />
                         </div>
@@ -3574,7 +3622,7 @@ const updateCanvasDimensions = () => {
                                   ref={progressBarRef}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef1.current?.currentTime || 0
+                                    selectedVideoRef1.current?.currentTime
                                   }
                                   max={selectedVideoRef1.current?.duration || 100}
                                   onChange={(e) =>
@@ -3705,7 +3753,7 @@ const updateCanvasDimensions = () => {
                                   ref={progressBarRef2}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef2.current?.currentTime || 0
+                                    selectedVideoRef2.current?.currentTime
                                   }
                                   max={selectedVideoRef2.current?.duration || 100}
                                   onChange={(e) =>
@@ -3787,16 +3835,16 @@ const updateCanvasDimensions = () => {
                             ref={globalProgressBarRef}
                             step="0.01"
                             value={
-                              (selectedVideoRef1.current?.currentTime || 0) >
-                                (selectedVideoRef2.current?.currentTime || 0)
-                                ? selectedVideoRef1.current?.currentTime || 0
-                                : selectedVideoRef2.current?.currentTime || 0
+                              Math.max(
+                                selectedVideoRef1.current?.currentTime || 0,
+                                selectedVideoRef2.current?.currentTime || 0
+                              )
                             }
                             max={
-                              (selectedVideoRef1.current?.duration || 0) >
-                                (selectedVideoRef2.current?.duration || 0)
-                                ? selectedVideoRef1.current?.duration || 0
-                                : selectedVideoRef2.current?.duration || 0
+                              Math.max(
+                                selectedVideoRef1.current?.duration || 0,
+                                selectedVideoRef2.current?.duration || 0
+                              )
                             }
                             onChange={handleGlobalProgressBarChange}
                             style={{ width: "450px" }}
