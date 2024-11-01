@@ -52,7 +52,8 @@ const TraineeRenderBooking = ({
   handleAddRatingModelState,
   accountType,
   activeTabs,
-  start_time
+  start_time,
+  bookingInfo
 }) => {
   const { scheduledMeetingDetails, addRatingModel } =
     useAppSelector(bookingsState);
@@ -62,7 +63,7 @@ const TraineeRenderBooking = ({
   const { removeNewBookingData } = traineeAction;
   const isCompleted =
     has24HoursPassedSinceBooking ||
-    scheduledMeetingDetails[booking_index]?.ratings?.trainee;
+    bookingInfo?.ratings?.trainee;
 
   const canShowRatingButton =
     !isUpcomingSession &&
@@ -125,7 +126,7 @@ const TraineeRenderBooking = ({
                 "Your trainee has submitted a new rating for your session.",
               senderId: trainee_info?._id,
               receiverId: trainer_info?._id,
-              bookingInfo:scheduledMeetingDetails[booking_index]
+              bookingInfo:bookingInfo
             });
           }}
         >
@@ -185,6 +186,7 @@ const TraineeRenderBooking = ({
                     setSelectedClips={setSelectedClips}
                     clips={clips}
                     shareFunc={addTraineeClipInBookedSession}
+                    sendNotfication={null}
                   />
                 </React.Fragment>
               )}
@@ -203,8 +205,8 @@ const TraineeRenderBooking = ({
                       isOpenModal: true,
                       traineeInfo: trainee_info,
                       trainerInfo: trainer_info,
-                      iceServers: scheduledMeetingDetails[booking_index].iceServers,
-                      trainee_clip: scheduledMeetingDetails[booking_index].trainee_clips
+                      iceServers: bookingInfo.iceServers,
+                      trainee_clip: bookingInfo.trainee_clips
                     });
 
                     sendNotifications({
@@ -212,7 +214,7 @@ const TraineeRenderBooking = ({
                       description: `${trainee_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
                       senderId: trainee_info?._id,
                       receiverId: trainer_info?._id,
-                      bookingInfo:scheduledMeetingDetails[booking_index]
+                      bookingInfo:bookingInfo
                     });
                   }}
                 >

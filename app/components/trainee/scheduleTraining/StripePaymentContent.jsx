@@ -128,15 +128,7 @@ const StripePaymentContent = ({
                   dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
 
                   setBookSessionPayload({});
-                  if(trainer){
-                    sendNotifications({
-                      title: notificiationTitles.newBookingRequest,
-                      description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
-                      senderId: userInfo?._id,
-                      receiverId: trainer?.userInfo?._id,
-                      bookingInfo:null
-                    });
-                  }
+                
                 }}
                 extraContent={
                   bookSessionPayload && bookSessionPayload.trainer_id ? (
@@ -155,19 +147,21 @@ const StripePaymentContent = ({
         <></>
       )}
 
-      <AddClip
+      {/* <AddClip
         isOpen={isAddClipModalOpen}
         onClose={() => {
           setIsAddClipModalOpen(false);
           setShowTransactionModal(false);
           router.push(routingPaths.dashboard);
+          
         }}
         trainer={trainerInfo?.fullname}
         selectedClips={selectedClips}
         setSelectedClips={setSelectedClips}
         clips={clips}
         shareFunc={addTraineeClipInBookedSession}
-      />
+        sendNotfication={triggerNotification}
+      /> */}
     </>
   );
 };
