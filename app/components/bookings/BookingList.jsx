@@ -174,6 +174,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   };
 
   const renderBooking = (
+    bookingInfo,
     status,
     booking_index,
     booked_date,
@@ -242,6 +243,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             }}
             activeTabs={activeTabs}
             start_time={start_time}
+            bookingInfo={bookingInfo}
           />
         );
       case AccountType.TRAINEE:
@@ -279,6 +281,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             accountType={AccountType.TRAINEE}
             activeTabs={activeTabs}
             start_time={start_time}
+            bookingInfo={bookingInfo}
           />
         );
       default:
@@ -348,6 +351,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             <div className="col-11">{showRatingLabel(ratings)}</div>
             <div className="col-12 col-lg-auto">
               {renderBooking(
+                bookingInfo,
                 status,
                 booking_index,
                 booked_date,
