@@ -104,7 +104,6 @@ export const HandleVideoCall = ({
   session_end_time,
   bIndex,
 }) => {
-
   //  console.log(toUser , fromUser , 'toUserFromUser')
   // const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
@@ -206,6 +205,7 @@ export const HandleVideoCall = ({
   const timeDifference = Timer(session_end_time);
   const errorHandling = (err) => toast.error(err)
   const [globalSliderValue ,setGlobalSliderValue] = useState(0);
+  console.log('start meeting info ' , startMeeting)
 
 
   /**
@@ -1537,7 +1537,7 @@ useEffect(() => {
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ type, videos, mainScreen }) => {
     if (type === "clips") {
       // console.log(videos, "videos");
-      setSelectedClips(videos);
+      setSelectedClips([...videos]);
       if (videos?.length) {
         resetInitialPinnedUser()
       } else {
@@ -2352,7 +2352,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
     // Get video elements by their IDs
     const video1 = document.getElementById("selected-video-1");
     const video2 = document.getElementById("selected-video-2");
-
+    console.log('its video' , video1 , video2)
     if (!video1) {
         console.error("Video element 'selected-video-1' not found.");
         return {};
@@ -2383,7 +2383,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
     const left = Math.min(rect1.left, rect2.left) + window.scrollX;
     const width = rect1.width + rect2.width; // Combined width
     const height = Math.max(rect1.height, rect2.height); // Maximum height
-
+   
     return {
         top,
         left,
@@ -2395,6 +2395,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 const previousCanvasContent = useRef(null);
   
 const updateCanvasDimensions = () => {
+
   const { top, left, width, height } = calculateCanvasDimensions();
   
   if (canvasRef.current) {
@@ -2438,20 +2439,29 @@ const updateCanvasDimensions = () => {
 
   }
 };
-    useEffect(() => {
-        // Initial calculation of dimensions
-        updateCanvasDimensions();
 
-        // Set up resize event listener
-        window.addEventListener("resize", updateCanvasDimensions);
+useEffect(() => {
+  const delay = 1000; // Delay in milliseconds
 
-        // Clean up the event listener on component unmount
-        return () => {
-            window.removeEventListener("resize", updateCanvasDimensions);
-        };
-    }, [selectedClips , isPinned , selectedVideoRef1 , selectedVideoRef2]); // Update when selectedClips changes
+  // Initial delayed call to update canvas dimensions
+  const initialTimeoutId = setTimeout(() => {
+      updateCanvasDimensions();
+      console.log('Initial delayed call to updateCanvasDimensions');
+  }, delay);
 
-    
+  // Set up delayed resize event listener
+  const handleResize = () => {
+      clearTimeout(initialTimeoutId); // Prevent the initial timeout from running again on resize
+      setTimeout(updateCanvasDimensions, delay);
+  };
+  window.addEventListener("resize", handleResize);
+
+  // Clean up on unmount
+  return () => {
+      clearTimeout(initialTimeoutId); // Clear the initial timeout when dependencies change or component unmounts
+      window.removeEventListener("resize", handleResize);
+  };
+}, [selectedClips, isPinned , selectedVideoRef1 , selectedVideoRef2]);
 
   if (isIOS || isMobile) {
     return (
