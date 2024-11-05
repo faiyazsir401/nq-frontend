@@ -919,7 +919,7 @@ const Index = (props) => {
                     className={`${activeTab === "file" ? "custom-mobile-menu" : ""
                       } custom-mobile-file-css`}
                   >
-                    <FileSection smallSideBarToggle={smallSideBarToggle} />
+                    <FileSection smallSideBarToggle={smallSideBarToggle} activeTabParent={activeTab} />
                   </TabPane>
 
                   <TabPane

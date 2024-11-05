@@ -197,8 +197,8 @@ const FileSection = (props) => {
   };
 
   useEffect(() => {
-    if (!isOpen) getMyClips()
-  }, [isOpen])
+    if (!isOpen && props.activeTabParent === 'file') getMyClips()
+  }, [props.activeTabParent])
 
   useEffect(() => {
     setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
