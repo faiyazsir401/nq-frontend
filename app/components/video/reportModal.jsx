@@ -184,64 +184,65 @@ const reportModal = ({
   var pdf = new jsPDF();
 
   const generatePDF = async () => {
-
     setPreview(true);
 
     const content = document.getElementById("report-pdf");
 
+    // Ensure the content is visible
     content.style.removeProperty("display");
 
     html2canvas(content).then(async (canvas) => {
-      const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/png');
 
-      // Calculate the width of the page
-      var pageWidth = pdf.internal.pageSize.width;
+        // Set the minimum width for the PDF
+        const minPageWidth = 1110; // minimum width in pixels
 
+        // Calculate the page width, ensuring it's at least the minimum width
+        const pageWidth = Math.max(pdf.internal.pageSize.width, minPageWidth);
 
-      // Calculate the aspect ratio of the canvas
-      var aspectRatio = canvas.width / canvas.height;
+        // Calculate the aspect ratio of the canvas
+        const aspectRatio = canvas.width / canvas.height;
 
-      // Calculate the height to maintain the aspect ratio
-      var imgHeight = pageWidth / aspectRatio;
+        // Calculate the image height based on the adjusted width
+        const imgHeight = pageWidth / aspectRatio;
 
+        // Set the height of the PDF page based on the calculated image height
+        pdf.internal.pageSize.height = imgHeight;
 
-      pdf.internal.pageSize.height = imgHeight;
+        updateCurrentDate();
 
-      updateCurrentDate();
+        // Add the canvas as an image to the PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
 
-      // Add the canvas as an image to the PDF
-      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+        // Get the data URL of the PDF
+        const generatedPdfDataUrl = pdf.output('dataurlstring');
 
-      // Get the data URL of the PDF
-      const generatedPdfDataUrl = pdf.output('dataurlstring');
+        // Convert data URL to Blob
+        const byteCharacters = atob(generatedPdfDataUrl.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const pdfBlob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
 
-      // Convert data URL to Blob
-      const byteCharacters = atob(generatedPdfDataUrl.split(',')[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const pdfBlob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+        // Create a File from the Blob
+        const pdfFile = new File([pdfBlob], 'generated_pdf.pdf', { type: 'application/pdf' });
 
-      // Create a File from the Blob
-      const pdfFile = new File([pdfBlob], 'generated_pdf.pdf', { type: 'application/pdf' });
+        // Upload the PDF file if a link is available
+        const link = await createUploadLink();
+        if (link) pushProfilePDFToS3(link, pdfFile);
 
-      // content.style.display = "none";
-
-      var link = await createUploadLink();
-      if (link) pushProfilePDFToS3(link, pdfFile);
-
-      // var res = await createReport({
-      //   sessions: currentReportData?.session,
-      //   trainer: currentReportData?.trainer,
-      //   trainee: currentReportData?.trainee,
-      //   title: reportObj?.title,
-      //   topic: reportObj?.topic,
-      //   reportData: [...screenShots],
-      // })
-
-    })
-  };
+        // Optionally save report data (commented out)
+        // await createReport({
+        //   sessions: currentReportData?.session,
+        //   trainer: currentReportData?.trainer,
+        //   trainee: currentReportData?.trainee,
+        //   title: reportObj?.title,
+        //   topic: reportObj?.topic,
+        //   reportData: [...screenShots],
+        // });
+    });
+};
 
   const createUploadLink = async () => {
     var payload = { session_id: currentReportData?.session };
@@ -458,7 +459,7 @@ const reportModal = ({
                   </div>
                 </div>
                 <div style={{ display: "flex" }}>
-                  <div style={{ width: "40%" }}>
+                  <div>
                     <div style={{ fontSize: '18px', fontWeight: '400', width: "70%", fontWeight: "bold" }}>Date: {currentDate}</div>
                     <h2 style={{ margin: '0px', fontWeight: "normal", paddingTop: "10px" }}>Topic: {reportObj?.title}</h2>
                     <h2 style={{ margin: '0px', fontWeight: "normal", color: "gray" }}>Name: {reportObj?.topic}</h2>
@@ -477,7 +478,7 @@ const reportModal = ({
                           style={{ maxHeight: '260px', objectFit: 'contain' }}
                         />
                       </div>
-                      <div className="text-center text-md-left w-100 w-md-50">
+                      <div className="text-left text-md-left w-100 w-md-50">
                         <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p>
                         <p>{screenShots[i]?.description}</p>
                       </div>
