@@ -458,7 +458,7 @@ const reportModal = ({
                   </div>
                 </div>
                 <div style={{ display: "flex" }}>
-                  <div style={{ width: "40%" }}>
+                  <div >
                     <div style={{ fontSize: '18px', fontWeight: '400', width: "70%", fontWeight: "bold" }}>Date: {currentDate}</div>
                     <h2 style={{ margin: '0px', fontWeight: "normal", paddingTop: "10px" }}>Topic: {reportObj?.title}</h2>
                     <h2 style={{ margin: '0px', fontWeight: "normal", color: "gray" }}>Name: {reportObj?.topic}</h2>
