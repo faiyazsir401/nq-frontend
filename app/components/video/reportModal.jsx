@@ -261,7 +261,9 @@ const reportModal = ({
   const pushProfilePDFToS3 = async (presignedUrl, uploadPdf) => {
     try {
       const content = document.getElementById("report-pdf");
-      content.style.display = "";
+      if(content?.style && content?.style?.display){
+        content.style.display = "";
+      }
       await axios({
         method: 'put', url: presignedUrl, data: uploadPdf, headers: { "Content-Type": 'application/pdf' }, onUploadProgress: (progressEvent) => {
           const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
@@ -271,7 +273,7 @@ const reportModal = ({
       console.log("pdf pushed in S3")
       // setIsOpenReport(false)
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 
@@ -294,7 +296,9 @@ const reportModal = ({
 
   const hidePreview = () => {
     const content = document.getElementById("report-pdf");
-    content.style.display = "none";
+    if(content?.style && content?.style?.display){
+      content.style.display = "none";
+    }
   }
 
   const sendNotifications = (data) => {
