@@ -517,8 +517,9 @@ const reportModal = ({
                         borderRadius: "8px",
                         objectFit:'contain'
                       }}
+                      // crossOrigin="anonymous"
                       // src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || '/assets/images/demoUser.png'}
-                      src={profilePic.current || demoProfilePic.current }
+                      src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || demoProfilePic.current }
                       alt={userInfo?.fullname}
                       onError={(e) => {
                         e.target.src = demoProfilePic.current;
