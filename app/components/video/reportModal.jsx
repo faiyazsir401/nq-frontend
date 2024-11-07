@@ -52,6 +52,7 @@ const reportModal = ({
 
   const demoProfilePic = useRef(null);
   const profilePic = useRef(null);
+
   const loadImageFromUrl = async (imageUrl) => {
     // console.log("===========>?", imageUrl)
     try {
@@ -124,29 +125,33 @@ const reportModal = ({
 
   const fetchAndSetScreenShortReport = async (reportData) => {
     var newReportImages = [];
-    setReportArr([])
     setLoading(true)
-    if (reportData && reportData?.length > 0) {
-      for (let index = 0; index < reportData?.length; index++) {
-        const element = reportData[index];
-        try {
-          const response = await fetch(`${awsS3Url}${element?.imageUrl}`);
-          const blob = await response.blob();
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64data = reader.result.split(',')[1];
-            newReportImages.push({ ...element, imageUrl: `data:image/jpeg;base64,${base64data}` })
-            setReportArr([...newReportImages])
-          };
-          reader.readAsDataURL(blob);
-        } catch (error) {
-          console.error('Error fetching or converting image:', error);
+    try {
+      if (reportData && reportData?.length > 0) {
+        for (let index = 0; index < reportData?.length; index++) {
+          const element = reportData[index];
+          try {
+            const response = await fetch(`${awsS3Url}${element?.imageUrl}`);
+            const blob = await response.blob();
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              const base64data = reader.result.split(',')[1];
+              newReportImages.push({ ...element, imageUrl: `data:image/jpeg;base64,${base64data}` })
+              setReportArr([...newReportImages])
+            };
+            reader.readAsDataURL(blob);
+          } catch (error) {
+            console.error('Error fetching or converting image:', error);
+          }
         }
+      } else {
+        setReportArr([...newReportImages])
       }
-    } else {
-      setReportArr([...newReportImages])
+    } catch (error) {
+      console.log("error",error)
+    }finally{
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleCropImage = async (filename, blob) => {
@@ -165,7 +170,6 @@ const reportModal = ({
   }
 
   const getReportData = async () => {
-    
     var res = await getReport({
       sessions: currentReportData?.session,
       trainer: currentReportData?.trainer,
@@ -184,72 +188,66 @@ const reportModal = ({
   }
 
   var pdf = new jsPDF();
-const generatePDF = async () => {
+
+  const generatePDF = async () => {
+
     setPreview(true);
-  
+
     const content = document.getElementById("report-pdf");
-    content.style.minWidth = '1110px';
-  
-    // Ensure the content is visible
+
     content.style.removeProperty("display");
+
     html2canvas(content).then(async (canvas) => {
-      let imgData = canvas.toDataURL('image/png');
-    
-      // Set the minimum width for the PDF
-      let minPageWidth = 1110; // minimum width in pixels
-      
-      // Calculate the page width, ensuring it's at least the minimum width
-      let pageWidth = Math.max(pdf.internal.pageSize.width, minPageWidth);
-    
-      // Calculate the page height based on the canvas size to maintain the aspect ratio
-      let imgHeight = content.style.height;
-    
-      // Ensure the image fits within the page's bounds
-      const maxWidth = pdf.internal.pageSize.width - 20; // 20px margin on each side
-      const maxHeight = pdf.internal.pageSize.height - 20; // 20px margin on top/bottom
-    
-      // Calculate the scale factor while maintaining the aspect ratio
-      const scaleFactor = Math.min(maxWidth / pageWidth, maxHeight / imgHeight);
-      pageWidth *= scaleFactor;
-      imgHeight *= scaleFactor;
-    
-      // If the content exceeds the page height, set a new page size for the PDF
-      if (imgHeight > pdf.internal.pageSize.height) {
-        pdf.internal.pageSize.height = imgHeight + 20; // Add margin to page height
-      }
-    
-      
-      // Add the canvas as an image to the PDF
-      pdf.addImage(imgData, 'PNG', 10, 10, pageWidth, imgHeight); // 10px margin from top-left
-    
+      const imgData = canvas.toDataURL('image/png');
+
+      // Calculate the width of the page
+      var pageWidth = pdf.internal.pageSize.width;
+
+
+      // Calculate the aspect ratio of the canvas
+      var aspectRatio = canvas.width / canvas.height;
+
+      // Calculate the height to maintain the aspect ratio
+      var imgHeight = pageWidth / aspectRatio;
+
+
+      pdf.internal.pageSize.height = imgHeight;
+
       updateCurrentDate();
-    
+
+      // Add the canvas as an image to the PDF
+      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+
       // Get the data URL of the PDF
-      let generatedPdfDataUrl = pdf.output('dataurlstring');
-    
+      const generatedPdfDataUrl = pdf.output('dataurlstring');
+
       // Convert data URL to Blob
-      let byteCharacters = atob(generatedPdfDataUrl.split(',')[1]);
-      let byteNumbers = new Array(byteCharacters.length);
+      const byteCharacters = atob(generatedPdfDataUrl.split(',')[1]);
+      const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
       }
-      let pdfBlob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
-    
-      // Create a File from the Blob
-      let pdfFile = new File([pdfBlob], 'generated_pdf.pdf', { type: 'application/pdf' });
-    
-      // Upload the PDF file if a link is available
-      const link = await createUploadLink();
-      if (link) pushProfilePDFToS3(link, pdfFile);
-    
-      // Trigger the download after everything is done
-      pdf.save("generated_report.pdf");
-    });
-    
-    content.style.minWidth = '0px';
-};
+      const pdfBlob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
 
-  
+      // Create a File from the Blob
+      const pdfFile = new File([pdfBlob], 'generated_pdf.pdf', { type: 'application/pdf' });
+
+      // content.style.display = "none";
+
+      var link = await createUploadLink();
+      if (link) pushProfilePDFToS3(link, pdfFile);
+
+      // var res = await createReport({
+      //   sessions: currentReportData?.session,
+      //   trainer: currentReportData?.trainer,
+      //   trainee: currentReportData?.trainee,
+      //   title: reportObj?.title,
+      //   topic: reportObj?.topic,
+      //   reportData: [...screenShots],
+      // })
+
+    })
+  };
 
   const createUploadLink = async () => {
     var payload = { session_id: currentReportData?.session };
@@ -302,10 +300,6 @@ const generatePDF = async () => {
   const sendNotifications = (data) => {
     socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
   };
-
-  useEffect(() =>{
-    console.log('printing report array ' , reportArr)
-  } , [preview ,reportArr])
 
   return <>
     <Modal
@@ -453,8 +447,8 @@ const generatePDF = async () => {
                   </label>
                   <div className="d-flex justify-content-center w-100 p-3 mb-5">
                     <Button className="mx-3" color="primary" disabled={uploadPercentage}
-                      // onClick={() => { generatePDF() }}
-                    onClick={() => { getReportData().then((res) => generatePDF()) }}
+                      onClick={() => { generatePDF() }}
+                    // onClick={() => { getReportData().then((res) => generatePDF()) }}
                     >Preview</Button>
                   </div>
                 </div>
@@ -470,7 +464,7 @@ const generatePDF = async () => {
                   </div>
                 </div>
                 <div style={{ display: "flex" }}>
-                  <div style={{ width: "40%" }}>
+                  <div >
                     <div style={{ fontSize: '18px', fontWeight: '400', width: "70%", fontWeight: "bold" }}>Date: {currentDate}</div>
                     <h2 style={{ margin: '0px', fontWeight: "normal", paddingTop: "10px" }}>Topic: {reportObj?.title}</h2>
                     <h2 style={{ margin: '0px', fontWeight: "normal", color: "gray" }}>Name: {reportObj?.topic}</h2>
@@ -486,7 +480,7 @@ const generatePDF = async () => {
                           className="h-100 w-100"
                           src={sst?.imageUrl}
                           alt="image"
-                          style={{ maxHeight: '260px',maxWidth:"500px", objectFit: 'contain' }}
+                          style={{ maxHeight: '260px', objectFit: 'contain' }}
                         />
                       </div>
                       <div className="text-center text-md-left w-100 w-md-50">
@@ -497,7 +491,7 @@ const generatePDF = async () => {
                     <hr className="border border-dark" />
                   </>
                 })}
-                {loading && <div className="my-3 mx-3 h-3">Hang tight, we're loading your images...</div>}
+                 {loading && <div className="my-3 mx-3 h-3">Hang tight, we're loading your images...</div>}
                 <div className="flex-wrap flex-md-nowrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ textAlign: 'left', marginRight: '20px' }}>
                     <h2 style={{ color: "black" }}>Trainer</h2>
