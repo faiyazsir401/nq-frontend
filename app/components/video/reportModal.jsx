@@ -197,57 +197,50 @@ const reportModal = ({
 
     content.style.removeProperty("display");
 
-    html2canvas(content).then(async (canvas) => {
-      const imgData = canvas.toDataURL('image/png');
+    // Use html2canvas with proxy settings for cross-origin images
+    html2canvas(content, {
+        proxy: "*", // Replace with your proxy URL if available
+        useCORS: true, // Enable CORS support
+        allowTaint: true // Allow images from different origins
+    }).then(async (canvas) => {
+        const imgData = canvas.toDataURL('image/png');
 
-      // Calculate the width of the page
-      var pageWidth = pdf.internal.pageSize.width;
+        // Calculate the width of the page
+        const pdf = new jsPDF();
+        var pageWidth = pdf.internal.pageSize.width;
+
+        // Calculate the aspect ratio of the canvas
+        var aspectRatio = canvas.width / canvas.height;
+
+        // Calculate the height to maintain the aspect ratio
+        var imgHeight = pageWidth / aspectRatio;
+
+        pdf.internal.pageSize.height = imgHeight;
+
+        updateCurrentDate();
+
+        // Add the canvas as an image to the PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+
+        // Get the data URL of the PDF
+        const generatedPdfDataUrl = pdf.output('dataurlstring');
+
+        // Convert data URL to Blob
+        const byteCharacters = atob(generatedPdfDataUrl.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const pdfBlob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+
+        // Create a File from the Blob
+        const pdfFile = new File([pdfBlob], 'generated_pdf.pdf', { type: 'application/pdf' });
 
 
-      // Calculate the aspect ratio of the canvas
-      var aspectRatio = canvas.width / canvas.height;
-
-      // Calculate the height to maintain the aspect ratio
-      var imgHeight = pageWidth / aspectRatio;
-
-
-      pdf.internal.pageSize.height = imgHeight;
-
-      updateCurrentDate();
-
-      // Add the canvas as an image to the PDF
-      pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
-
-      // Get the data URL of the PDF
-      const generatedPdfDataUrl = pdf.output('dataurlstring');
-
-      // Convert data URL to Blob
-      const byteCharacters = atob(generatedPdfDataUrl.split(',')[1]);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const pdfBlob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
-
-      // Create a File from the Blob
-      const pdfFile = new File([pdfBlob], 'generated_pdf.pdf', { type: 'application/pdf' });
-
-      // content.style.display = "none";
-
-      var link = await createUploadLink();
-      if (link) pushProfilePDFToS3(link, pdfFile);
-
-      // var res = await createReport({
-      //   sessions: currentReportData?.session,
-      //   trainer: currentReportData?.trainer,
-      //   trainee: currentReportData?.trainee,
-      //   title: reportObj?.title,
-      //   topic: reportObj?.topic,
-      //   reportData: [...screenShots],
-      // })
-
-    })
-  };
+        var link = await createUploadLink();
+        if (link) pushProfilePDFToS3(link, pdfFile);
+    });
+};
 
   const createUploadLink = async () => {
     var payload = { session_id: currentReportData?.session };
@@ -304,7 +297,7 @@ const reportModal = ({
   const sendNotifications = (data) => {
     socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
   };
-
+  
   return <>
     <Modal
       isOpen={isOpenReport}
