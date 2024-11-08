@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './schedular.css';
+import timezones from '../../../utils/timezones.json';
 
 const generateTimeOptions = () => {
   const times = [];
@@ -18,8 +19,14 @@ const timeZones = [
   "UTC", "America/New_York", "Europe/London", "Asia/Kolkata", "Asia/Tokyo", "Australia/Sydney"
   // Add more time zones as needed
 ];
+const appointmentDurations = [
+  { label: '15 minutes', value: 15 },
+  { label: '30 minutes', value: 30 },
+  { label: '1 hour', value: 60 },
+  { label: '2 hours', value: 120 }
+];
 
-const DayAvailability = ({ day, times, setTimes, copyFromMonday }) => {
+const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
   const handleTimeChange = (index, field, value) => {
     const newTimes = [...times];
     newTimes[index][field] = value;
@@ -28,7 +35,7 @@ const DayAvailability = ({ day, times, setTimes, copyFromMonday }) => {
 
   const addTimeSlot = () => setTimes([...times, { start: '09:00 AM', end: '05:00 PM' }]);
   const removeTimeSlot = (index) => setTimes(times.filter((_, i) => i !== index));
-
+  
   return (
     <div className="day-availability d-flex justify-content-between">
       <h4>{day}</h4>
@@ -63,6 +70,7 @@ const DayAvailability = ({ day, times, setTimes, copyFromMonday }) => {
       )}
       <div className="day-actions">
         {times.length <= 0 && <button className="icon-button add" onClick={addTimeSlot}>+</button>}
+        <button className="icon-button add" onClick={() => copyToAll()}>copy</button>
       </div>
     </div>
   );
@@ -79,8 +87,8 @@ const Scheduler = () => {
     Fri: [{ start: '09:00 AM', end: '05:00 PM' }],
     Sat: []
   });
-  const [timeZone, setTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone); // Default to system time zone
-
+  const [timeZone, setTimeZone] = useState(timeZones[0]); // Default to system time zone
+  const [selectedDuration, setSelectedDuration] = useState(15);
   const setDayTimes = (day, newTimes) => {
     setAvailability((prev) => ({
       ...prev,
@@ -94,7 +102,14 @@ const Scheduler = () => {
       [targetDay]: [...prev[sourceDay]]
     }));
   };
-
+  const copyToAll = (day_key) => {
+    let tempObj = {}
+    Object.keys(availability).map((key) =>{
+      tempObj[key] =JSON.parse(JSON.stringify(availability[day_key])); 
+    })
+    setAvailability(tempObj)
+    tempObj = {}
+  }
   return (
     <div className="scheduler-container">
       <label>General Availability</label>
@@ -102,10 +117,26 @@ const Scheduler = () => {
       <div className="timezone-selector">
         <label htmlFor="timeZone">Select Time Zone: </label>
         <select id="timeZone" value={timeZone} onChange={(e) => setTimeZone(e.target.value)}>
-          {timeZones.map((zone) => (
-            <option key={zone} value={zone}>{zone}</option>
+          {timezones.map((zone, index) => (
+            <option key={index} value={zone.name}>
+              {zone.name}
+            </option>
           ))}
         </select>
+        <div className='my-3'>
+        <label >Appointment duration</label>
+        <select 
+            id="appointmentDuration" 
+            value={selectedDuration} 
+            onChange={(e) => setSelectedDuration(e.target.value)}
+        >
+            {appointmentDurations.map((duration) => (
+                <option key={duration.value} value={duration.value}>
+                    {duration.label}
+                </option>
+            ))}
+        </select>
+        </div>
       </div>
 
       {Object.entries(availability).map(([day, times]) => (
@@ -114,11 +145,9 @@ const Scheduler = () => {
           day={day}
           times={times}
           setTimes={(newTimes) => setDayTimes(day, newTimes)}
-          copyFromMonday={() => copyTimes('Mon', day)}
+          copyToAll={() => copyToAll(day)}
         />
       ))}
-      
-      <p className="time-zone">Time Zone: {timeZone}</p>
     </div>
   );
 };
