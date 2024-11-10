@@ -30,7 +30,7 @@ const Schedule = ({ activeCenterContainerTab }) => {
   const { userInfo } = useAppSelector(authState);
   return (
     userInfo?.account_type === "Trainer" && userInfo?.is_kyc_completed ? <>
-      {/* <Addworkinghour /> */}
+      <Addworkinghour />
       {/* <CalendarPage /> */}
       <Scheduler/>
     </> :

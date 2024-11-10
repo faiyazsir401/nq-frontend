@@ -29,3 +29,14 @@ export function demoSessionEndTime(){
        const minutes = newTime.minute();
        return `${hour}:${minutes}`
 }
+
+export function currentTimeZone () {
+    const date = new Date();
+const offsetInMinutes = -date.getTimezoneOffset();
+const hours = Math.floor(Math.abs(offsetInMinutes) / 60);
+const minutes = Math.abs(offsetInMinutes) % 60;
+
+// Format the offset as GMT+hh:mm or GMT-hh:mm
+const formattedOffset = `GMT${offsetInMinutes >= 0 ? '+' : '-'}${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+return formattedOffset;
+}

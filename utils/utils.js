@@ -824,4 +824,49 @@ export class Utils {
     const isCurrentDateGreater = currentDate.isAfter(givenDatePlusOneMinute);
     return isCurrentDateGreater;
   }
+  static convertToAmPm(time) {
+    const [hour, minute] = time.split(':').map(Number);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12; // Convert "0" hour to "12" for 12-hour format
+    return `${formattedHour}:${minute.toString().padStart(2, '0')} ${period}`;
+  }
+
+  static isInFuture(inputTimeStr) {
+    // Get the current time (hours and minutes)
+    const currentTime = new Date();
+    const currentHours = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
+      console.log(currentHours , currentMinutes)
+    // Parse the input time string
+   console.log('inputstring' , inputTimeStr)
+    let [inputHours, inputMinutes] = inputTimeStr.split(':').map(Number);
+  
+    // Compare hours first, then minutes if hours are equal
+    if (inputHours > currentHours || (inputHours === currentHours && inputMinutes > currentMinutes)) {
+      return true;
+    } else if (inputHours < currentHours || (inputHours === currentHours && inputMinutes < currentMinutes)) {
+      return false;
+    } else {
+      return false ;
+    }
+  }
+
+  static isSlotAvailable(slotArray , startDate){
+      // Get the current time (hours and minutes)
+      let isSlotAvailable = false;
+
+    let today = new Date().toISOString().split('T')[0];
+    if (startDate !== today) {
+      return true;
+    }
+      slotArray.map((slot , index) =>{
+        if(this.isInFuture(slot.end)){
+          isSlotAvailable = true;
+        }
+      })
+
+      return isSlotAvailable;
+  }
 }
+  
+
