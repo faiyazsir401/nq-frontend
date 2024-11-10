@@ -9,6 +9,7 @@ const initialState = {
   session_durations: { from: "", to: "" },
   availableSlots: [],
   clips: [],
+  slots:[]
 };
 
 export const checkSlotAsync = createAsyncThunk("checkSlot", async (payload) => {
@@ -45,6 +46,9 @@ export const commonSlice = createSlice({
     handleTrainerAvailable: (state, action) => {
       state.isSlotAvailable = action.payload;
     },
+    setSlots: (state , action) =>{
+      state.slots = action.payload
+    }
   },
   extraReducers: (builder) => {
     builder

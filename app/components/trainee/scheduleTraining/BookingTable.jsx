@@ -3,7 +3,7 @@ import TrainerSlider from "./trainerSlider";
 import ReactDatePicker from "react-datepicker";
 import moment from "moment";
 import { Utils } from "../../../../utils/utils";
-import { checkSlotAsync } from "../../../common/common.slice";
+import { checkSlotAsync, commonAction, commonState } from "../../../common/common.slice";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { getAvailability } from "../../calendar/calendar.api";
 // import Input from './Input';
@@ -29,6 +29,9 @@ import { authAction, authState } from "../../auth/auth.slice";
 import { useRouter } from "next/router";
 import AuthUserModal from "./authUserModal";
 import InstantLessonTimeLine from "./InstantLessonTimeLine";
+import { currentTimeZone } from "../../../../utils/videoCall";
+import { checkSlot } from "../../../common/common.api";
+import { useSelector } from "react-redux";
 const BookingTable = ({
   selectedTrainer,
   trainerInfo,
@@ -66,8 +69,9 @@ const BookingTable = ({
   const formateEndTime = Utils.getTimeFormate(
     trainerInfo?.userInfo?.extraInfo?.working_hours?.to
   );
-
-
+const {slots} = useAppSelector(commonState)
+  const [isCommonBooking , setIsCommonBooking] = useState(false);
+  const [selectedSlots , setSelectedSlot] = useState(null)
   useEffect(() => {
     const todaySDate = Utils.getDateInFormatIOS(new Date());
     const { weekDates, weekDateFormatted } =
@@ -147,21 +151,26 @@ const BookingTable = ({
           0
         ).toISOString();
         // dispatch(authAction.updateTrainerAndDate({selectedTrainerId : trainerInfo?.userInfo?.trainer_id || selectedTrainer?.trainer_id , selectedDate: startDate}))
-        getAvailability({
-          trainer_id:
-            trainerInfo?.userInfo?.trainer_id ||
-            selectedTrainer?.trainer_id ||
-            trainerInfo?.userInfo?.id || trainerInfo?.userInfo?._id,
-          start_time: start_time,
-          end_time: end_time,
+        // getAvailability({
+        //   trainer_id:
+        //     trainerInfo?.userInfo?.trainer_id ||
+        //     selectedTrainer?.trainer_id ||
+        //     trainerInfo?.userInfo?.id || trainerInfo?.userInfo?._id,
+        //   start_time: start_time,
+        //   end_time: end_time,
+        // })
+        //   .then((res) => {
+        //     setAvailableSlotsState(res?.data);
+        //   })
+        //   .catch((err) => {
+        //     // dispatch(authAction.updateIsAuthModalOpen(true))
+        //   });
+        // dispatch(checkSlotAsync(payload));
+        checkSlot(payload).then(res => {
+          dispatch(commonAction.setSlots(res.data.availableSlots))
+        }).catch((err) =>{
+          dispatch(commonAction.setSlots([]))
         })
-          .then((res) => {
-            setAvailableSlotsState(res?.data);
-          })
-          .catch((err) => {
-            // dispatch(authAction.updateIsAuthModalOpen(true))
-          });
-        dispatch(checkSlotAsync(payload));
       }
     }
   }, [status]);
@@ -252,8 +261,9 @@ const BookingTable = ({
                       timeRange.endTime ||
                       DefaultTimeRange.endTime,
                   },
+                  traineeTimeZone : currentTimeZone()
                 };
-                dispatch(checkSlotAsync(payload));
+                // dispatch(checkSlotAsync(payload));
                 setStartDate(date);
                 date = new Date(date).toISOString().split("T")[0];
                 let dateArr = date?.split("-");
@@ -275,17 +285,22 @@ const BookingTable = ({
                   0,
                   0
                 ).toISOString();
-                getAvailability({
-                  trainer_id:
-                    trainerInfo?.userInfo?._id ||
-                    trainerInfo?.userInfo?.trainer_id ||
-                    selectedTrainer?.trainer_id ||
-                    trainerInfo?.userInfo?.id,
-                  start_time: start_time,
-                  end_time: end_time,
-                }).then((res) => {
-                  setAvailableSlotsState(res?.data);
-                });
+                // getAvailability({
+                //   trainer_id:
+                //     trainerInfo?.userInfo?._id ||
+                //     trainerInfo?.userInfo?.trainer_id ||
+                //     selectedTrainer?.trainer_id ||
+                //     trainerInfo?.userInfo?.id,
+                //   start_time: start_time,
+                //   end_time: end_time,
+                // }).then((res) => {
+                //   setAvailableSlotsState(res?.data);
+                // });
+                checkSlot(payload).then(res => {
+                  dispatch(commonAction.setSlots(res.data.availableSlots))
+                }).catch((err) =>{
+                  dispatch(commonAction.setSlots(null))
+                })
               }
               const todaySDate = Utils.getDateInFormatIOS(date.toString());
               const { weekDateFormatted, weekDates } =
@@ -318,20 +333,22 @@ const BookingTable = ({
                 textAlign: "center",
               }}
             >
-              {availableSlotsState?.length ? (
+              {slots?.length > 0 && Utils.isSlotAvailable(slots , startDate) ? (
                 <>
                   {" "}
-                  {availableSlotsState?.map((item, i) => {
+                  {slots?.map((item, i) => {
+                    
+                    // let today = new Date().toISOString().split('T')[0];
+                    // if(startDate === today){
+                    //   if (!Utils.isInFuture(item.end)) return;
+                    // }
+                    
                     return (
                       <div
                         onClick={() => {
-                          if (!item?.status) {
-                            var temp = availableSlotsState?.map((slt) => {
-                              return { ...slt, isSelected: false };
-                            });
-                            temp[i].isSelected = true;
-                            setAvailableSlotsState([...temp]);
-                          }
+                        setIsInstantLessonModalOpen(true)
+                        setIsCommonBooking(true)
+                        setSelectedSlot(item)
                         }}
                         className="col-6"
                         style={{
@@ -347,13 +364,13 @@ const BookingTable = ({
                         <b
                           style={{ color: item?.status ? "grey" : "#000080" }}
                         >
-                          {moment(item?.start_time).format("h:mm a")} -{" "}
-                          {moment(item?.end_time).format("h:mm a")}
+                          {Utils.convertToAmPm(item?.start)}{"  -  "}
+                          {Utils.convertToAmPm(item?.end)}
                         </b>
                       </div>
                     );
                   })}
-                  <div className="col-12 mb-3 d-flex justify-content-center align-items-center">
+                  {/* <div className="col-12 mb-3 d-flex justify-content-center align-items-center">
                     <button
                       type="button"
                       disabled={
@@ -442,7 +459,7 @@ const BookingTable = ({
                     >
                       Book Slot Now
                     </button>
-                  </div>
+                  </div> */}
                 </>
               ) : (
                 <div className="mt-1 ml-3" style={{ fontSize: "13px" }}>
@@ -572,6 +589,10 @@ const BookingTable = ({
         setBookSessionPayload={setBookSessionPayload}
         setAmount={setAmount}
         startDate={startDate}
+        isCommonBooking = {isCommonBooking}
+        setIsCommonBooking ={setIsCommonBooking}
+        selectedDate = {startDate ? Utils.getDateInFormatIOS(startDate) :  new Date().toISOString().split('T')[0]}
+        selectedSlot = {selectedSlots}
       />
       <Modal
         isOpen={showTransactionModal}
@@ -584,6 +605,9 @@ const BookingTable = ({
             setBookSessionPayload={setBookSessionPayload}
             bookSessionPayload={bookSessionPayload}
             trainerInfo={trainerInfo}
+            isCommonBooking = {isCommonBooking}
+            setIsCommonBooking ={setIsCommonBooking}
+            selectedSlot = {selectedSlots}
           />
         }
       />
