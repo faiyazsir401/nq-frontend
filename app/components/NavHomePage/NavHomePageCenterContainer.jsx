@@ -30,8 +30,8 @@ const Schedule = ({ activeCenterContainerTab }) => {
   const { userInfo } = useAppSelector(authState);
   return (
     userInfo?.account_type === "Trainer" && userInfo?.is_kyc_completed ? <>
-      <Addworkinghour />
-      {/* <CalendarPage /> */}
+      {/* <Addworkinghour /> */}
+      <CalendarPage />
       <Scheduler/>
     </> :
       <p style={{ textAlign: "center" }}>Please complete your KYC to create slot</p>
