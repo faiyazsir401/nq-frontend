@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import './schedular.css';
 import timezones from '../../../utils/timezones.json';
+import { template } from 'lodash';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { authState } from '../auth/auth.slice';
+import { updateProfileAsync } from '../trainer/trainer.slice';
+import { currentTimeZone } from '../../../utils/videoCall';
 
 const generateTimeOptions = () => {
   const times = [];
@@ -14,6 +19,16 @@ const generateTimeOptions = () => {
   return times;
 };
 
+const initialDayValue = 
+{
+  Sun: [],
+  Mon: [],
+  Tue: [],
+  Wed: [],
+  Thu: [],
+  Fri: [],
+  Sat: []
+}
 const timeOptions = generateTimeOptions();
 const timeZones = [
   "UTC", "America/New_York", "Europe/London", "Asia/Kolkata", "Asia/Tokyo", "Australia/Sydney"
@@ -28,8 +43,10 @@ const appointmentDurations = [
 
 const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
   const handleTimeChange = (index, field, value) => {
-    const newTimes = [...times];
-    newTimes[index][field] = value;
+    let newTimes = [...times];
+    const newSlot = {...times[index]}
+    newSlot[field] = value;
+    newTimes[index] = newSlot;
     setTimes(newTimes);
   };
 
@@ -70,7 +87,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
       )}
       <div className="day-actions">
         {times.length <= 0 && <button className="icon-button add" onClick={addTimeSlot}>+</button>}
-        <button className="icon-button add" onClick={() => copyToAll()}>copy</button>
+        {times.length > 0 &&  <button className="icon-button add" onClick={() => copyToAll()}>copy</button>}
       </div>
     </div>
   );
@@ -78,17 +95,12 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
 
 const Scheduler = () => {
   const [duration, setDuration] = useState(60);
-  const [availability, setAvailability] = useState({
-    Sun: [],
-    Mon: [{ start: '09:00 AM', end: '05:00 PM' }],
-    Tue: [{ start: '09:00 AM', end: '05:00 PM' }],
-    Wed: [{ start: '09:00 AM', end: '05:00 PM' }],
-    Thu: [{ start: '09:00 AM', end: '05:00 PM' }],
-    Fri: [{ start: '09:00 AM', end: '05:00 PM' }],
-    Sat: []
-  });
-  const [timeZone, setTimeZone] = useState(timeZones[0]); // Default to system time zone
-  const [selectedDuration, setSelectedDuration] = useState(15);
+  const dispatch = useAppDispatch();
+  const { userInfo } = useAppSelector(authState);
+  const [availability, setAvailability] = useState(userInfo.extraInfo.availabilityInfo.availability || initialDayValue);
+  const [timeZone, setTimeZone] = useState(userInfo.extraInfo.availabilityInfo.timeZone || currentTimeZone()); // Default to system time zone
+  const [selectedDuration, setSelectedDuration] = useState(userInfo.extraInfo.availabilityInfo.duration || 15);
+  
   const setDayTimes = (day, newTimes) => {
     setAvailability((prev) => ({
       ...prev,
@@ -96,22 +108,37 @@ const Scheduler = () => {
     }));
   };
 
-  const copyTimes = (sourceDay, targetDay) => {
-    setAvailability((prev) => ({
-      ...prev,
-      [targetDay]: [...prev[sourceDay]]
-    }));
-  };
+  
   const copyToAll = (day_key) => {
     let tempObj = {}
     Object.keys(availability).map((key) =>{
+
+      if(availability[key].length === 0){
+        tempObj[key] = [];
+        return  
+      }
+
       tempObj[key] =JSON.parse(JSON.stringify(availability[day_key])); 
     })
     setAvailability(tempObj)
     tempObj = {}
   }
+  
+  const handleSave = () => {
+    const working_hours = { availability, selectedDuration, timeZone };
+
+    dispatch(
+      updateProfileAsync({
+        extraInfo: {
+          ...userInfo?.extraInfo,
+          availabilityInfo : working_hours,
+        },
+      })
+    );
+  };
+
   return (
-    <div className="scheduler-container">
+    <div className="scheduler-container card-body">
       <label>General Availability</label>
       
       <div className="timezone-selector">
@@ -148,6 +175,11 @@ const Scheduler = () => {
           copyToAll={() => copyToAll(day)}
         />
       ))}
+      {/* Add Save Button */}
+      <button onClick={handleSave} type="button"
+        className="ml-2 btn btn-sm btn-primary">
+        Save
+      </button>
     </div>
   );
 };
