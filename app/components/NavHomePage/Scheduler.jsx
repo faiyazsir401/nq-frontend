@@ -176,10 +176,12 @@ const Scheduler = () => {
         />
       ))}
       {/* Add Save Button */}
+      <div className='w-100 text-center my-2'>
       <button onClick={handleSave} type="button"
         className="ml-2 btn btn-sm btn-primary">
         Save
       </button>
+      </div>
     </div>
   );
 };
