@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Button } from 'reactstrap';
 import moment from 'moment';
-import { Utils } from '../../../../utils/utils';
+import { convertTimesToISO, Utils } from '../../../../utils/utils';
 import { createPaymentIntentAsync } from '../trainee.slice';
 import { authAction } from '../../auth/auth.slice';
 import { useAppDispatch } from '../../../store';
@@ -50,6 +50,7 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
   const isTokenExists = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [slot ,setSlot ] = useState(null);
+ 
   useEffect(() =>{
     console.log('prinitng' , selectedLesson  , trainerInfo, parseInt(trainerInfo?.extraInfo?.availabilityInfo?.selectedDuration) )
     if(isCommonBooking){
@@ -142,13 +143,22 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
             disabled={!selectedLesson}
             className="mt-3 btn btn-sm btn-primary"
             onClick={() => {
-              if (!selectedLesson || !selectedSlot ) {
+              console.log('onclick triggered');
+              if (!selectedLesson ) {
+                if(isCommonBooking && !selectedSlot){
+                  return;
+                }
+                
+                console.log('cancelling the onclick')
                 return;
               }
               
+              const slot1 = getTimeRange(selectedLesson.duration);
+              console.log('onclick after return' , selectedSlot?.start , slot1?.sessionStartTime );
+              
               const amountPayable = Utils.getMinutesFromHourMM(
-                selectedSlot.start,
-                selectedSlot.end,
+                isCommonBooking ? selectedSlot.start : slot1?.sessionStartTime,
+                isCommonBooking ? selectedSlot.end :  slot1?.sessionEndTime ,
                 trainerInfo?.userInfo?.extraInfo?.hourly_rate
               );
               
@@ -166,6 +176,8 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                   } else {
                     dispatch(authAction.updateIsAuthModalOpen(true));
                   }
+              console.log('onclick at payload');
+
                   const payload = {
                     slot_id: slot?._id,
                     charging_price: amountPayable,
@@ -177,10 +189,10 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                     hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
                     status: BookedSession.booked,
                     booked_date: startDate,
-                    session_start_time: slot.sessionStartTime || selectedSlot.start,
-                    session_end_time: slot.sessionEndTime || selectedSlot.end,
-                    start_time: slot?.startTime ||selectedSlot.start,
-                    end_time: slot?.endTime || selectedSlot.end,
+                    session_start_time: slot1.sessionStartTime || selectedSlot.start,
+                    session_end_time: slot1.sessionEndTime || selectedSlot.end,
+                    start_time: !isCommonBooking ?  slot1?.startTime :   convertTimesToISO(startDate , selectedSlot.start) ,
+                    end_time: !isCommonBooking ? slot1?.endTime :   convertTimesToISO(startDate , selectedSlot.end),
                   };
                   console.log(payload , 'payload')
                   setBookSessionPayload(payload);
