@@ -459,7 +459,7 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
               </div>
               <div className="d-flex flex-column align-items-center">
                 <h1 className="p-3">Report</h1>
-                <div style={{ width: '100%', height: '100vh' }}>
+                <div style={{ height: '100vh' }} className="pdf-viewer">
                   <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
                     <Viewer fileUrl={`${awsS3Url}${reportName}`} />
                   </Worker>

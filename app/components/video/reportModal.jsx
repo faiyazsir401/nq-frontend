@@ -16,7 +16,7 @@ import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
-
+import "./reportModal.css"
 
 
 
@@ -454,8 +454,8 @@ const reportModal = ({
             }
             <div className="theme-tab">
               <div id="report-pdf" style={{ display: "none", padding: "20px ", border: '10px solid #000080', borderColor: '#14328d' }}>
-                <div className="mb-2 flex-wrap" style={{ display: 'flex', justifyContent: 'space-between', alignItems: "center" }}>
-                  <p style={{ textTransform: 'uppercase', margin: '0px', fontSize: '40px', fontWeight: '600', color: "black" }}>Game Plan</p>
+                <div className="mb-2" style={{ display: 'flex', justifyContent: 'space-between',gap:"5px", alignItems: "center" }}>
+                  <p style={{ textTransform: 'uppercase', margin: '0px',  fontWeight: '600', color: "black" }} className="text-md-xl">Game Plan</p>
                   <div style={{ textAlign: 'right' }}>
                     <img className="w-100" src="/assets/images/logo/netqwix_logo real.png" alt="Logo" style={{ maxWidth: '200px', objectFit: 'contain' }} />
                   </div>
@@ -471,7 +471,7 @@ const reportModal = ({
                 <hr style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'black' }} />
                 {reportArr?.map((sst, i) => {
                   return <>
-                    <div className="d-flex flex-column flex-md-row align-items-center">
+                    <div className="d-flex flex-row  align-items-center">
                       <div className="text-center w-100 w-md-50">
                         <img
                           className="h-100 w-100"
@@ -481,7 +481,7 @@ const reportModal = ({
                         />
                       </div>
                       <div className="text-center text-md-left w-100 w-md-50">
-                        <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p>
+                        {/* <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p> */}
                         <p>{screenShots[i]?.description}</p>
                       </div>
                     </div>
@@ -489,7 +489,7 @@ const reportModal = ({
                   </>
                 })}
                  {loading && <div className="my-3 mx-3 h-3">Hang tight, we're loading your images...</div>}
-                <div className="flex-wrap flex-md-nowrap" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div style={{ textAlign: 'left', marginRight: '20px' }}>
                     <h2 style={{ color: "black" }}>Trainer</h2>
                     <p>{userInfo?.extraInfo?.about}</p>

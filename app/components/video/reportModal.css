@@ -1,0 +1,39 @@
+.text-md-xl {
+  font-size: 1.5rem; /* Small screens */
+  white-space: nowrap;
+}
+
+.pdf-viewer {
+  width: 100%;
+}
+
+@media (max-width: 500px) {
+  /* Medium screens */
+  .text-md-xl {
+    font-size: 1.2rem;
+  }
+  .pdf-viewer {
+    width: 100vw;
+  }
+}
+
+@media (min-width: 768px) {
+  /* Medium screens */
+  .text-md-xl {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 992px) {
+  /* Large screens */
+  .text-md-xl {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* Extra large screens */
+  .text-md-xl {
+    font-size: 2.5rem;
+  }
+}
