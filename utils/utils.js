@@ -167,6 +167,7 @@ export class Utils {
     endTime,
     chargingRate = TRAINER_AMOUNT_USD
   ) => {
+    console.log(startTime , endTime , 'start endtime from here')
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
 
@@ -869,4 +870,25 @@ export class Utils {
   }
 }
   
+export function convertTimesToISO(date, time1) {
+  const baseDate = new Date(date);
 
+  if (isNaN(baseDate.getTime())) {
+      throw new Error("Invalid date format. Please provide a valid ISO 8601 date.");
+  }
+
+  // Function to combine date and time
+  const combineDateTime = (date, time) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      if (isNaN(hours) || isNaN(minutes)) {
+          throw new Error("Invalid time format. Please provide time in HH:mm format.");
+      }
+
+      const newDate = new Date(date);
+      newDate.setUTCHours(hours, minutes, 0, 0); // Set hours, minutes, seconds, milliseconds
+      return newDate.toISOString();
+  };
+
+  return combineDateTime(baseDate, time1)
+  
+}
