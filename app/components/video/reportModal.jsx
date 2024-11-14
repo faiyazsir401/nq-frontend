@@ -409,7 +409,7 @@ const reportModal = ({
                               </div>
                             </div>
                             <div className="form-group m-0">
-                              <label className="col-form-label">Title</label>
+                              {/* <label className="col-form-label">Title</label>
                               <input
                                 className="form-control"
                                 type="text"
@@ -420,7 +420,7 @@ const reportModal = ({
                                   setScreenShots([...screenShots])
                                 }}
                                 value={screenShots[i]?.title}
-                              />
+                              /> */}
                               <label className="col-form-label">Description</label>
                               <textarea
                                 rows="4"
