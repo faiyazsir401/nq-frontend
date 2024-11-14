@@ -480,8 +480,8 @@ const BookingTable = ({
   return (
     <>
       {/* <ToastContainer /> */}
-      {
-        userIsOnlineOrNot &&
+      
+        
           <div
             style={{
               width : '100%',
@@ -495,6 +495,7 @@ const BookingTable = ({
           >
             {" "}
             {/* Banner styles */}
+            {userIsOnlineOrNot &&<>
             <div style={{ display: "flex", alignItems: "center", width : '100%' }}>
               {" "}
               <h2
@@ -553,7 +554,7 @@ const BookingTable = ({
                 fontWeight : "bold",
                 margin : '0'
                  }}>OR</p>
-            </div>
+            </div></>}
             <div style={{ display: "flex", alignItems: "center", marginLeft: "10px",  width : '100%' }}>
                 <button
                   style={{
@@ -643,7 +644,7 @@ const BookingTable = ({
             </div>
             </div>
           
-      }
+      
 
       {
         showCommonBookingOption ? renderBookingComponent() : null
