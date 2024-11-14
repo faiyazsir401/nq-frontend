@@ -106,76 +106,76 @@ const BookingTable = ({
     }
   }, [transaction]);
 
-  useEffect(() => {
-    if (status === STATUS.fulfilled) {
-      const bookingDate = Utils.getDateInFormatIOS(startDate);
-      if (
-        trainerInfo?.userInfo?.trainer_id ||
-        selectedTrainer?.trainer_id ||
-        trainerInfo?.userInfo?.id ||
-        trainerInfo?.userInfo?._id
-      ) {
-        const payload = {
-          trainer_id:
-            trainerInfo?.userInfo?.trainer_id ||
-            selectedTrainer?.trainer_id ||
-            trainerInfo?.userInfo?.id || trainerInfo?.userInfo?._id,
-          booked_date: bookingDate,
-          slotTime: {
-            from: timeRange.startTime
-              ? timeRange.startTime
-              : DefaultTimeRange.startTime,
-            to: timeRange.endTime
-              ? timeRange.endTime
-              : DefaultTimeRange.endTime,
-          },
-        };
-        let date = new Date(startDate).toISOString().split("T")[0];
-        let dateArr = date?.split("-");
-        let start_time = new Date(
-          Number(dateArr[0]),
-          Number(dateArr[1]) - 1,
-          Number(dateArr[2]),
-          0,
-          0,
-          0,
-          0
-        ).toISOString();
-        let end_time = new Date(
-          Number(dateArr[0]),
-          Number(dateArr[1]) - 1,
-          Number(dateArr[2]),
-          23,
-          59,
-          0,
-          0
-        ).toISOString();
-        // dispatch(authAction.updateTrainerAndDate({selectedTrainerId : trainerInfo?.userInfo?.trainer_id || selectedTrainer?.trainer_id , selectedDate: startDate}))
-        // getAvailability({
-        //   trainer_id:
-        //     trainerInfo?.userInfo?.trainer_id ||
-        //     selectedTrainer?.trainer_id ||
-        //     trainerInfo?.userInfo?.id || trainerInfo?.userInfo?._id,
-        //   start_time: start_time,
-        //   end_time: end_time,
-        // })
-        //   .then((res) => {
-        //     setAvailableSlotsState(res?.data);
-        //   })
-        //   .catch((err) => {
-        //     // dispatch(authAction.updateIsAuthModalOpen(true))
-        //   });
-        // dispatch(checkSlotAsync(payload));
-        console.log("payload",payload)
-        checkSlot(payload).then(res => {
-          console.log("payload",res)
-          dispatch(commonAction.setSlots(res.data.availableSlots))
-        }).catch((err) =>{
-          dispatch(commonAction.setSlots([]))
-        })
-      }
-    }
-  }, [status,showCommonBookingOption]);
+  // useEffect(() => {
+  //   if (status === STATUS.fulfilled) {
+  //     const bookingDate = Utils.getDateInFormatIOS(startDate);
+  //     if (
+  //       trainerInfo?.userInfo?.trainer_id ||
+  //       selectedTrainer?.trainer_id ||
+  //       trainerInfo?.userInfo?.id ||
+  //       trainerInfo?.userInfo?._id
+  //     ) {
+  //       const payload = {
+  //         trainer_id:
+  //           trainerInfo?.userInfo?.trainer_id ||
+  //           selectedTrainer?.trainer_id ||
+  //           trainerInfo?.userInfo?.id || trainerInfo?.userInfo?._id,
+  //         booked_date: bookingDate,
+  //         slotTime: {
+  //           from: timeRange.startTime
+  //             ? timeRange.startTime
+  //             : DefaultTimeRange.startTime,
+  //           to: timeRange.endTime
+  //             ? timeRange.endTime
+  //             : DefaultTimeRange.endTime,
+  //         },
+  //       };
+  //       let date = new Date(startDate).toISOString().split("T")[0];
+  //       let dateArr = date?.split("-");
+  //       let start_time = new Date(
+  //         Number(dateArr[0]),
+  //         Number(dateArr[1]) - 1,
+  //         Number(dateArr[2]),
+  //         0,
+  //         0,
+  //         0,
+  //         0
+  //       ).toISOString();
+  //       let end_time = new Date(
+  //         Number(dateArr[0]),
+  //         Number(dateArr[1]) - 1,
+  //         Number(dateArr[2]),
+  //         23,
+  //         59,
+  //         0,
+  //         0
+  //       ).toISOString();
+  //       // dispatch(authAction.updateTrainerAndDate({selectedTrainerId : trainerInfo?.userInfo?.trainer_id || selectedTrainer?.trainer_id , selectedDate: startDate}))
+  //       // getAvailability({
+  //       //   trainer_id:
+  //       //     trainerInfo?.userInfo?.trainer_id ||
+  //       //     selectedTrainer?.trainer_id ||
+  //       //     trainerInfo?.userInfo?.id || trainerInfo?.userInfo?._id,
+  //       //   start_time: start_time,
+  //       //   end_time: end_time,
+  //       // })
+  //       //   .then((res) => {
+  //       //     setAvailableSlotsState(res?.data);
+  //       //   })
+  //       //   .catch((err) => {
+  //       //     // dispatch(authAction.updateIsAuthModalOpen(true))
+  //       //   });
+  //       // dispatch(checkSlotAsync(payload));
+  //       console.log("payload",payload)
+  //       checkSlot(payload).then(res => {
+  //         console.log("payload",res)
+  //         dispatch(commonAction.setSlots(res.data.availableSlots))
+  //       }).catch((err) =>{
+  //         dispatch(commonAction.setSlots([]))
+  //       })
+  //     }
+  //   }
+  // }, [status,showCommonBookingOption]);
 
   useEffect(() => {
     if (
