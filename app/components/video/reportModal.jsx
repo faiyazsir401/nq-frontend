@@ -446,7 +446,7 @@ const reportModal = ({
                     <Button className="mx-3" color="primary" disabled={uploadPercentage}
                       onClick={() => { generatePDF() }}
                     // onClick={() => { getReportData().then((res) => generatePDF()) }}
-                    >Preview</Button>
+                    >{uploadPercentage?"Loading":"Preview"}</Button>
                   </div>
                 </div>
                 :
@@ -549,7 +549,7 @@ const reportModal = ({
                         bookingInfo:null
                       });
 
-                    }}>Save</Button>
+                    }}>{uploadPercentage ?"Loading":"Save"}</Button>
                   </div>
                   : null}
             </div>
