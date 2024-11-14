@@ -6,6 +6,7 @@ import { authState } from "../auth/auth.slice";
 import { updateProfileAsync } from "../trainer/trainer.slice";
 import { currentTimeZone } from "../../../utils/videoCall";
 import { MdContentCopy } from "react-icons/md";
+import Image from "next/image";
 
 const generateTimeOptions = () => {
   const times = [];
@@ -58,11 +59,11 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
     const [hour, minute] = time.split(":");
     const parsedHour = parseInt(hour, 10);
     const isPM = time.includes("PM");
-    return [parsedHour % 12 + (isPM ? 12 : 0), minute.slice(0, 2)];
+    return [(parsedHour % 12) + (isPM ? 12 : 0), minute.slice(0, 2)];
   };
 
   const getNextTimeSlot = () => {
-    console.log("times",times)
+    console.log("times", times);
     if (times.length === 0) return { start: "09:00 AM", end: "10:00 AM" };
 
     const lastSlot = times[times.length - 1];
@@ -88,7 +89,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
 
   const addTimeSlot = () => {
     if (times.length === 0 || times[times.length - 1].end !== "11:59 PM") {
-      console.log("slimshady",[...times, getNextTimeSlot()])
+      console.log("slimshady", [...times, getNextTimeSlot()]);
       setTimes([...times, getNextTimeSlot()]);
     }
   };
@@ -97,61 +98,72 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
     setTimes(times.filter((_, i) => i !== index));
   };
 
-  console.log("plesae")
+  console.log("plesae");
 
   return (
     <div className="day-availability d-flex justify-content-between">
       <h4>{day}</h4>
+      <div className="d-flex align-items-start">
       {times.length === 0 ? (
         <p className="unavailable-text">Unavailable</p>
       ) : (
-        <div className="time-slot-container">
-          {times.map((slot, index) => (
-            <div key={index} className="time-slot">
-              <select
-                value={slot.start}
-                onChange={(e) => handleTimeChange(index, "start", e.target.value)}
-              >
-                {timeOptions.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-              <span> - </span>
-              <select
-                value={slot.end}
-                onChange={(e) => handleTimeChange(index, "end", e.target.value)}
-              >
-                {timeOptions.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-              <button
-                className="icon-button delete"
-                onClick={() => removeTimeSlot(index)}
-              >
-                🚫
-              </button>
-            </div>
-          ))}
-        </div>
+      
+          <div className="time-slot-container">
+            {times.map((slot, index) => (
+              <div key={index} className="time-slot">
+                <select
+                  value={slot.start}
+                  onChange={(e) =>
+                    handleTimeChange(index, "start", e.target.value)
+                  }
+                >
+                  {timeOptions.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+                <span> - </span>
+                <select
+                  value={slot.end}
+                  onChange={(e) =>
+                    handleTimeChange(index, "end", e.target.value)
+                  }
+                >
+                  {timeOptions.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  className="icon-button delete"
+                  onClick={() => removeTimeSlot(index)}
+                >
+                  🚫
+                </button>
+              </div>
+            ))}
+          </div>
+          
+     
       )}
-      <div className="day-actions">
-        <button className="icon-button add" onClick={addTimeSlot}>
-          +
-        </button>
-        {times.length > 0 && (
-          <button
-            className="icon-button add"
-            onClick={() => copyToAll()}
-          >
-            <MdContentCopy color="blue" className="h-10 w-10"/>
-          </button>
-        )}
-      </div>
+      <div className="day-actions d-flex align-items-center justify-content-end">
+            <button className="icon-button add" onClick={addTimeSlot}>
+              +
+            </button>
+            {times.length > 0 && (
+              <button className="icon-button add" onClick={() => copyToAll()}>
+                <Image
+                  src={"/icons/copy-icon.png"}
+                  alt=""
+                  height={15}
+                  width={15}
+                />
+              </button>
+            )}
+          </div>
+          </div>
     </div>
   );
 };
