@@ -1,5 +1,10 @@
 import axios from "axios";
-import { createReport, cropImage, getReport, removeImage } from "../videoupload/videoupload.api";
+import {
+  createReport,
+  cropImage,
+  getReport,
+  removeImage,
+} from "../videoupload/videoupload.api";
 import CropImage from "./cropimage";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import jsPDF from "jspdf";
@@ -16,9 +21,7 @@ import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
-import "./reportModal.css"
-
-
+import "./reportModal.css";
 
 const reportModal = ({
   currentReportData,
@@ -26,27 +29,26 @@ const reportModal = ({
   setIsOpenReport,
   screenShots,
   setScreenShots,
-  reportObj, 
+  reportObj,
   setReportObj,
   isClose,
   isTraineeJoined,
   isCallEnded,
   gamePlanModalNote,
-  setGamePlanModalClose
+  setGamePlanModalClose,
 }) => {
-
   const [isOpenCrop, setIsOpenCrop] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [selectImage, setSelectImage] = useState("")
+  const [selectImage, setSelectImage] = useState("");
   const [reportArr, setReportArr] = useState([]);
   // const [reportObj, setReportObj] = useState({ title: "", topic: "" });
   // const [screenShots, setScreenShots] = useState([]);
-  const [currentDate, setCurrentDate] = useState('');
+  const [currentDate, setCurrentDate] = useState("");
   const { userInfo } = useAppSelector(authState);
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [pdfFileCurrent, setPdfFileCurrent] = useState();
   const socket = useContext(SocketContext);
-  const [loading ,setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   // const [demoProfilePic, setDemoProfilePic] = useState();
   // const [profilePic, setProfilePic] = useState();
 
@@ -62,16 +64,14 @@ const reportModal = ({
 
       return new Promise((resolve) => {
         reader.onloadend = () => {
-          const base64data = reader.result.split(',')[1];
+          const base64data = reader.result.split(",")[1];
           resolve(`data:image/jpeg;base64,${base64data}`);
         };
         reader.readAsDataURL(blob);
       });
-
     } catch (err) {
-      console.log("----->err", err)
+      console.log("----->err", err);
     }
-
   };
 
   // const getImageBase64 = async (url) => await loadImageFromUrl(url);
@@ -82,29 +82,29 @@ const reportModal = ({
   );
 
   const setImagebase64 = async () => {
-    
-    const dpp = await getImageBase64('/assets/images/demoUser.png')
+    const dpp = await getImageBase64("/assets/images/demoUser.png");
     // setDemoProfilePic(dpp)
     demoProfilePic.current = dpp;
 
-    const pp = await getImageBase64(Utils?.getImageUrlOfS3(userInfo?.profile_picture))
+    const pp = await getImageBase64(
+      Utils?.getImageUrlOfS3(userInfo?.profile_picture)
+    );
     // setProfilePic(pp);
 
     profilePic.current = pp;
-  }
+  };
 
   useEffect(() => {
     // Set the current date when the component mounts
     updateCurrentDate();
 
-    setImagebase64()
+    setImagebase64();
   }, []);
 
   const resetState = () => {
     setScreenShots([]);
-    setReportObj({ title: "", topic: "" })
-  }
-
+    setReportObj({ title: "", topic: "" });
+  };
 
   const updateCurrentDate = () => {
     const today = new Date();
@@ -118,14 +118,14 @@ const reportModal = ({
   };
   useEffect(() => {
     if (currentReportData?.session && isOpenReport) {
-      getReportData()
-      setUploadPercentage(0)
+      getReportData();
+      setUploadPercentage(0);
     }
-  }, [currentReportData?.session, isOpenReport])
+  }, [currentReportData?.session, isOpenReport]);
 
   const fetchAndSetScreenShortReport = async (reportData) => {
     var newReportImages = [];
-    setLoading(true)
+    setLoading(true);
     try {
       if (reportData && reportData?.length > 0) {
         for (let index = 0; index < reportData?.length; index++) {
@@ -135,38 +135,46 @@ const reportModal = ({
             const blob = await response.blob();
             const reader = new FileReader();
             reader.onloadend = () => {
-              const base64data = reader.result.split(',')[1];
-              newReportImages.push({ ...element, imageUrl: `data:image/jpeg;base64,${base64data}` })
-              setReportArr([...newReportImages])
+              const base64data = reader.result.split(",")[1];
+              newReportImages.push({
+                ...element,
+                imageUrl: `data:image/jpeg;base64,${base64data}`,
+              });
+              setReportArr([...newReportImages]);
             };
             reader.readAsDataURL(blob);
           } catch (error) {
-            console.error('Error fetching or converting image:', error);
+            console.error("Error fetching or converting image:", error);
           }
         }
       } else {
-        setReportArr([...newReportImages])
+        setReportArr([...newReportImages]);
       }
     } catch (error) {
-      console.log("error",error)
-    }finally{
-      setLoading(false)
+      console.log("error", error);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   const handleCropImage = async (filename, blob) => {
-    var res = await cropImage({ sessions: currentReportData?.session, trainer: currentReportData?.trainer, trainee: currentReportData?.trainee, oldFile: filename })
-    if (res?.data?.url) await pushProfilePhotoToS3(res?.data?.url, blob)
-    getReportData()
-    setIsOpenCrop(false)
-  }
+    var res = await cropImage({
+      sessions: currentReportData?.session,
+      trainer: currentReportData?.trainer,
+      trainee: currentReportData?.trainee,
+      oldFile: filename,
+    });
+    if (res?.data?.url) await pushProfilePhotoToS3(res?.data?.url, blob);
+    getReportData();
+    setIsOpenCrop(false);
+  };
 
   async function pushProfilePhotoToS3(presignedUrl, uploadPhoto) {
-    const myHeaders = new Headers({ 'Content-Type': 'image/*' });
+    const myHeaders = new Headers({ "Content-Type": "image/*" });
     await axios.put(presignedUrl, uploadPhoto, {
       headers: myHeaders,
-    })
-    return true
+    });
+    return true;
   }
 
   const getReportData = async () => {
@@ -174,106 +182,107 @@ const reportModal = ({
       sessions: currentReportData?.session,
       trainer: currentReportData?.trainer,
       trainee: currentReportData?.trainee,
-    })
+    });
 
-    console.log(res?.data?.reportData , 'screenshots')
-    setScreenShots(res?.data?.reportData)
-    setReportObj({ title: res?.data?.title, topic: res?.data?.description })
-    fetchAndSetScreenShortReport(res?.data?.reportData)
-  }
+    console.log(res?.data?.reportData, "screenshots");
+    setScreenShots(res?.data?.reportData);
+    setReportObj({ title: res?.data?.title, topic: res?.data?.description });
+    fetchAndSetScreenShortReport(res?.data?.reportData);
+  };
 
   const handleRemoveImage = async (filename) => {
-    await removeImage({ sessions: currentReportData?.session, trainer: currentReportData?.trainer, trainee: currentReportData?.trainee, filename: filename })
-    getReportData()
-  }
+    await removeImage({
+      sessions: currentReportData?.session,
+      trainer: currentReportData?.trainer,
+      trainee: currentReportData?.trainee,
+      filename: filename,
+    });
+    getReportData();
+  };
 
   var pdf = new jsPDF();
 
   const generatePDF = async () => {
-
     setPreview(true);
-
-    const content = document.getElementById("report-pdf");
-
-    content.style.removeProperty("display");
 
     // Use html2canvas with proxy settings for cross-origin images
     html2canvas(content, {
-        proxy: "*", // Replace with your proxy URL if available
-        useCORS: true, // Enable CORS support
-        allowTaint: true // Allow images from different origins
+      proxy: "*", // Replace with your proxy URL if available
+      useCORS: true, // Enable CORS support
+      allowTaint: true, // Allow images from different origins
     }).then(async (canvas) => {
-        const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL("image/png");
 
-        // Calculate the width of the page
-        const pdf = new jsPDF();
-        var pageWidth = pdf.internal.pageSize.width;
+      // Calculate the width of the page
+      const pdf = new jsPDF();
+      var pageWidth = pdf.internal.pageSize.width;
 
-        // Calculate the aspect ratio of the canvas
-        var aspectRatio = canvas.width / canvas.height;
+      // Calculate the aspect ratio of the canvas
+      var aspectRatio = canvas.width / canvas.height;
 
-        // Calculate the height to maintain the aspect ratio
-        var imgHeight = pageWidth / aspectRatio;
+      // Calculate the height to maintain the aspect ratio
+      var imgHeight = pageWidth / aspectRatio;
 
-        pdf.internal.pageSize.height = imgHeight;
+      pdf.internal.pageSize.height = imgHeight;
 
-        updateCurrentDate();
+      updateCurrentDate();
 
-        // Add the canvas as an image to the PDF
-        pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, imgHeight);
+      // Add the canvas as an image to the PDF
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
 
-        // Get the data URL of the PDF
-        const generatedPdfDataUrl = pdf.output('dataurlstring');
+      // Get the data URL of the PDF
+      const generatedPdfDataUrl = pdf.output("dataurlstring");
 
-        // Convert data URL to Blob
-        const byteCharacters = atob(generatedPdfDataUrl.split(',')[1]);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const pdfBlob = new Blob([new Uint8Array(byteNumbers)], { type: 'application/pdf' });
+      // Convert data URL to Blob
+      const byteCharacters = atob(generatedPdfDataUrl.split(",")[1]);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const pdfBlob = new Blob([new Uint8Array(byteNumbers)], {
+        type: "application/pdf",
+      });
 
-        // Create a File from the Blob
-        const pdfFile = new File([pdfBlob], 'generated_pdf.pdf', { type: 'application/pdf' });
+      // Create a File from the Blob
+      const pdfFile = new File([pdfBlob], "generated_pdf.pdf", {
+        type: "application/pdf",
+      });
 
-
-        var link = await createUploadLink();
-        if (link) pushProfilePDFToS3(link, pdfFile);
+      var link = await createUploadLink();
+      if (link) pushProfilePDFToS3(link, pdfFile);
     });
-};
+  };
 
   const createUploadLink = async () => {
     var payload = { session_id: currentReportData?.session };
     const data = await getS3SignPdfUrl(payload);
     console.log("=======245====?data", data);
-    if (data?.url) return data?.url
-    else return ""
-  }
-
+    if (data?.url) return data?.url;
+    else return "";
+  };
 
   const pushProfilePDFToS3 = async (presignedUrl, uploadPdf) => {
     try {
-      const content = document.getElementById("report-pdf");
-      if(content?.style && content?.style?.display){
-        content.style.display = "";
-      }
       await axios({
-        method: 'put', url: presignedUrl, data: uploadPdf, headers: { "Content-Type": 'application/pdf' }, onUploadProgress: (progressEvent) => {
-          const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-          setUploadPercentage(progress === 100 ? 0 : progress)
+        method: "put",
+        url: presignedUrl,
+        data: uploadPdf,
+        headers: { "Content-Type": "application/pdf" },
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round(
+            (progressEvent.loaded / progressEvent.total) * 100
+          );
+          setUploadPercentage(progress === 100 ? 0 : progress);
         },
       });
-      console.log("pdf pushed in S3")
+      console.log("pdf pushed in S3");
       // setIsOpenReport(false)
     } catch (e) {
       console.error(e);
     }
-  }
+  };
 
   async function createOrUpdateReport() {
-    const content = document.getElementById("report-pdf");
-    content.style.display = "none";
-
     // var link = await createUploadLink();
     // if (link) pushProfilePDFToS3(link, pdfFile);
 
@@ -284,98 +293,297 @@ const reportModal = ({
       title: reportObj?.title,
       topic: reportObj?.topic,
       reportData: [...screenShots],
-    })
+    });
   }
 
-  const hidePreview = () => {
-    const content = document.getElementById("report-pdf");
-    if(content?.style && content?.style?.display){
-      content.style.display = "none";
-    }
-  }
 
   const sendNotifications = (data) => {
     socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
   };
-  
-  return <>
-    <Modal
-      isOpen={isOpenReport}
-      allowFullWidth={true}
-      element={
-        <>
-          <div id="generate-report" className="container media-gallery portfolio-section grid-portfolio">
-            <div className="theme-title  mb-5">
-              <div className="media-body media-body text-right" >
-                <div
-                  className="icon-btn btn-sm btn-outline-light close-apps pointer"
-                  onClick={() => {
-                    setIsOpenReport(false)
-                    setPreview(false);
-                    hidePreview()
-                    resetState();
-                    if(isTraineeJoined && isCallEnded){
-                      isClose();
-                    }
-                  }}
-                >
-                  <X />
+
+  return (
+    <>
+      <Modal
+        isOpen={isOpenReport}
+        allowFullWidth={true}
+        element={
+          <>
+            <div
+              id="generate-report"
+              className="container media-gallery portfolio-section grid-portfolio"
+            >
+              <div className="theme-title  mb-5">
+                <div className="media-body media-body text-right">
+                  <div
+                    className="icon-btn btn-sm btn-outline-light close-apps pointer"
+                    onClick={() => {
+                      setIsOpenReport(false);
+                      setPreview(false);
+                      // hidePreview();
+                      resetState();
+                      if (isTraineeJoined && isCallEnded) {
+                        isClose();
+                      }
+                    }}
+                  >
+                    <X />
+                  </div>
+                </div>
+                <div className="media d-flex flex-column  align-items-center">
+                  <div>
+                    <h2>Report</h2>
+                  </div>
                 </div>
               </div>
-              <div className="media d-flex flex-column  align-items-center">
-                <div>
-                  <h2>Report</h2>
+              {preview ? (
+                <div className="theme-tab">
+                  <div
+                    id="report-pdf"
+                    style={{
+                      padding: "20px ",
+                      border: "10px solid #000080",
+                      borderColor: "#14328d",
+                    }}
+                  >
+                    <div
+                      className="mb-2"
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "5px",
+                        alignItems: "center",
+                      }}
+                    >
+                      <p
+                        style={{
+                          textTransform: "uppercase",
+                          margin: "0px",
+                          fontWeight: "600",
+                          color: "black",
+                        }}
+                        className="text-md-xl"
+                      >
+                        Game Plan
+                      </p>
+                      <div style={{ textAlign: "right" }}>
+                        <img
+                          className="w-100"
+                          src="/assets/images/logo/netqwix_logo real.png"
+                          alt="Logo"
+                          style={{ maxWidth: "200px", objectFit: "contain" }}
+                        />
+                      </div>
+                    </div>
+                    <div style={{ display: "flex" }}>
+                      <div>
+                        <div
+                          style={{
+                            fontSize: "18px",
+                            fontWeight: "400",
+                            width: "70%",
+                            fontWeight: "bold",
+                            whiteSpace:"nowrap"
+                          }}
+                        >
+                          Date: {currentDate}
+                        </div>
+                        <h2
+                          style={{
+                            margin: "0px",
+                            fontWeight: "normal",
+                            paddingTop: "10px",
+                          }}
+                        >
+                          Topic: {reportObj?.title}
+                        </h2>
+                        <h2
+                          style={{
+                            margin: "0px",
+                            fontWeight: "normal",
+                            color: "black",
+                          }}
+                        >
+                          Name: {reportObj?.topic}
+                        </h2>
+                      </div>
+                    </div>
+                    <hr
+                      style={{
+                        borderWidth: "2px",
+                        borderStyle: "solid",
+                        borderColor: "black",
+                      }}
+                    />
+                    {reportArr?.map((sst, i) => {
+                      return (
+                        <>
+                          <div className="d-flex flex-row  align-items-center">
+                            <div className="text-center w-100 w-md-50">
+                              <img
+                                className="h-100 w-100"
+                                src={sst?.imageUrl}
+                                alt="image"
+                                style={{
+                                  maxHeight: "260px",
+                                  objectFit: "contain",
+                                }}
+                              />
+                            </div>
+                            <div className="text-center text-md-left w-100 w-md-50">
+                              {/* <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p> */}
+                              <p style={{
+                                color:"black"
+                              }}>{screenShots[i]?.description}</p>
+                            </div>
+                          </div>
+                          <hr className="border border-dark" />
+                        </>
+                      );
+                    })}
+                    {loading && (
+                      <div className="my-3 mx-3 h-3">
+                        Hang tight, we're loading your images...
+                      </div>
+                    )}
+                    <div
+                      className=""
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div style={{ textAlign: "left", marginRight: "20px" }}>
+                        <h2 style={{ color: "black" }}>Trainer</h2>
+                        <p style={{
+                                color:"black"
+                              }}>{userInfo?.extraInfo?.about}</p>
+                      </div>
+                      <div>
+                        <h2 className="text-nowrap" style={{ color: "black" }}>
+                          {userInfo?.fullname}
+                        </h2>
+                        {/* <img src={userInfo?.profile_picture}
+                        alt="John Image"
+                        style={{ width: '205.8px', height: '154.4px', marginRight: "20px" }}
+                      /> */}
+
+                        <img
+                          className="w-100"
+                          style={{
+                            maxWidth: "205.8px",
+                            maxHeight: "205.8px",
+                            marginTop: "10px",
+                            borderRadius: "8px",
+                            objectFit: "contain",
+                          }}
+                          // crossOrigin="anonymous"
+                          // src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || '/assets/images/demoUser.png'}
+                          src={
+                            Utils?.getImageUrlOfS3(userInfo?.profile_picture) ||
+                            demoProfilePic.current
+                          }
+                          alt={userInfo?.fullname}
+                          onError={(e) => {
+                            e.target.src = demoProfilePic.current;
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      paddingTop: "10px",
+                    }}
+                    className="mb-5"
+                  >
+                    <Button
+                      className="mx-3 px-3 px-sm-5"
+                      color="primary"
+                      onClick={() => {
+                        setPreview(false);
+                        // hidePreview();
+                      }}
+                    >
+                      Back
+                    </Button>
+                    <Button
+                      className="mx-3 px-3 px-sm-5"
+                      color="primary"
+                      disabled={uploadPercentage}
+                      onClick={() => {
+                        createOrUpdateReport();
+                        setIsOpenReport(false);
+                        // hidePreview();
+                        setPreview(false);
+                        resetState();
+                        if (isTraineeJoined && isCallEnded) {
+                          isClose();
+                        }
+                        sendNotifications({
+                          title: notificiationTitles.gamePlanReport,
+                          description: `Trainer shared the gameplan. Check it in the gameplan tab`,
+                          senderId: currentReportData?.trainer,
+                          receiverId: currentReportData?.trainee,
+                          bookingInfo: null,
+                        });
+                      }}
+                    >
+                      {uploadPercentage ? "Loading" : "Save"}
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </div>
-            {
-              !preview ?
+              ) : (
                 <div className="theme-tab">
                   <div className="row">
-                    <div className="col-12 d-flex flex-wrap"
-                    >
-                    {/* main title for the report */}
-                    <div className="p-2 flex-grow-1" >
-                      <div className="form-group">
-                        <label className="col-form-label">Title</label>
-                        <input
-                          className="form-control"
-                          type="text"
-                          name="title"
-                          placeholder="Title"
-                          onChange={(e) => {
-                            reportObj.title = e.target.value;
-                            setReportObj({ ...reportObj })
-                          }}
-                          value={reportObj?.title}
-                        />
+                    <div className="col-12 d-flex flex-wrap">
+                      {/* main title for the report */}
+                      <div className="p-2 flex-grow-1">
+                        <div className="form-group">
+                          <label className="col-form-label">Title</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            name="title"
+                            placeholder="Title"
+                            onChange={(e) => {
+                              reportObj.title = e.target.value;
+                              setReportObj({ ...reportObj });
+                            }}
+                            value={reportObj?.title}
+                          />
+                        </div>
                       </div>
-                    </div>
-                     {/* main description for the report */}
-                    <div className="p-2 flex-grow-1" >
-                      <div className="form-group">
-                        <label className="col-form-label">Description</label>
-                        <input
-                          className="form-control"
-                          type="text"
-                          name="topic"
-                          placeholder="Topic"
-                          onChange={(e) => {
-                            reportObj.topic = e.target.value;
-                            setReportObj({ ...reportObj })
-                          }}
-                          value={reportObj?.topic}
-                        />
+                      {/* main description for the report */}
+                      <div className="p-2 flex-grow-1">
+                        <div className="form-group">
+                          <label className="col-form-label">Description</label>
+                          <input
+                            className="form-control"
+                            type="text"
+                            name="topic"
+                            placeholder="Topic"
+                            onChange={(e) => {
+                              reportObj.topic = e.target.value;
+                              setReportObj({ ...reportObj });
+                            }}
+                            value={reportObj?.topic}
+                          />
+                        </div>
                       </div>
-                    </div>
                     </div>
 
                     {screenShots?.map((sst, i) => {
-                      console.log(sst , 'resport sst')
-                      console.log('ggg', `${awsS3Url}${sst?.imageUrl}`)
-                      return(
+                      console.log(sst, "resport sst");
+                      console.log("ggg", `${awsS3Url}${sst?.imageUrl}`);
+                      return (
                         <div className="col-12 d-flex flex-column flex-sm-row flex-wrap p-4 mb-4 shadow-sm border rounded">
-                          <div className="border p-2 m-md-2 rounded" style={{ position: "relative",flex:1 }}>
+                          <div
+                            className="border p-2 m-md-2 rounded"
+                            style={{ position: "relative", flex: 1 }}
+                          >
                             <img
                               style={{
                                 width: "100%",
@@ -386,21 +594,24 @@ const reportModal = ({
                               src={`${awsS3Url}${sst?.imageUrl}`}
                               alt="Screen Shot"
                             />
-                            <div style={{ position: "absolute", bottom: 10 }} >
-                              <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => {
-                                setSelectImage(sst?.imageUrl)
-                                setIsOpenCrop(true)
-                              }}>
+                            <div style={{ position: "absolute", bottom: 10 }}>
+                              <div
+                                className="icon-btn btn-sm btn-outline-light close-apps pointer"
+                                onClick={() => {
+                                  setSelectImage(sst?.imageUrl);
+                                  setIsOpenCrop(true);
+                                }}
+                              >
                                 <Crop />
                               </div>
                             </div>
                           </div>
-                          <div className="m-2" style={{flex:1}} >
-                            <div className="media-body media-body text-right" >
+                          <div className="m-2" style={{ flex: 1 }}>
+                            <div className="media-body media-body text-right">
                               <div
                                 className="icon-btn btn-sm btn-outline-light close-apps pointer"
                                 onClick={() => {
-                                  handleRemoveImage(sst?.imageUrl)
+                                  handleRemoveImage(sst?.imageUrl);
                                   // var temp = screenShots.filter((st, index) => index !== i)
                                   // setScreenShots([...temp])
                                 }}
@@ -410,18 +621,20 @@ const reportModal = ({
                             </div>
                             <div className="form-group m-0">
                               {/* <label className="col-form-label">Title</label>
-                              <input
-                                className="form-control"
-                                type="text"
-                                name="title"
-                                placeholder="Title"
-                                onChange={(e) => {
-                                  screenShots[i].title = e.target.value;
-                                  setScreenShots([...screenShots])
-                                }}
-                                value={screenShots[i]?.title}
-                              /> */}
-                              <label className="col-form-label">Description</label>
+                            <input
+                              className="form-control"
+                              type="text"
+                              name="title"
+                              placeholder="Title"
+                              onChange={(e) => {
+                                screenShots[i].title = e.target.value;
+                                setScreenShots([...screenShots])
+                              }}
+                              value={screenShots[i]?.title}
+                            /> */}
+                              <label className="col-form-label">
+                                Description
+                              </label>
                               <textarea
                                 rows="4"
                                 className="form-control"
@@ -430,162 +643,75 @@ const reportModal = ({
                                 placeholder="Description"
                                 onChange={(e) => {
                                   screenShots[i].description = e.target.value;
-                                  setScreenShots([...screenShots])
+                                  setScreenShots([...screenShots]);
                                 }}
                                 value={screenShots[i]?.description}
                               />
                             </div>
                           </div>
-                        </div>)
+                        </div>
+                      );
                     })}
                   </div>
-                  <label style={{ color: "black", fontWeight: "500" }} className="col-form-label mt-2" htmlFor="account_type">
-                    {uploadPercentage ? <> Uploading... {uploadPercentage}%</> : <></>}
+                  <label
+                    style={{ color: "black", fontWeight: "500" }}
+                    className="col-form-label mt-2"
+                    htmlFor="account_type"
+                  >
+                    {uploadPercentage ? (
+                      <> Uploading... {uploadPercentage}%</>
+                    ) : (
+                      <></>
+                    )}
                   </label>
                   <div className="d-flex justify-content-center w-100 p-3 mb-5">
-                    <Button className="mx-3" color="primary" disabled={uploadPercentage}
-                      onClick={() => { generatePDF() }}
-                    // onClick={() => { getReportData().then((res) => generatePDF()) }}
-                    >{uploadPercentage?"Loading":"Preview"}</Button>
-                  </div>
-                </div>
-                :
-                null
-            }
-            <div className="theme-tab">
-              <div id="report-pdf" style={{ display: "none", padding: "20px ", border: '10px solid #000080', borderColor: '#14328d' }}>
-                <div className="mb-2" style={{ display: 'flex', justifyContent: 'space-between',gap:"5px", alignItems: "center" }}>
-                  <p style={{ textTransform: 'uppercase', margin: '0px',  fontWeight: '600', color: "black" }} className="text-md-xl">Game Plan</p>
-                  <div style={{ textAlign: 'right' }}>
-                    <img className="w-100" src="/assets/images/logo/netqwix_logo real.png" alt="Logo" style={{ maxWidth: '200px', objectFit: 'contain' }} />
-                  </div>
-                </div>
-                <div style={{ display: "flex" }}>
-                  <div >
-                    <div style={{ fontSize: '18px', fontWeight: '400', width: "70%", fontWeight: "bold" }}>Date: {currentDate}</div>
-                    <h2 style={{ margin: '0px', fontWeight: "normal", paddingTop: "10px" }}>Topic: {reportObj?.title}</h2>
-                    <h2 style={{ margin: '0px', fontWeight: "normal", color: "gray" }}>Name: {reportObj?.topic}</h2>
-                  </div>
-
-                </div>
-                <hr style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'black' }} />
-                {reportArr?.map((sst, i) => {
-                  return <>
-                    <div className="d-flex flex-row  align-items-center">
-                      <div className="text-center w-100 w-md-50">
-                        <img
-                          className="h-100 w-100"
-                          src={sst?.imageUrl}
-                          alt="image"
-                          style={{ maxHeight: '260px', objectFit: 'contain' }}
-                        />
-                      </div>
-                      <div className="text-center text-md-left w-100 w-md-50">
-                        {/* <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p> */}
-                        <p>{screenShots[i]?.description}</p>
-                      </div>
-                    </div>
-                    <hr className="border border-dark" />
-                  </>
-                })}
-                 {loading && <div className="my-3 mx-3 h-3">Hang tight, we're loading your images...</div>}
-                <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div style={{ textAlign: 'left', marginRight: '20px' }}>
-                    <h2 style={{ color: "black" }}>Trainer</h2>
-                    <p>{userInfo?.extraInfo?.about}</p>
-                  </div>
-                  <div>
-                    <h2 className="text-nowrap" style={{ color: "black" }}>{userInfo?.fullname}</h2>
-                    {/* <img src={userInfo?.profile_picture}
-                          alt="John Image"
-                          style={{ width: '205.8px', height: '154.4px', marginRight: "20px" }}
-                        /> */}
-
-                    <img
-                    className="w-100"
-                      style={{
-                        maxWidth: '205.8px',
-                        maxHeight: '205.8px',
-                        marginTop: "10px",
-                        borderRadius: "8px",
-                        objectFit:'contain'
+                    <Button
+                      className="mx-3"
+                      color="primary"
+                      disabled={uploadPercentage}
+                      onClick={() => {
+                        generatePDF();
                       }}
-                      // crossOrigin="anonymous"
-                      // src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || '/assets/images/demoUser.png'}
-                      src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || demoProfilePic.current }
-                      alt={userInfo?.fullname}
-                      onError={(e) => {
-                        e.target.src = demoProfilePic.current;
-                      }}
-                    />
+                      // onClick={() => { getReportData().then((res) => generatePDF()) }}
+                    >
+                      {uploadPercentage ? "Loading" : "Preview"}
+                    </Button>
                   </div>
                 </div>
-
-              </div>
-              {
-                preview ?
-
-                  <div style={{ display: "flex", justifyContent: "center", paddingTop: "10px" }} className="mb-5">
-
-                    <Button className="mx-3 px-3 px-sm-5" color="primary" onClick={() => {
-                      setPreview(false)
-                      hidePreview()
-                      }}>Back</Button>
-                    <Button className="mx-3 px-3 px-sm-5" color="primary" disabled={uploadPercentage} 
-                    onClick={() => {
-                      createOrUpdateReport()
-                      setIsOpenReport(false)
-                      hidePreview()
-                      setPreview(false)
-                      resetState()
-                      if(isTraineeJoined && isCallEnded){
-                      isClose();
-                      }
-                      sendNotifications({
-                        title: notificiationTitles.gamePlanReport,
-                        description: `Trainer shared the gameplan. Check it in the gameplan tab`,
-                        senderId: currentReportData?.trainer,
-                        receiverId: currentReportData?.trainee,
-                        bookingInfo:null
-                      });
-
-                    }}>{uploadPercentage ?"Loading":"Save"}</Button>
-                  </div>
-                  : null}
+              )}
             </div>
 
-
-          </div>
-
-        {gamePlanModalNote && (
-        <Notes
-          isOpen={gamePlanModalNote}
-          onClose={setGamePlanModalClose}
-          title={"Game Plans"}
-          desc={"Select clips to choose up to two clips, videos will load onto your board when you click the X (cross)."}
-          style={{
-            top: "10px",
-            left: "10px",
-          }}
-          triangle = {"clip-select"}
-          nextFunc={() => {
-            setGamePlanModalClose(false);
-          }}
-        />
-      )}
-          <CropImage
-            isOpenCrop={isOpenCrop}
-            setIsOpenCrop={setIsOpenCrop}
-            selectImage={selectImage}
-            screenShots={screenShots}
-            setScreenShots={setScreenShots}
-            handleCropImage={handleCropImage}
-          />
-        </>
-      }
-    />
-  </>
-}
-
+            {gamePlanModalNote && (
+              <Notes
+                isOpen={gamePlanModalNote}
+                onClose={setGamePlanModalClose}
+                title={"Game Plans"}
+                desc={
+                  "Select clips to choose up to two clips, videos will load onto your board when you click the X (cross)."
+                }
+                style={{
+                  top: "10px",
+                  left: "10px",
+                }}
+                triangle={"clip-select"}
+                nextFunc={() => {
+                  setGamePlanModalClose(false);
+                }}
+              />
+            )}
+            <CropImage
+              isOpenCrop={isOpenCrop}
+              setIsOpenCrop={setIsOpenCrop}
+              selectImage={selectImage}
+              screenShots={screenShots}
+              setScreenShots={setScreenShots}
+              handleCropImage={handleCropImage}
+            />
+          </>
+        }
+      />
+    </>
+  );
+};
 
 export default reportModal;
