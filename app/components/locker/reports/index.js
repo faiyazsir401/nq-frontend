@@ -311,14 +311,14 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                               }}
                             >
                               <a
-                                href={Utils?.generateVideoURL(clp)}
-                                download={true}
+                                href={awsS3Url+clp?.session?.report} // Assuming this generates a URL for the PDF file
+                                download="file.pdf" // This specifies the filename for the downloaded file
                                 onClick={(e) => e.stopPropagation()}
                                 style={{
                                   color : '#fff',
                                   fontSize : '16px'
                                 }}
-                                target="_self"
+                                target="_blank"
                               >
                                 <FaDownload />
                               </a>
