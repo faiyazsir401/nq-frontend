@@ -16,6 +16,7 @@ export const checkSlot = async (payload) => {
         )}`,
       },
     });
+    console.log("response",response.data)
     return response.data;
   } catch (err) {
     throw err;

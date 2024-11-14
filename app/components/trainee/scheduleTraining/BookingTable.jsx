@@ -69,7 +69,7 @@ const BookingTable = ({
   const formateEndTime = Utils.getTimeFormate(
     trainerInfo?.userInfo?.extraInfo?.working_hours?.to
   );
-const {slots} = useAppSelector(commonState)
+  const {slots} = useAppSelector(commonState)
   const [isCommonBooking , setIsCommonBooking] = useState(false);
   const [selectedSlots , setSelectedSlot] = useState(null)
   useEffect(() => {
@@ -166,14 +166,16 @@ const {slots} = useAppSelector(commonState)
         //     // dispatch(authAction.updateIsAuthModalOpen(true))
         //   });
         // dispatch(checkSlotAsync(payload));
+        console.log("payload",payload)
         checkSlot(payload).then(res => {
+          console.log("payload",res)
           dispatch(commonAction.setSlots(res.data.availableSlots))
         }).catch((err) =>{
           dispatch(commonAction.setSlots([]))
         })
       }
     }
-  }, [status]);
+  }, [status,showCommonBookingOption]);
 
   useEffect(() => {
     if (
@@ -479,7 +481,7 @@ const {slots} = useAppSelector(commonState)
     <>
       {/* <ToastContainer /> */}
       {
-        userIsOnlineOrNot ?
+        userIsOnlineOrNot &&
           <div
             style={{
               width : '100%',
@@ -565,6 +567,73 @@ const {slots} = useAppSelector(commonState)
                     fontSize : '1rem'
                   }}
                   onClick={() => {
+                    let date= new Date();
+                    if (date) {
+                      const booked_date = Utils.getDateInFormatIOS(date);
+                      const payload = {
+                        trainer_id:
+                          trainerInfo?.userInfo?._id ||
+                          trainerInfo?.userInfo?.trainer_id ||
+                          selectedTrainer?.trainer_id ||
+                          trainerInfo?.userInfo?.id,
+                        booked_date,
+                        slotTime: {
+                          from:
+                            formateStartTime ||
+                            timeRange.startTime ||
+                            DefaultTimeRange.startTime,
+                          to:
+                            formateEndTime ||
+                            timeRange.endTime ||
+                            DefaultTimeRange.endTime,
+                        },
+                        traineeTimeZone : currentTimeZone()
+                      };
+                      // dispatch(checkSlotAsync(payload));
+                      setStartDate(date);
+                      date = new Date(date).toISOString().split("T")[0];
+                      let dateArr = date?.split("-");
+                      let start_time = new Date(
+                        Number(dateArr[0]),
+                        Number(dateArr[1]) - 1,
+                        Number(dateArr[2]),
+                        0,
+                        0,
+                        0,
+                        0
+                      ).toISOString();
+                      let end_time = new Date(
+                        Number(dateArr[0]),
+                        Number(dateArr[1]) - 1,
+                        Number(dateArr[2]),
+                        23,
+                        59,
+                        0,
+                        0
+                      ).toISOString();
+                      // getAvailability({
+                      //   trainer_id:
+                      //     trainerInfo?.userInfo?._id ||
+                      //     trainerInfo?.userInfo?.trainer_id ||
+                      //     selectedTrainer?.trainer_id ||
+                      //     trainerInfo?.userInfo?.id,
+                      //   start_time: start_time,
+                      //   end_time: end_time,
+                      // }).then((res) => {
+                      //   setAvailableSlotsState(res?.data);
+                      // });
+                      checkSlot(payload).then(res => {
+                        dispatch(commonAction.setSlots(res.data.availableSlots))
+                      }).catch((err) =>{
+                        dispatch(commonAction.setSlots(null))
+                      })
+                    }
+                    const todaySDate = Utils.getDateInFormatIOS(date.toString());
+                    const { weekDateFormatted, weekDates } =
+                      Utils.getNext7WorkingDays(todaySDate);
+                    SetColumns(weekDateFormatted, setBookingColumns);
+                    // setTableData(getTraineeSlots, weekDates);
+                    SetColumns(weekDateFormatted, setBookingColumns);
                     setShowCommonBookingOption(true);
                     setIsInstantLessonModalOpen(false);
                   }}
@@ -573,8 +642,7 @@ const {slots} = useAppSelector(commonState)
                 </button>
             </div>
             </div>
-          :
-          renderBookingComponent()
+          
       }
 
       {
