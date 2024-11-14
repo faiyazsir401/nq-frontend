@@ -202,8 +202,9 @@ const reportModal = ({
 
   var pdf = new jsPDF();
 
-  const generatePDF = async () => {
-    setPreview(true);
+  const generatePDF = async (content) => {
+    console.log("content", content);
+    // content.style.removeProperty("display");
 
     // Use html2canvas with proxy settings for cross-origin images
     html2canvas(content, {
@@ -253,6 +254,14 @@ const reportModal = ({
     });
   };
 
+  useEffect(() => {
+    const content = document.getElementById("report-pdf");
+    console.log("content", content);
+    if (preview && content) {
+      generatePDF(content);
+    }
+  }, [preview]);
+
   const createUploadLink = async () => {
     var payload = { session_id: currentReportData?.session };
     const data = await getS3SignPdfUrl(payload);
@@ -295,7 +304,6 @@ const reportModal = ({
       reportData: [...screenShots],
     });
   }
-
 
   const sendNotifications = (data) => {
     socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
@@ -367,7 +375,7 @@ const reportModal = ({
                       </p>
                       <div style={{ textAlign: "right" }}>
                         <img
-                          className="w-100"
+                          className="w-100 netqwix_logo"
                           src="/assets/images/logo/netqwix_logo real.png"
                           alt="Logo"
                           style={{ maxWidth: "200px", objectFit: "contain" }}
@@ -375,14 +383,14 @@ const reportModal = ({
                       </div>
                     </div>
                     <div style={{ display: "flex" }}>
-                      <div>
+                      <div className="report-meta-data">
                         <div
                           style={{
                             fontSize: "18px",
                             fontWeight: "400",
                             width: "70%",
                             fontWeight: "bold",
-                            whiteSpace:"nowrap"
+                            whiteSpace: "nowrap",
                           }}
                         >
                           Date: {currentDate}
@@ -417,7 +425,7 @@ const reportModal = ({
                     {reportArr?.map((sst, i) => {
                       return (
                         <>
-                          <div className="d-flex flex-row  align-items-center">
+                          <div className="d-flex flex-row  align-items-center ss-data">
                             <div className="text-center w-100 w-md-50">
                               <img
                                 className="h-100 w-100"
@@ -431,9 +439,13 @@ const reportModal = ({
                             </div>
                             <div className="text-center text-md-left w-100 w-md-50">
                               {/* <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p> */}
-                              <p style={{
-                                color:"black"
-                              }}>{screenShots[i]?.description}</p>
+                              <p
+                                style={{
+                                  color: "black",
+                                }}
+                              >
+                                {screenShots[i]?.description}
+                              </p>
                             </div>
                           </div>
                           <hr className="border border-dark" />
@@ -446,7 +458,7 @@ const reportModal = ({
                       </div>
                     )}
                     <div
-                      className=""
+                      className="trainer-data"
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
@@ -454,9 +466,13 @@ const reportModal = ({
                     >
                       <div style={{ textAlign: "left", marginRight: "20px" }}>
                         <h2 style={{ color: "black" }}>Trainer</h2>
-                        <p style={{
-                                color:"black"
-                              }}>{userInfo?.extraInfo?.about}</p>
+                        <p
+                          style={{
+                            color: "black",
+                          }}
+                        >
+                          {userInfo?.extraInfo?.about}
+                        </p>
                       </div>
                       <div>
                         <h2 className="text-nowrap" style={{ color: "black" }}>
@@ -670,7 +686,7 @@ const reportModal = ({
                       color="primary"
                       disabled={uploadPercentage}
                       onClick={() => {
-                        generatePDF();
+                        setPreview(true);
                       }}
                       // onClick={() => { getReportData().then((res) => generatePDF()) }}
                     >

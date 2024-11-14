@@ -15,12 +15,48 @@
   .pdf-viewer {
     width: 100vw;
   }
+  .netqwix_logo{
+    max-width: 100px !important;
+  }
+  .report-meta-data div{
+    font-size: 14px !important;
+  }
+  .report-meta-data h2{
+    font-size: 14px;
+  }
+  .ss-data div p{
+    font-size: 10px;
+  }
+  .trainer-data div h2{
+    font-size: 14px;
+  }
+  .trainer-data div p{
+    font-size: 10px;
+  }
 }
 
 @media (min-width: 768px) {
   /* Medium screens */
   .text-md-xl {
     font-size: 2rem;
+  }
+  .netqwix_logo{
+    max-width: 150px !important;
+  }
+  .report-meta-data div{
+    font-size: 16px !important;
+  }
+  .report-meta-data h2{
+    font-size: 16px;
+  }
+  .ss-data div p{
+    font-size: 14px;
+  }
+  .trainer-data div h2{
+    font-size: 16px;
+  }
+  .trainer-data div p{
+    font-size: 14px;
   }
 }
 
@@ -37,3 +73,4 @@
     font-size: 2.5rem;
   }
 }
+
