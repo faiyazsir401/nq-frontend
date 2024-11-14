@@ -7,18 +7,9 @@ import { updateProfileAsync } from "../trainer/trainer.slice";
 import { currentTimeZone } from "../../../utils/videoCall";
 import { MdContentCopy } from "react-icons/md";
 import Image from "next/image";
+import { toast } from "react-toastify";
 
-const generateTimeOptions = () => {
-  const times = [];
-  const period = ["AM", "PM"];
-  for (let i = 0; i < 2; i++) {
-    for (let h = 1; h <= 12; h++) {
-      times.push(`${h}:00 ${period[i]}`);
-      times.push(`${h}:30 ${period[i]}`);
-    }
-  }
-  return times;
-};
+
 
 const initialDayValue = {
   Sun: [{ start: "09:00 AM", end: "05:00 PM" }],
@@ -30,7 +21,7 @@ const initialDayValue = {
   Sat: [{ start: "09:00 AM", end: "05:00 PM" }],
 };
 
-const timeOptions = generateTimeOptions();
+
 const timeZones = [
   "UTC",
   "America/New_York",
@@ -50,11 +41,46 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
   const handleTimeChange = (index, field, value) => {
     const newTimes = [...times];
     const newSlot = { ...times[index] };
+  
+    if (field === "end") {
+      const [startHour, startMinutes] = parseTime(newSlot.start);
+      const [endHour, endMinutes] = parseTime(value);
+  
+      // Check if end time is earlier than start time
+      if (endHour < startHour || (endHour === startHour && endMinutes < startMinutes)) {
+        toast.error("End time cannot be earlier than start time.");
+        return; // Exit without updating if end time is invalid
+      }
+    } else if (field === "start") {
+      const [newStartHour, newStartMinutes] = parseTime(value);
+      const [currentEndHour, currentEndMinutes] = parseTime(newSlot.end);
+  
+      // Check if start time is later than end time
+      if (newStartHour > currentEndHour || (newStartHour === currentEndHour && newStartMinutes > currentEndMinutes)) {
+        toast.error("Start time cannot be later than end time.");
+        return; // Exit without updating if start time is invalid
+      }
+    }
+  
     newSlot[field] = value;
     newTimes[index] = newSlot;
     setTimes(newTimes);
   };
+  
+  
+  const generateTimeOptions = () => {
+    const times = [];
+    const period = ["AM", "PM"];
+    for (let i = 0; i < 2; i++) {
+      for (let h = 1; h <= 12; h++) {
+        times.push(`${h}:00 ${period[i]}`);
+        times.push(`${h}:30 ${period[i]}`);
+      }
+    }
+    return times;
+  };
 
+  const timeOptions = generateTimeOptions();
   const parseTime = (time) => {
     const [hour, minute] = time.split(":");
     const parsedHour = parseInt(hour, 10);
@@ -64,7 +90,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
 
   const getNextTimeSlot = () => {
     console.log("times", times);
-    if (times.length === 0) return { start: "09:00 AM", end: "10:00 AM" };
+    if (times.length === 0) return { start: "9:00 AM", end: "10:00 AM" };
 
     const lastSlot = times[times.length - 1];
     const [lastEndHour, lastEndMinutes] = parseTime(lastSlot.end);
@@ -81,14 +107,14 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
 
     // Ensure the end time does not exceed 11:59 PM
     if (nextStart === "11:00 PM") {
-      return { start: "11:00 PM", end: "11:59 PM" };
+      return { start: "11:00 PM", end: "12:00 PM" };
     }
 
     return { start: nextStart, end: nextEnd };
   };
 
   const addTimeSlot = () => {
-    if (times.length === 0 || times[times.length - 1].end !== "11:59 PM") {
+    if (times.length === 0 || times[times.length - 1].end !== "12:00 PM") {
       console.log("slimshady", [...times, getNextTimeSlot()]);
       setTimes([...times, getNextTimeSlot()]);
     }
@@ -98,7 +124,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
     setTimes(times.filter((_, i) => i !== index));
   };
 
-  console.log("plesae");
+  console.log("plesae",timeOptions);
 
   return (
     <div className="day-availability d-flex justify-content-between">
@@ -111,14 +137,14 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
           <div className="time-slot-container">
             {times.map((slot, index) => (
               <div key={index} className="time-slot">
-                <select
-                  value={slot.start}
+                <select            
                   onChange={(e) =>
                     handleTimeChange(index, "start", e.target.value)
                   }
+                  value={slot.start}
                 >
                   {timeOptions.map((time) => (
-                    <option key={time} value={time}>
+                    <option key={time} value={time} >
                       {time}
                     </option>
                   ))}
@@ -131,7 +157,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
                   }
                 >
                   {timeOptions.map((time) => (
-                    <option key={time} value={time}>
+                    <option key={time} value={time} >
                       {time}
                     </option>
                   ))}
