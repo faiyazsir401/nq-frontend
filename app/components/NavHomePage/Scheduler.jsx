@@ -148,7 +148,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
             className="icon-button add"
             onClick={() => copyToAll()}
           >
-            <MdContentCopy color="blue" />
+            <MdContentCopy color="blue" className="h-10 w-10"/>
           </button>
         )}
       </div>
