@@ -34,9 +34,9 @@ const getTimeRange = (duration , isSchedule , selectedSlot) => {
   }
 
   const now = moment();
-  const startTime = moment(now).add(2, 'minutes'); //NOTE - Start time is 10 minutes from now
+  const startTime = moment(now).add(2, 'minutes');
   const endTime = moment(startTime).add(duration, 'minutes');
-
+  console.log("getTimeRange",startTime,endTime)
   return {
     sessionStartTime: startTime.format('HH:mm'),
     sessionEndTime: endTime.format('HH:mm'),
@@ -176,7 +176,8 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                   } else {
                     dispatch(authAction.updateIsAuthModalOpen(true));
                   }
-              console.log('onclick at payload');
+              
+                  console.log("isCommonBooking",selectedSlot,slot1,startDate)
 
                   const payload = {
                     slot_id: slot?._id,
@@ -189,12 +190,12 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                     hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
                     status: BookedSession.booked,
                     booked_date: startDate,
-                    session_start_time: slot1.sessionStartTime || selectedSlot.start,
-                    session_end_time: slot1.sessionEndTime || selectedSlot.end,
-                    start_time: !isCommonBooking ?  slot1?.startTime :   convertTimesToISO(startDate , selectedSlot.start) ,
-                    end_time: !isCommonBooking ? slot1?.endTime :   convertTimesToISO(startDate , selectedSlot.end),
+                    session_start_time:isCommonBooking ? selectedSlot.start   : slot1.sessionStartTime,
+                    session_end_time: isCommonBooking ? selectedSlot.end  : slot1.sessionEndTime ,
+                    start_time: isCommonBooking ?  convertTimesToISO(startDate , selectedSlot.start) :  convertTimesToISO(startDate , slot1.sessionStartTime) ,
+                    end_time: isCommonBooking ?  convertTimesToISO(startDate , selectedSlot.end) :   convertTimesToISO(startDate , slot1.sessionEndTime),
                   };
-                  console.log(payload , 'payload')
+                  console.log('onclick at payload',payload);
                   setBookSessionPayload(payload);
                   setAmount(amountPayable.toFixed(1));
                   onClose(false);

@@ -28,6 +28,18 @@ import { commonState } from "../../common/common.slice";
 import { traineeAction, traineeState } from "../trainee/trainee.slice";
 import OrientationModal from "../modalComponent/OrientationModal";
 
+function formatToAMPM(date) {
+  let hours = date.getUTCHours(); // Use UTC hours to avoid local timezone
+  let minutes = date.getUTCMinutes(); // Use UTC minutes
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 becomes 12 (midnight case)
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  
+  return hours + ':' + minutes + ' ' + ampm;
+}
+
 export var meetingRoom = () => <></>;
 
 const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
@@ -305,12 +317,9 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       end_time,
     } = bookingInfo;
 
-    const customStartDateTime = moment(start_time)
-      ?.tz(userTimeZone)
-      ?.format("h:mm a");
-    const customEndDateTime = moment(end_time)
-      ?.tz(userTimeZone)
-      ?.format("h:mm a");
+    console.log("bookingInfo:"+_id, formatToAMPM(new Date(start_time)))
+
+
 
     return (
       <div
@@ -341,7 +350,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             <div className="col">
               <dl className="row">
                 <dd className="ml-3">Time Durations :</dd>
-                <dt className="ml-1">{`${customStartDateTime} - ${customEndDateTime}`}</dt>
+                <dt className="ml-1">{`${formatToAMPM(new Date(start_time))} - ${formatToAMPM(new Date(end_time))}`}</dt>
               </dl>
             </div>
           </div>
