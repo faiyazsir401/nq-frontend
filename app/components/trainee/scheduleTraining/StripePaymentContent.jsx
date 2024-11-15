@@ -118,14 +118,16 @@ const StripePaymentContent = ({
 
                   // Refecting the current Booking 
 
+                   // Redirecting to the Booking tab
+                   dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
+
                   dispatch(
                     getScheduledMeetingDetailsAsync({
                       status: "upcoming",
                     })
                   );
 
-                   // Redirecting to the Booking tab
-                  dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
+                  
 
                   setBookSessionPayload({});
                 

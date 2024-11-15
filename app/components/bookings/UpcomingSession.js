@@ -69,7 +69,7 @@ const UpcomingSession = ({ accountType = null }) => {
         status: "upcoming",
       })
     );
-  }, []);
+  }, [newBookingData]);
 
   const trainer = scheduledMeetingDetails?.filter((booking) => {
     return (

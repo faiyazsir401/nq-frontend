@@ -98,7 +98,8 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
             textAlign : 'center'
         }}
         >
-          Don't want to wait for a scheduled slot? Book an Instant Lesson and get started within just 2 minutes!
+          {isCommonBooking ?"Book your slot in advance to avoid waiting for the trainer to come online.":
+          "Don't want to wait for a scheduled slot? Book an Instant Lesson and get started within just 2 minutes!"}
         </p>
         <div
         className='row'

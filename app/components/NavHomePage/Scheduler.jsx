@@ -71,14 +71,29 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
   const generateTimeOptions = () => {
     const times = [];
     const period = ["AM", "PM"];
-    for (let i = 0; i < 2; i++) {
-      for (let h = 1; h <= 12; h++) {
-        times.push(`${h}:00 ${period[i]}`);
-        times.push(`${h}:30 ${period[i]}`);
-      }
+  
+    // Generate AM times (1:00 AM to 11:30 AM)
+    for (let h = 1; h < 12; h++) {
+      times.push(`${h}:00 AM`);
+      times.push(`${h}:30 AM`);
     }
+  
+    // Add 12:00 PM and 12:30 PM separately
+    times.push("12:00 PM");
+    times.push("12:30 PM");
+  
+    // Generate PM times (1:00 PM to 11:30 PM)
+    for (let h = 1; h < 12; h++) {
+      times.push(`${h}:00 PM`);
+      times.push(`${h}:30 PM`);
+    }
+  
+    // Add 12:00 AM at the end
+    times.push("12:00 AM");
+  
     return times;
   };
+  
 
   const timeOptions = generateTimeOptions();
   const parseTime = (time) => {
