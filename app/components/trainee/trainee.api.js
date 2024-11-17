@@ -23,6 +23,9 @@ export const fetchTraineeWithSlots = async (params) => {
 
 export const bookSession = async (payload) => {
   try {
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // Include the timezone in the payload
+    payload.time_zone = userTimeZone;
     const iceServerResponse = await fetchPeerConfig();
     payload.iceServers = iceServerResponse.data.formattedIceServers;
     const response = await axiosInstance({

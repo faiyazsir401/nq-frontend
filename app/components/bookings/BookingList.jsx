@@ -32,11 +32,11 @@ function formatToAMPM(date) {
   let hours = date.getUTCHours(); // Use UTC hours to avoid local timezone
   let minutes = date.getUTCMinutes(); // Use UTC minutes
   const ampm = hours >= 12 ? 'PM' : 'AM';
-  
+
   hours = hours % 12;
   hours = hours ? hours : 12; // 0 becomes 12 (midnight case)
   minutes = minutes < 10 ? '0' + minutes : minutes;
-  
+
   return hours + ':' + minutes + ' ' + ampm;
 }
 
@@ -100,9 +100,9 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     var timeZones = response.data;
     const ianaTimeZone = utcOffset
       ? timeZones.find(
-        (tz) =>
-          moment.tz(tz).utcOffset() === moment.duration(utcOffset).asMinutes()
-      )
+          (tz) =>
+            moment.tz(tz).utcOffset() === moment.duration(utcOffset).asMinutes()
+        )
       : "";
     // console.log("=====>ianaTimeZone", ianaTimeZone, utcOffset)
     setUserTimeZone(
@@ -315,11 +315,62 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       report,
       start_time,
       end_time,
+      time_zone, // Assuming 'time_zone' is coming from API
     } = bookingInfo;
 
-    console.log("bookingInfo:"+_id, formatToAMPM(new Date(start_time)))
-
-
+    // Helper function to get the local time zone
+    const getLocalTimeZone = () => {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    };
+    
+    // Helper function to get the UTC offset in minutes for a given time zone
+    const getTimeZoneOffset = (timeZone) => {
+      const date = new Date();
+      const options = { timeZone, hour: '2-digit', minute: '2-digit' };
+      
+      // Get the formatted time for the given time zone
+      const timeString = new Intl.DateTimeFormat('en-US', options).format(date);
+      
+      // Parse the offset from the formatted time string
+      const offsetSign = timeString.charAt(0) === '-' ? -1 : 1;
+      const hours = parseInt(timeString.split(':')[0]);
+      const minutes = parseInt(timeString.split(':')[1]);
+      
+      // Convert the offset to total minutes
+      return offsetSign * (hours * 60 + minutes);
+    };
+    
+    // Helper function to format time based on the given time zone
+    const formatTimeInLocalZone = (time, timeZone) => {
+      const localTimeZone = getLocalTimeZone();
+    
+      if (!timeZone || timeZone === localTimeZone) {
+        // If time zone is the same as local, return formatted time as is
+        return formatToAMPM(new Date(time));
+      }
+    
+      // If the time zones are different, calculate the offset difference and adjust time
+      const fromOffset = getTimeZoneOffset(timeZone); // Get the offset for the provided time zone
+      const toOffset = getTimeZoneOffset(localTimeZone); // Get the offset for the local time zone
+    
+      // Calculate the difference in minutes between the time zones
+      const offsetDifference = toOffset - fromOffset;
+    
+      // Create a new Date object from the time input
+      const date = new Date(time);
+    
+      // Apply the offset difference (in minutes)
+      date.setMinutes(date.getMinutes() + offsetDifference);
+    
+      // Format the adjusted time using the local time zone
+      return formatToAMPM(date);
+    };
+    
+    // Convert start and end times to local time if the time zone is different
+    const localStartTime = formatTimeInLocalZone(start_time, time_zone);
+    const localEndTime = formatTimeInLocalZone(end_time, time_zone);
+    
+    console.log("bookingInfo:" + _id, localStartTime); // Displaying the converted start time
 
     return (
       <div
@@ -350,7 +401,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             <div className="col">
               <dl className="row">
                 <dd className="ml-3">Time Durations :</dd>
-                <dt className="ml-1">{`${formatToAMPM(new Date(start_time))} - ${formatToAMPM(new Date(end_time))}`}</dt>
+                <dt className="ml-1">{`${localStartTime} - ${localEndTime}`}</dt>
               </dl>
             </div>
           </div>
@@ -384,23 +435,23 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
   const renderVideoCall = (height, width, isRotatedInitally) => height > width && !isRotatedInitally ?
     <OrientationModal isOpen={true} /> :
-    <StartMeeting
-      id={startMeeting.id}
-      accountType={accountType}
-      traineeInfo={startMeeting.traineeInfo}
-      trainerInfo={startMeeting.trainerInfo}
-      session_end_time={scheduledMeetingDetails[bIndex]?.session_end_time}
-      isClose={() => {
-        MeetingSetter({
-          ...startMeeting,
-          id: null,
-          isOpenModal: false,
-          traineeInfo: null,
-          trainerInfo: null,
-        });
-        dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
-      }}
-    />
+      <StartMeeting
+        id={startMeeting.id}
+        accountType={accountType}
+        traineeInfo={startMeeting.traineeInfo}
+        trainerInfo={startMeeting.trainerInfo}
+        session_end_time={scheduledMeetingDetails[bIndex]?.session_end_time}
+        isClose={() => {
+          MeetingSetter({
+            ...startMeeting,
+            id: null,
+            isOpenModal: false,
+            traineeInfo: null,
+            trainerInfo: null,
+          });
+          dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
+        }}
+      />
 
   meetingRoom = (height, width, isRotatedInitally) => {
     return (
@@ -433,7 +484,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       );
     }
   }, [startMeeting?.isOpenModal]);
-  
+
   const renderRating = () => {
     return (
       <ReactStrapModal
@@ -455,7 +506,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         }
         isOpen={addRatingModel.isOpen}
         id={addRatingModel._id}
-      // width={"50%"}
+        // width={"50%"}
       />
     );
   };
@@ -488,6 +539,3 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 };
 
 export default BookingList;
-
-
-

@@ -43,7 +43,7 @@ const TrainerRenderBooking = ({
   handleAddRatingModelState,
   updateParentState,
   start_time,
-  bookingInfo
+  bookingInfo,
 }) => {
   const { scheduledMeetingDetails, addRatingModel } =
     useAppSelector(bookingsState);
@@ -52,9 +52,13 @@ const TrainerRenderBooking = ({
   const { accountType } = useAppSelector(authState);
   const dispatch = useAppDispatch();
 
+  // Compare the current time with start_time and end_time
+  const currentTime = new Date();
+  const isWithinTimeFrame =
+    currentTime >= new Date(start_time) ;
+
   const isCompleted =
-    has24HoursPassedSinceBooking ||
-    bookingInfo?.ratings?.trainee;
+    has24HoursPassedSinceBooking || bookingInfo?.ratings?.trainee;
 
   const canShowRatingButton =
     !isUpcomingSession &&
@@ -164,12 +168,13 @@ const TrainerRenderBooking = ({
                     });
                     updateBookedStatusApi(_id, BookedSession.confirmed);
                     sendNotifications({
-                    title: notificiationTitles.sessionConfirmation,
-                    description: "Your upcoming training session has been confirmed.",
-                    senderId: trainer_info?._id,
-                    receiverId: trainee_info?._id,
-                    bookingInfo:bookingInfo
-                  });
+                      title: notificiationTitles.sessionConfirmation,
+                      description:
+                        "Your upcoming training session has been confirmed.",
+                      senderId: trainer_info?._id,
+                      receiverId: trainee_info?._id,
+                      bookingInfo: bookingInfo,
+                    });
                   }}
                 >
                   {status === BookedSession.confirmed
@@ -182,8 +187,9 @@ const TrainerRenderBooking = ({
                   className={`btn btn-primary button-effect btn-sm mr-2 btn_cancel my-1`}
                   type="button"
                   style={{
-                    cursor:"pointer",
+                    cursor: isWithinTimeFrame ? "pointer" : "not-allowed",
                   }}
+                  disabled={!isWithinTimeFrame}
                   onClick={() => {
                     handleClick();
                     setStartMeeting({
@@ -193,15 +199,18 @@ const TrainerRenderBooking = ({
                       traineeInfo: trainee_info,
                       trainerInfo: trainer_info,
                       iceServers: bookingInfo.iceServers,
-                      trainee_clip: bookingInfo.trainee_clips
+                      trainee_clip: bookingInfo.trainee_clips,
                     });
-                    console.log('start meeting set the booking info is ' , bookingInfo)
+                    console.log(
+                      "start meeting set the booking info is ",
+                      bookingInfo
+                    );
                     sendNotifications({
                       title: notificiationTitles.sessionStrated,
                       description: `${trainer_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
-                      bookingInfo:bookingInfo
+                      bookingInfo: bookingInfo,
                     });
                   }}
                 >
@@ -238,7 +247,7 @@ const TrainerRenderBooking = ({
                         "A scheduled training session has been cancelled. Please check your calendar for details.",
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
-                      bookingInfo:null
+                      bookingInfo: null,
                     });
                   }
                 }}
