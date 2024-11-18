@@ -2,8 +2,12 @@ import React, { useEffect, useState } from "react";
 import TrainerSlider from "./trainerSlider";
 import ReactDatePicker from "react-datepicker";
 import moment from "moment";
-import { Utils } from "../../../../utils/utils";
-import { checkSlotAsync, commonAction, commonState } from "../../../common/common.slice";
+import { getLocalTimeZone, Utils } from "../../../../utils/utils";
+import {
+  checkSlotAsync,
+  commonAction,
+  commonState,
+} from "../../../common/common.slice";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { getAvailability } from "../../calendar/calendar.api";
 // import Input from './Input';
@@ -32,13 +36,14 @@ import InstantLessonTimeLine from "./InstantLessonTimeLine";
 import { currentTimeZone } from "../../../../utils/videoCall";
 import { checkSlot } from "../../../common/common.api";
 import { useSelector } from "react-redux";
+import { DateTime } from "luxon";
 const BookingTable = ({
   selectedTrainer,
   trainerInfo,
   setStartDate,
   startDate,
   getParams,
-  isUserOnline = false
+  isUserOnline = false,
 }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -53,7 +58,8 @@ const BookingTable = ({
   const [bookSessionPayload, setBookSessionPayload] = useState({});
   const [listOfTrainers, setListOfTrainers] = useState([]);
   const [bookingColumns, setBookingColumns] = useState([]);
-  const [isInstantLessonModalOpen, setIsInstantLessonModalOpen] = useState(false);
+  const [isInstantLessonModalOpen, setIsInstantLessonModalOpen] =
+    useState(false);
   const [timeRange, setTimeRange] = useState({
     startTime: "",
     endTime: "",
@@ -69,9 +75,9 @@ const BookingTable = ({
   const formateEndTime = Utils.getTimeFormate(
     trainerInfo?.userInfo?.extraInfo?.working_hours?.to
   );
-  const {slots} = useAppSelector(commonState)
-  const [isCommonBooking , setIsCommonBooking] = useState(false);
-  const [selectedSlots , setSelectedSlot] = useState(null)
+  const { slots } = useAppSelector(commonState);
+  const [isCommonBooking, setIsCommonBooking] = useState(false);
+  const [selectedSlots, setSelectedSlot] = useState(null);
   useEffect(() => {
     const todaySDate = Utils.getDateInFormatIOS(new Date());
     const { weekDates, weekDateFormatted } =
@@ -222,157 +228,199 @@ const BookingTable = ({
   );
   // console.log(trainerInfo, "trainerInfo");
 
-  const userIsOnlineOrNot = isUserOnline || Utils.isTrainerOnline(
-    (trainerInfo?.userInfo?._id ||
-      trainerInfo?.userInfo?.trainer_id ||
-      selectedTrainer?.trainer_id ||
-      trainerInfo?.userInfo?.id),
-    onlineUsers
-  )
+  const userIsOnlineOrNot =
+    isUserOnline ||
+    Utils.isTrainerOnline(
+      trainerInfo?.userInfo?._id ||
+        trainerInfo?.userInfo?.trainer_id ||
+        selectedTrainer?.trainer_id ||
+        trainerInfo?.userInfo?.id,
+      onlineUsers
+    );
 
   const renderBookingComponent = () => {
-    return (<div className="row">
-      <div className="col-12 mb-3 d-flex ml-n3 ">
-        <label className="mr-2 mt-2 ml-3" style={{ fontSize: "14px" }}>
-          Select date :{" "}
-        </label>
-        <div className="date-picker">
-          <ReactDatePicker
-            style={{
-              fontSize: "14px",
-            }}
-            className="mt-1"
-            minDate={moment().toDate()}
-            onChange={(date) => {
-              if (date) {
-                const booked_date = Utils.getDateInFormatIOS(date);
-                const payload = {
-                  trainer_id:
-                    trainerInfo?.userInfo?._id ||
-                    trainerInfo?.userInfo?.trainer_id ||
-                    selectedTrainer?.trainer_id ||
-                    trainerInfo?.userInfo?.id,
-                  booked_date,
-                  slotTime: {
-                    from:
-                      formateStartTime ||
-                      timeRange.startTime ||
-                      DefaultTimeRange.startTime,
-                    to:
-                      formateEndTime ||
-                      timeRange.endTime ||
-                      DefaultTimeRange.endTime,
-                  },
-                  traineeTimeZone : currentTimeZone()
-                };
-                // dispatch(checkSlotAsync(payload));
-                setStartDate(date);
-                date = new Date(date).toISOString().split("T")[0];
-                let dateArr = date?.split("-");
-                let start_time = new Date(
-                  Number(dateArr[0]),
-                  Number(dateArr[1]) - 1,
-                  Number(dateArr[2]),
-                  0,
-                  0,
-                  0,
-                  0
-                ).toISOString();
-                let end_time = new Date(
-                  Number(dateArr[0]),
-                  Number(dateArr[1]) - 1,
-                  Number(dateArr[2]),
-                  23,
-                  59,
-                  0,
-                  0
-                ).toISOString();
-                // getAvailability({
-                //   trainer_id:
-                //     trainerInfo?.userInfo?._id ||
-                //     trainerInfo?.userInfo?.trainer_id ||
-                //     selectedTrainer?.trainer_id ||
-                //     trainerInfo?.userInfo?.id,
-                //   start_time: start_time,
-                //   end_time: end_time,
-                // }).then((res) => {
-                //   setAvailableSlotsState(res?.data);
-                // });
-                checkSlot(payload).then(res => {
-                  dispatch(commonAction.setSlots(res.data.availableSlots))
-                }).catch((err) =>{
-                  dispatch(commonAction.setSlots(null))
-                })
-              }
-              const todaySDate = Utils.getDateInFormatIOS(date.toString());
-              const { weekDateFormatted, weekDates } =
-                Utils.getNext7WorkingDays(todaySDate);
-              SetColumns(weekDateFormatted, setBookingColumns);
-              // setTableData(getTraineeSlots, weekDates);
-              SetColumns(weekDateFormatted, setBookingColumns);
-            }}
-            selected={startDate}
-            customInput={<Input />}
-            dateFormat="MM-dd-yyyy"
-          />
-        </div>
-      </div>
-
-      <div className="col-11">
-        {(getParams?.search && getParams?.search.length) ||
-          !bookingColumns.length ? (
-          <div className="row">
-            <label className="mt-1 ml-3" style={{ fontSize: "13px" }}>
-              Select Slot :{" "}
-            </label>
-            <div
-              className="row"
+    return (
+      <div className="row">
+        <div className="col-12 mb-3 d-flex ml-n3 ">
+          <label className="mr-2 mt-2 ml-3" style={{ fontSize: "14px" }}>
+            Select date :{" "}
+          </label>
+          <div className="date-picker">
+            <ReactDatePicker
               style={{
-                display: "flex",
-                width: "100%",
-                justifyContent: "space-between",
-                margin: "0px 10px",
-                textAlign: "center",
+                fontSize: "14px",
               }}
-            >
-              {slots?.length > 0 && Utils.isSlotAvailable(slots , startDate) ? (
-                <>
-                  {" "}
-                  {slots?.map((item, i) => {
-                    
-                    // let today = new Date().toISOString().split('T')[0];
-                    // if(startDate === today){
-                    //   if (!Utils.isInFuture(item.end)) return;
-                    // }
-                    
-                    return (
-                      <div
-                        onClick={() => {
-                        setIsInstantLessonModalOpen(true)
-                        setIsCommonBooking(true)
-                        setSelectedSlot(item)
-                        }}
-                        className="col-6"
-                        style={{
-                          border: item?.status
-                            ? "2px solid grey"
-                            : item?.isSelected
+              className="mt-1"
+              minDate={moment().toDate()}
+              onChange={(date) => {
+                if (date) {
+                  let booked_date = DateTime.fromJSDate(date,{zone:'utc'}); // Sample booked date
+                  console.log("booked_date",booked_date)
+                  const today = DateTime.now();
+
+                  // Initialize a variable to store the final formatted date
+                  let finalFormattedDate;
+
+                  if (booked_date.hasSame(today, "day")) {
+                    // If the booked_date is the same day as today
+                    finalFormattedDate =
+                      today.toISO({
+                        suppressMilliseconds: false,
+                        includeOffset: false,
+                      }) + "Z";
+                    console.log(
+                      "Formatted Date (Same Day):",
+                      finalFormattedDate
+                    );
+                  } else if (booked_date > today) {
+                    // If the booked_date is in the future
+                    finalFormattedDate =
+                      booked_date
+                        .startOf("day")
+                        .toISO({
+                          suppressMilliseconds: false,
+                          includeOffset: false,
+                        }) + "Z";
+                    console.log(
+                      "Formatted Date (Future Date):",
+                      finalFormattedDate
+                    );
+                  } else {
+                    // Optional: Handle the case where the booked_date is in the past
+                    finalFormattedDate = null; // or any other value you want to set for past dates
+                    console.log("Booked date is in the past.");
+                  }
+
+                  const payload = {
+                    trainer_id:
+                      trainerInfo?.userInfo?._id ||
+                      trainerInfo?.userInfo?.trainer_id ||
+                      selectedTrainer?.trainer_id ||
+                      trainerInfo?.userInfo?.id,
+                    booked_date:finalFormattedDate,
+                    slotTime: {
+                      from:
+                        formateStartTime ||
+                        timeRange.startTime ||
+                        DefaultTimeRange.startTime,
+                      to:
+                        formateEndTime ||
+                        timeRange.endTime ||
+                        DefaultTimeRange.endTime,
+                    },
+                    traineeTimeZone: getLocalTimeZone(),
+                  };
+                  // dispatch(checkSlotAsync(payload));
+                  setStartDate(date);
+                  date = new Date(date).toISOString().split("T")[0];
+                  let dateArr = date?.split("-");
+                  let start_time = new Date(
+                    Number(dateArr[0]),
+                    Number(dateArr[1]) - 1,
+                    Number(dateArr[2]),
+                    0,
+                    0,
+                    0,
+                    0
+                  ).toISOString();
+                  let end_time = new Date(
+                    Number(dateArr[0]),
+                    Number(dateArr[1]) - 1,
+                    Number(dateArr[2]),
+                    23,
+                    59,
+                    0,
+                    0
+                  ).toISOString();
+                  // getAvailability({
+                  //   trainer_id:
+                  //     trainerInfo?.userInfo?._id ||
+                  //     trainerInfo?.userInfo?.trainer_id ||
+                  //     selectedTrainer?.trainer_id ||
+                  //     trainerInfo?.userInfo?.id,
+                  //   start_time: start_time,
+                  //   end_time: end_time,
+                  // }).then((res) => {
+                  //   setAvailableSlotsState(res?.data);
+                  // });
+                  checkSlot(payload)
+                    .then((res) => {
+                      dispatch(commonAction.setSlots(res.data.availableSlots));
+                    })
+                    .catch((err) => {
+                      dispatch(commonAction.setSlots(null));
+                    });
+                }
+                const todaySDate = Utils.getDateInFormatIOS(date.toString());
+                const { weekDateFormatted, weekDates } =
+                  Utils.getNext7WorkingDays(todaySDate);
+                SetColumns(weekDateFormatted, setBookingColumns);
+                // setTableData(getTraineeSlots, weekDates);
+                SetColumns(weekDateFormatted, setBookingColumns);
+              }}
+              selected={startDate}
+              customInput={<Input />}
+              dateFormat="MM-dd-yyyy"
+            />
+          </div>
+        </div>
+
+        <div className="col-11">
+          {(getParams?.search && getParams?.search.length) ||
+          !bookingColumns.length ? (
+            <div className="row">
+              <label className="mt-1 ml-3" style={{ fontSize: "13px" }}>
+                Select Slot :{" "}
+              </label>
+              <div
+                className="row"
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "space-between",
+                  margin: "0px 10px",
+                  textAlign: "center",
+                }}
+              >
+                {slots?.length > 0 &&
+                Utils.isSlotAvailable(slots, startDate) ? (
+                  <>
+                    {" "}
+                    {slots?.map((item, i) => {
+                      // let today = new Date().toISOString().split('T')[0];
+                      // if(startDate === today){
+                      //   if (!Utils.isInFuture(item.end)) return;
+                      // }
+
+                      return (
+                        <div
+                          onClick={() => {
+                            setIsInstantLessonModalOpen(true);
+                            setIsCommonBooking(true);
+                            setSelectedSlot(item);
+                          }}
+                          className="col-6"
+                          style={{
+                            border: item?.status
+                              ? "2px solid grey"
+                              : item?.isSelected
                               ? "2px solid green"
                               : "1px solid",
-                          cursor: "pointer",
-                          padding: "10px 0px",
-                        }}
-                      >
-                        <b
-                          style={{ color: item?.status ? "grey" : "#000080" }}
+                            cursor: "pointer",
+                            padding: "10px 0px",
+                          }}
                         >
-                          {Utils.convertToAmPm(item?.start)}{"  -  "}
-                          {Utils.convertToAmPm(item?.end)}
-                        </b>
-                      </div>
-                    );
-                  })}
-                  {/* <div className="col-12 mb-3 d-flex justify-content-center align-items-center">
+                          <b
+                            style={{ color: item?.status ? "grey" : "#000080" }}
+                          >
+                            {item?.start}
+                            {"  -  "}
+                            {item?.end}
+                          </b>
+                        </div>
+                      );
+                    })}
+                    {/* <div className="col-12 mb-3 d-flex justify-content-center align-items-center">
                     <button
                       type="button"
                       disabled={
@@ -462,50 +510,53 @@ const BookingTable = ({
                       Book Slot Now
                     </button>
                   </div> */}
-                </>
-              ) : (
-                <div className="mt-1 ml-3" style={{ fontSize: "13px" }}>
-                  <span>Trainer is not available.</span>
-                </div>
-              )}
+                  </>
+                ) : (
+                  <div className="mt-1 ml-3" style={{ fontSize: "13px" }}>
+                    <span>Trainer is not available.</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ) : (
-          <TrainerSlider list={listOfTrainers} />
-        )}
+          ) : (
+            <TrainerSlider list={listOfTrainers} />
+          )}
+        </div>
       </div>
-    </div>)
-  }
+    );
+  };
 
   return (
     <>
       {/* <ToastContainer /> */}
-      
-        
-          <div
-            style={{
-              width : '100%',
-              display: "flex",
-              // justifyContent: "space-between",
-              alignItems: "center",
-              padding: "1rem",
-              flexDirection : 'column'
-              // backgroundColor: "#f0f0f0",
-            }}
-          >
-            {" "}
-            {/* Banner styles */}
-            {userIsOnlineOrNot &&<>
-            <div style={{ display: "flex", alignItems: "center", width : '100%' }}>
+
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          // justifyContent: "space-between",
+          alignItems: "center",
+          padding: "1rem",
+          flexDirection: "column",
+          // backgroundColor: "#f0f0f0",
+        }}
+      >
+        {" "}
+        {/* Banner styles */}
+        {userIsOnlineOrNot && (
+          <>
+            <div
+              style={{ display: "flex", alignItems: "center", width: "100%" }}
+            >
               {" "}
               <h2
                 style={{
                   fontSize: "1.2rem",
                   fontWeight: "bold",
                   // color: "#28a745",
-                  marginRight:"auto",
-                  marginLeft:"auto",
-                  marginBottom:10
+                  marginRight: "auto",
+                  marginLeft: "auto",
+                  marginBottom: 10,
                 }}
               >
                 Book Instant Lesson
@@ -525,7 +576,9 @@ const BookingTable = ({
                 Trainer is Online
               </button> */}
             </div>
-            <div style={{ display: "flex", alignItems: "center" ,  width : '100%' }}>
+            <div
+              style={{ display: "flex", alignItems: "center", width: "100%" }}
+            >
               {" "}
               {/* Banner right styles */}
               <button
@@ -534,10 +587,10 @@ const BookingTable = ({
                   color: "#fff",
                   padding: "0.7rem 1rem",
                   borderRadius: "5px",
-                  margin : '5px auto',
-                  width : '100%',
-                  fontSize : '1rem',
-                  border : '1px solid #28a745',
+                  margin: "5px auto",
+                  width: "100%",
+                  fontSize: "1rem",
+                  border: "1px solid #28a745",
                 }}
                 onClick={() => {
                   setIsInstantLessonModalOpen(true);
@@ -547,108 +600,155 @@ const BookingTable = ({
                 Book Lesson Now
               </button>
             </div>
-            <div style={{margin : '5px auto',}}>
-              <p style={{ 
-                color: "rgb(0, 0, 128)",
-                fontSize: "1.5rem",
-                fontWeight : "bold",
-                margin : '0'
-                 }}>OR</p>
-            </div></>}
-            <div style={{ display: "flex", alignItems: "center", marginLeft: "10px",  width : '100%' }}>
-                <button
-                  style={{
-                    backgroundColor: "#000080",
-                    border: "1px solid #000080",
-                    color: "#fff",
-                    padding: "0.7rem 1rem",
-                    borderRadius: "5px",
-                    margin : '5px auto',
-                    width : '100%',
-                    fontSize : '1rem'
-                  }}
-                  onClick={() => {
-                    let date= new Date();
-                    if (date) {
-                      const booked_date = Utils.getDateInFormatIOS(date);
-                      const payload = {
-                        trainer_id:
-                          trainerInfo?.userInfo?._id ||
-                          trainerInfo?.userInfo?.trainer_id ||
-                          selectedTrainer?.trainer_id ||
-                          trainerInfo?.userInfo?.id,
-                        booked_date,
-                        slotTime: {
-                          from:
-                            formateStartTime ||
-                            timeRange.startTime ||
-                            DefaultTimeRange.startTime,
-                          to:
-                            formateEndTime ||
-                            timeRange.endTime ||
-                            DefaultTimeRange.endTime,
-                        },
-                        traineeTimeZone : currentTimeZone()
-                      };
-                      // dispatch(checkSlotAsync(payload));
-                      setStartDate(date);
-                      date = new Date(date).toISOString().split("T")[0];
-                      let dateArr = date?.split("-");
-                      let start_time = new Date(
-                        Number(dateArr[0]),
-                        Number(dateArr[1]) - 1,
-                        Number(dateArr[2]),
-                        0,
-                        0,
-                        0,
-                        0
-                      ).toISOString();
-                      let end_time = new Date(
-                        Number(dateArr[0]),
-                        Number(dateArr[1]) - 1,
-                        Number(dateArr[2]),
-                        23,
-                        59,
-                        0,
-                        0
-                      ).toISOString();
-                      // getAvailability({
-                      //   trainer_id:
-                      //     trainerInfo?.userInfo?._id ||
-                      //     trainerInfo?.userInfo?.trainer_id ||
-                      //     selectedTrainer?.trainer_id ||
-                      //     trainerInfo?.userInfo?.id,
-                      //   start_time: start_time,
-                      //   end_time: end_time,
-                      // }).then((res) => {
-                      //   setAvailableSlotsState(res?.data);
-                      // });
-                      checkSlot(payload).then(res => {
-                        dispatch(commonAction.setSlots(res.data.availableSlots))
-                      }).catch((err) =>{
-                        dispatch(commonAction.setSlots(null))
-                      })
-                    }
-                    const todaySDate = Utils.getDateInFormatIOS(date.toString());
-                    const { weekDateFormatted, weekDates } =
-                      Utils.getNext7WorkingDays(todaySDate);
-                    SetColumns(weekDateFormatted, setBookingColumns);
-                    // setTableData(getTraineeSlots, weekDates);
-                    SetColumns(weekDateFormatted, setBookingColumns);
-                    setShowCommonBookingOption(true);
-                    setIsInstantLessonModalOpen(false);
-                  }}
-                >
-                  Schedule Lesson
-                </button>
+            <div style={{ margin: "5px auto" }}>
+              <p
+                style={{
+                  color: "rgb(0, 0, 128)",
+                  fontSize: "1.5rem",
+                  fontWeight: "bold",
+                  margin: "0",
+                }}
+              >
+                OR
+              </p>
             </div>
-            </div>
-          
-      
+          </>
+        )}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginLeft: "10px",
+            width: "100%",
+          }}
+        >
+          <button
+            style={{
+              backgroundColor: "#000080",
+              border: "1px solid #000080",
+              color: "#fff",
+              padding: "0.7rem 1rem",
+              borderRadius: "5px",
+              margin: "5px auto",
+              width: "100%",
+              fontSize: "1rem",
+            }}
+            onClick={() => {
+              let date = new Date();
+              if (date) {
+                let booked_date = DateTime.fromJSDate(date,{zone:'utc'}); // Sample booked date
+                console.log("booked_date",booked_date)
+                const today = DateTime.now();
 
-      {
-        showCommonBookingOption ? renderBookingComponent() : null
-      }
+                // Initialize a variable to store the final formatted date
+                let finalFormattedDate;
+
+                if (booked_date.hasSame(today, "day")) {
+                  // If the booked_date is the same day as today
+                  finalFormattedDate =
+                    today.toISO({
+                      suppressMilliseconds: false,
+                      includeOffset: false,
+                    }) + "Z";
+                  console.log(
+                    "Formatted Date (Same Day):",
+                    finalFormattedDate
+                  );
+                } else if (booked_date > today) {
+                  // If the booked_date is in the future
+                  finalFormattedDate =
+                    booked_date
+                      .startOf("day")
+                      .toISO({
+                        suppressMilliseconds: false,
+                        includeOffset: false,
+                      }) + "Z";
+                  console.log(
+                    "Formatted Date (Future Date):",
+                    finalFormattedDate
+                  );
+                } else {
+                  // Optional: Handle the case where the booked_date is in the past
+                  finalFormattedDate = null; // or any other value you want to set for past dates
+                  console.log("Booked date is in the past.");
+                }
+
+                const payload = {
+                  trainer_id:
+                    trainerInfo?.userInfo?._id ||
+                    trainerInfo?.userInfo?.trainer_id ||
+                    selectedTrainer?.trainer_id ||
+                    trainerInfo?.userInfo?.id,
+                  booked_date:finalFormattedDate,
+                  slotTime: {
+                    from:
+                      formateStartTime ||
+                      timeRange.startTime ||
+                      DefaultTimeRange.startTime,
+                    to:
+                      formateEndTime ||
+                      timeRange.endTime ||
+                      DefaultTimeRange.endTime,
+                  },
+                  traineeTimeZone: getLocalTimeZone(),
+                };
+                // dispatch(checkSlotAsync(payload));
+                setStartDate(date);
+                date = new Date(date).toISOString().split("T")[0];
+                let dateArr = date?.split("-");
+                let start_time = new Date(
+                  Number(dateArr[0]),
+                  Number(dateArr[1]) - 1,
+                  Number(dateArr[2]),
+                  0,
+                  0,
+                  0,
+                  0
+                ).toISOString();
+                let end_time = new Date(
+                  Number(dateArr[0]),
+                  Number(dateArr[1]) - 1,
+                  Number(dateArr[2]),
+                  23,
+                  59,
+                  0,
+                  0
+                ).toISOString();
+                // getAvailability({
+                //   trainer_id:
+                //     trainerInfo?.userInfo?._id ||
+                //     trainerInfo?.userInfo?.trainer_id ||
+                //     selectedTrainer?.trainer_id ||
+                //     trainerInfo?.userInfo?.id,
+                //   start_time: start_time,
+                //   end_time: end_time,
+                // }).then((res) => {
+                //   setAvailableSlotsState(res?.data);
+                // });
+                checkSlot(payload)
+                  .then((res) => {
+                    dispatch(commonAction.setSlots(res.data.availableSlots));
+                  })
+                  .catch((err) => {
+                    dispatch(commonAction.setSlots(null));
+                  });
+              }
+              const todaySDate = Utils.getDateInFormatIOS(date.toString());
+              const { weekDateFormatted, weekDates } =
+                Utils.getNext7WorkingDays(todaySDate);
+              SetColumns(weekDateFormatted, setBookingColumns);
+              // setTableData(getTraineeSlots, weekDates);
+              SetColumns(weekDateFormatted, setBookingColumns);
+              setShowCommonBookingOption(true);
+              setIsInstantLessonModalOpen(false);
+            }}
+          >
+            Schedule Lesson
+          </button>
+        </div>
+      </div>
+
+      {showCommonBookingOption ? renderBookingComponent() : null}
 
       <InstantLessonTimeLine
         isOpen={isInstantLessonModalOpen}
@@ -658,10 +758,14 @@ const BookingTable = ({
         setBookSessionPayload={setBookSessionPayload}
         setAmount={setAmount}
         startDate={startDate}
-        isCommonBooking = {isCommonBooking}
-        setIsCommonBooking ={setIsCommonBooking}
-        selectedDate = {startDate ? Utils.getDateInFormatIOS(startDate) :  new Date().toISOString().split('T')[0]}
-        selectedSlot = {selectedSlots}
+        isCommonBooking={isCommonBooking}
+        setIsCommonBooking={setIsCommonBooking}
+        selectedDate={
+          startDate
+            ? Utils.getDateInFormatIOS(startDate)
+            : new Date().toISOString().split("T")[0]
+        }
+        selectedSlot={selectedSlots}
       />
       <Modal
         isOpen={showTransactionModal}
@@ -674,16 +778,13 @@ const BookingTable = ({
             setBookSessionPayload={setBookSessionPayload}
             bookSessionPayload={bookSessionPayload}
             trainerInfo={trainerInfo}
-            isCommonBooking = {isCommonBooking}
-            setIsCommonBooking ={setIsCommonBooking}
-            selectedSlot = {selectedSlots}
+            isCommonBooking={isCommonBooking}
+            setIsCommonBooking={setIsCommonBooking}
+            selectedSlot={selectedSlots}
           />
         }
       />
-  {
-    isAuthModalOpen && 
-    <AuthUserModal />
-  }
+      {isAuthModalOpen && <AuthUserModal />}
     </>
   );
 };

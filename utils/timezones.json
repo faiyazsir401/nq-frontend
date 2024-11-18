@@ -1,32 +1,22 @@
 [
-	{
-		"label": "America/Los_Angeles (GMT-08:00)",
-		"tzCode": "America/Los_Angeles",
-		"name": "(GMT-08:00) Pacific Time (US & Canada)",
-		"utc": "-08:00"
-	},
-	{
-		"label": "America/Denver (GMT-07:00)",
-		"tzCode": "America/Denver",
-		"name": "(GMT-07:00) Mountain Time (US & Canada)",
-		"utc": "-07:00"
-	},
-	{
-		"label": "America/Chicago (GMT-06:00)",
-		"tzCode": "America/Chicago",
-		"name": "(GMT-06:00) Central Time (US & Canada)",
-		"utc": "-06:00"
-	},
-	{
-		"label": "America/New_York (GMT-05:00)",
-		"tzCode": "America/New_York",
-		"name": "(GMT-05:00) Eastern Time (US & Canada)",
-		"utc": "-05:00"
-	},
-	{
-		"label": "Asia/Kolkata (GMT+05:30)",
-		"tzCode": "Asia/Kolkata",
-		"name": "(GMT+05:30) India Standard Time",
-		"utc": "+05:30"
-	}
+  {
+    "value": "America/Los_Angeles",
+    "label": "(UTC-08:00) Pacific Time (US & Canada)"
+  },
+  {
+    "value": "America/Denver",
+    "label": "(UTC-07:00) Mountain Time (US & Canada)"
+  },
+  {
+    "value": "America/Chicago",
+    "label": "(UTC-06:00) Central Time (US & Canada)"
+  },
+  {
+    "value": "America/New_York",
+    "label": "(UTC-05:00) Eastern Time (US & Canada)"
+  },
+  {
+    "value": "Asia/Calcutta",
+    "label": "(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi"
+  }
 ]

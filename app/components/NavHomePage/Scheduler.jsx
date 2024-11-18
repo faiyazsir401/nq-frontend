@@ -22,14 +22,6 @@ const initialDayValue = {
 };
 
 
-const timeZones = [
-  "UTC",
-  "America/New_York",
-  "Europe/London",
-  "Asia/Kolkata",
-  "Asia/Tokyo",
-  "Australia/Sydney",
-];
 const appointmentDurations = [
   { label: "15 minutes", value: 15 },
   { label: "30 minutes", value: 30 },
@@ -221,7 +213,7 @@ const Scheduler = () => {
   );
   const [selectedDuration, setSelectedDuration] = useState(
     userInfo.extraInfo.availabilityInfo.duration || 15
-  );
+  );                  
 
   const setDayTimes = (day, newTimes) => {
     setAvailability((prev) => ({
@@ -263,8 +255,8 @@ const Scheduler = () => {
           onChange={(e) => setTimeZone(e.target.value)}
         >
           {timezones.map((zone, index) => (
-            <option key={index} value={zone.name}>
-              {zone.name}
+            <option key={index} value={zone.value}>
+              {zone.label}
             </option>
           ))}
         </select>
