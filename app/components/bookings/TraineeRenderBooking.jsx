@@ -68,6 +68,7 @@ const TraineeRenderBooking = ({
   const currentTime = new Date();
   const isWithinTimeFrame = currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone);
 
+  console.log("traineedate",currentTime, CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone))
   const canShowRatingButton =
     !isUpcomingSession &&
     !isCurrentDateBefore &&

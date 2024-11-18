@@ -57,7 +57,7 @@ const TrainerRenderBooking = ({
   const isWithinTimeFrame =
     currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone) ;
 
-    console.log("start_time",currentTime,CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone))
+    console.log("trainerdate",currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone))
 
   const isCompleted =
     has24HoursPassedSinceBooking || bookingInfo?.ratings?.trainee;

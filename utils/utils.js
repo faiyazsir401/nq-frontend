@@ -931,10 +931,19 @@ export const getTimeZoneOffset = (timeZone) => {
 // Helper function to format time based on the given time zone
 export const formatTimeInLocalZone = (time, timeZone) => {
   const localTimeZone = getLocalTimeZone();
-
+  console.log("timeZone",timeZone,localTimeZone)
   if (!timeZone || timeZone === localTimeZone) {
     // If time zone is the same as local, return formatted time as is
-    return formatToAMPM(new Date(time));
+    const date = DateTime.fromISO(time, { zone: 'utc' });
+    console.log("date",date)
+    const jsDate = date.toJSDate();
+    jsDate.setMinutes(date.c.minute)
+    jsDate.setHours(date.c.hour)
+    jsDate.setDate(date.c.day)
+    jsDate.setMonth(date.c.month-1)
+    jsDate.setYear(date.c.year)
+    console.log("sametime",jsDate)
+    return formatToAMPM(jsDate);
   }
 
   // If the time zones are different, calculate the offset difference and adjust time
@@ -952,7 +961,7 @@ export const formatTimeInLocalZone = (time, timeZone) => {
       jsDate.setMinutes(date.c.minute)
       jsDate.setHours(date.c.hour)
       jsDate.setDate(date.c.day)
-      jsDate.setMonth(date.c.month)
+      jsDate.setMonth(date.c.month-1)
       jsDate.setYear(date.c.year)
 
       console.log("date1234",jsDate)
@@ -970,7 +979,16 @@ export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
 
   if (!timeZone || timeZone === localTimeZone) {
     // If time zone is the same as local, return formatted time as is
-    return new Date(time);
+    const date = DateTime.fromISO(time, { zone: 'utc' });
+    console.log("date123",date)
+    const jsDate = date.toJSDate();
+    jsDate.setMinutes(date.c.minute)
+    jsDate.setHours(date.c.hour)
+    jsDate.setDate(date.c.day)
+    jsDate.setMonth(date.c.month-1)
+    jsDate.setYear(date.c.year)
+    console.log("sametime",jsDate)
+    return jsDate;
   }
 
   // If the time zones are different, calculate the offset difference and adjust time
@@ -988,7 +1006,7 @@ export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
       jsDate.setMinutes(date.c.minute)
       jsDate.setHours(date.c.hour)
       jsDate.setDate(date.c.day)
-      jsDate.setMonth(date.c.month)
+      jsDate.setMonth(date.c.month-1)
       jsDate.setYear(date.c.year)
 
       console.log("date1234",jsDate)
