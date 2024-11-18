@@ -9,7 +9,7 @@ import { Button } from "reactstrap";
 import { X } from "react-feather";
 import Modal from "../../common/modal";
 import { authState } from "../auth/auth.slice";
-import { Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, formatTimeInLocalZone, Utils } from "../../../utils/utils";
 import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
@@ -55,7 +55,9 @@ const TrainerRenderBooking = ({
   // Compare the current time with start_time and end_time
   const currentTime = new Date();
   const isWithinTimeFrame =
-    currentTime >= new Date(start_time) ;
+    currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone) ;
+
+    console.log("start_time",currentTime,CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone))
 
   const isCompleted =
     has24HoursPassedSinceBooking || bookingInfo?.ratings?.trainee;

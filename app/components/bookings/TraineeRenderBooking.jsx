@@ -6,7 +6,7 @@ import {
   getScheduledMeetingDetailsAsync,
   updateBookedSessionScheduledMeetingAsync,
 } from "../common/common.slice";
-import { Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, Utils } from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
@@ -66,7 +66,7 @@ const TraineeRenderBooking = ({
 
   // Compare the current time with start_time and end_time
   const currentTime = new Date();
-  const isWithinTimeFrame = currentTime >= new Date(start_time);
+  const isWithinTimeFrame = currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone);
 
   const canShowRatingButton =
     !isUpcomingSession &&

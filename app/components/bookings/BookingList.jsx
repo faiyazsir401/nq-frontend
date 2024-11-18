@@ -6,7 +6,7 @@ import {
   bookingsState,
   getScheduledMeetingDetailsAsync,
 } from "../common/common.slice";
-import { Utils } from "../../../utils/utils";
+import { formatTimeInLocalZone, Utils } from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
@@ -28,17 +28,7 @@ import { commonState } from "../../common/common.slice";
 import { traineeAction, traineeState } from "../trainee/trainee.slice";
 import OrientationModal from "../modalComponent/OrientationModal";
 
-function formatToAMPM(date) {
-  let hours = date.getUTCHours(); // Use UTC hours to avoid local timezone
-  let minutes = date.getUTCMinutes(); // Use UTC minutes
-  const ampm = hours >= 12 ? 'PM' : 'AM';
 
-  hours = hours % 12;
-  hours = hours ? hours : 12; // 0 becomes 12 (midnight case)
-  minutes = minutes < 10 ? '0' + minutes : minutes;
-
-  return hours + ':' + minutes + ' ' + ampm;
-}
 
 export var meetingRoom = () => <></>;
 
@@ -318,53 +308,6 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       time_zone, // Assuming 'time_zone' is coming from API
     } = bookingInfo;
 
-    // Helper function to get the local time zone
-    const getLocalTimeZone = () => {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone;
-    };
-    
-    // Helper function to get the UTC offset in minutes for a given time zone
-    const getTimeZoneOffset = (timeZone) => {
-      const date = new Date();
-      const options = { timeZone, hour: '2-digit', minute: '2-digit' };
-      
-      // Get the formatted time for the given time zone
-      const timeString = new Intl.DateTimeFormat('en-US', options).format(date);
-      
-      // Parse the offset from the formatted time string
-      const offsetSign = timeString.charAt(0) === '-' ? -1 : 1;
-      const hours = parseInt(timeString.split(':')[0]);
-      const minutes = parseInt(timeString.split(':')[1]);
-      
-      // Convert the offset to total minutes
-      return offsetSign * (hours * 60 + minutes);
-    };
-    
-    // Helper function to format time based on the given time zone
-    const formatTimeInLocalZone = (time, timeZone) => {
-      const localTimeZone = getLocalTimeZone();
-    
-      if (!timeZone || timeZone === localTimeZone) {
-        // If time zone is the same as local, return formatted time as is
-        return formatToAMPM(new Date(time));
-      }
-    
-      // If the time zones are different, calculate the offset difference and adjust time
-      const fromOffset = getTimeZoneOffset(timeZone); // Get the offset for the provided time zone
-      const toOffset = getTimeZoneOffset(localTimeZone); // Get the offset for the local time zone
-    
-      // Calculate the difference in minutes between the time zones
-      const offsetDifference = toOffset - fromOffset;
-    
-      // Create a new Date object from the time input
-      const date = new Date(time);
-    
-      // Apply the offset difference (in minutes)
-      date.setMinutes(date.getMinutes() + offsetDifference);
-    
-      // Format the adjusted time using the local time zone
-      return formatToAMPM(date);
-    };
     
     // Convert start and end times to local time if the time zone is different
     const localStartTime = formatTimeInLocalZone(start_time, time_zone);
