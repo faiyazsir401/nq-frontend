@@ -206,13 +206,13 @@ const Scheduler = () => {
   const dispatch = useAppDispatch();
   const { userInfo } = useAppSelector(authState);
   const [availability, setAvailability] = useState(
-    userInfo.extraInfo.availabilityInfo.availability || initialDayValue
+    userInfo.extraInfo?.availabilityInfo.availability || initialDayValue
   );
   const [timeZone, setTimeZone] = useState(
-    userInfo.extraInfo.availabilityInfo.timeZone || currentTimeZone()
+    userInfo.extraInfo?.availabilityInfo.timeZone || currentTimeZone()
   );
   const [selectedDuration, setSelectedDuration] = useState(
-    userInfo.extraInfo.availabilityInfo.duration || 15
+    userInfo.extraInfo?.availabilityInfo.duration || 15
   );                  
 
   const setDayTimes = (day, newTimes) => {

@@ -35,7 +35,7 @@ const getTimeRange = (duration , isSchedule , selectedSlot) => {
   }
 
   const now = moment();
-  const startTime = moment(now).add(2, 'minutes');
+  const startTime = moment(now).add(0, 'minutes');
   const endTime = moment(startTime).add(duration, 'minutes');
   console.log("getTimeRange",startTime,endTime)
   return {
@@ -158,12 +158,12 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
               const slot1 = getTimeRange(selectedLesson.duration);
               console.log('onclick after return' , selectedSlot?.start , slot1?.sessionStartTime );
               
-              let startTime = DateTime.fromFormat(selectedSlot?.start, "h:mm a").toFormat("HH:mm");
-              let endTime = DateTime.fromFormat(selectedSlot?.end, "h:mm a").toFormat("HH:mm");
+              let startTime =isCommonBooking ? DateTime.fromFormat(selectedSlot?.start, "h:mm a").toFormat("HH:mm"): slot1?.sessionStartTime
+              let endTime =isCommonBooking ? DateTime.fromFormat(selectedSlot?.end, "h:mm a").toFormat("HH:mm"): slot1?.sessionEndTime 
 
               const amountPayable = Utils.getMinutesFromHourMM(
-                isCommonBooking ? startTime : slot1?.sessionStartTime,
-                isCommonBooking ? endTime :  slot1?.sessionEndTime ,
+                startTime,
+                endTime ,
                 trainerInfo?.userInfo?.extraInfo?.hourly_rate
               );
               console.log("amountPayable",amountPayable)
@@ -195,10 +195,10 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                     hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
                     status: BookedSession.booked,
                     booked_date: startDate,
-                    session_start_time:isCommonBooking ? startTime   : slot1.sessionStartTime,
-                    session_end_time: isCommonBooking ? endTime : slot1.sessionEndTime ,
-                    start_time: isCommonBooking ?  convertTimesToISO(startDate , startTime) :  convertTimesToISO(startDate , slot1.sessionStartTime) ,
-                    end_time: isCommonBooking ?  convertTimesToISO(startDate , endTime) :   convertTimesToISO(startDate , slot1.sessionEndTime),
+                    session_start_time:startTime,
+                    session_end_time: endTime,
+                    start_time: convertTimesToISO(startDate , startTime),
+                    end_time: convertTimesToISO(startDate , endTime),
                   };
                   console.log('onclick at payload',payload);
                   setBookSessionPayload(payload);
