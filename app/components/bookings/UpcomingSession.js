@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useContext, useLayoutEffect } from "react";
 import { useState, useEffect } from "react";
 import { Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 import { bookingButton, not_data_for_booking } from "../../common/constants";
@@ -18,6 +18,9 @@ import AddClip from "./start/AddClip";
 import { authState } from "../auth/auth.slice";
 import { isMobile } from "react-device-detect";
 import OrientationModal from "../modalComponent/OrientationModal";
+import { notificiationTitles } from "../../../utils/constant";
+import { EVENTS } from "../../../helpers/events";
+import { SocketContext } from "../socket";
 
 const UpcomingSession = ({ accountType = null }) => {
   const dispatch = useAppDispatch();
@@ -30,6 +33,7 @@ const UpcomingSession = ({ accountType = null }) => {
   const [selectedClips, setSelectedClips] = useState([]);
   const [isOpenID, setIsOpenID] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const socket = useContext(SocketContext);
 
   const width768 = useMediaQuery(768);
 
@@ -49,6 +53,7 @@ const UpcomingSession = ({ accountType = null }) => {
       setIsOpenID(newBookingData?._id);
       setIsOpen(true);
     }
+    console.log('new booking data' , newBookingData)
   }, [newBookingData]);
 
   const handleChangeBookingTab = async (tab) => {
@@ -64,7 +69,7 @@ const UpcomingSession = ({ accountType = null }) => {
         status: "upcoming",
       })
     );
-  }, []);
+  }, [newBookingData]);
 
   const trainer = scheduledMeetingDetails?.filter((booking) => {
     return (
@@ -113,6 +118,10 @@ const UpcomingSession = ({ accountType = null }) => {
       window.removeEventListener('resize', handleOrientationChange);
     };
   }, [isMobile]);
+
+  const sendNotifications = (data) => {
+    socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
+  };
 
   if(modal){
     return <OrientationModal isOpen={modal}/>
@@ -185,6 +194,15 @@ const UpcomingSession = ({ accountType = null }) => {
           setSelectedClips={setSelectedClips}
           clips={clips}
           shareFunc={addTraineeClipInBookedSession}
+          sendNotfication={() =>{
+              sendNotifications({
+                title: notificiationTitles.newBookingRequest,
+                description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
+                senderId: userInfo?._id,
+                receiverId: newBookingData?.trainer_id,
+                bookingInfo:null
+              });
+          }}
         />
       </>
     );

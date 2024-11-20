@@ -14,6 +14,7 @@ import {
 import moment from "moment";
 import axios from "axios";
 import momenttz from "moment-timezone";
+import { DateTime } from 'luxon';
 
 export class Utils {
   static isEmailValid = (email) => {
@@ -167,6 +168,7 @@ export class Utils {
     endTime,
     chargingRate = TRAINER_AMOUNT_USD
   ) => {
+    console.log(startTime , endTime , 'start endtime from here')
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
 
@@ -824,4 +826,194 @@ export class Utils {
     const isCurrentDateGreater = currentDate.isAfter(givenDatePlusOneMinute);
     return isCurrentDateGreater;
   }
+  static convertToAmPm(time) {
+    const [hour, minute] = time.split(':').map(Number);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const formattedHour = hour % 12 || 12; // Convert "0" hour to "12" for 12-hour format
+    return `${formattedHour}:${minute.toString().padStart(2, '0')} ${period}`;
+  }
+
+  static isInFuture(inputTimeStr) {
+    // Get the current time (hours and minutes)
+    const currentTime = new Date();
+    const currentHours = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
+      console.log(currentHours , currentMinutes)
+    // Parse the input time string
+   console.log('inputstring' , inputTimeStr)
+    let [inputHours, inputMinutes] = inputTimeStr.split(':').map(Number);
+  
+    // Compare hours first, then minutes if hours are equal
+    if (inputHours > currentHours || (inputHours === currentHours && inputMinutes > currentMinutes)) {
+      return true;
+    } else if (inputHours < currentHours || (inputHours === currentHours && inputMinutes < currentMinutes)) {
+      return false;
+    } else {
+      return false ;
+    }
+  }
+
+  static isSlotAvailable(slotArray , startDate){
+      // Get the current time (hours and minutes)
+      let isSlotAvailable = false;
+
+    let today = new Date().toISOString().split('T')[0];
+    if (startDate !== today) {
+      return true;
+    }
+      slotArray.map((slot , index) =>{
+        if(this.isInFuture(slot.end)){
+          isSlotAvailable = true;
+        }
+      })
+
+      return isSlotAvailable;
+  }
 }
+  
+export function convertTimesToISO(date, time1) {
+  const baseDate = new Date(date);
+
+  if (isNaN(baseDate.getTime())) {
+      throw new Error("Invalid date format. Please provide a valid ISO 8601 date.");
+  }
+
+  // Function to combine date and time
+  const combineDateTime = (date, time) => {
+      const [hours, minutes] = time.split(":").map(Number);
+      if (isNaN(hours) || isNaN(minutes)) {
+          throw new Error("Invalid time format. Please provide time in HH:mm format.");
+      }
+
+      const newDate = new Date(date);
+      newDate.setUTCHours(hours, minutes, 0, 0); // Set hours, minutes, seconds, milliseconds
+      return newDate.toISOString();
+  };
+
+  return combineDateTime(baseDate, time1)
+  
+}
+
+export function formatToAMPM(date) {
+  let hours = date.getHours(); // Use UTC hours to avoid local timezone
+  let minutes = date.getMinutes(); // Use UTC minutes
+  console.log("datehours",date.getHours())
+  console.log("dateminutes",date.getMinutes())
+
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 becomes 12 (midnight case)
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+
+  return hours + ':' + minutes + ' ' + ampm;
+}
+
+// Helper function to get the local time zone
+export const getLocalTimeZone = () => {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+
+// Helper function to get the UTC offset in minutes for a given time zone
+export const getTimeZoneOffset = (timeZone) => {
+  const date = new Date();
+  
+  // Create a Date object for the specified time zone
+  const utcDate = new Date(date.toLocaleString('en-US', { timeZone }));
+  
+  // Calculate the offset in minutes
+  const offset = (utcDate.getTime() - date.getTime()) / 60000;
+  
+  return offset;
+};
+
+
+// Helper function to format time based on the given time zone
+export const formatTimeInLocalZone = (time, timeZone) => {
+  const localTimeZone = getLocalTimeZone();
+  console.log("timeZone",timeZone,localTimeZone)
+  if (!timeZone || timeZone === localTimeZone) {
+    // If time zone is the same as local, return formatted time as is
+    const date = DateTime.fromISO(time, { zone: 'utc' });
+    console.log("date",date)
+    const jsDate = date.toJSDate();
+    jsDate.setMinutes(date.c.minute)
+    jsDate.setHours(date.c.hour)
+    jsDate.setDate(date.c.day)
+    jsDate.setMonth(date.c.month-1)
+    jsDate.setYear(date.c.year)
+    console.log("sametime",jsDate)
+    return formatToAMPM(jsDate);
+  }
+
+  // If the time zones are different, calculate the offset difference and adjust time
+  const fromOffset = getTimeZoneOffset(timeZone); // Get the offset for the provided time zone
+  const toOffset = getTimeZoneOffset(localTimeZone); // Get the offset for the local time zone
+
+  // Calculate the difference in minutes between the time zones
+  const offsetDifference = toOffset - fromOffset;
+
+      // Create a new Date object from the time input
+      console.log("date123",time,timeZone)
+      const date = DateTime.fromISO(time, { zone: 'utc' });
+      console.log("date",date)
+      const jsDate = date.toJSDate();
+      jsDate.setMinutes(date.c.minute)
+      jsDate.setHours(date.c.hour)
+      jsDate.setDate(date.c.day)
+      jsDate.setMonth(date.c.month-1)
+      jsDate.setYear(date.c.year)
+
+      console.log("date1234",jsDate)
+      // Apply the offset difference (in minutes)
+      console.log("offsetDifference",jsDate.getMinutes())
+      jsDate.setMinutes(jsDate.getMinutes() + offsetDifference);
+      console.log("jsDate123",jsDate)
+  // Format the adjusted time using the local time zone
+  return formatToAMPM(jsDate);
+};
+
+
+export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
+  const localTimeZone = getLocalTimeZone();
+
+  if (!timeZone || timeZone === localTimeZone) {
+    // If time zone is the same as local, return formatted time as is
+    const date = DateTime.fromISO(time, { zone: 'utc' });
+    console.log("date123",date)
+    const jsDate = date.toJSDate();
+    jsDate.setMinutes(date.c.minute)
+    jsDate.setHours(date.c.hour)
+    jsDate.setDate(date.c.day)
+    jsDate.setMonth(date.c.month-1)
+    jsDate.setYear(date.c.year)
+    console.log("sametime",jsDate)
+    return jsDate;
+  }
+
+  // If the time zones are different, calculate the offset difference and adjust time
+  const fromOffset = getTimeZoneOffset(timeZone); // Get the offset for the provided time zone
+  const toOffset = getTimeZoneOffset(localTimeZone); // Get the offset for the local time zone
+
+  // Calculate the difference in minutes between the time zones
+  const offsetDifference = toOffset - fromOffset;
+
+      // Create a new Date object from the time input
+      console.log("date123",time,timeZone)
+      const date = DateTime.fromISO(time, { zone: 'utc' });
+      console.log("date",date)
+      const jsDate = date.toJSDate();
+      jsDate.setMinutes(date.c.minute)
+      jsDate.setHours(date.c.hour)
+      jsDate.setDate(date.c.day)
+      jsDate.setMonth(date.c.month-1)
+      jsDate.setYear(date.c.year)
+
+      console.log("date1234",jsDate)
+      // Apply the offset difference (in minutes)
+      console.log("offsetDifference",jsDate.getMinutes())
+      jsDate.setMinutes(jsDate.getMinutes() + offsetDifference);
+      console.log("jsDate123",jsDate)
+  // Format the adjusted time using the local time zone
+  return jsDate;
+};

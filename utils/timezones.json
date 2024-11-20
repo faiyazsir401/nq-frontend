@@ -1,0 +1,22 @@
+[
+  {
+    "value": "America/Los_Angeles",
+    "label": "(UTC-08:00) Pacific Time (US & Canada)"
+  },
+  {
+    "value": "America/Denver",
+    "label": "(UTC-07:00) Mountain Time (US & Canada)"
+  },
+  {
+    "value": "America/Chicago",
+    "label": "(UTC-06:00) Central Time (US & Canada)"
+  },
+  {
+    "value": "America/New_York",
+    "label": "(UTC-05:00) Eastern Time (US & Canada)"
+  },
+  {
+    "value": "Asia/Calcutta",
+    "label": "(UTC+05:30) Chennai, Kolkata, Mumbai, New Delhi"
+  }
+]

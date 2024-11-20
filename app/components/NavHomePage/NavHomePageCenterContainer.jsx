@@ -23,14 +23,16 @@ import Slider from "react-slick";
 import { useMediaQuery } from "../../hook/useMediaQuery";
 import OrientationModal from "../modalComponent/OrientationModal";
 import Image from "next/image";
+import Scheduler from "./Scheduler";
 
 const Schedule = ({ activeCenterContainerTab }) => {
   useEffect(() => { }, [activeCenterContainerTab]);
   const { userInfo } = useAppSelector(authState);
   return (
     userInfo?.account_type === "Trainer" && userInfo?.is_kyc_completed ? <>
-      <Addworkinghour />
-      <CalendarPage />
+      {/* <Addworkinghour /> */}
+      <Scheduler/>
+      {/* <CalendarPage /> */}
     </> :
       <p style={{ textAlign: "center" }}>Please complete your KYC to create slot</p>
   );

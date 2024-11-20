@@ -160,7 +160,7 @@ export const TrainerDetails = ({
           </div>
         </div>
       )}
-      <div className={isUserOnline ? `custom-trainer-scroll recent-user` : `custom-trainer-scroll`} style={{ marginTop: "24px" }}>
+      <div className={`custom-trainer-scroll `+isUserOnline&&`recent-user`} style={{ marginTop: "24px" }}>
         {trainerDetails?.select_trainer ? (
           <TrainerSessionInfo
             accordionData={accordionData}

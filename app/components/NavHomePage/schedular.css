@@ -1,0 +1,128 @@
+/* General Styles */
+.scheduler-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  color: #333;
+}
+
+.scheduler-container label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.scheduler-container select {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  width: 100%;
+  /* margin-bottom: 16px; */
+  border: 0px !important;
+}
+
+/* Availability Section */
+.availability-section h3 {
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.day-availability {
+  border-bottom: 1px solid #ddd;
+  padding: 8px 0;
+  margin-bottom: 10px;
+  align-items: start;
+}
+
+.day-availability h4 {
+  font-size: 0.9rem;
+  width: 60px;
+  text-align: left;
+  color: #555;
+  margin-right: 10px;
+}
+
+/* Time Slot Container for Multiple Slots */
+.time-slot-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Spacing between multiple time slots */
+}
+
+/* Time Slot Controls */
+.time-slot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-slot input[type="time"] {
+  padding: 6px;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 70px;
+  background-color: #f7f7f7;
+  text-align: center;
+}
+
+/* Icons for Actions */
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+  color: #666;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: 8px;
+}
+
+.icon-button:hover {
+  background-color: #e0e0e0;
+  border-radius: 50%;
+}
+
+.icon-button.add {
+  color: #4CAF50;
+}
+
+.icon-button.copy {
+  color: #008CBA;
+}
+
+.icon-button.delete {
+  color: #d9534f;
+}
+
+/* Unavailable text */
+.unavailable-text {
+  color: #888;
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Footer Time Zone */
+.time-zone {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 20px;
+}
+
+@media (max-width:768px){
+  .day-availability{
+    flex-wrap: wrap;
+  }
+  .scheduler-container select {
+    font-size: 0.6rem;
+  }
+  
+}

@@ -17,9 +17,8 @@ import {
 import { Utils } from "../../../utils/utils";
 import { useSelector } from "react-redux";
 import { AccountType } from "../../common/constants";
-import "./common.css"
 // Sample friend data
-
+import './common.css'
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
@@ -77,7 +76,7 @@ const FriendsPopup = ({ props }) => {
   }, [selectedFriends]);
 
   return (
-    <div className="d-flex flex-direction-column my-2">
+    <div className="d-flex flex-direction-column my-2  ">
       <button
         className="m-auto px-3 py-2 rounded border-0"
         color="primary"
@@ -90,10 +89,10 @@ const FriendsPopup = ({ props }) => {
         isOpen={isOpen}
         toggle={toggle}
         centered={true}
-        style={{ maxWidth: "700px"}}
-        className="fade-model"
+        style={{ maxWidth: "1440px"}}
+        fade={true}
+        className="friends-modal"
       >
-        <ModalHeader>Select Friends</ModalHeader>
         <ModalBody>
           <div
             style={{
@@ -101,7 +100,8 @@ const FriendsPopup = ({ props }) => {
               justifyContent: "start",
               flexWrap: "wrap",
               gap: "10px",
-              alignItems:'center'
+              alignItems:'center',
+              justifyContent:'center'
             }}
           >
             {friendsList.map((friend) => (
@@ -119,7 +119,7 @@ const FriendsPopup = ({ props }) => {
               >
                 <CardImg
                   top
-                  style={{ minHeight: 145 }}
+                  style={{ minHeight: 145 , maxHeight: 145 , objectFit:"cover" }}
                   src={
                     Utils.getImageUrlOfS3(friend.profile_picture) ||
                     "/assets/images/demoUser.png"
@@ -138,11 +138,8 @@ const FriendsPopup = ({ props }) => {
             ))}
           </div>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={confirmSelection}>
-            Confirm Selection
-          </Button>
-          <Button color="secondary" onClick={toggle}>
+        <ModalFooter className="d-flex">
+          <Button className="m-auto" color="danger" onClick={toggle}>
             Close
           </Button>
         </ModalFooter>

@@ -6,7 +6,7 @@ import {
   bookingsState,
   getScheduledMeetingDetailsAsync,
 } from "../common/common.slice";
-import { Utils } from "../../../utils/utils";
+import { formatTimeInLocalZone, Utils } from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
@@ -27,6 +27,8 @@ import ReactStrapModal from "../../common/modal";
 import { commonState } from "../../common/common.slice";
 import { traineeAction, traineeState } from "../trainee/trainee.slice";
 import OrientationModal from "../modalComponent/OrientationModal";
+
+
 
 export var meetingRoom = () => <></>;
 
@@ -88,9 +90,9 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     var timeZones = response.data;
     const ianaTimeZone = utcOffset
       ? timeZones.find(
-        (tz) =>
-          moment.tz(tz).utcOffset() === moment.duration(utcOffset).asMinutes()
-      )
+          (tz) =>
+            moment.tz(tz).utcOffset() === moment.duration(utcOffset).asMinutes()
+        )
       : "";
     // console.log("=====>ianaTimeZone", ianaTimeZone, utcOffset)
     setUserTimeZone(
@@ -174,6 +176,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   };
 
   const renderBooking = (
+    bookingInfo,
     status,
     booking_index,
     booked_date,
@@ -242,6 +245,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             }}
             activeTabs={activeTabs}
             start_time={start_time}
+            bookingInfo={bookingInfo}
           />
         );
       case AccountType.TRAINEE:
@@ -279,6 +283,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             accountType={AccountType.TRAINEE}
             activeTabs={activeTabs}
             start_time={start_time}
+            bookingInfo={bookingInfo}
           />
         );
       default:
@@ -300,14 +305,15 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       report,
       start_time,
       end_time,
+      time_zone, // Assuming 'time_zone' is coming from API
     } = bookingInfo;
 
-    const customStartDateTime = moment(start_time)
-      ?.tz(userTimeZone)
-      ?.format("h:mm a");
-    const customEndDateTime = moment(end_time)
-      ?.tz(userTimeZone)
-      ?.format("h:mm a");
+    
+    // Convert start and end times to local time if the time zone is different
+    const localStartTime = formatTimeInLocalZone(start_time, time_zone);
+    const localEndTime = formatTimeInLocalZone(end_time, time_zone);
+    
+    console.log("bookingInfo:" + _id, localStartTime); // Displaying the converted start time
 
     return (
       <div
@@ -338,7 +344,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             <div className="col">
               <dl className="row">
                 <dd className="ml-3">Time Durations :</dd>
-                <dt className="ml-1">{`${customStartDateTime} - ${customEndDateTime}`}</dt>
+                <dt className="ml-1">{`${localStartTime} - ${localEndTime}`}</dt>
               </dl>
             </div>
           </div>
@@ -348,6 +354,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             <div className="col-11">{showRatingLabel(ratings)}</div>
             <div className="col-12 col-lg-auto">
               {renderBooking(
+                bookingInfo,
                 status,
                 booking_index,
                 booked_date,
@@ -371,23 +378,23 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
   const renderVideoCall = (height, width, isRotatedInitally) => height > width && !isRotatedInitally ?
     <OrientationModal isOpen={true} /> :
-    <StartMeeting
-      id={startMeeting.id}
-      accountType={accountType}
-      traineeInfo={startMeeting.traineeInfo}
-      trainerInfo={startMeeting.trainerInfo}
-      session_end_time={scheduledMeetingDetails[bIndex]?.session_end_time}
-      isClose={() => {
-        MeetingSetter({
-          ...startMeeting,
-          id: null,
-          isOpenModal: false,
-          traineeInfo: null,
-          trainerInfo: null,
-        });
-        dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
-      }}
-    />
+      <StartMeeting
+        id={startMeeting.id}
+        accountType={accountType}
+        traineeInfo={startMeeting.traineeInfo}
+        trainerInfo={startMeeting.trainerInfo}
+        session_end_time={scheduledMeetingDetails[bIndex]?.session_end_time}
+        isClose={() => {
+          MeetingSetter({
+            ...startMeeting,
+            id: null,
+            isOpenModal: false,
+            traineeInfo: null,
+            trainerInfo: null,
+          });
+          dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
+        }}
+      />
 
   meetingRoom = (height, width, isRotatedInitally) => {
     return (
@@ -420,7 +427,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       );
     }
   }, [startMeeting?.isOpenModal]);
-  
+
   const renderRating = () => {
     return (
       <ReactStrapModal
@@ -442,7 +449,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         }
         isOpen={addRatingModel.isOpen}
         id={addRatingModel._id}
-      // width={"50%"}
+        // width={"50%"}
       />
     );
   };
@@ -475,6 +482,3 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 };
 
 export default BookingList;
-
-
-

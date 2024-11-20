@@ -70,7 +70,7 @@ import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 import { fetchPeerConfig } from "../../../api";
 import { bookingsState } from "../common/common.slice";
 import { useAppSelector } from "../../store";
-
+import './common.css'
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
 let canvasConfigs = {
@@ -104,7 +104,6 @@ export const HandleVideoCall = ({
   session_end_time,
   bIndex,
 }) => {
-
   //  console.log(toUser , fromUser , 'toUserFromUser')
   // const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
@@ -205,7 +204,8 @@ export const HandleVideoCall = ({
   const [showThumbnailForTwoVideo, setShowThumbnailForTwoVideo] = useState(true);
   const timeDifference = Timer(session_end_time);
   const errorHandling = (err) => toast.error(err)
-
+  const [globalSliderValue ,setGlobalSliderValue] = useState(0);
+  console.log('start meeting info ' , startMeeting)
 
 
   /**
@@ -1384,10 +1384,14 @@ useEffect(() => {
 
 
   
-    html2canvas(targetElement, { type: "png" }).then(async (canvas) => {
+    html2canvas(targetElement, { type: "png",
+      allowTaint:true,
+      useCORS:true
+     }).then(async (canvas) => {
       // document.body.appendChild(canvas);
       // console.log("1366=======S3",{canvas})
       const dataUrl = canvas.toDataURL("image/png");
+      console.log("dataUrl",dataUrl)
       // console.log("1367=======S3",{dataUrl})
       // screenShots.push({
       //   title: "",
@@ -1513,7 +1517,7 @@ useEffect(() => {
   }
 
   async function pushProfilePhotoToS3(presignedUrl, uploadPhoto, cb) {
-    const myHeaders = new Headers({ "Content-Type": "image/*" });
+      const myHeaders = new Headers({ "Content-Type": "image/*" });
     await axios.put(presignedUrl, uploadPhoto, {
       headers: myHeaders,
     });
@@ -1537,7 +1541,7 @@ useEffect(() => {
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ type, videos, mainScreen }) => {
     if (type === "clips") {
       // console.log(videos, "videos");
-      setSelectedClips(videos);
+      setSelectedClips([...videos]);
       if (videos?.length) {
         resetInitialPinnedUser()
       } else {
@@ -1570,6 +1574,7 @@ useEffect(() => {
 
 
   socket.on(EVENTS.ON_VIDEO_PLAY_PAUSE, ({ isPlayingAll, number, isPlaying1, isPlaying2 }) => {
+
     const playPauseVideo = (videoRef, isPlaying) => {
       if (videoRef?.current) {
         isPlaying ? videoRef.current.play() : videoRef.current.pause();
@@ -1601,15 +1606,15 @@ useEffect(() => {
   //NOTE -  Video Time Update emit
 const emitVideoTimeEvent = (clickedTime, number) => {
 
-    if (isPlaying.isPlaying1) {
-    setIsPlaying(prev => ({ ...prev, isPlaying1: false }));
-  }
-    if (isPlaying.isPlaying1) {
-    setIsPlaying(prev => ({ ...prev, isPlaying2: false }));
-  }
-  if (isPlaying.isPlayingAll) {
-    setIsPlaying(prev => ({ ...prev, isPlayingAll: false }));
-  }
+  //   if (isPlaying.isPlaying1) {
+  //   setIsPlaying(prev => ({ ...prev, isPlaying1: false }));
+  // }
+  //   if (isPlaying.isPlaying2) {
+  //   setIsPlaying(prev => ({ ...prev, isPlaying2: false }));
+  // }
+  // if (isPlaying.isPlayingAll) {
+  //   setIsPlaying(prev => ({ ...prev, isPlayingAll: false }));
+  // }
 
   socket?.emit(EVENTS.ON_VIDEO_TIME, {
     userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
@@ -1624,98 +1629,141 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const globalProgressBarToggler = (e) => {
     setVideoController(!videoController);
-
+    selectedVideoRef1.current.currentTime = 0
+    selectedVideoRef2.current.currentTime = 0
+    setIsPlaying({
+      isPlayingAll: false,
+      number: "",
+      isPlaying1: false,
+      isPlaying2: false,
+    })
+    setVideoTime({
+      currentTime1: "00:00",
+      currentTime2: "00:00",
+      remainingTime1: "00:00",
+      remainingTime2: "00:00",
+    })
   };
 
   const handleGlobalProgressBarChange = (e) => {
     const { value } = e.target;
+    
+    // Calculate the maximum duration across both videos to set a global control limit
     const maxTime = Math.max(
-      selectedVideoRef1.current?.duration || 0,
-      selectedVideoRef2.current?.duration || 0
+        selectedVideoRef1.current?.duration || 0,
+        selectedVideoRef2.current?.duration || 0
     );
 
+    // Check if both videos have ended
+    const bothVideosEnded =
+        selectedVideoRef1.current?.currentTime === selectedVideoRef1.current?.duration &&
+        selectedVideoRef2.current?.currentTime === selectedVideoRef2.current?.duration;
+
+        console.log('video ended' , bothVideosEnded)
+    // Prevent re-triggering playback if both videos have ended
+    if (bothVideosEnded) {
+        // Pause both videos if they reached the end
+        selectedVideoRef1.current.pause();
+        selectedVideoRef2.current.pause();
+        
+        // Reset the isPlaying state to indicate videos are not playing
+        setIsPlaying({
+          isPlayingAll: false,
+          number: "",
+          isPlaying1: false,
+          isPlaying2: false,
+        })
+        setVideoTime({
+          currentTime1: "00:00",
+          currentTime2: "00:00",
+          remainingTime1: "00:00",
+          remainingTime2: "00:00",
+        })
+        return; // Exit the function to avoid unintentional replay
+    }
+
+    // Set the current time of each video to the slider value
     if (selectedVideoRef1.current) {
-      selectedVideoRef1.current.currentTime = value;
-      emitVideoTimeEvent(value, "one");
+        selectedVideoRef1.current.currentTime = value;
+        emitVideoTimeEvent(value, "one");
     }
-
+    
     if (selectedVideoRef2.current) {
-      selectedVideoRef2.current.currentTime = value;
-      emitVideoTimeEvent(value, "two");
+        selectedVideoRef2.current.currentTime = value;
+        emitVideoTimeEvent(value, "two");
     }
 
+    // Reset play state if the control value is zero
     if (!value) {
-      setIsPlaying({ ...isPlaying, isPlayingAll: false });
+        setIsPlaying({ ...isPlaying, isPlayingAll: false });
     }
-  };
+};
 
   const togglePlay = (num) => {
-
+    // Handle thumbnail visibility
     if (num === 'one' && showThumbnailForFirstVideo) {
-      setShowThumbnailForFirstVideo(false)
+        setShowThumbnailForFirstVideo(false);
     }
 
     if (num === 'two' && showThumbnailForTwoVideo) {
-      setShowThumbnailForTwoVideo(false)
+        setShowThumbnailForTwoVideo(false);
     }
 
     if (num === 'all') {
-      if (showThumbnailForFirstVideo) {
-        setShowThumbnailForFirstVideo(false)
-      }
-
-      if (showThumbnailForTwoVideo) {
-        setShowThumbnailForTwoVideo(false)
-      }
+        setShowThumbnailForFirstVideo(false);
+        setShowThumbnailForTwoVideo(false);
     }
 
-    var temp = isPlaying;
-    temp.number = num;
-    if (
-      selectedVideoRef1.current && 
-      selectedVideoRef1?.current?.currentTime ===
-      selectedVideoRef1?.current?.duration &&
-      selectedVideoRef2?.current?.currentTime ===
-      selectedVideoRef2?.current?.duration
-    ) {
-      selectedVideoRef1.current.currentTime = 0;
-      emitVideoTimeEvent(0, "one");
-      if(selectedVideoRef2.current){
-        selectedVideoRef2.current.currentTime = 0;
-      }
-      emitVideoTimeEvent(0, "two");
+    // Reset video time if both videos are ended
+    if (selectedVideoRef1.current && selectedVideoRef2.current) {
+        if (
+            selectedVideoRef1.current.currentTime === selectedVideoRef1.current.duration &&
+            selectedVideoRef2.current.currentTime === selectedVideoRef2.current.duration
+        ) {
+            selectedVideoRef1.current.currentTime = 0;
+            selectedVideoRef2.current.currentTime = 0;
+            emitVideoTimeEvent(0, "one");
+            emitVideoTimeEvent(0, "two");
+        }
     }
 
-    if (num === "all") {
-      if (isPlaying.isPlayingAll) {
-        selectedVideoRef1?.current?.pause();
-        selectedVideoRef2?.current?.pause();
-      } else {
-        selectedVideoRef1?.current?.play();
-        selectedVideoRef2?.current?.play();
-      }
-      temp = {
-        ...isPlaying,
-        isPlayingAll: !isPlaying.isPlayingAll,
-        isPlaying1: !isPlaying.isPlayingAll,
-        isPlaying2: !isPlaying.isPlayingAll,
-      };
-    } else if (num === "one") {
-      if (isPlaying.isPlaying1) selectedVideoRef1?.current?.pause();
-      else selectedVideoRef1?.current?.play();
-      temp = { ...isPlaying, isPlaying1: !isPlaying.isPlaying1 };
-    } else if (num === "two") {
-      if (isPlaying?.isPlaying2) selectedVideoRef2?.current?.pause();
-      else selectedVideoRef2.current.play();
-      temp = { ...isPlaying, isPlaying2: !isPlaying.isPlaying2 };
+    // Update playing state based on selected video
+    let updatedPlayingState = { ...isPlaying };
+    const toggleAll = num === "all";
+    
+    if (toggleAll) {
+        updatedPlayingState.isPlayingAll = !isPlaying.isPlayingAll;
+
+        if (updatedPlayingState.isPlayingAll) {
+            selectedVideoRef1.current?.play();
+            selectedVideoRef2.current?.play();
+        } else {
+            selectedVideoRef1.current?.pause();
+            selectedVideoRef2.current?.pause();
+        }
+    } else {
+        // Handle individual video play/pause
+        const videoRef = num === "one" ? selectedVideoRef1 : selectedVideoRef2;
+        const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
+        const isPlayingValue = updatedPlayingState[isPlayingKey];
+
+        if (isPlayingValue) {
+            videoRef.current?.pause();
+        } else {
+            videoRef.current?.play();
+        }
+        updatedPlayingState[isPlayingKey] = !isPlayingValue;
     }
 
+    // Emit the updated play state to the socket
     socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
-      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-      ...temp,
+        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+        ...updatedPlayingState,
     });
-    setIsPlaying({ ...temp });
-  };
+
+    console.log('Updated play state:', updatedPlayingState);
+    setIsPlaying(updatedPlayingState);
+};
 
 
   // console.log("video time--------->",videoTime)
@@ -1778,19 +1826,24 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
-    // console.log(clickedTime, "handleProgressBarChange");
-    if (number === "one") {
-      selectedVideoRef1.current.currentTime = clickedTime;
-    } else {
-      selectedVideoRef2.current.currentTime = clickedTime;
-    }
+    const videoRef = number === "one" ? selectedVideoRef1 : selectedVideoRef2;
+    if (videoRef.current) {
+        videoRef.current.currentTime = clickedTime;
+        
+        socket?.emit(EVENTS?.ON_VIDEO_TIME, {
+            userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+            clickedTime,
+            number,
+        });
+  }
 
-    socket?.emit(EVENTS?.ON_VIDEO_TIME, {
-      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-      clickedTime: clickedTime,
-      number: number,
-    });
-  };
+  setGlobalSliderValue(() =>{
+   return Math.max(
+      selectedVideoRef1.current?.currentTime || 0,
+      selectedVideoRef2.current?.currentTime || 0
+    )
+  })
+};
   const handleVolumeChange = () => {
     // Update the video volume based on the input value (0 to 1)
     const newVolume = parseFloat(volumeInputRef.current.value);
@@ -1809,16 +1862,19 @@ const emitVideoTimeEvent = (clickedTime, number) => {
     setScreenShot();
   }, [screenShots?.length]);
 
-  // useEffect(() => {
-  //   const canvas = canvasRef.current;
-  //   if (canvas) {
-  //     const bookingsElement = document.getElementById('bookings');
-  //     if (bookingsElement) {
-  //       canvas.width = bookingsElement.clientWidth;
-  //       canvas.height = bookingsElement.clientHeight;
-  //     }
-  //   }
-  // }, []);
+  useEffect(() => {
+      const navbarContainer = document.getElementById('get-navbar-tabs');
+      if (navbarContainer) {
+        navbarContainer.classList.add('temp_nav')
+      }
+
+      return ()=>{
+        const navbarContainer = document.getElementById('get-navbar-tabs');
+        if (navbarContainer) {
+        navbarContainer.classList.remove('temp_nav')
+        }
+      }
+  }, []);
 
   const setScreenShot = async () => {
     var newReportImages = [];
@@ -2182,6 +2238,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
           <ModalHeader
             toggle={() => {
               setIsOpenConfirm(false);
+              setSelectedClips([])
             }}
             close={() => <></>}
           >
@@ -2294,10 +2351,122 @@ const emitVideoTimeEvent = (clickedTime, number) => {
   // }
   // console.log('..pinnedUser...',pinnedUser)
 
-  useEffect(() =>{
 
-        console.log("hello" , document.getElementById("clips-container-id")?.clientX)
-  },[])
+  const calculateCanvasDimensions = () => {
+    // Get video elements by their IDs
+    const video1 = document.getElementById("selected-video-1");
+    const video2 = document.getElementById("selected-video-2");
+    console.log('its video' , video1 , video2)
+    if (!video1) {
+        console.error("Video element 'selected-video-1' not found.");
+        return {};
+    }
+    // If only one clip is selected, use only video1's dimensions
+    if (selectedClips?.length && selectedClips?.length === 1 ) {
+        const rect1 = video1.getBoundingClientRect();
+        return {
+            top: rect1.top + window.scrollY,
+            left: rect1.left + window.scrollX,
+            width: rect1.width,
+            height: rect1.height,
+        };
+    }
+
+    // If both clips are selected, ensure video2 exists before proceeding
+    if (!video2) {
+        console.error("Video element 'selected-video-2' not found.");
+        return {};
+    }
+
+    // Get the bounding rectangles for both video elements
+    const rect1 = video1.getBoundingClientRect();
+    const rect2 = video2.getBoundingClientRect();
+
+    // Calculate the overlay dimensions and position
+    const top = Math.min(rect1.top, rect2.top) + window.scrollY;
+    const left = Math.min(rect1.left, rect2.left) + window.scrollX;
+    const width = rect1.width + rect2.width; // Combined width
+    const height = Math.max(rect1.height, rect2.height); // Maximum height
+   
+    return {
+        top,
+        left,
+        width,
+        height,
+    };
+  };
+  
+const previousCanvasContent = useRef(null);
+  
+const updateCanvasDimensions = () => {
+
+  const { top, left, width, height } = calculateCanvasDimensions();
+  
+  if (canvasRef.current) {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      if(pinnedUser === 'user-video-1' || pinnedUser === 'user-video-2'){
+        canvas.style.display = 'none';
+        return;
+      }    
+
+      // Save the current content as an image before resizing
+      const previousContent = canvas.toDataURL();
+
+      // Get the current dimensions for calculating scale
+      const oldWidth = canvas.width;
+      const oldHeight = canvas.height;
+
+      // Resize the canvas
+      canvas.style.position = "absolute";
+      canvas.style.display = 'block'
+      canvas.style.top = `${top}px`;
+      canvas.style.left = `${left}px`;
+      canvas.width = width;
+      canvas.height = height;
+
+      // Calculate scale factors to maintain aspect ratio
+      const scaleX = width / oldWidth;
+      const scaleY = height / oldHeight;
+
+      if(pinnedUser !== 'user-video-1' && pinnedUser !== 'user-video-2'){
+        // Redraw the saved content with scaling
+        const img = new Image();
+        img.onload = () => {
+            // Apply scaling with six parameters
+            ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0); // Apply scaling with translation
+            ctx.drawImage(img, 0, 0);
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform to default
+          };
+        img.src = previousContent; // Set the source to the saved content
+      }
+
+  }
+};
+
+useEffect(() => {
+  const delay = 1000; // Delay in milliseconds
+
+  // Initial delayed call to update canvas dimensions
+  const initialTimeoutId = setTimeout(() => {
+      updateCanvasDimensions();
+      console.log('Initial delayed call to updateCanvasDimensions');
+  }, delay);
+
+  // Set up delayed resize event listener
+  const handleResize = () => {
+      clearTimeout(initialTimeoutId); // Prevent the initial timeout from running again on resize
+      setTimeout(updateCanvasDimensions, delay);
+  };
+  window.addEventListener("resize", handleResize);
+
+  // Clean up on unmount
+  return () => {
+      clearTimeout(initialTimeoutId); // Clear the initial timeout when dependencies change or component unmounts
+      window.removeEventListener("resize", handleResize);
+  };
+}, [selectedClips, isPinned , selectedVideoRef1 , selectedVideoRef2]);
+
   if (isIOS || isMobile) {
     return (
       <React.Fragment>
@@ -2318,9 +2487,14 @@ const emitVideoTimeEvent = (clickedTime, number) => {
           className="row"
           style={{ height: "100%", display: "flex", alignItems: "center", marginTop: "env(safe-area-inset-bottom)"}}
         >
+          <canvas
+                ref={canvasRef}
+                id="drawing-canvas"
+                className="canvas-print"
+              />
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
-            <div id="sidetoolbar" className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', }}>
+            <div id="sidetoolbar" className="col-lg-1 col-md-1 col-sm-2 z-50" style={{ flex: '0 0 9px', width: '9px', marginLeft:'7vh' }}>
               <div>
                 <CanvasMenuBar
                   isOpen={isOpen}
@@ -2403,14 +2577,6 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                   {displayMsg?.msg}
                 </div>
               ) : null}
-              <canvas
-                ref={canvasRef}
-                id="drawing-canvas"
-                width={document.getElementById("third")?.clientWidth}
-                height={document.getElementById("drawing-canvas")?.clientHeight}
-                className="canvas-print absolute all-0"
-                style={{ height: (isIOS ? (isPinned ? "52vh" : "48vh") : (isPinned ? "73vh" : "66vh")), width: '100%' }}
-              />
               {selectedClips?.length ? (
                 <div
                   className={
@@ -2534,7 +2700,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                                   ref={progressBarRef}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef1.current?.currentTime || 0
+                                    selectedVideoRef1.current?.currentTime
                                   }
                                   max={selectedVideoRef1.current?.duration || 100}
                                   onChange={(e) =>
@@ -2585,7 +2751,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                         {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
-                          !isPinned && (
+                          !isPinned && !isPlaying.isPlayingAll && (
                             <>
                               <div
                                 className="Pause2"
@@ -2628,7 +2794,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                                   ref={progressBarRef2}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef2.current?.currentTime || 0
+                                    selectedVideoRef2.current?.currentTime 
                                   }
                                   max={selectedVideoRef2.current?.duration || 100}
                                   onChange={(e) =>
@@ -2683,18 +2849,17 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                             ref={globalProgressBarRef}
                             step="0.01"
                             value={
-                              (selectedVideoRef1.current?.currentTime || 0) >
-                                (selectedVideoRef2.current?.currentTime || 0)
-                                ? selectedVideoRef1.current?.currentTime || 0
-                                : selectedVideoRef2.current?.currentTime || 0
+                              globalSliderValue
                             }
                             max={
-                              (selectedVideoRef1.current?.duration || 0) >
-                                (selectedVideoRef2.current?.duration || 0)
-                                ? selectedVideoRef1.current?.duration || 0
-                                : selectedVideoRef2.current?.duration || 0
+                              Math.max(
+                                selectedVideoRef1.current?.duration || 0,
+                                selectedVideoRef2.current?.duration || 0
+                              )
                             }
-                            onChange={handleGlobalProgressBarChange}
+                            onChange={(e) =>
+                              handleGlobalProgressBarChange(e)
+                            }
                             style={{ width: "450px" }}
                           />
                         </div>
@@ -3236,8 +3401,13 @@ const emitVideoTimeEvent = (clickedTime, number) => {
         <OrientationModal isOpen={modal} />
         <div
           className="row"
-          style={{ height: "100%", display: "flex", alignItems: "center" }}
+          style={{ height: "100vh", display: "flex", alignItems: "center" }}
         >
+            <canvas
+                ref={canvasRef}
+                id="drawing-canvas"
+                className="canvas-print"
+              />
           {/* 1 */}
           {accountType === AccountType.TRAINER ? (
             <div className="col-lg-1 col-md-1 col-sm-2 z-50"
@@ -3301,7 +3471,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
           {
             <div
-              className="col-lg-8 col-md-8 col-sm-12 "
+              className="col col-8"
               id="third"
               style={{
                 height: "100%",
@@ -3324,14 +3494,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                   {displayMsg?.msg}
                 </div>
               ) : null}
-              <canvas
-                ref={canvasRef}
-                id="drawing-canvas"
-                width={document.getElementById("third")?.clientWidth}
-                height={document.getElementById("drawing-canvas")?.clientHeight}
-                className="canvas-print absolute all-0"
-                style={{ margin: 'auto', height: isPinned ? "500px" : "69vh", width: '100%' }}
-              />
+            
               {selectedClips?.length ? (
                 <div
                   id="clips-container-id"
@@ -3339,19 +3502,19 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                     isPinned
                       ? accountType === AccountType.TRAINER
                         ? pinnedUser === "user-video-1"
-                          ? height < 500 ? "switch-clips-container-for-mobile" : "switch-clips-container"
-                          : height < 500 ? "scs2-mobile" : "scs2"
+                          ? "switch-clips-container pb-2 pt-3"
+                          : "scs2"
                         : accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"
-                          ? height < 500 ? "scs2-mobile" : "scs2"
-                          : height < 500 ? "switch-clips-container-for-mobile" : "switch-clips-container"
+                          ? "scs2"
+                          : "switch-clips-container pb-2 pt-3"
                       : "row"
                   }
                   style={{
                     zIndex: isPinned ? "999" : "auto",
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
-                    padding: isPinned ? "5px" : "",
+                    padding: isPinned ? "15px !important" : "",
                     position:'relative'
                   }}
                   onClick={() => {
@@ -3363,12 +3526,12 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                   }}
                 >
                   <div
-                    className="row"
+                    className={`row ${pinnedUser === "user-video-1" ? "m-0 p-2" :'m-0 p-2'}`}
                     style={
                       mediaQuery.matches
                         ? selectedClips?.length === 1
-                          ? isOnlyOneVideo
-                          : isTwoVideos
+                          ? {...isOnlyOneVideo , paddingTop:'0px !important'}
+                          : {...isTwoVideos , paddingTop:'0px !important'}
                         : {}
                     }
                   >
@@ -3473,7 +3636,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                                   ref={progressBarRef}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef1.current?.currentTime || 0
+                                    selectedVideoRef1.current?.currentTime
                                   }
                                   max={selectedVideoRef1.current?.duration || 100}
                                   onChange={(e) =>
@@ -3604,7 +3767,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                                   ref={progressBarRef2}
                                   step="0.01"
                                   value={
-                                    selectedVideoRef2.current?.currentTime || 0
+                                    selectedVideoRef2.current?.currentTime
                                   }
                                   max={selectedVideoRef2.current?.duration || 100}
                                   onChange={(e) =>
@@ -3686,16 +3849,16 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                             ref={globalProgressBarRef}
                             step="0.01"
                             value={
-                              (selectedVideoRef1.current?.currentTime || 0) >
-                                (selectedVideoRef2.current?.currentTime || 0)
-                                ? selectedVideoRef1.current?.currentTime || 0
-                                : selectedVideoRef2.current?.currentTime || 0
+                              Math.max(
+                                selectedVideoRef1.current?.currentTime || 0,
+                                selectedVideoRef2.current?.currentTime || 0
+                              )
                             }
                             max={
-                              (selectedVideoRef1.current?.duration || 0) >
-                                (selectedVideoRef2.current?.duration || 0)
-                                ? selectedVideoRef1.current?.duration || 0
-                                : selectedVideoRef2.current?.duration || 0
+                              Math.max(
+                                selectedVideoRef1.current?.duration || 0,
+                                selectedVideoRef2.current?.duration || 0
+                              )
                             }
                             onChange={handleGlobalProgressBarChange}
                             style={{ width: "450px" }}
@@ -3757,7 +3920,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                         pinnedUser === "user-video-1") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-2"))
-                      ? "switch-user-video"
+                      ? "switch-user-video w-auto"
                       : selectedClips.length &&
                         isPinned &&
                         selectedClips.length &&
@@ -3765,72 +3928,12 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                           pinnedUser === "user-video-1") ||
                           (accountType === AccountType.TRAINEE &&
                             pinnedUser === "user-video-2"))
-                        ? "switch-user-video"
+                        ? "switch-user-video w-auto"
                         : selectedClips?.length !== 0 && mediaQuery.matches
                           ? "scs"
-                          : ""
+                          : "switch-user-video w-auto"
                 }
-                style={{
-                  zIndex:
-                    !selectedClips.length &&
-                      isPinned &&
-                      // pinnedUser === "user-video-2"
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? "999"
-                      : selectedClips?.length &&
-                        ((accountType === AccountType.TRAINER &&
-                          pinnedUser !== "user-video-1") ||
-                          (accountType === AccountType.TRAINEE &&
-                            pinnedUser !== "user-video-2")) &&
-                        isPinned
-                        ? 999
-                        : selectedClips?.length && !pinnedUser && !isPinned
-                          ? 999
-                          : "auto",
-                  height:
-                    !selectedClips.length &&
-                      isPinned &&
-                      // pinnedUser === "user-video-2"
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? height < 500 ? "80px" : ""
-                      : selectedClips?.length === 0 ||
-                        (accountType === AccountType.TRAINER &&
-                          pinnedUser === "user-video-1") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-2")
-                        ? width500
-                          ? "380px"
-                          : height < 500 ? "100%" : "500px"
-                        : height < 500 ? "80px" : "",
-                  marginTop: width768 ? (width500 ? "40px" : "50px") : "20px",
-                  top:
-                    isPinned ?
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-1") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-2"))
-                        ? "0% !important"
-                        // ? height < 500 ? "50px" : "0% !important"
-                        : (accountType === AccountType.TRAINER &&
-                          pinnedUser !== "user-video-1") ||
-                          (accountType === AccountType.TRAINEE &&
-                            pinnedUser !== "user-video-2") ||
-                          pinnedUser === null
-                          ? "45% !important"
-                          : "50%" :
-                      "",
-
-                  // position: displayMsg?.msg || isRemoteVideoOff ? "relative" : height < 500 ? pinnedUser === "user-video-1" ? "relative" : "absolute" : "relative",
-                  position: height < 500 ? ((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) ? "relative" : "absolute" : "relative",
-
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-1") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-2")) && height < 500 ? "-140px" : "",
-                }}
+                style={{position:'relative'}}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
                     if (pinnedUser === "user-video-1") {
@@ -3934,7 +4037,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                       pinnedUser === "user-video-2") ||
                       (accountType === AccountType.TRAINEE &&
                         pinnedUser === "user-video-1"))
-                    ? "switch-user-video"
+                    ? "switch-user-video w-auto"
                     : selectedClips.length &&
                       isPinned &&
                       selectedClips.length &&
@@ -3942,52 +4045,11 @@ const emitVideoTimeEvent = (clickedTime, number) => {
                         pinnedUser === "user-video-2") ||
                         (accountType === AccountType.TRAINEE &&
                           pinnedUser === "user-video-1"))
-                      ? "switch-user-video"
+                      ? "switch-user-video w-auto"
                       : mediaQuery.matches
                         ? "scs2"
                         : ""
                 }
-                style={{
-                  zIndex:
-                    isPinned &&
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? "auto"
-                      : 999,
-
-                  marginLeft:'auto',
-                  marginRight:'auto',
-                  marginTop: (!isMobile && accountType.trainee ? "20px" : ""),
-                  height:
-                    isPinned &&
-                      ((accountType === AccountType.TRAINER &&
-                        pinnedUser === "user-video-2") ||
-                        (accountType === AccountType.TRAINEE &&
-                          pinnedUser === "user-video-1"))
-                      ? width500
-                        ? "380px"
-                        : height < 500 ? "100%" : "500px"
-                      : width500
-                        ? "150px"
-                        : height < 500 ? "80px" : "",
-                  // top :  selectedClips.length > 0 ?  "10% !important" : "20%"
-                  top:
-                    isPinned && !(height < 500) ?
-                      ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1"))
-                        ? "0% !important"
-                        : (accountType === AccountType.TRAINER && pinnedUser !== "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser !== "user-video-1") || pinnedUser === null
-                          ? "10% !important" : "20%"
-                      : height < 500 ? !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) ? "50px" : "" : "",
-
-                  position: height < 500 ?
-                    ((accountType === AccountType.TRAINER && pinnedUser === "user-video-2")
-                      || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")
-                    ) ?
-                      "relative" : "absolute" : "relative",
-                  right: !((accountType === AccountType.TRAINER && pinnedUser === "user-video-2") || (accountType === AccountType.TRAINEE && pinnedUser === "user-video-1")) && height < 500 ? "-140px" : "",
-                }}
                 onClick={() => {
                   if (accountType === AccountType.TRAINER) {
                     if (pinnedUser === "user-video-2") {

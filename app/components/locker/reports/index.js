@@ -21,6 +21,8 @@ import { FaDownload, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import '../../trainer/dashboard/index.css';
 import ConfirmModal from "../my-clips/confirmModal";
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
 
 const Reports = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
@@ -309,14 +311,14 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                               }}
                             >
                               <a
-                                href={Utils?.generateVideoURL(clp)}
-                                download={true}
+                                href={awsS3Url+clp?.session?.report} // Assuming this generates a URL for the PDF file
+                                download="file.pdf" // This specifies the filename for the downloaded file
                                 onClick={(e) => e.stopPropagation()}
                                 style={{
                                   color : '#fff',
                                   fontSize : '16px'
                                 }}
-                                target="_self"
+                                target="_blank"
                               >
                                 <FaDownload />
                               </a>
@@ -455,9 +457,13 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                   </div>
                 </div>
               </div>
-              <div className="d-flex flex-column  align-items-center">
+              <div className="d-flex flex-column align-items-center">
                 <h1 className="p-3">Report</h1>
-                <embed src={`${awsS3Url}${reportName}`} width="100%" height="500px" allowfullscreen />
+                <div style={{ height: '100vh' }} className="pdf-viewer">
+                  <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                    <Viewer fileUrl={`${awsS3Url}${reportName}`} />
+                  </Worker>
+                </div>
               </div>
               <div className="justify-content-center">
               </div>

@@ -6,7 +6,7 @@ import {
   getScheduledMeetingDetailsAsync,
   updateBookedSessionScheduledMeetingAsync,
 } from "../common/common.slice";
-import { Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, Utils } from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
@@ -52,7 +52,8 @@ const TraineeRenderBooking = ({
   handleAddRatingModelState,
   accountType,
   activeTabs,
-  start_time
+  start_time,
+  bookingInfo
 }) => {
   const { scheduledMeetingDetails, addRatingModel } =
     useAppSelector(bookingsState);
@@ -61,9 +62,13 @@ const TraineeRenderBooking = ({
   const dispatch = useAppDispatch();
   const { removeNewBookingData } = traineeAction;
   const isCompleted =
-    has24HoursPassedSinceBooking ||
-    scheduledMeetingDetails[booking_index]?.ratings?.trainee;
+    has24HoursPassedSinceBooking || bookingInfo?.ratings?.trainee;
 
+  // Compare the current time with start_time and end_time
+  const currentTime = new Date();
+  const isWithinTimeFrame = currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone);
+
+  console.log("traineedate",currentTime, CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone))
   const canShowRatingButton =
     !isUpcomingSession &&
     !isCurrentDateBefore &&
@@ -99,16 +104,16 @@ const TraineeRenderBooking = ({
   };
 
   const isMeetingCanceled = () => {
-    return (status === BookedSession.canceled || activeTabs === BookedSession.canceled)
-  }
+    return (
+      status === BookedSession.canceled || activeTabs === BookedSession.canceled
+    );
+  };
 
   return (
     <React.Fragment>
       {status !== BookedSession.canceled &&
         activeTabs !== BookedSession.canceled &&
-        isMeetingDone && (
-          <h3 className="mt-1">Completed</h3>
-        )}
+        isMeetingDone && <h3 className="mt-1">Completed</h3>}
       {canShowRatingButton && status !== BookedSession.canceled ? (
         <button
           className={`btn btn-success button-effect btn-sm mr-2 my-1`}
@@ -125,7 +130,7 @@ const TraineeRenderBooking = ({
                 "Your trainee has submitted a new rating for your session.",
               senderId: trainee_info?._id,
               receiverId: trainer_info?._id,
-              bookingInfo:scheduledMeetingDetails[booking_index]
+              bookingInfo: bookingInfo,
             });
           }}
         >
@@ -185,6 +190,7 @@ const TraineeRenderBooking = ({
                     setSelectedClips={setSelectedClips}
                     clips={clips}
                     shareFunc={addTraineeClipInBookedSession}
+                    sendNotfication={null}
                   />
                 </React.Fragment>
               )}
@@ -193,8 +199,9 @@ const TraineeRenderBooking = ({
                   className="btn btn-primary button-effect btn-sm mr-2 my-1"
                   type="button"
                   style={{
-                    cursor: "pointer",
+                    cursor: isWithinTimeFrame ? "pointer" : "not-allowed",
                   }}
+                  disabled={!isWithinTimeFrame}
                   onClick={() => {
                     handleClick();
                     setStartMeeting({
@@ -203,8 +210,8 @@ const TraineeRenderBooking = ({
                       isOpenModal: true,
                       traineeInfo: trainee_info,
                       trainerInfo: trainer_info,
-                      iceServers: scheduledMeetingDetails[booking_index].iceServers,
-                      trainee_clip: scheduledMeetingDetails[booking_index].trainee_clips
+                      iceServers: bookingInfo.iceServers,
+                      trainee_clip: bookingInfo.trainee_clips,
                     });
 
                     sendNotifications({
@@ -212,7 +219,7 @@ const TraineeRenderBooking = ({
                       description: `${trainee_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
                       senderId: trainee_info?._id,
                       receiverId: trainer_info?._id,
-                      bookingInfo:scheduledMeetingDetails[booking_index]
+                      bookingInfo: bookingInfo,
                     });
                   }}
                 >
@@ -249,7 +256,7 @@ const TraineeRenderBooking = ({
                         "A scheduled training session has been cancelled. Please check your calendar for details.",
                       senderId: trainee_info?._id,
                       receiverId: trainer_info?._id,
-                      bookingInfo:null
+                      bookingInfo: null,
                     });
                   }
                 }}
@@ -270,9 +277,7 @@ const TraineeRenderBooking = ({
               }}
               disabled={isMeetingCanceled()}
             >
-              {isMeetingCanceled()
-                ? BookedSession.canceled
-                : "Cancel"}
+              {isMeetingCanceled() ? BookedSession.canceled : "Cancel"}
             </button>
           )}
         </React.Fragment>

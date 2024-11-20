@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button } from 'reactstrap';
 import moment from 'moment';
-import { Utils } from '../../../../utils/utils';
+import { convertTimesToISO, Utils } from '../../../../utils/utils';
 import { createPaymentIntentAsync } from '../trainee.slice';
 import { authAction } from '../../auth/auth.slice';
 import { useAppDispatch } from '../../../store';
 import { BookedSession, LOCAL_STORAGE_KEYS } from '../../../common/constants';
 import { RxCross2 } from 'react-icons/rx';
+import { DateTime } from 'luxon';
 
 const InstantLessons = [
   { label: '15 Minutes', duration: 15 },
@@ -15,11 +16,28 @@ const InstantLessons = [
   { label: '2 Hours', duration: 120 },
 ];
 
-const getTimeRange = (duration) => {
-  const now = moment();
-  const startTime = moment(now).add(2, 'minutes'); //NOTE - Start time is 10 minutes from now
-  const endTime = moment(startTime).add(duration, 'minutes');
+const indexedInstantLesson = {
+15:  { label: '15 Minutes', duration: 15 },
+30:  { label: '30 Minutes', duration: 30 },
+60: { label: '60 Minutes', duration: 60 },
+120: { label: '2 Hours', duration: 120 },
+}
 
+const getTimeRange = (duration , isSchedule , selectedSlot) => {
+  
+  if(isSchedule){
+    return {
+      startTime: selectedSlot?.start,
+      endTime: selectedSlot?.end,
+      sessionStartTime: selectedSlot?.start,
+      sessionEndTime: selectedSlot?.end,
+    }
+  }
+
+  const now = moment();
+  const startTime = moment(now).add(0, 'minutes');
+  const endTime = moment(startTime).add(duration, 'minutes');
+  console.log("getTimeRange",startTime,endTime)
   return {
     sessionStartTime: startTime.format('HH:mm'),
     sessionEndTime: endTime.format('HH:mm'),
@@ -28,10 +46,25 @@ const getTimeRange = (duration) => {
   };
 };
 
-const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBookSessionPayload, setAmount, startDate}) => {
+const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBookSessionPayload, setAmount, startDate ,isCommonBooking ,setIsCommonBooking , selectedDate , selectedSlot}) => {
   const dispatch = useAppDispatch();
   const isTokenExists = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const [slot ,setSlot ] = useState(null);
+ 
+  useEffect(() =>{
+    console.log('prinitng' , selectedLesson  , trainerInfo, parseInt(trainerInfo?.extraInfo?.availabilityInfo?.selectedDuration) )
+    if(isCommonBooking){
+      setSelectedLesson(parseInt(trainerInfo.userInfo?.extraInfo?.availabilityInfo?.selectedDuration))
+    }
+  },[trainerInfo , isCommonBooking , selectedSlot])
+
+  useEffect(() =>{
+    if(selectedLesson && isCommonBooking){
+      const tempSlot = getTimeRange(selectedLesson.duration , isCommonBooking);
+      setSlot(tempSlot)
+    }
+  }, [selectedLesson , isCommonBooking])
 
   return (
     <Modal isOpen={isOpen}>
@@ -50,6 +83,8 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
           }}
           onClick={() => {
             onClose(false);
+            setSelectedLesson(null)
+            setIsCommonBooking(false)
           }}
         />
       </div>
@@ -64,7 +99,8 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
             textAlign : 'center'
         }}
         >
-          Don't want to wait for a scheduled slot? Book an Instant Lesson and get started within just 2 minutes!
+          {isCommonBooking ?"Book your slot in advance to avoid waiting for the trainer to come online.":
+          "Don't want to wait for a scheduled slot? Book an Instant Lesson and get started within just 2 minutes!"}
         </p>
         <div
         className='row'
@@ -74,7 +110,7 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
             justifyContent : 'center',
             textAlign : 'center'
         }}>
-        {InstantLessons.map((item, i) => {
+        {!isCommonBooking && InstantLessons.map((item, i) => {
           return (
             <div
               key={i}
@@ -91,6 +127,17 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
             </div>
           );
         })}
+        {isCommonBooking && <div
+              className="col-5"
+              style={{
+                border: '2px solid #000080',
+                cursor: 'pointer',
+                padding: '10px 0px',
+                margin: '5px 3px',
+              }}
+            >
+              <b style={{ color: '#000080' }}>{indexedInstantLesson[selectedLesson]?.label }</b>
+            </div>}
         </div>
         <div className="col-12 mb-3 d-flex justify-content-center align-items-center">
           <Button
@@ -98,18 +145,28 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
             disabled={!selectedLesson}
             className="mt-3 btn btn-sm btn-primary"
             onClick={() => {
-              if (!selectedLesson) {
+              console.log('onclick triggered');
+              if (!selectedLesson ) {
+                if(isCommonBooking && !selectedSlot){
+                  return;
+                }
+                
+                console.log('cancelling the onclick')
                 return;
               }
-              const slot = getTimeRange(selectedLesson.duration);
-              console.log(slot)
-             
+              
+              const slot1 = getTimeRange(selectedLesson.duration);
+              console.log('onclick after return' , selectedSlot?.start , slot1?.sessionStartTime );
+              
+              let startTime =isCommonBooking ? DateTime.fromFormat(selectedSlot?.start, "h:mm a").toFormat("HH:mm"): slot1?.sessionStartTime
+              let endTime =isCommonBooking ? DateTime.fromFormat(selectedSlot?.end, "h:mm a").toFormat("HH:mm"): slot1?.sessionEndTime 
+
               const amountPayable = Utils.getMinutesFromHourMM(
-                slot?.sessionStartTime,
-                slot?.sessionEndTime,
+                startTime,
+                endTime ,
                 trainerInfo?.userInfo?.extraInfo?.hourly_rate
               );
-              
+              console.log("amountPayable",amountPayable)
               if (amountPayable > 0) {
                   if (isTokenExists) {
                     dispatch(authAction.updateIsAuthModalOpen(false));
@@ -124,6 +181,9 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                   } else {
                     dispatch(authAction.updateIsAuthModalOpen(true));
                   }
+              
+                  console.log("isCommonBooking",selectedSlot,slot1,startDate)
+
                   const payload = {
                     slot_id: slot?._id,
                     charging_price: amountPayable,
@@ -135,19 +195,19 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                     hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
                     status: BookedSession.booked,
                     booked_date: startDate,
-                    session_start_time: slot.sessionStartTime,
-                    session_end_time: slot.sessionEndTime,
-                    start_time: slot?.startTime,
-                    end_time: slot?.endTime,
+                    session_start_time:startTime,
+                    session_end_time: endTime,
+                    start_time: convertTimesToISO(startDate , startTime),
+                    end_time: convertTimesToISO(startDate , endTime),
                   };
-                  console.log(payload , 'payload')
+                  console.log('onclick at payload',payload);
                   setBookSessionPayload(payload);
                   setAmount(amountPayable.toFixed(1));
                   onClose(false);
               }
             }}
           >
-            Book Instant Lesson
+            {isCommonBooking ? "Process to Checkout": "Book Instant Lesson"}
           </Button>
         </div>
       </div>
