@@ -1384,10 +1384,14 @@ useEffect(() => {
 
 
   
-    html2canvas(targetElement, { type: "png" }).then(async (canvas) => {
+    html2canvas(targetElement, { type: "png",
+      allowTaint:true,
+      useCORS:true
+     }).then(async (canvas) => {
       // document.body.appendChild(canvas);
       // console.log("1366=======S3",{canvas})
       const dataUrl = canvas.toDataURL("image/png");
+      console.log("dataUrl",dataUrl)
       // console.log("1367=======S3",{dataUrl})
       // screenShots.push({
       //   title: "",
@@ -1513,7 +1517,7 @@ useEffect(() => {
   }
 
   async function pushProfilePhotoToS3(presignedUrl, uploadPhoto, cb) {
-    const myHeaders = new Headers({ "Content-Type": "image/*" });
+      const myHeaders = new Headers({ "Content-Type": "image/*" });
     await axios.put(presignedUrl, uploadPhoto, {
       headers: myHeaders,
     });
