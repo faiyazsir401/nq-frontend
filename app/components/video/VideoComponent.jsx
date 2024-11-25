@@ -13,7 +13,7 @@ const VideoComponent = forwardRef(({ src, poster, id, style, onTimeUpdate, ...pr
       playsInline
       {...props}
     >
-      <source src={src} type="video/mp4" />
+      <source src={src}/>
       Your browser does not support the video tag.
     </video>
   );
