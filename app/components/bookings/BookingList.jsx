@@ -6,7 +6,7 @@ import {
   bookingsState,
   getScheduledMeetingDetailsAsync,
 } from "../common/common.slice";
-import { formatTimeInLocalZone, Utils } from "../../../utils/utils";
+import { formatTimeInLocalZone, formatToAMPM, Utils } from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
@@ -310,8 +310,8 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
     
     // Convert start and end times to local time if the time zone is different
-    const localStartTime = formatTimeInLocalZone(start_time, time_zone);
-    const localEndTime = formatTimeInLocalZone(end_time, time_zone);
+    const localStartTime = formatTimeInLocalZone(start_time);
+    const localEndTime = formatTimeInLocalZone(end_time);
     
     console.log("bookingInfo:" + _id, localStartTime); // Displaying the converted start time
 

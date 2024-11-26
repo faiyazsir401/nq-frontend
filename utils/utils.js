@@ -929,10 +929,10 @@ export const getTimeZoneOffset = (timeZone) => {
 
 
 // Helper function to format time based on the given time zone
-export const formatTimeInLocalZone = (time, timeZone) => {
+export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
   const localTimeZone = getLocalTimeZone();
   console.log("timeZone",timeZone,localTimeZone)
-  if (!timeZone || timeZone === localTimeZone) {
+  if (!timeZone || timeZone === localTimeZone || noConversion) {
     // If time zone is the same as local, return formatted time as is
     const date = DateTime.fromISO(time, { zone: 'utc' });
     console.log("date",date)
@@ -975,22 +975,11 @@ export const formatTimeInLocalZone = (time, timeZone) => {
 
 
 export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
-  const localTimeZone = getLocalTimeZone();
+  const localTimeZone = getLocalTimeZone()
 
-  if (!timeZone || timeZone === localTimeZone) {
-    // If time zone is the same as local, return formatted time as is
-    const date = DateTime.fromISO(time, { zone: 'utc' });
-    console.log("date123",date)
-    const jsDate = date.toJSDate();
-    jsDate.setMinutes(date.c.minute)
-    jsDate.setHours(date.c.hour)
-    jsDate.setDate(date.c.day)
-    jsDate.setMonth(date.c.month-1)
-    jsDate.setYear(date.c.year)
-    console.log("sametime",jsDate)
-    return jsDate;
+  if(localTimeZone === timeZone){
+    return time
   }
-
   // If the time zones are different, calculate the offset difference and adjust time
   const fromOffset = getTimeZoneOffset(timeZone); // Get the offset for the provided time zone
   const toOffset = getTimeZoneOffset(localTimeZone); // Get the offset for the local time zone
@@ -998,22 +987,82 @@ export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
   // Calculate the difference in minutes between the time zones
   const offsetDifference = toOffset - fromOffset;
 
-      // Create a new Date object from the time input
-      console.log("date123",time,timeZone)
-      const date = DateTime.fromISO(time, { zone: 'utc' });
-      console.log("date",date)
-      const jsDate = date.toJSDate();
-      jsDate.setMinutes(date.c.minute)
-      jsDate.setHours(date.c.hour)
-      jsDate.setDate(date.c.day)
-      jsDate.setMonth(date.c.month-1)
-      jsDate.setYear(date.c.year)
+  console.log("Input Time:", time);
+  console.log("Time Zones:", timeZone);
 
-      console.log("date1234",jsDate)
-      // Apply the offset difference (in minutes)
-      console.log("offsetDifference",jsDate.getMinutes())
-      jsDate.setMinutes(jsDate.getMinutes() + offsetDifference);
-      console.log("jsDate123",jsDate)
-  // Format the adjusted time using the local time zone
-  return jsDate;
+
+    let date;
+
+    // Check if the time is a Date object
+    if (time instanceof Date) {
+      // If it's a Date object, use fromJSDate
+      date = DateTime.fromJSDate(time, { zone: "utc" });
+    } else {
+      // If it's a string, use fromISO
+      date = DateTime.fromISO(time, { zone: "utc" });
+    }
+
+  console.log("Original DateTime (UTC):", date.toISO());
+
+  // Apply the offset difference (in minutes) to the DateTime object
+  const adjustedDate = date.plus({ minutes: offsetDifference });
+
+  console.log("Adjusted DateTime:", adjustedDate.toISO());
+
+  // Return the adjusted DateTime object
+  return adjustedDate.toISO({
+  
+    includeOffset: false,
+  }) + "Z";
+};
+
+
+// Function to format a JavaScript Date to HH:mm (local time)
+const formatToHHMM = (isoDate) => {
+  const date = new Date(isoDate); // Parse ISO date string into a Date object
+  const hours = date.getUTCHours().toString().padStart(2, '0'); // Use UTC hours
+  const minutes = date.getUTCMinutes().toString().padStart(2, '0'); // Use UTC minutes
+  return `${hours}:${minutes}`;
+};
+
+
+
+export const convertTimesForDataArray = (dataArray) => {
+  return dataArray.map((item) => {
+    // Convert start time
+    console.log("item.start_time",item.start_time)
+    const convertedStartTime = CovertTimeAccordingToTimeZone(
+      item.start_time, 
+      item.time_zone, 
+      false  // Assuming we always want conversion unless noConversion is set to true
+    );
+    console.log("convertedStartTime",convertedStartTime)
+    // Convert end time
+    const convertedEndTime = CovertTimeAccordingToTimeZone(
+      item.end_time, 
+      item.time_zone, 
+      false  // Assuming we always want conversion unless noConversion is set to true
+    );
+
+    // Convert end time
+    const convertedBookDate = CovertTimeAccordingToTimeZone(
+      item.booked_date, 
+      item.time_zone, 
+      false  // Assuming we always want conversion unless noConversion is set to true
+    );
+
+    // Format the converted times to HH:mm format (without date)
+    const formattedStartTime = formatToHHMM(convertedStartTime);
+    const formattedEndTime = formatToHHMM(convertedEndTime);
+
+    // Return a new object with converted times
+    return {
+      ...item,
+      start_time: convertedStartTime,
+      end_time: convertedEndTime,
+      booked_date:convertedBookDate,
+      session_start_time: formattedStartTime,
+      session_end_time: formattedEndTime
+    };
+  });
 };

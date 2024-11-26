@@ -1771,7 +1771,7 @@ const togglePlay = (num) => {
 
   // console.log("video time--------->",videoTime)
   const handleTimeUpdate = (videoRef, progressBarRef, number) => {
-    let num = number;
+    
     if (!videoRef.current) return; // Ensure videoRef is valid
   
     // Update progress bar value
@@ -1781,8 +1781,22 @@ const togglePlay = (num) => {
   
     // Check if video has ended
     if (videoRef.current.duration === videoRef.current.currentTime) {
-      // togglePlay(number === 1 ? "one" : "two");
-      videoRef.current.currentTime = 0;     
+      videoRef.current.currentTime = 0;    
+      if(videoController){
+        const updatedPlayingState = { ...isPlaying };
+        const isPlayingValue = updatedPlayingState.isPlayingAll;
+        updatedPlayingState.isPlayingAll = !isPlayingValue;
+        setIsPlaying(updatedPlayingState); 
+      }else{
+        const num =number === 1 ? "one" : "two";
+        const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
+        const updatedPlayingState = { ...isPlaying };
+        const isPlayingValue = updatedPlayingState[isPlayingKey];
+        updatedPlayingState[isPlayingKey] = !isPlayingValue;
+        setIsPlaying(updatedPlayingState); 
+      }
+
+     
     }
   
     // Calculate remaining time

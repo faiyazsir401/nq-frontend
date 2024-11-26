@@ -22,6 +22,7 @@ import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
 import { notificiationTitles } from "../../../utils/constant";
+import { DateTime } from "luxon";
 
 const TraineeRenderBooking = ({
   _id,
@@ -65,10 +66,11 @@ const TraineeRenderBooking = ({
     has24HoursPassedSinceBooking || bookingInfo?.ratings?.trainee;
 
   // Compare the current time with start_time and end_time
-  const currentTime = new Date();
-  const isWithinTimeFrame = currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone);
+  const currentTime = DateTime.now();
+  const isWithinTimeFrame =
+  currentTime>= DateTime.fromISO(bookingInfo.start_time,{zone:'utc'})
 
-  console.log("traineedate",currentTime, CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone))
+  console.log("traineedate",currentTime, DateTime.fromISO(bookingInfo.start_time,{zone:'utc'}))
   const canShowRatingButton =
     !isUpcomingSession &&
     !isCurrentDateBefore &&

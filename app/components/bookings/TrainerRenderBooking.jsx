@@ -14,6 +14,7 @@ import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
 import { notificiationTitles } from "../../../utils/constant";
+import { DateTime } from "luxon";
 
 const TrainerRenderBooking = ({
   _id,
@@ -53,11 +54,11 @@ const TrainerRenderBooking = ({
   const dispatch = useAppDispatch();
 
   // Compare the current time with start_time and end_time
-  const currentTime = new Date();
+  const currentTime = DateTime.now();
   const isWithinTimeFrame =
-    currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone) ;
+  currentTime>= DateTime.fromISO(bookingInfo.start_time,{zone:'utc'})
 
-    console.log("trainerdate",currentTime >= CovertTimeAccordingToTimeZone(bookingInfo.start_time,bookingInfo.time_zone))
+    console.log("trainerdate",currentTime, DateTime.fromISO(bookingInfo.start_time,{zone:'utc'}))
 
   const isCompleted =
     has24HoursPassedSinceBooking || bookingInfo?.ratings?.trainee;

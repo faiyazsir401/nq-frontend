@@ -1,7 +1,8 @@
 import axios from "axios";
 import { axiosInstance } from "../../../config/axios-interceptor";
-import { Utils } from "../../../utils/utils";
+import { convertTimesForDataArray, Utils } from "../../../utils/utils";
 import { LOCAL_STORAGE_KEYS } from "../../common/constants";
+
 
 export const addRating = async (payload) => {
   try {
@@ -35,8 +36,13 @@ export const getScheduledMeetingDetails = async (payload) => {
       },
       params: payload,
     });
+    console.log("getScheduledMeetingDetails1",response.data )
+
+    response.data.data = convertTimesForDataArray(response.data.data)
+    console.log("convertTimesForDataArray",response.data.data)
     return response.data;
   } catch (error) {
+    console.log("getScheduledMeetingDetailsError",error)
     throw error;
   }
 };
