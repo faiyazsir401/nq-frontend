@@ -1699,70 +1699,73 @@ const emitVideoTimeEvent = (clickedTime, number) => {
     }
 };
 
-  const togglePlay = (num) => {
-    // Handle thumbnail visibility
-    if (num === 'one' && showThumbnailForFirstVideo) {
-        setShowThumbnailForFirstVideo(false);
+const togglePlay = (num) => {
+  console.log("whichvideo",num)
+  if (num === 'one' && showThumbnailForFirstVideo) {
+      setShowThumbnailForFirstVideo(false);
+  }
+
+  if (num === 'two' && showThumbnailForTwoVideo) {
+      setShowThumbnailForTwoVideo(false);
+  }
+
+  if (num === 'all') {
+      setShowThumbnailForFirstVideo(false);
+      setShowThumbnailForTwoVideo(false);
+  }
+
+  if (selectedVideoRef1.current && selectedVideoRef2.current) {
+      if (
+          selectedVideoRef1.current.currentTime === selectedVideoRef1.current.duration &&
+          selectedVideoRef2.current.currentTime === selectedVideoRef2.current.duration
+      ) {
+          selectedVideoRef1.current.currentTime = 0;
+          selectedVideoRef2.current.currentTime = 0;
+          emitVideoTimeEvent(0, "one");
+          emitVideoTimeEvent(0, "two");
+      }
+  }
+
+  const updatedPlayingState = { ...isPlaying };
+  console.log('updatedPlayingState')
+  const toggleAll = num === "all";
+
+  if (toggleAll) {
+      updatedPlayingState.isPlayingAll = !isPlaying.isPlayingAll;
+
+      if (updatedPlayingState.isPlayingAll) {
+          selectedVideoRef1.current?.play();
+          selectedVideoRef2.current?.play();
+      } else {
+          selectedVideoRef1.current?.pause();
+          selectedVideoRef2.current?.pause();
+      }
+  } else {
+      const videoRef = num === "one" ? selectedVideoRef1 : selectedVideoRef2;
+      const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
+      const isPlayingValue = updatedPlayingState[isPlayingKey];
+
+      if (isPlayingValue) {
+          videoRef.current?.pause();
+      } else {
+          videoRef.current?.play();
+      }
+      updatedPlayingState[isPlayingKey] = !isPlayingValue;
     }
+    updatedPlayingState.number = num;
 
-    if (num === 'two' && showThumbnailForTwoVideo) {
-        setShowThumbnailForTwoVideo(false);
-    }
+  // Emit using the updated state directly
+  console.log('Emitting play/pause event:', {
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+      ...updatedPlayingState,
+  });
+  socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+      ...updatedPlayingState,
+  });
 
-    if (num === 'all') {
-        setShowThumbnailForFirstVideo(false);
-        setShowThumbnailForTwoVideo(false);
-    }
-
-    // Reset video time if both videos are ended
-    if (selectedVideoRef1.current && selectedVideoRef2.current) {
-        if (
-            selectedVideoRef1.current.currentTime === selectedVideoRef1.current.duration &&
-            selectedVideoRef2.current.currentTime === selectedVideoRef2.current.duration
-        ) {
-            selectedVideoRef1.current.currentTime = 0;
-            selectedVideoRef2.current.currentTime = 0;
-            emitVideoTimeEvent(0, "one");
-            emitVideoTimeEvent(0, "two");
-        }
-    }
-
-    // Update playing state based on selected video
-    let updatedPlayingState = { ...isPlaying };
-    const toggleAll = num === "all";
-    
-    if (toggleAll) {
-        updatedPlayingState.isPlayingAll = !isPlaying.isPlayingAll;
-
-        if (updatedPlayingState.isPlayingAll) {
-            selectedVideoRef1.current?.play();
-            selectedVideoRef2.current?.play();
-        } else {
-            selectedVideoRef1.current?.pause();
-            selectedVideoRef2.current?.pause();
-        }
-    } else {
-        // Handle individual video play/pause
-        const videoRef = num === "one" ? selectedVideoRef1 : selectedVideoRef2;
-        const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
-        const isPlayingValue = updatedPlayingState[isPlayingKey];
-
-        if (isPlayingValue) {
-            videoRef.current?.pause();
-        } else {
-            videoRef.current?.play();
-        }
-        updatedPlayingState[isPlayingKey] = !isPlayingValue;
-    }
-
-    // Emit the updated play state to the socket
-    socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
-        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-        ...updatedPlayingState,
-    });
-
-    console.log('Updated play state:', updatedPlayingState);
-    setIsPlaying(updatedPlayingState);
+  // Update the state locally after emitting
+  setIsPlaying(updatedPlayingState);
 };
 
 
@@ -1778,9 +1781,8 @@ const emitVideoTimeEvent = (clickedTime, number) => {
   
     // Check if video has ended
     if (videoRef.current.duration === videoRef.current.currentTime) {
-      togglePlay(number === 1 ? "one" : "two");
-      videoRef.current.currentTime = 0;
-      emitVideoTimeEvent(0, number);
+      // togglePlay(number === 1 ? "one" : "two");
+      videoRef.current.currentTime = 0;     
     }
   
     // Calculate remaining time
@@ -1793,7 +1795,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
       [`remainingTime${number}`]: formatTime(remainingTime),
     }));
   };
-  
+
   // Helper function to format time as MM:SS
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
