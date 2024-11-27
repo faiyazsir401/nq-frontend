@@ -797,6 +797,7 @@ useEffect(() => {
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
+ 
     const context = canvas?.getContext("2d");
     if (!context) return;
 
@@ -1645,6 +1646,49 @@ const emitVideoTimeEvent = (clickedTime, number) => {
       remainingTime2: "00:00",
     })
   };
+
+
+  const [video1Loaded, setVideo1Loaded] = useState(false);
+  const [video2Loaded, setVideo2Loaded] = useState(false);
+
+  useEffect(() => {
+    const video1 = selectedVideoRef1.current;
+    const video2 = selectedVideoRef2.current;
+    console.log("videohaiji1",video1)
+    console.log("videohaiji2",video2)
+
+    const handleVideo1Load = () => {
+      console.log("Video 1 loaded");
+      setVideo1Loaded(true);
+    };
+
+    const handleVideo2Load = () => {
+      console.log("Video 2 loaded");
+      setVideo2Loaded(true);
+    };
+
+    if (video1) {
+      video1.addEventListener("loadeddata", handleVideo1Load);
+    }
+    if (video2) {
+      video2.addEventListener("loadeddata", handleVideo2Load);
+    }
+
+    setTimeout(()=>{
+      setVideo1Loaded(true)
+      setVideo2Loaded(true)
+    },5000)
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      if (video1) {
+        video1.removeEventListener("loadeddata", handleVideo1Load);
+      }
+      if (video2) {
+        video2.removeEventListener("loadeddata", handleVideo2Load);
+      }
+    };
+  }, [selectedClips, isPinned , selectedVideoRef1 , selectedVideoRef2]);
 
   const handleGlobalProgressBarChange = (e) => {
     const { value } = e.target;
@@ -2675,7 +2719,7 @@ useEffect(() => {
                         {/* <canvas id="video-canvas-1" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
-                          !isPinned && (
+                          !isPinned &&video1Loaded&& (
                             <>
                               <div
                                 className="Pause"
@@ -2770,7 +2814,7 @@ useEffect(() => {
                         {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
                           !videoController &&
-                          !isPinned && !isPlaying.isPlayingAll && (
+                          !isPinned && !isPlaying.isPlayingAll &&video2Loaded&& (
                             <>
                               <div
                                 className="Pause2"
