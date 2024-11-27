@@ -12,6 +12,7 @@ const VideoComponent = forwardRef(({ src, poster, id, style, onTimeUpdate, ...pr
       preload="metadata"
       playsInline
       {...props}
+      crossOrigin="anonymous"
     >
       <source src={src}/>
       Your browser does not support the video tag.

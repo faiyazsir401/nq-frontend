@@ -1390,6 +1390,7 @@ useEffect(() => {
      }).then(async (canvas) => {
       // document.body.appendChild(canvas);
       // console.log("1366=======S3",{canvas})
+ 
       const dataUrl = canvas.toDataURL("image/png");
       console.log("dataUrl",dataUrl)
       // console.log("1367=======S3",{dataUrl})
