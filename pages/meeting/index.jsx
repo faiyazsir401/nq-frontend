@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { authAction, authState } from "../../app/components/auth/auth.slice";
 import StartMeeting from "../../app/components/bookings/start";
+import "../dashboard/index"
 import {
   bookingsAction,
   bookingsState,
@@ -254,7 +255,7 @@ const MeetingRoom = () => {
             switch (meetingDetails.status) {
               case "confirmed":
                 return (
-                  <div>
+                  <div id="get-navbar-tabs" className="get-navbar-tabs">
                     <div
                       id="bookings"
                       className={
