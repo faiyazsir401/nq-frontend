@@ -12,7 +12,9 @@ import { useEffect, useState } from "react";
 import { getSocket, SocketContext } from "../../app/components/socket";
 import { LOCAL_STORAGE_KEYS, topNavbarOptions } from "../../app/common/constants";
 import { useMediaQuery } from "usehooks-ts";
-const RenderVideoCall = () => {
+import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
+import OrientationModal from "../../app/components/modalComponent/OrientationModal";
+const RenderVideoCall = ({height,width,isRotatedInitally}) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const id = router?.query?.id;
@@ -33,6 +35,9 @@ const RenderVideoCall = () => {
 
   console.log("meetingDetails", meetingDetails, accountType);
   return (
+    height > width && !isRotatedInitally ?
+    <OrientationModal isOpen={true} /> 
+    :
     <StartMeeting
       id={meetingDetails._id}
       accountType={accountType}
@@ -55,6 +60,11 @@ const RenderVideoCall = () => {
 
 const MeetingRoom = () => {
 
+  const { height, width } = useWindowDimensions();
+  const [isRotatedInitally, setIsRotatedInitally] = useState(false);
+  useEffect(() => {
+    if (height < width) setIsRotatedInitally(true)
+  }, [height, width])
 
   const mediaQuery = useMediaQuery("(min-width: 992px)");
   const { isLoading, configs, startMeeting } = useAppSelector(bookingsState);
@@ -270,7 +280,7 @@ const MeetingRoom = () => {
                         }
                       }}
                     >
-                      <RenderVideoCall />
+                      <RenderVideoCall height={height} width={width} isRotatedInitally={isRotatedInitally}/>
                     </div>
                   </div>
                 );

@@ -8,7 +8,7 @@ const VideoComponent = forwardRef(({ src, poster, id, style, onTimeUpdate, ...pr
       style={style}
       ref={ref}
       onTimeUpdate={onTimeUpdate}
-      
+      muted={true}
       preload="metadata"
       playsInline
       {...props}
