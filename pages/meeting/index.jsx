@@ -47,6 +47,7 @@ const RenderVideoCall = () => {
           trainerInfo: null,
         });
         dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
+        router.push("/dashboard")
       }}
     />
   );
