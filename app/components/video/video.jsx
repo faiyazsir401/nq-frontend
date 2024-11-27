@@ -1669,15 +1669,17 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
     if (video1) {
       video1.addEventListener("loadeddata", handleVideo1Load);
+      setTimeout(()=>{
+        setVideo1Loaded(true)
+      },5000)
     }
     if (video2) {
       video2.addEventListener("loadeddata", handleVideo2Load);
+      setTimeout(()=>{
+        setVideo2Loaded(true)
+      },5000)
     }
 
-    setTimeout(()=>{
-      setVideo1Loaded(true)
-      setVideo2Loaded(true)
-    },5000)
 
     // Cleanup event listeners on component unmount
     return () => {
