@@ -2670,6 +2670,7 @@ useEffect(() => {
                           onTimeUpdate={handleTimeUpdate1}
                           poster={Utils?.generateThumbnailURL(selectedClips[0])}
                           src={Utils?.generateVideoURL(selectedClips[0])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-1" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
@@ -2764,6 +2765,7 @@ useEffect(() => {
                           onTimeUpdate={handleTimeUpdate2}
                           poster={Utils?.generateThumbnailURL(selectedClips[1])}
                           src={Utils?.generateVideoURL(selectedClips[1])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
@@ -3606,6 +3608,7 @@ useEffect(() => {
                           onTimeUpdate={handleTimeUpdate1}
                           poster={Utils?.generateThumbnailURL(selectedClips[0])}
                           src={Utils?.generateVideoURL(selectedClips[0])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-1" hidden></canvas> */}
     
@@ -3730,6 +3733,7 @@ useEffect(() => {
                           onTimeUpdate={handleTimeUpdate2}
                           poster={Utils?.generateThumbnailURL(selectedClips[1])}
                           src={Utils?.generateVideoURL(selectedClips[1])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
