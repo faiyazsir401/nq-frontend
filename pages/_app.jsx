@@ -31,8 +31,11 @@ export default function MyAppComponent({ Component, pageProps }) {
     let localStorageUser = localStorage.getItem("email");
     // get all details about authenticate login users
     if (currentUser === undefined) {
-      console.log(`redirecting >>> `);
-      handlePublicRoutes(pathName, path, router);
+      
+      console.log(`redirecting >>> `,pathName);
+      if(pathName !== "/meeting"){
+        handlePublicRoutes(pathName, path, router);
+      }
     } else {
       setCurrentUser(localStorageUser);
     }

@@ -977,7 +977,7 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
 export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
   const localTimeZone = getLocalTimeZone()
 
-  if(localTimeZone === timeZone){
+  if(localTimeZone === timeZone ||!timeZone){
     return time
   }
   // If the time zones are different, calculate the offset difference and adjust time
