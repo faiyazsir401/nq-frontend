@@ -2,7 +2,7 @@ import axios from "axios";
 import { axiosInstance } from "../../../config/axios-interceptor";
 import { convertTimesForDataArray, Utils } from "../../../utils/utils";
 import { LOCAL_STORAGE_KEYS } from "../../common/constants";
-
+import store from "../../store";
 
 export const addRating = async (payload) => {
   try {
@@ -36,13 +36,60 @@ export const getScheduledMeetingDetails = async (payload) => {
       },
       params: payload,
     });
-    console.log("getScheduledMeetingDetails1",response.data )
+    console.log("getScheduledMeetingDetails1", response.data);
 
-    response.data.data = convertTimesForDataArray(response.data.data)
-    console.log("convertTimesForDataArray",response.data.data)
-    return response.data;
+    let filteredData = response.data.data;
+
+    // Convert times for the filtered data
+    filteredData = convertTimesForDataArray(filteredData);
+
+    // Iterate through the data and update statuses if needed
+    filteredData = filteredData.map((item, index) => {
+      if (item.status === "booked" || item.status === "confirmed") {
+        const availabilityInfo = Utils.meetingAvailability(
+          item.booked_date,
+          item.session_start_time,
+          item.session_end_time,
+          item.time_zone, // Assuming `userTimeZone` is `item.time_zone`
+          item.start_time,
+          item.end_time
+        );
+        const { has24HoursPassedSinceBooking } = availabilityInfo;
+
+        const accountType = store.getState().auth.accountType;
+
+        const isMeetingCompleted = (detail) => {
+          return (
+            detail &&
+            detail.ratings &&
+            detail.ratings[accountType.toLowerCase()] &&
+            detail.ratings[accountType.toLowerCase()].sessionRating
+          );
+        };
+
+        // Check if the meeting is done, and if so, update its status to completed
+        if (isMeetingCompleted(item) || has24HoursPassedSinceBooking) {
+          item.status = "completed"; // Update the status to completed
+        }
+      }
+      return item;
+    });
+
+    // Filter based on the status provided in payload
+    if (payload.status === "upcoming") {
+      filteredData = filteredData.filter(
+        (item) => item.status === "booked" || item.status === "confirmed"
+      );
+    } else if (payload.status === "canceled") {
+      filteredData = filteredData.filter((item) => item.status === "canceled");
+    } else if (payload.status === "completed") {
+      filteredData = filteredData.filter((item) => item.status === "completed");
+    }
+
+    console.log("convertTimesForDataArray", filteredData);
+    return { ...response.data, data: filteredData };
   } catch (error) {
-    console.log("getScheduledMeetingDetailsError",error)
+    console.log("getScheduledMeetingDetailsError", error);
     throw error;
   }
 };

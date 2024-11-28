@@ -132,7 +132,7 @@ const TraineeRenderBooking = ({
       {status !== BookedSession.canceled &&
         activeTabs !== BookedSession.canceled &&
         isMeetingDone && <h3 className="mt-1">Completed</h3>}
-      {canShowRatingButton && status !== BookedSession.canceled ? (
+      {canShowRatingButton && status === BookedSession.completed ? (
         <button
           className={`btn btn-success button-effect btn-sm mr-2 my-1`}
           type="button"

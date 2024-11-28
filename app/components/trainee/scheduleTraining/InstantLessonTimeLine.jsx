@@ -183,7 +183,10 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                   }
               
                   console.log("isCommonBooking",selectedSlot,slot1,startDate)
-
+                  const today = DateTime.now().toISO({
+                    suppressMilliseconds: false,
+                    includeOffset: false,
+                  }) + "Z"
                   const payload = {
                     slot_id: slot?._id,
                     charging_price: amountPayable,
@@ -194,11 +197,11 @@ const InstantLessonTimeLine = ({isOpen , onClose, trainerInfo, userInfo, setBook
                     trainer_info: trainerInfo,
                     hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
                     status: BookedSession.booked,
-                    booked_date: startDate,
+                    booked_date: today,
                     session_start_time:startTime,
                     session_end_time: endTime,
-                    start_time: convertTimesToISO(startDate , startTime),
-                    end_time: convertTimesToISO(startDate , endTime),
+                    start_time: convertTimesToISO(today , startTime),
+                    end_time: convertTimesToISO(today , endTime),
                   };
                   console.log('onclick at payload',payload);
                   setBookSessionPayload(payload);

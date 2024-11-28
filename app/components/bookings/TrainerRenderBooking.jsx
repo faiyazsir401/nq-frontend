@@ -152,7 +152,7 @@ const TrainerRenderBooking = ({
       status === BookedSession.confirmed &&
       !isStartButtonEnabled &&
       Utils.compairDateGraterOrNot(start_time) &&
-      !isMeetingDone ? (
+      !isMeetingDone&& status === BookedSession.completed ? (
         <button
           className={`btn btn-success button-effect btn-sm mr-2 my-1`}
           type="button"

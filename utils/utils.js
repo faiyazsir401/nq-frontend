@@ -934,8 +934,18 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
   console.log("timeZone",timeZone,localTimeZone)
   if (!timeZone || timeZone === localTimeZone || noConversion) {
     // If time zone is the same as local, return formatted time as is
-    const date = DateTime.fromISO(time, { zone: 'utc' });
-    console.log("date",date)
+    let date;
+
+    // Check if the time is a Date object
+    if (time instanceof Date) {
+      // If it's a Date object, use fromJSDate
+      date = DateTime.fromJSDate(time, { zone: "utc" });
+      return formatToAMPM(date);
+    } else {
+      console.log("time1243",time)
+      // If it's a string, use fromISO
+      date = DateTime.fromISO(time, { zone: "utc" });
+      console.log("date",date)
     const jsDate = date.toJSDate();
     jsDate.setMinutes(date.c.minute)
     jsDate.setHours(date.c.hour)
@@ -944,6 +954,8 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
     jsDate.setYear(date.c.year)
     console.log("sametime",jsDate)
     return formatToAMPM(jsDate);
+    }
+    
   }
 
   // If the time zones are different, calculate the offset difference and adjust time
@@ -976,7 +988,7 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
 
 export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
   const localTimeZone = getLocalTimeZone()
-
+  console.log("time_zones",timeZone)
   if(localTimeZone === timeZone ||!timeZone){
     return time
   }
