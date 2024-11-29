@@ -212,7 +212,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
     switch (accountType) {
       case AccountType.TRAINER:
-        setBIndex(booking_index);
+        
         return (
           <TrainerRenderBooking
             _id={_id}
@@ -249,7 +249,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
           />
         );
       case AccountType.TRAINEE:
-        setBIndex(booking_index);
+        
         return (
           <TraineeRenderBooking
             _id={_id}
