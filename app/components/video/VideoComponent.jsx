@@ -28,7 +28,7 @@ const VideoComponent = forwardRef(
         style={style}
         ref={ref}
         onTimeUpdate={onTimeUpdate}
-        muted={videoController}
+        muted={true}
         poster={showPoster ? poster : undefined}
         preload="metadata"
         playsInline
