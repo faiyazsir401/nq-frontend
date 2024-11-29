@@ -96,9 +96,8 @@ const TraineeRenderBooking = ({
     !isCompleted;
 
   const handleClick = () => {
-    isStartButtonEnabled
-      ? updateParentState(booking_index)
-      : updateParentState(null); // Calling the function passed from parent
+   updateParentState(booking_index)
+
   };
 
   const updateBookedStatusApi = (_id, booked_status) => {
