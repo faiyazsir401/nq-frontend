@@ -2614,7 +2614,7 @@ useEffect(() => {
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
                     padding: isPinned ? "10px" : "5px",
-                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '50px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '50px',
+                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '30px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '40px',
                     top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
                       // trainee
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
