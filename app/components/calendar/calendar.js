@@ -455,8 +455,8 @@ export default function CalendarPage() {
   function extractAvailabilities(availabilitiesList) {
     const result = [];
     availabilitiesList?.forEach(availability => {
-      const startTime = new Date(availability.start_time);
-      const endTime = new Date(availability.end_time);
+      const startTime = new Date(availability?.start_time);
+      const endTime = new Date(availability?.end_time);
       result.push({
         start: startTime,
         end: endTime

@@ -797,6 +797,7 @@ useEffect(() => {
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
+ 
     const context = canvas?.getContext("2d");
     if (!context) return;
 
@@ -1390,6 +1391,7 @@ useEffect(() => {
      }).then(async (canvas) => {
       // document.body.appendChild(canvas);
       // console.log("1366=======S3",{canvas})
+ 
       const dataUrl = canvas.toDataURL("image/png");
       console.log("dataUrl",dataUrl)
       // console.log("1367=======S3",{dataUrl})
@@ -1699,76 +1701,79 @@ const emitVideoTimeEvent = (clickedTime, number) => {
     }
 };
 
-  const togglePlay = (num) => {
-    // Handle thumbnail visibility
-    if (num === 'one' && showThumbnailForFirstVideo) {
-        setShowThumbnailForFirstVideo(false);
+const togglePlay = (num) => {
+  console.log("whichvideo",num)
+  if (num === 'one' && showThumbnailForFirstVideo) {
+      setShowThumbnailForFirstVideo(false);
+  }
+
+  if (num === 'two' && showThumbnailForTwoVideo) {
+      setShowThumbnailForTwoVideo(false);
+  }
+
+  if (num === 'all') {
+      setShowThumbnailForFirstVideo(false);
+      setShowThumbnailForTwoVideo(false);
+  }
+
+  if (selectedVideoRef1.current && selectedVideoRef2.current) {
+      if (
+          selectedVideoRef1.current.currentTime === selectedVideoRef1.current.duration &&
+          selectedVideoRef2.current.currentTime === selectedVideoRef2.current.duration
+      ) {
+          selectedVideoRef1.current.currentTime = 0;
+          selectedVideoRef2.current.currentTime = 0;
+          emitVideoTimeEvent(0, "one");
+          emitVideoTimeEvent(0, "two");
+      }
+  }
+
+  const updatedPlayingState = { ...isPlaying };
+  console.log('updatedPlayingState')
+  const toggleAll = num === "all";
+
+  if (toggleAll) {
+      updatedPlayingState.isPlayingAll = !isPlaying.isPlayingAll;
+
+      if (updatedPlayingState.isPlayingAll) {
+          selectedVideoRef1.current?.play();
+          selectedVideoRef2.current?.play();
+      } else {
+          selectedVideoRef1.current?.pause();
+          selectedVideoRef2.current?.pause();
+      }
+  } else {
+      const videoRef = num === "one" ? selectedVideoRef1 : selectedVideoRef2;
+      const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
+      const isPlayingValue = updatedPlayingState[isPlayingKey];
+
+      if (isPlayingValue) {
+          videoRef.current?.pause();
+      } else {
+          videoRef.current?.play();
+      }
+      updatedPlayingState[isPlayingKey] = !isPlayingValue;
     }
+    updatedPlayingState.number = num;
 
-    if (num === 'two' && showThumbnailForTwoVideo) {
-        setShowThumbnailForTwoVideo(false);
-    }
+  // Emit using the updated state directly
+  console.log('Emitting play/pause event:', {
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+      ...updatedPlayingState,
+  });
+  socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+      ...updatedPlayingState,
+  });
 
-    if (num === 'all') {
-        setShowThumbnailForFirstVideo(false);
-        setShowThumbnailForTwoVideo(false);
-    }
-
-    // Reset video time if both videos are ended
-    if (selectedVideoRef1.current && selectedVideoRef2.current) {
-        if (
-            selectedVideoRef1.current.currentTime === selectedVideoRef1.current.duration &&
-            selectedVideoRef2.current.currentTime === selectedVideoRef2.current.duration
-        ) {
-            selectedVideoRef1.current.currentTime = 0;
-            selectedVideoRef2.current.currentTime = 0;
-            emitVideoTimeEvent(0, "one");
-            emitVideoTimeEvent(0, "two");
-        }
-    }
-
-    // Update playing state based on selected video
-    let updatedPlayingState = { ...isPlaying };
-    const toggleAll = num === "all";
-    
-    if (toggleAll) {
-        updatedPlayingState.isPlayingAll = !isPlaying.isPlayingAll;
-
-        if (updatedPlayingState.isPlayingAll) {
-            selectedVideoRef1.current?.play();
-            selectedVideoRef2.current?.play();
-        } else {
-            selectedVideoRef1.current?.pause();
-            selectedVideoRef2.current?.pause();
-        }
-    } else {
-        // Handle individual video play/pause
-        const videoRef = num === "one" ? selectedVideoRef1 : selectedVideoRef2;
-        const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
-        const isPlayingValue = updatedPlayingState[isPlayingKey];
-
-        if (isPlayingValue) {
-            videoRef.current?.pause();
-        } else {
-            videoRef.current?.play();
-        }
-        updatedPlayingState[isPlayingKey] = !isPlayingValue;
-    }
-
-    // Emit the updated play state to the socket
-    socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
-        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-        ...updatedPlayingState,
-    });
-
-    console.log('Updated play state:', updatedPlayingState);
-    setIsPlaying(updatedPlayingState);
+  // Update the state locally after emitting
+  setIsPlaying(updatedPlayingState);
 };
 
 
   // console.log("video time--------->",videoTime)
   const handleTimeUpdate = (videoRef, progressBarRef, number) => {
-    let num = number;
+    
     if (!videoRef.current) return; // Ensure videoRef is valid
   
     // Update progress bar value
@@ -1778,9 +1783,22 @@ const emitVideoTimeEvent = (clickedTime, number) => {
   
     // Check if video has ended
     if (videoRef.current.duration === videoRef.current.currentTime) {
-      togglePlay(number === 1 ? "one" : "two");
-      videoRef.current.currentTime = 0;
-      emitVideoTimeEvent(0, number);
+      videoRef.current.currentTime = 0;    
+      if(videoController){
+        const updatedPlayingState = { ...isPlaying };
+        const isPlayingValue = updatedPlayingState.isPlayingAll;
+        updatedPlayingState.isPlayingAll = !isPlayingValue;
+        setIsPlaying(updatedPlayingState); 
+      }else{
+        const num =number === 1 ? "one" : "two";
+        const isPlayingKey = num === "one" ? 'isPlaying1' : 'isPlaying2';
+        const updatedPlayingState = { ...isPlaying };
+        const isPlayingValue = updatedPlayingState[isPlayingKey];
+        updatedPlayingState[isPlayingKey] = !isPlayingValue;
+        setIsPlaying(updatedPlayingState); 
+      }
+
+     
     }
   
     // Calculate remaining time
@@ -1793,7 +1811,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
       [`remainingTime${number}`]: formatTime(remainingTime),
     }));
   };
-  
+
   // Helper function to format time as MM:SS
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
@@ -2596,7 +2614,7 @@ useEffect(() => {
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
                     padding: isPinned ? "10px" : "5px",
-                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '50px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '50px',
+                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '35px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '35px',
                     top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
                       // trainee
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
@@ -2647,12 +2665,13 @@ useEffect(() => {
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
                             height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
-                            objectFit: "cover",
+                            objectFit: "fill",
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
                           poster={Utils?.generateThumbnailURL(selectedClips[0])}
                           src={Utils?.generateVideoURL(selectedClips[0])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-1" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
@@ -2741,12 +2760,13 @@ useEffect(() => {
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
                             height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
-                            objectFit: "cover",
+                            objectFit: "fill",
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}
                           poster={Utils?.generateThumbnailURL(selectedClips[1])}
                           src={Utils?.generateVideoURL(selectedClips[1])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&
@@ -3583,12 +3603,13 @@ useEffect(() => {
                           style={{
                             height: "95%",
                             width: "100%",
-                            objectFit: "cover",
+                            objectFit: "fill",
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
                           poster={Utils?.generateThumbnailURL(selectedClips[0])}
                           src={Utils?.generateVideoURL(selectedClips[0])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-1" hidden></canvas> */}
     
@@ -3707,12 +3728,13 @@ useEffect(() => {
                           style={{
                             height: "95%",
                             width: "100%",
-                            objectFit: "cover",
+                            objectFit: "fill",
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}
                           poster={Utils?.generateThumbnailURL(selectedClips[1])}
                           src={Utils?.generateVideoURL(selectedClips[1])}
+                          videoController={videoController}
                         />
                         {/* <canvas id="video-canvas-2" hidden></canvas> */}
                         {accountType === AccountType.TRAINER &&

@@ -3,7 +3,7 @@ import React, { forwardRef } from 'react';
 import { useInView } from 'react-intersection-observer';
 import VideoComponent from './VideoComponent';
 
-const LazyVideo = forwardRef(({ src, poster, id, style, onTimeUpdate, ...props }, ref) => {
+const LazyVideo = forwardRef(({ src, poster, id, style, onTimeUpdate,videoController, ...props }, ref) => {
   const { ref: inViewRef, inView } = useInView({
     threshold: 0,
     triggerOnce: true
@@ -30,6 +30,7 @@ const LazyVideo = forwardRef(({ src, poster, id, style, onTimeUpdate, ...props }
       onTimeUpdate={onTimeUpdate}
       poster={poster}
       src={src}
+      videoController={videoController}
       {...props}
     />
   );

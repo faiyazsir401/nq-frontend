@@ -115,33 +115,7 @@ function ScreenShotDetails({
                 width: '70%',
                 marginLeft: '5px'
               }}>
-              <div
-                style={{
-                  width: '100%',
-                }}
-              >
-                <input
-                  type="text"
-                  name="title"
-                  placeholder="Title"
-                  style={{
-                    padding: "10px 10px",
-                    fontSize: "12px",
-                    margin: "3px 0",
-                    width: "100%",
-                    outline: "none",
-                    border: "1px solid rgb(0, 0, 128)",
-                    borderRadius: '8px'
-                  }}
-                  onChange={(e) => {
-                    // screenShotImages[screenShotImages?.length - 1].title =
-                    //   e.target.value;
-                    // setScreenShotImages([...screenShotImages]);
-                    setTitle(e.target.value)
-                  }}
-                  value={title}
-                />
-              </div>
+              
               <div
                 style={{
                   width: '100%',

@@ -25,7 +25,9 @@ const AuthGuard = ({ children }) => {
     if (isTokenExists) {  
       dispatch(getMeAsync());
       if(isRedirectToDashboard){
-        router.push(routingPaths.dashboard);
+        if(pathName !== "/meeting"){
+          router.push(routingPaths.dashboard);
+        }
       }else{
         dispatch(authAction.updateIsAuthModalOpen(false))
         dispatch(authAction.updateIsRedirectToDashboard(true));
