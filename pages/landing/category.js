@@ -16,9 +16,11 @@ import { debounce } from "lodash";
 import { LABELS } from "../../utils/constant";
 import { TrainerDetails } from "../../app/components/trainer/trainerDetails";
 import BookingTable from "../../app/components/trainee/scheduleTraining/BookingTable";
+import { useRouter } from "next/router";
 
 const Category = (masterRecords) => {
   const dispatch = useAppDispatch();
+  const router = useRouter()
   const { handleSelectedTrainer } = bookingsAction;
   const [isMobileScreen, setIsMobileScreen] = useState(false);
   const [query, setQuery] = useState("");
@@ -195,7 +197,7 @@ const Category = (masterRecords) => {
               </div>
               <div className="">
                 <button className={`btn btn-primary d-flex  ${isMobileScreen ?"mb-1 mt-1 p-2 px-3":"mb-4 mt-5"}`}>
-                  <div style={{margin:"auto",fontSize:isMobileScreen?"10px":"14px"}}>Get Started</div>
+                  <div style={{margin:"auto",fontSize:isMobileScreen?"10px":"14px"}} onClick={()=> router.push("/auth/signUp")}>Get Started</div>
                   <div className="pl-2" style={{position:"relative", top:"3px"}}>
                     <ChevronRight />
                   </div>
