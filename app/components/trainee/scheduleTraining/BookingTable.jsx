@@ -366,8 +366,8 @@ const BookingTable = ({
         </div>
 
         <div className="col-11">
-          {(getParams?.search && getParams?.search.length) ||
-          !bookingColumns.length ? (
+          {
+          
             <div className="row">
               <label className="mt-1 ml-3" style={{ fontSize: "13px" }}>
                 Select Slot :{" "}
@@ -518,9 +518,7 @@ const BookingTable = ({
                 )}
               </div>
             </div>
-          ) : (
-            <TrainerSlider list={listOfTrainers} />
-          )}
+  }
         </div>
       </div>
     );

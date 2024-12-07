@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Courses, CourseItems } from "../../app/common/constants";
 import { ChevronRight, Filter, Circle, Star } from "react-feather";
 import { LABELS } from "../../utils/constant";
@@ -7,7 +7,7 @@ import { Utils } from "../../utils/utils";
 import { TrainerDetails } from "../../app/components/trainer/trainerDetails";
 import BookingTable from "../../app/components/trainee/scheduleTraining/BookingTable";
 import "../../app/components/trainee/scheduleTraining/index.scss";
-import { Modal } from "reactstrap";
+import { Button, Card, CardBody, CardText, CardTitle, Modal } from "reactstrap";
 import "./landing.css";
 import { getTraineeWithSlotsAsync } from "../../app/components/trainee/trainee.slice";
 import { useAppDispatch } from "../../app/store";
@@ -76,7 +76,7 @@ const Course = (masterRecords) => {
   }, [getParams]);
 
   const showRatings = (ratings, extraClasses = "") => {
-    console.log(ratings , 'ratings')
+    console.log(ratings, "ratings");
     const { ratingRatio, totalRating } = Utils.getRatings(ratings);
     return (
       <>
@@ -90,6 +90,27 @@ const Course = (masterRecords) => {
   };
 
   console.log("getAllLatestActiveTrainer =====> activeTrainer", activeTrainer);
+
+  const sliderRef = useRef(null);
+
+  // Custom Slider Handlers
+  const slideToNext = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({
+        left: sliderRef.current.clientWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const slideToPrev = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({
+        left: -sliderRef.current.clientWidth,
+        behavior: "smooth",
+      });
+    }
+  };
 
   return (
     <React.Fragment>
@@ -109,89 +130,96 @@ const Course = (masterRecords) => {
 
         <div className={`row gy-3`}>
           {activeTrainer.length ? (
-            activeTrainer?.map((data, index) => {
-              const { last_activity_time, trainer_info, _id } = data;
-              console.log(trainer_info, "trainer_info");
-              return (
-                <div
-                  key={`courses_list${index}`}
-                  className="col-lg-4 col-sm-12"
-                >
-                  <div className="card m-2">
-                    <img
-                      className="card-img-top"
-                      src={
-                        trainer_info.profilePicture
-                          ? Utils?.getImageUrlOfS3(trainer_info.profilePicture)
-                          : "/assets/images/demoUser.png"
-                      }
-                      alt="Card image cap"
-                      style={{ padding: "10px", borderRadius: "20px" }}
-                      onError={(e) => {
-                        e.target.src =
-                          arrOfDemoImg[index] ?? "/assets/images/demoUser.png";
-                        // e.target.src = "/assets/images/Almer.jpeg";
-                      }}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title text-truncate">
-                        {trainer_info.fullName}
-                        <i
-                          className="fa fa-check-circle ml-2"
-                          style={{ color: "green" }}
-                        ></i>
-                        <span
-                          style={{
-                            color: "green",
-                            fontWeight: 600,
-                            // fontSize: "9px !important"
-                          }}
-                        >
-                          {" "}
-                          Verified
-                        </span>
-                      </h5>
-                      <div className="row mt-4 mb-4">
-                        <div
-                          // key={`courses-details${index}`}
-                          className="col-lg-6 col-sm-12"
-                        >
-                          <i className="fa fa-list-alt mr-2"></i>
-                          {"Hourly Rate"}{" "}
-                          <span>
-                            {trainer_info && trainer_info.extraInfo
-                              ? `: ${trainer_info.extraInfo.hourly_rate}`
-                              : null}
-                          </span>
-                        </div>
-                      </div>
-                       {showRatings(trainer_info?.trainer_ratings, "d-flex")}
-                      <div>
-                        <button
+            <div className="slider-container m-3 mb-5">
+              <button onClick={slideToPrev} className="prev-button shadow">
+                &#10094;
+              </button>
+              <div ref={sliderRef} className="slider-content">
+                {activeTrainer.map((data, index) => (
+                  <div key={index} className="slider-item">
+                    <Card className="overflow-hidden rounded shadow-sm">
+                      <img
+                        className="card-img-top"
+                        src={
+                          data?.trainer_info.profilePicture
+                            ? Utils?.getImageUrlOfS3(
+                                data?.trainer_info.profilePicture
+                              )
+                            : "/assets/images/demoUser.png"
+                        }
+                        alt="Card image cap"
+                        style={{
+                          width: "100%",
+                          maxHeight: 250,
+                          minHeight: 250,
+                          maxWidth: 278,
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          e.target.src =
+                            arrOfDemoImg[index] ??
+                            "/assets/images/demoUser.png";
+                          // e.target.src = "/assets/images/Almer.jpeg";
+                        }}
+                      />
+                      <CardBody>
+                        <CardTitle tag="h5">
+                          <div className="d-flex align-items-center">
+                            <div>{data?.trainer_info?.fullname}</div>
+                            <i
+                              className="fa fa-check-circle mx-2"
+                              style={{ color: "green" }}
+                            ></i>
+                            <span style={{ color: "green", fontWeight: 600 }}>
+                              Verified
+                            </span>
+                          </div>
+                        </CardTitle>
+                        <CardText>
+                          <div>
+                            <i className="fa fa-list-alt mr-2"></i>
+                            {"Hourly Rate"}{" "}
+                            <span>
+                              {data?.trainer_info &&
+                              data?.trainer_info.extraInfo
+                                ? `: ${data?.trainer_info.extraInfo.hourly_rate}`
+                                : null}
+                            </span>
+                          </div>
+                        </CardText>
+                        {showRatings(
+                          data?.trainer_info?.trainer_ratings,
+                          "d-flex"
+                        )}
+
+                        <Button
                           className="btn btn-primary btn-sm d-flex"
                           onClick={() => {
                             setTrainerInfo((prev) => ({
                               ...prev,
-                              userInfo: trainer_info,
+                              userInfo: data?.trainer_info,
                               selected_category: null,
                             }));
                             setSelectedTrainer({
-                              id: trainer_info?.id,
-                              trainer_id: trainer_info?.id,
+                              id: data?.trainer_info?.id,
+                              trainer_id: data?.trainer_info?.id,
                               data: trainer,
                             });
-                            setParams({ search: trainer_info?.fullName });
+                            setParams({ search: data?.trainer_info?.fullName });
                             setIsModalOpen(true);
                           }}
                         >
                           <div>Book session</div>
-                        </button>
-                      </div>
-                    </div>
+                        </Button>
+                      </CardBody>
+                    </Card>
                   </div>
-                </div>
-              );
-            })
+                ))}
+              </div>
+              <button onClick={slideToNext} className="next-button shadow">
+                &#10095;
+              </button>
+            </div>
           ) : (
             <p>No Online Trainer Available</p>
           )}
@@ -237,7 +265,7 @@ const Course = (masterRecords) => {
                 }));
                 setIsModalOpen(false);
               }}
-              isUserOnline = {true}
+              isUserOnline={true}
               element={
                 <BookingTable
                   selectedTrainer={selectedTrainer}
@@ -245,7 +273,7 @@ const Course = (masterRecords) => {
                   setStartDate={setStartDate}
                   startDate={startDate}
                   getParams={getParams}
-                  isUserOnline = {true}
+                  isUserOnline={true}
                 />
               }
             />

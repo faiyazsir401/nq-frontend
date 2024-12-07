@@ -103,7 +103,7 @@ const TopTrainers = (props) => {
       {/* Trainer Details Modal */}
       {trainerInfo?.userInfo && (
         <Modal className="recent-user-modal" isOpen={isModalOpen}>
-          <ModalBody style={{ height: "100vh", width: "100vw" }}>
+          <ModalBody style={{minHeight:"100vh"}}>
             <TrainerDetails
               selectOption={trainerInfo}
               isPopoverOpen={props.isPopoverOpen}
@@ -145,7 +145,6 @@ const TopTrainers = (props) => {
                   setStartDate={setStartDate}
                   startDate={startDate}
                   getParams={getParams}
-                  isUserOnline={true}
                 />
               }
             />

@@ -306,6 +306,7 @@ const Category = (masterRecords) => {
       // isOpen={getParams?.search ? true : false}
       overflowHidden={true}
       minHeight={true}
+      allowFullWidth={true}
       element = {<TrainerDetails
         selectOption={trainerInfo}
         categoryList={categoryList}
