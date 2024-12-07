@@ -109,7 +109,7 @@ const Category = (masterRecords) => {
 
   useEffect(() => {
     const handleResize = () => {
-      const isMobileScreen = window.innerWidth < 390;
+      const isMobileScreen = window.innerWidth < 600;
       setIsMobileScreen(isMobileScreen);
     };
     window.addEventListener("resize", handleResize);
@@ -125,17 +125,17 @@ const Category = (masterRecords) => {
     <React.Fragment>
       <div className="container category-content">
         <div className="row">
-          <div className="col d-none d-sm-block">
+          <div className="col">
             {masterRecords?.masterRecords?.category?.map((item, index) => {
               return (
                 <span 
                   key={`category_item${index}`}
                   className="badge badge-light lg"
                   style={{
-                    margin: "12px",
-                    padding: "18px",
+                    margin: isMobileScreen?"5px":"12px",
+                    padding: isMobileScreen?"10px":"18px",
                     alignItems: "center",
-                    fontSize: "14px",
+                    fontSize: isMobileScreen?"8px":"14px",
                     color: "black",
                     cursor : 'pointer'
                   }}
@@ -180,12 +180,12 @@ const Category = (masterRecords) => {
           })}
         </div> */}
         <div className="container">
-          <div className="row mt-5">
+          <div className={`row ${isMobileScreen ?"mt-1":"mt-5"}`}>
             <div className="col-lg-6">
               <div
-                className="mt-4"
+                className={` ${isMobileScreen ?"mt-2":"mt-4"}`}
                 style={{
-                  fontSize: "35px",
+                  fontSize: isMobileScreen?"16px":"35px",
                   color: "black",
                   fontWeight: 600,
                   textAlign: "left",
@@ -193,9 +193,9 @@ const Category = (masterRecords) => {
               >
                 {LABELS.LANDIGN_MSG}
               </div>
-              <div className="col-lg-6">
-                <button className="btn btn-primary d-flex mb-4 mt-5">
-                  <div style={{margin:"auto"}}>Get Started</div>
+              <div className="">
+                <button className={`btn btn-primary d-flex  ${isMobileScreen ?"mb-1 mt-1 p-2 px-3":"mb-4 mt-5"}`}>
+                  <div style={{margin:"auto",fontSize:isMobileScreen?"10px":"14px"}}>Get Started</div>
                   <div className="pl-2" style={{position:"relative", top:"3px"}}>
                     <ChevronRight />
                   </div>
@@ -203,8 +203,8 @@ const Category = (masterRecords) => {
               </div>
             </div>
             <div
-              className="col-lg-6  bg-primary"
-              style={{ borderRadius: "50%" }}
+              className="col-lg-6  bg-primary mt-3"
+              style={{ borderRadius: "50%",width:isMobileScreen?"70%":"100%",margin:'auto' }}
             >
               <img
                 src="/assets/images/1-removebg 1.png"
@@ -220,12 +220,9 @@ const Category = (masterRecords) => {
           </div>
         </div>
         <div
-          className={`container ${isMobileScreen
-            ? "d-flex justify-content-start"
-            : "d-flex justify-content-center"
-            } `}
+          className={`container d-flex justify-content-center`}
         >
-          <div className="row my-5">
+          <div className={`row ${isMobileScreen ?"mb-2 mt-3":"my-5"}`}>
             <div className={`col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12`}>
               <SearchableDropdown
                 placeholder="Search Trainers..."

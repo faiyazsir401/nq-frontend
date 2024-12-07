@@ -32,69 +32,52 @@ const LandingHeader = (masterRecords) => {
 
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const isMobileScreen = useMediaQuery("(max-width: 1200px)");
+  const isMobileScreen = useMediaQuery("(max-width: 1000px)");
 
 
   return (
     <React.Fragment>
       <div
-        className="row"
+        className="row d-flex justify-content-between"
         style={{
           position: "sticky",
           top: 0,
           zIndex: 1000,
           backgroundColor: "white",
           margin: 0,
-          paddingBottom: "20px",
+          paddingBottom: isMobileScreen?"5px":"20px",
+          flexWrap:"nowrap"
         }}
       >
-        <div className={`col-1 col-sm-1 col-md-1 col-xl-4 pr-0 pl-0`}>
+        <div className={``}>
           <img
             src="/assets/images/netquix_logo.png"
             alt="logo"
-            className="mt-3 header-image-logo"
+            className="header-image-logo "
             style={{
-              marginLeft: "25px",
+              marginTop:isMobileScreen?"":"15px",
+               marginLeft:isMobileScreen?"10px":"20px"
             }}
+
           />
         </div>
-        <div className={`col-11 col-sm-11 col-md-11 col-xl-8 pr-0 pl-0`}>
-          <button
-            className="navbar-toggler d-xl-none"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarNav"
-            aria-controls="navbarNav"
-            aria-expanded={isMenuOpen ? "true" : "false"}
-            aria-label="Toggle navigation"
-            onClick={toggleMenu}
-            style={{
-              float: "right",
-            }}
-          >
-            <i
-              className="fa fa-bars"
-              style={{
-                marginTop: "40px",
-                cursor: "pointer",
-              }}
-              aria-hidden="true"
-            ></i>
-          </button>
+        <div className={``}>
+        
           <Collapse
-            className={`navbar-collapse d-xl-block ${isMenuOpen ? "show" : ""}`}
+            className={`show`}
             id="navbarNav"
           >
             <Nav
-              navbar={isMobileScreen && isMenuOpen ? true : false}
-              className={`border-0 d-flex   mr-4 navbaritem ${isMenuOpen ? "d-none" : "" // Hide the Nav when the menu is open
+              
+              className={`border-0 d-flex mr-2 navbaritem ${isMenuOpen ? "d-none" : "" // Hide the Nav when the menu is open
                 }`}
               style={{
-                marginTop: isMobileScreen ? "100px" : "40px",
-                float: isMobileScreen ? "left" : "right",
-                alignItems: isMobileScreen ? "" : "end",
+                marginTop: isMobileScreen?"10px":"40px",
+              
               }}
             >
+              {!isMobileScreen &&
+                <>
               <Dropdown nav isOpen={dropdownOpen} toggle={toggle}>
                 <DropdownToggle
                   nav
@@ -133,6 +116,8 @@ const LandingHeader = (masterRecords) => {
                   </NavItem>
                 );
               })}
+              </>}
+
               <div className="d-flex gap-5">
 
               <button
@@ -142,7 +127,7 @@ const LandingHeader = (masterRecords) => {
                   width: "82px",
                   padding: "11px",
                   alignItems: "center",
-                  fontSize: "14px",
+                  fontSize: isMobileScreen?"10px":"14px",
                   color: "white",
                   cursor: "pointer",
                 }}
@@ -157,9 +142,9 @@ const LandingHeader = (masterRecords) => {
                   width: "82px",
                   padding: "11px",
                   marginright: "5px",
-                  marginLeft: isMobileScreen ? "1px" : "5px",
+                  marginLeft: "5px",
                   alignItems: "center",
-                  fontSize: "14px",
+                  fontSize: isMobileScreen?"10px":"14px",
                   color: "white",
                   cursor: "pointer",
                 }}
