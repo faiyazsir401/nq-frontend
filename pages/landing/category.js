@@ -137,7 +137,7 @@ const Category = (masterRecords) => {
                     margin: isMobileScreen?"5px":"12px",
                     padding: isMobileScreen?"10px":"18px",
                     alignItems: "center",
-                    fontSize: isMobileScreen?"8px":"14px",
+                    fontSize: isMobileScreen?"10px":"14px",
                     color: "black",
                     cursor : 'pointer'
                   }}

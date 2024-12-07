@@ -5,13 +5,14 @@ import { traineeAction } from '../../trainee/trainee.slice';
 import { Utils } from '../../../../utils/utils';
 import { X } from 'react-feather';
 import { Button } from 'reactstrap';
+import { useMediaQuery } from 'usehooks-ts';
 
 const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedClips, shareFunc , sendNotfication }) => {
 
   const [selectedClipsCopy, setSelectedClipsCopy] = useState([]);
   const dispatch = useAppDispatch();
   const { removeNewBookingData } = traineeAction;
-
+  const isMobileScreen = useMediaQuery("(max-width:1000px)")
   return (
     <Modal isOpen={isOpen} element={
       <div className='d-flex justify-content-center align-items-center flex-column' style={{width:'100vw' , height:'100vh'}}>
@@ -58,7 +59,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                 <div
                   key={ind}
                   className={`d-inline ${cl?.show ? "" : "open"}`}
-                  style={{ display: 'inline-block' }}
+                  style={{ display: 'inline-block'}}
                 >
                   <div className='d-flex' style={{ gap: 10 }}>
                     {cl?.clips.map((clp, index) => {
@@ -86,7 +87,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                             style={{
                               border: `${isSelected ? "4px solid green" : "4px solid #b4bbd1"}`,
                               height: "180px",
-                              width: "300px",
+                              width: isMobileScreen?"200px":"300px",
                               borderRadius: "5px",
                               objectFit: "cover",
                             }}

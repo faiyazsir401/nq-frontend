@@ -21,6 +21,7 @@ import "./landing.css";
 import { Utils } from "../../utils/utils";
 import BookingTable from "../../app/components/trainee/scheduleTraining/BookingTable";
 import { object } from "prop-types";
+import { useMediaQuery } from "usehooks-ts";
 
 const filter = (category, trainers) => {
   const filteredTrainers = trainers.filter(
@@ -219,6 +220,7 @@ const CategoryTrainerSlider = ({
 };
 
 const TrainerCard = ({ trainer, setter }) => {
+  const isMobileScreen= useMediaQuery("(max-width:1000px)")
   const getImageUrl = (image) => {
     const backendUrl = "https://data.netqwix.com/";
 
@@ -235,14 +237,14 @@ const TrainerCard = ({ trainer, setter }) => {
   };
 
   return (
-    <Card className="overflow-hidden rounded shadow-sm">
+    <Card className="overflow-hidden rounded shadow-sm h-100">
       <img
         alt={trainer.fullname}
         style={{
           width: "100%",
-          maxHeight: 250,
-          minHeight: 250,
-          maxWidth: 278,
+          maxHeight:isMobileScreen? 150:250,
+          minHeight: isMobileScreen? 150:250,
+          maxWidth: "100%",
           objectFit: "cover",
         }}
         src={
@@ -254,23 +256,23 @@ const TrainerCard = ({ trainer, setter }) => {
       <CardBody>
         <CardTitle tag="h5">
           <div className="d-flex align-items-center">
-            <div>{trainer.fullname}</div>
+            <div style={{fontSize:isMobileScreen?12:14}}>{trainer.fullname}</div>
             <i
               className="fa fa-check-circle mx-2"
               style={{ color: "green" }}
             ></i>
-            <span style={{ color: "green", fontWeight: 600 }}>Verified</span>
+            <span style={{ color: "green", fontWeight: 600,fontSize:isMobileScreen?10:14 }}>Verified</span>
           </div>
         </CardTitle>
         <CardText>
-          <div>
+          <div style={{fontSize:isMobileScreen?10:12}}>
             <i className="fa fa-list-alt mr-2"></i>
             Hourly Rate: {trainer?.extraInfo?.hourly_rate || "N/A"}
           </div>
         </CardText>
         <Button
           className="text-white py-2 px-3 rounded width-fit btn-primary"
-          style={{ cursor: "pointer", fontSize: 15 }}
+          style={{ cursor: "pointer", fontSize: isMobileScreen?10:14 }}
           onClick={() => {
             setter.setTrainerInfo((prev) => ({
               ...prev,

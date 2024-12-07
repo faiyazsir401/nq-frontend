@@ -495,7 +495,7 @@ const Index = (props) => {
                     <i className="fa fa-home" />
                   </NavLink>
 
-                  <p className="menu-name">My Locker</p>
+                  <p className="menu-name px-2">My Locker</p>
                 </li>
 
                 {accountType === AccountType.TRAINEE && <li>
@@ -511,7 +511,7 @@ const Index = (props) => {
                     <i className="fa fa-calendar" />
                   </NavLink>
 
-                  <p className="menu-name">Booking</p>
+                  <p className="menu-name px-2">Bookings</p>
                 </li>}
                 {accountType === AccountType?.TRAINEE && <li>
 
@@ -528,7 +528,7 @@ const Index = (props) => {
 
                   </NavLink>
 
-                  <p className="menu-name">Book Trainer</p>
+                  <p className="menu-name px-2">Book Trainer</p>
                 </li>}
                 <li>
 
@@ -545,7 +545,7 @@ const Index = (props) => {
                     {/* <i className="fa fa-lock" /> */}
                   </NavLink>
 
-                  <p className="menu-name">My Uploads</p>
+                  <p className="menu-name px-2">My Uploads</p>
                 </li>
                 {/* <li>
               <Tooltip title="Chats" position="top" trigger="mouseenter">
@@ -652,7 +652,7 @@ const Index = (props) => {
 
                   </NavLink>
 
-                  <p className="menu-name">Upcoming Sessions</p>
+                  <p className="menu-name px-2">Upcoming Sessions</p>
                 </li>}
 
                 <li>
@@ -670,7 +670,7 @@ const Index = (props) => {
                     </NavLink>
 
                   </div>
-                  <p className="menu-name">Notifications</p>
+                  <p className="menu-name px-2">Notifications</p>
                 </li>
 
                 <li>
@@ -684,7 +684,7 @@ const Index = (props) => {
                     <i className="fa fa-cog" />
                   </NavLink>
 
-                  <p className="menu-name">Settings</p>
+                  <p className="menu-name px-2">Settings</p>
                 </li>
 
                 {/* Commented */}
@@ -704,7 +704,7 @@ const Index = (props) => {
                       <i className={mode ? "fa fa-lightbulb-o" : "fa fa-moon-o"} />
                     </NavLink>
                   </Tooltip>
-                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}>Change Mode</p>
+                  <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}>Change Mode</p>
                 </li> */}
                 {/* {accountType === AccountType?.TRAINER && */}
                 <li>
@@ -719,7 +719,7 @@ const Index = (props) => {
                   </NavLink>
 
                   {/* </div> */}
-                  <p className="menu-name">Transactions</p>
+                  <p className="menu-name px-2">Transactions</p>
                 </li>
 
                 {width < 800 && <>
@@ -736,7 +736,7 @@ const Index = (props) => {
                     </NavLink>
 
                     {/* </div> */}
-                    <p className="menu-name">My Community</p>
+                    <p className="menu-name px-2">My Community</p>
                   </li>
 
                   {/* About Us */}
@@ -752,7 +752,7 @@ const Index = (props) => {
                     </NavLink>
 
                     {/* </div> */}
-                    <p className="menu-name">About Us</p>
+                    <p className="menu-name px-2">About Us</p>
                   </li>
 
                   {/* Contact Us */}
@@ -768,7 +768,7 @@ const Index = (props) => {
                     </NavLink>
 
                     {/* </div> */}
-                    <p className="menu-name">Contact Us</p>
+                    <p className="menu-name px-2">Contact Us</p>
                   </li>
 
                   {/* Practice Session */}
@@ -788,7 +788,7 @@ const Index = (props) => {
                         <i class="fa fa-object-group" aria-hidden="true" />
                       </NavLink>
                     </Tooltip>
-                    <p className="menu-name">Practice Session</p>
+                    <p className="menu-name px-2">Practice Session</p>
                   </li> */}
                 </>}
 
@@ -803,14 +803,14 @@ const Index = (props) => {
                     <i className="fa fa-power-off"> </i>
                   </NavLink>
 
-                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}>Logout</p>
+                  <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}>Logout</p>
                 </li>
 
                 <li>
-                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}></p>
+                  <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}></p>
                 </li>
                 <li>
-                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}></p>
+                  <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}></p>
                 </li>
               </ul>
               {/* <ul className="sidebar-bottom">
@@ -830,7 +830,7 @@ const Index = (props) => {
                       <i className={mode ? "fa fa-lightbulb-o" : "fa fa-moon-o"} />
                     </NavLink>
                   </Tooltip>
-                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}>Change Mode</p>
+                  <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}>Change Mode</p>
                 </li>
                 <li>
                   <Tooltip title="Logout" position="top" trigger="mouseenter">
@@ -843,7 +843,7 @@ const Index = (props) => {
                       <i className="fa fa-power-off"> </i>
                     </NavLink>
                   </Tooltip>
-                  <p className="menu-name" style={{ color: "black", fontWeight: "500" }}>Logout</p>
+                  <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}>Logout</p>
                 </li>
               </ul> */}
             </div>
