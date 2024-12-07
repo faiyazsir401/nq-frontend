@@ -11,6 +11,7 @@ import { Button, Card, CardBody, CardText, CardTitle, Modal } from "reactstrap";
 import "./landing.css";
 import { getTraineeWithSlotsAsync } from "../../app/components/trainee/trainee.slice";
 import { useAppDispatch } from "../../app/store";
+import { useMediaQuery } from "usehooks-ts";
 const arrOfDemoImg = [
   "/assets/images/Almer.jpeg",
   "/assets/images/Edolie.jpeg",
@@ -42,6 +43,7 @@ const Course = (masterRecords) => {
     selected_category: null,
   });
   const [categoryList, setCategoryList] = useState([]);
+  const isMobileScreen= useMediaQuery("(max-width:1000px)")
   useEffect(() => {
     getAllLatestActiveTrainer();
     const updateTableView = () => {
@@ -137,7 +139,7 @@ const Course = (masterRecords) => {
               <div ref={sliderRef} className="slider-content">
                 {activeTrainer.map((data, index) => (
                   <div key={index} className="slider-item">
-                    <Card className="overflow-hidden rounded shadow-sm">
+                    <Card className="overflow-hidden rounded shadow-sm h-100">
                       <img
                         className="card-img-top"
                         src={
@@ -150,9 +152,9 @@ const Course = (masterRecords) => {
                         alt="Card image cap"
                         style={{
                           width: "100%",
-                          maxHeight: 250,
-                          minHeight: 250,
-                          maxWidth: 278,
+                          maxHeight:isMobileScreen? 150:250,
+                          minHeight: isMobileScreen? 150:250,
+                          maxWidth: "100%",
                           objectFit: "cover",
                         }}
                         onError={(e) => {
@@ -165,18 +167,18 @@ const Course = (masterRecords) => {
                       <CardBody>
                         <CardTitle tag="h5">
                           <div className="d-flex align-items-center">
-                            <div>{data?.trainer_info?.fullname}</div>
+                            <div style={{fontSize:isMobileScreen?12:14}}>{data?.trainer_info?.fullName}</div>
                             <i
                               className="fa fa-check-circle mx-2"
                               style={{ color: "green" }}
                             ></i>
-                            <span style={{ color: "green", fontWeight: 600 }}>
+                            <span  style={{ color: "green", fontWeight: 600,fontSize:isMobileScreen?10:14 }}>
                               Verified
                             </span>
                           </div>
                         </CardTitle>
                         <CardText>
-                          <div>
+                          <div  style={{fontSize:isMobileScreen?10:12}}>
                             <i className="fa fa-list-alt mr-2"></i>
                             {"Hourly Rate"}{" "}
                             <span>
@@ -187,13 +189,11 @@ const Course = (masterRecords) => {
                             </span>
                           </div>
                         </CardText>
-                        {showRatings(
-                          data?.trainer_info?.trainer_ratings,
-                          "d-flex"
-                        )}
+              
 
                         <Button
                           className="btn btn-primary btn-sm d-flex"
+                          style={{ cursor: "pointer", fontSize: isMobileScreen?10:14 }}
                           onClick={() => {
                             setTrainerInfo((prev) => ({
                               ...prev,
