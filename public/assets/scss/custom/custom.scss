@@ -758,7 +758,7 @@ slick-slider .slick-list,
   height: auto !important;
 
   /* Media queries for larger screens */
-  @media (min-width: 768px) {
+  @media (max-width: 768px) {
     width: 160px !important;
     /* Adjust the width for tablets and larger screens */
   }
@@ -820,16 +820,6 @@ slick-slider .slick-list,
     overflow-x: hidden !important;
     overflow-y: auto !important;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  }
-
-  .category-content {
-    overflow-x: hidden !important;
-  }
-
-  .custom-arrow-icon {
-    position: absolute;
-    top: 55px;
-    left: 7% !important;
   }
 
   .custom-close-icon {

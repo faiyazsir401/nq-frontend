@@ -242,7 +242,7 @@ const Auth_SignUp = (props) => {
                   {/* <h3>Hello Everyone , We are Chitchat</h3>
                   <h4>Welcome to chitchat please Register to your account.</h4> */}
                   <h3 className="header-text">Welcome</h3>
-                  <h4>Please register to your account.</h4>
+                  <h4>Please register to start your account.</h4>
                   <div>
                     <Stepper
                       steps={signUpSteps}
@@ -313,7 +313,7 @@ const Auth_SignUp = (props) => {
                   </form>
                   <div className="termscondition">
                     <h4 className="mb-0">
-                      <span>*</span>Terms and condition<b>&amp;</b>
+                      <span>*</span>Terms and conditions<b>&amp;</b>
                       Privacy policy
                     </h4>
                   </div>

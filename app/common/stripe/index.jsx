@@ -136,7 +136,7 @@ const CheckoutForm = ({clientSecret, handlePaymentSuccess, extraContent = <></>}
       }
       <PaymentElement />
       <button
-        className="btn btn-primary mt-4 w-100"
+        className="btn btn-primary mt-4 w-100 mb-5"
         type="submit"
         disabled={!stripe || !elements}
       >
