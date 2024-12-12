@@ -30,10 +30,8 @@ const FooterLanding = (masterRecords) => {
           </div>
           <div className="col-sm-9 col-lg-10 ">
             <p className="mt-4">
-              Are you ready to embark on a transformative journey towards your
-              personal and professional development? We are here to
-              revolutionize the way you learn and connect with expert trainers.
-              Our cutting-edge platform.
+              NetQwix is a community where passionate experts and enthusiasts
+              meet LIVE over the internet to consult.
             </p>
           </div>
         </div>
@@ -84,7 +82,7 @@ const FooterLanding = (masterRecords) => {
                 );
               })}
             </div>
-            <div className="col-md-4 col-sm-2 col-lg-4 mb-4">
+            {/* <div className="col-md-4 col-sm-2 col-lg-4 mb-4">
               <div>
                 {" "}
                 <b>Quick access</b>
@@ -114,13 +112,13 @@ const FooterLanding = (masterRecords) => {
                   );
                 })}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
         <div className="row bg-primary p-3 m-2 justify-content-center">
           <span style={{ fontSize: "14px", color: "white" }}>
-            All Copyright (c) 2023 Reserved
+            All Copyright (c) 2025 Reserved
           </span>
         </div>
       </div>
