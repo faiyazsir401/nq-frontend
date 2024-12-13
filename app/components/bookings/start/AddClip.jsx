@@ -7,7 +7,7 @@ import { X } from 'react-feather';
 import { Button } from 'reactstrap';
 import { useMediaQuery } from 'usehooks-ts';
 
-const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedClips, shareFunc , sendNotfication }) => {
+const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedClips, shareFunc  }) => {
 
   const [selectedClipsCopy, setSelectedClipsCopy] = useState([]);
   const dispatch = useAppDispatch();
@@ -25,11 +25,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                   onClick={() => {
                     onClose();
                     dispatch(removeNewBookingData());
-                    if(sendNotfication){
-                      sendNotfication();
-                  console.log('sendNotfiicaiotn ' , sendNotfication)
-
-                    }
+                   
                   }}
                 >
                   <X />
@@ -112,11 +108,6 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                 onClick={() => {
                   setSelectedClips(selectedClipsCopy);
                   shareFunc(selectedClipsCopy);
-                  console.log('sendNotfiicaiotn ' , sendNotfication)
-                  if(sendNotfication){
-                    console.log('triggering send')
-                    sendNotfication();
-                  }
                 }}
               >
                 Share

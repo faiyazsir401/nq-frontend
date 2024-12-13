@@ -511,7 +511,7 @@ const Index = (props) => {
                     <i className="fa fa-calendar" />
                   </NavLink>
 
-                  <p className="menu-name px-2">Bookings</p>
+                  <p className="menu-name px-2">Upcoming Sessions</p>
                 </li>}
                 {accountType === AccountType?.TRAINEE && <li>
 

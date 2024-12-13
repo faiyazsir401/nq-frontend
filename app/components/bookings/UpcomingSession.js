@@ -119,10 +119,6 @@ const UpcomingSession = ({ accountType = null }) => {
     };
   }, [isMobile]);
 
-  const sendNotifications = (data) => {
-    socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
-  };
-
   if(modal){
     return <OrientationModal isOpen={modal}/>
   }else{
@@ -194,15 +190,6 @@ const UpcomingSession = ({ accountType = null }) => {
           setSelectedClips={setSelectedClips}
           clips={clips}
           shareFunc={addTraineeClipInBookedSession}
-          sendNotfication={() =>{
-              sendNotifications({
-                title: notificiationTitles.newBookingRequest,
-                description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
-                senderId: userInfo?._id,
-                receiverId: newBookingData?.trainer_id,
-                bookingInfo:null
-              });
-          }}
         />
       </>
     );

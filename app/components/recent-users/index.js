@@ -105,7 +105,7 @@ const RecentUsers = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    border: "2px solid rgb(0, 0, 128)",
+                    
                     // padding : "5px",
                     textAlign: "center",
                     overflow: "hidden",
@@ -114,7 +114,8 @@ const RecentUsers = () => {
                   <img
                     className="Image-Division"
                     style={{
-                      marginRight: "0px"
+                      marginRight: "0px",
+                      border: "2px solid rgb(0, 0, 128)",
                     }}
                     key={index}
                     // src={item?.profile_picture}
@@ -131,7 +132,7 @@ const RecentUsers = () => {
                       SetselectedStudentData({ ...item });
                     }}
                   />
-                  <h5 class="d-inline-block text-truncate" style={{ maxWidth: "80px", marginBottom: "5px" }}>{item?.fullname}</h5>
+                  <h5 class="d-inline-block" style={{ maxWidth: "80px", marginBottom: "5px" }}>{item?.fullname}</h5>
                 </div>
               ))}
 
@@ -143,7 +144,7 @@ const RecentUsers = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    border: "2px solid rgb(0, 0, 128)",
+                    
                     // padding: "5px",
                     textAlign: "center",
                     overflow:"hidden"
@@ -152,7 +153,8 @@ const RecentUsers = () => {
                   <img
                     className="Image-Division"
                     style={{
-                      marginRight: "0px"
+                      marginRight: "0px",
+                      border: "2px solid rgb(0, 0, 128)",
                     }}
                     key={index}
                     // src={item || '/assets/images/demoUser.png'}
@@ -169,7 +171,7 @@ const RecentUsers = () => {
                     alt={`Recent Trainee ${index + 1}`}
 
                   />
-                  <h5 class="d-inline-block text-truncate" style={{ maxWidth: "80px", marginBottom: "5px" }}>
+                  <h5 class="d-inline-block " style={{ maxWidth: "80px", marginBottom: "5px" }}>
                     Student {index + 1}
                   </h5>
                 </div>
