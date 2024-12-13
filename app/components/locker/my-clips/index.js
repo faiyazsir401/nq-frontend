@@ -187,10 +187,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       style={{
                         borderRadius: 5,
                       }}
-                      onClick={() => {
-                        setSelectedVideo(Utils?.generateVideoURL(clp));
-                        setIsOpen(true);
-                      }}
+                   
                     >
                       <div
                         style={{
@@ -226,6 +223,10 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                               borderRadius: "5px",
                               objectFit: "cover",
                             }}
+                            onClick={() => {
+                              setSelectedVideo(Utils?.generateVideoURL(clp));
+                              setIsOpen(true);
+                            }}
                           >
                             <source src={Utils?.generateVideoURL(clp)} />
                           </video>
@@ -240,9 +241,13 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                               justifyContent: "space-between",
                               backgroundColor: "#333",
                               color: "#fff",
-                              padding: "8px",
+                              
                               fontSize: "16px",
                               zIndex: "8",
+                            }}
+                            onClick={() => {
+                              setSelectedVideo(Utils?.generateVideoURL(clp));
+                              setIsOpen(true);
                             }}
                           >
                             <div
@@ -253,7 +258,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                 setSelectedId(clp?._id);
                               }}
                               style={{
-                                margin: "3px auto",
+                                padding: "10px",
                                 cursor: "pointer",
                               }}
                             >
@@ -261,7 +266,9 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                             </div>
                             <div
                               style={{
-                                margin: "3px auto",
+                                padding: "10px",
+                                paddingTop:"0px",
+                                cursor: "pointer",
                               }}
                             >
                               <a

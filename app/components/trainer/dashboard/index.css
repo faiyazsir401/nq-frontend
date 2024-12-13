@@ -80,6 +80,15 @@
     flex-wrap: wrap;
     flex-direction: column;
   }
+  .hover-video .download-delete{
+    /* opacity: '0'; */
+    display: flex !important;
+  }
+  
+  .video-container2 .download-delete{
+    /* opacity: '0'; */
+    display: flex !important;
+  }
 
   .videoStyle {
     width: 100% !important;
