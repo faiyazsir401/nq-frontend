@@ -773,23 +773,20 @@ const Index = (props) => {
 
                   {/* Practice Session */}
 
-                  {/* <li>
-                    <Tooltip
-                      title="Practice Session"
-                      position="top-end"
-                      size="small"
-                      trigger="mouseenter"
+                  <li>
+
+                  <NavLink id="sidebar-item-setting"
+                      className={`icon-btn btn-light button-effect step2 ${activeTab === "practice_session" ? "active" : ""
+                        }`}
+                      onClick={() => ToggleTab("practice_session")}
                     >
-                      <NavLink id="sidebar-item-setting"
-                        className={`icon-btn btn-light button-effect step2 ${activeTab === "practice_session" ? "active" : ""
-                          }`}
-                        onClick={() => ToggleTab("practice_session")}
-                      >
-                        <i class="fa fa-object-group" aria-hidden="true" />
-                      </NavLink>
-                    </Tooltip>
+                      <i class="fa fa-commenting-o" aria-hidden="true" />
+                    </NavLink>
+
+                    {/* </div> */}
                     <p className="menu-name px-2">Practice Session</p>
-                  </li> */}
+                    
+                  </li>
                 </>}
 
                 <li>
