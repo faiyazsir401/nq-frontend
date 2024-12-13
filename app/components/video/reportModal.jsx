@@ -112,8 +112,8 @@ const reportModal = ({
     const month = today.getMonth() + 1; // Months are zero-based, so add 1
     const year = today.getFullYear();
 
-    // Format the date as "day/month/year"
-    const formattedDate = `${day}/${month}/${year}`;
+    // Format the date as "month/day/year"
+    const formattedDate = `${month}/${day}/${year}`;
     setCurrentDate(formattedDate);
   };
   useEffect(() => {

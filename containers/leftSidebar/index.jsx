@@ -741,7 +741,7 @@ const Index = (props) => {
 
                   {/* About Us */}
 
-                  <li>
+                  {/* <li>
 
                     <NavLink id="sidebar-item-setting"
                       className={`icon-btn btn-light button-effect step2 ${activeTab === "about_us" ? "active" : ""
@@ -751,9 +751,9 @@ const Index = (props) => {
                       <i class="fa fa-address-card" aria-hidden="true" />
                     </NavLink>
 
-                    {/* </div> */}
+                    {/* </div> 
                     <p className="menu-name px-2">About Us</p>
-                  </li>
+                  </li> */}
 
                   {/* Contact Us */}
 

@@ -8,6 +8,7 @@ import SessionsList from "./SessionsList";
 
 import { HelpCircle, MessageSquare } from 'react-feather'; // Import Feather icons
 import { AccountType } from "../../common/constants";
+import AboutUs from "../aboutUs";
 
 const CardComponent = ({ title, onClick, icon }) => {
   return (
@@ -74,6 +75,8 @@ const ContactUs = () => {
         isOpen={isWriteFormOpen}
         setIsWriteFormOpen={setIsWriteFormOpen}
       />
+      <h2 className="text-center mt-5">About Us</h2>
+      <AboutUs />
     </>
   );
 };
