@@ -30,8 +30,8 @@ const FooterLanding = (masterRecords) => {
           </div>
           <div className="col-sm-9 col-lg-10 ">
             <p className="mt-4">
-              NetQwix is a community where passionate experts and enthusiasts
-              meet LIVE over the internet to consult.
+              NetQwix is a community where passionate Experts and Enthusiasts
+              meet LIVE for “Qwick Sessions over the Net”
             </p>
           </div>
         </div>

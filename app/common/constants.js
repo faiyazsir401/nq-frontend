@@ -611,14 +611,14 @@ export const WHY_CHOOSE_US = [
     icon: "🚀",
     title: "Seamless Trainer Booking",
     content:
-      "Discover a diverse community of experienced trainers spanning various fields. Browse profiles, read reviews, and select the perfect trainer to help you achieve your goals.",
+      "NetQwix serves as host to a diverse community of experienced trainers in many walks of life. Search profiles, read reviews, and select the perfect trainer to help you achieve your goals.",
   },
   {
     id: 2,
     icon: "🎯",
     title: "Tailored Learning Plans",
     content:
-      "Say goodbye to one-size-fits-all approaches. Our trainers create personalized learning plans that cater to your unique needs and aspirations.",
+      "Say goodbye to one-size-fits-all approaches. Our Expert Trainers create personalized learning plans that cater to your unique needs and aspirations.",
   },
   {
     id: 3,
@@ -630,23 +630,23 @@ export const WHY_CHOOSE_US = [
   {
     id: 4,
     icon: "🖌️",
-    title: "Interactive Learning Tools",
+    title: "Instant Session",
     content:
-      " Immerse yourself in engaging sessions with our unique interactive features. Draw freehand, create shapes, and annotate live video feeds to enhance your understanding and retention.",
+      "With NetQwix’s Instant Session feature, you can request a Session any time you see your favorite Expert online and when they accept, you are brought right into the Session.  How’s that for instant gratification?",
   },
   {
     id: 5,
     icon: "📹",
-    title: "Clip Share",
+    title: "Review Game Footage",
     content:
-      "Capture the moments of your sessions and easily share them with your trainer. Make feedback and progress tracking a breeze.",
+      "Capture the key moments while you are doing your thing and then upload them for the Session so you can review and huddle LIVE with your Expert to make a NetQwix Gameplan for improved performance.  Make feedback and tracking progress easy.",
   },
   {
     id: 6,
     icon: "🌐",
     title: "Connect from Anywhere",
     content:
-      "Whether you're at home, in the office, or on the go, LearnConnect's web application allows you to connect with your trainer seamlessly, anytime, anywhere.",
+      "Whether you're at home, in the office, or on the go, NetQwix’s LIVE Lesson pplication allows you to connect with your trainer seamlessly, anytime, anywhere on any device.",
   },
 ];
 
