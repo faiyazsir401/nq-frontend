@@ -191,9 +191,10 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                     >
                       <div
                         style={{
-                          margin: "2px",
+                          margin: "auto",
                           textAlign: "center",
                           maxHeight: "220px",
+                          width:"fit-content"
                         }}
                         className="hover-video"
                       >
@@ -209,80 +210,82 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         </h5>
                         <Tooltip
                           title={clp?.title}
-                          position="top"
+                          position="bottom"
                           trigger="mouseenter"
                         >
-                          <video
-                            id="Home-page-vid"
-                            poster={Utils?.generateThumbnailURL(clp)}
-                            style={{
-                              position: "relative",
-                              height: "180px",
-                              width: "100% !important",
-                              border: "4px solid #b4bbd1",
-                              borderRadius: "5px",
-                              objectFit: "cover",
-                            }}
-                            onClick={() => {
-                              setSelectedVideo(Utils?.generateVideoURL(clp));
-                              setIsOpen(true);
-                            }}
-                          >
-                            <source src={Utils?.generateVideoURL(clp)} />
-                          </video>
-                          <div
-                            className="download-delete"
-                            style={{
-                              position: "absolute",
-                              top: "12.5%",
-                              right: "4.5%",
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "space-between",
-                              backgroundColor: "#333",
-                              color: "#fff",
-                              
-                              fontSize: "16px",
-                              zIndex: "8",
-                            }}
-                            onClick={() => {
-                              setSelectedVideo(Utils?.generateVideoURL(clp));
-                              setIsOpen(true);
-                            }}
-                          >
-                            <div
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // handleDelete(clp?._id);
-                                setIsConfirmModalOpen(true);
-                                setSelectedId(clp?._id);
-                              }}
+                          <div style={{position:"relative"}}>
+                            <video
+                              id="Home-page-vid"
+                              poster={Utils?.generateThumbnailURL(clp)}
                               style={{
-                                padding: "10px",
-                                cursor: "pointer",
+                                position: "relative",
+                                aspectRatio:"1/1",
+                                width: "100% !important",
+                                border: "4px solid #b4bbd1",
+                                borderRadius: "5px",
+                                objectFit: "cover",
+                              }}
+                              onClick={() => {
+                                setSelectedVideo(Utils?.generateVideoURL(clp));
+                                setIsOpen(true);
                               }}
                             >
-                              <FaTrash />
-                            </div>
+                              <source src={Utils?.generateVideoURL(clp)} />
+                            </video>
                             <div
+                              className="download-delete"
                               style={{
-                                padding: "10px",
-                                paddingTop:"0px",
-                                cursor: "pointer",
+                                position: "absolute",
+                                top: "4px",
+                                right: "4px",
+                                display: "flex",
+                                flexDirection: "column",
+                                justifyContent: "space-between",
+                                backgroundColor: "#333",
+                                color: "#fff",
+                                
+                                fontSize: "16px",
+                                zIndex: "8",
+                              }}
+                              onClick={() => {
+                                setSelectedVideo(Utils?.generateVideoURL(clp));
+                                setIsOpen(true);
                               }}
                             >
-                              <a
-                                href={Utils?.generateVideoURL(clp)}
-                                download={true}
-                                onClick={(e) => e.stopPropagation()}
-                                style={{
-                                  color: "#fff",
-                                  fontSize: "16px",
+                              <div
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // handleDelete(clp?._id);
+                                  setIsConfirmModalOpen(true);
+                                  setSelectedId(clp?._id);
                                 }}
-                                target="_self"
+                                style={{
+                                  padding: "10px",
+                                  cursor: "pointer",
+                                }}
                               >
-                                <FaDownload />
-                              </a>
+                                <FaTrash />
+                              </div>
+                              <div
+                                style={{
+                                  padding: "10px",
+                                  paddingTop:"0px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <a
+                                  href={Utils?.generateVideoURL(clp)}
+                                  download={true}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{
+                                    color: "#fff",
+                                    fontSize: "16px",
+                                  }}
+                                  target="_self"
+                                >
+                                  <FaDownload />
+                                </a>
+                              </div>
                             </div>
                           </div>
                         </Tooltip>

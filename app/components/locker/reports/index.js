@@ -370,7 +370,7 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                             padding: "2px",
                             position : 'relative',
                             // maxWidth: "250px",
-                            height: "150px",
+                            aspectRatio:"1/1",
                             // width: "auto",
                             // height: "auto",
                             width: "100%",
