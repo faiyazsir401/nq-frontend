@@ -13,7 +13,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
   const dispatch = useAppDispatch();
   const { removeNewBookingData } = traineeAction;
   const isMobileScreen = useMediaQuery("(max-width:1000px)")
-  
+
   const allClips = clips.reduce((acc, category) => {
     return acc.concat(category.clips);
   }, []);
@@ -95,7 +95,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                             style={{
                               border: `${isSelected ? "4px solid green" : "4px solid #b4bbd1"}`,
                               height: isMobileScreen?"100px":"200px",
-                              width: isMobileScreen?"150px":"300px",
+                              width: isMobileScreen?"100px":"200px",
                               borderRadius: "5px",
                               objectFit: "cover",
                             }}
@@ -135,7 +135,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                             style={{
                               border: `${isSelected ? "4px solid green" : "4px solid #b4bbd1"}`,
                               height: isMobileScreen?"100px":"200px",
-                              width: isMobileScreen?"150px":"300px",
+                              width: isMobileScreen?"100px":"200px",
                               borderRadius: "5px",
                               objectFit: "cover",
                             }}
