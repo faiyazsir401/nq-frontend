@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import TrainerSlider from "./trainerSlider";
 import ReactDatePicker from "react-datepicker";
 import moment from "moment";
@@ -13,6 +13,7 @@ import { getAvailability } from "../../calendar/calendar.api";
 // import Input from './Input';
 import { SetColumns } from "./SetColumns";
 import {
+  bookSessionAsync,
   createPaymentIntentAsync,
   traineeAction,
   traineeState,
@@ -27,6 +28,7 @@ import {
   LOCAL_STORAGE_KEYS,
   STATUS,
   routingPaths,
+  topNavbarOptions,
 } from "../../../common/constants";
 import { ToastContainer, toast } from "react-toastify";
 import { authAction, authState } from "../../auth/auth.slice";
@@ -37,6 +39,12 @@ import { currentTimeZone } from "../../../../utils/videoCall";
 import { checkSlot } from "../../../common/common.api";
 import { useSelector } from "react-redux";
 import { DateTime } from "luxon";
+import { SocketContext } from "../../socket";
+import { EVENTS } from "../../../../helpers/events";
+import { getScheduledMeetingDetailsAsync } from "../../common/common.slice";
+import { notificiationTitles } from "../../../../utils/constant";
+// import { SocketContext } from "../socket";
+
 const BookingTable = ({
   selectedTrainer,
   trainerInfo,
@@ -47,6 +55,7 @@ const BookingTable = ({
 }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const socket = useContext(SocketContext);
   const isTokenExists = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
   const { status, getTraineeSlots, transaction } = useAppSelector(traineeState);
   const { userInfo, isAuthModalOpen, slotData, onlineUsers } =
@@ -78,6 +87,11 @@ const BookingTable = ({
   const { slots } = useAppSelector(commonState);
   const [isCommonBooking, setIsCommonBooking] = useState(false);
   const [selectedSlots, setSelectedSlot] = useState(null);
+
+    const sendNotifications = (data) => {
+      socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
+    };
+  
   useEffect(() => {
     const todaySDate = Utils.getDateInFormatIOS(new Date());
     const { weekDates, weekDateFormatted } =
@@ -102,13 +116,46 @@ const BookingTable = ({
     );
   }, [getTraineeSlots]);
   useEffect(() => {
+    console.log("transaction",transaction)
     if (
-      transaction &&
-      transaction?.intent &&
-      transaction?.intent?.result &&
-      transaction?.intent.result?.client_secret
+      transaction?.intent?.result?.client_secret
     ) {
       setShowTransactionModal(true);
+    }
+
+    if(transaction?.intent?.result?.skip){
+      const payload = {
+        ...bookSessionPayload,
+        // payment_intent_id: transaction?.intent?.result?.id,
+        amount: 0,
+        // application_fee_amount:
+        //   transaction?.intent?.result?.application_fee_amount / 100,
+      };
+      dispatch(bookSessionAsync(payload));
+      console.log("newBookingData",payload)
+
+      sendNotifications({
+        title: notificiationTitles.newBookingRequest,
+        description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
+        senderId: userInfo?._id,
+        receiverId: payload?.trainer_id,
+        bookingInfo:null
+      });
+
+      // Refecting the current Booking 
+
+        // Redirecting to the Booking tab
+        dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
+
+      dispatch(
+        getScheduledMeetingDetailsAsync({
+          status: "upcoming",
+        })
+      );
+
+      
+
+      setBookSessionPayload({});
     }
   }, [transaction]);
 

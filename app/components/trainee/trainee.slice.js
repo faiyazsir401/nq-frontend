@@ -66,6 +66,7 @@ export const createPaymentIntentAsync = createAsyncThunk(
       const response = await createPaymentIntent(payload);
       return response;
     } catch (err) {
+      console.log("createPaymentIntentAsyncError",err)
       toast.error(err.response.data.error);
       throw err;
     }
