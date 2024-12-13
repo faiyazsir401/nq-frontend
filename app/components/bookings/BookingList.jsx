@@ -268,6 +268,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             selectedClips={selectedClips}
             setSelectedClips={setSelectedClips}
             setIsOpenID={setIsOpenID}
+            isOpenID= {isOpenID}
             addTraineeClipInBookedSession={addTraineeClipInBookedSession}
             trainee_clips={trainee_clips}
             report={report}

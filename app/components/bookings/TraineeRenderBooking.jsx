@@ -41,6 +41,7 @@ const TraineeRenderBooking = ({
   selectedClips,
   setSelectedClips,
   setIsOpenID,
+  isOpenID,
   addTraineeClipInBookedSession,
   trainee_clips,
   report,
@@ -196,6 +197,7 @@ const TraineeRenderBooking = ({
                       {BookedSession.confirmed}
                     </button>
                   )}
+                  {isOpenID === _id &&
                   <AddClip
                     isOpen={isOpen}
                     onClose={() => {
@@ -208,7 +210,7 @@ const TraineeRenderBooking = ({
                     clips={clips}
                     shareFunc={addTraineeClipInBookedSession}
                     sendNotfication={null}
-                  />
+                  />}
                 </React.Fragment>
               )}
               {status === BookedSession.confirmed && (

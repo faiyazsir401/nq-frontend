@@ -605,7 +605,7 @@ const Bookings = ({ accountType = null }) => {
                     <Modal
                       isOpen={isOpen}
                       element={
-                        <div className="d-flex justify-content-center align-items-center" style={{height:'100vh' , width:'100vw' }}>
+                        <div className="d-flex justify-content-center align-items-center" style={{height:'100%' , width:'100%' }}>
                           <div className="theme-title">
                             <div className="media">
                               <div className="media-body media-body text-right d-flex">
@@ -694,6 +694,8 @@ const Bookings = ({ accountType = null }) => {
                             )}
                             <div style={{ marginTop: "30px" }}></div>
                             {clips?.length ? (
+                               Array.from({ length: 5 }, () =>
+              
                               clips?.map((cl, ind) => (
                                 <div
                                   className={`collapse-block ${
@@ -757,7 +759,7 @@ const Bookings = ({ accountType = null }) => {
                                     </div>
                                   </div>
                                 </div>
-                              ))
+                              )))
                             ) : (
                               <>
                                 <div

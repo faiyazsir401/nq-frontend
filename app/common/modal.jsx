@@ -6,7 +6,7 @@ const Modal = ({
   id,
   element,
   toggle,
-  footer = <></>,
+  footer = false,
   width,
   allowFullWidth = false,
   height,
@@ -33,7 +33,7 @@ const Modal = ({
       onClick={() =>toggle && toggle()}
     >
       <ModalBody>{element}</ModalBody>
-      <ModalFooter>{footer}</ModalFooter>
+      {footer &&<ModalFooter>{footer}</ModalFooter>}
     </ReactStrapModal>
   );
 };
