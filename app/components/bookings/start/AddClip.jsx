@@ -61,10 +61,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
             }}
           >
             {clips?.length ? (
-               Array.from({ length: 5 }, () =>
-              
-           
-              
+
                 <div
                   className={`d-inline `}
                   style={{ display: 'inline-block'}}
@@ -150,7 +147,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                     })}
                   </div>
                 </div>
-              )
+          
             ) : null}
           </div>
           {clips?.length ? (

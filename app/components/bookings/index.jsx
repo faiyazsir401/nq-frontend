@@ -694,8 +694,7 @@ const Bookings = ({ accountType = null }) => {
                             )}
                             <div style={{ marginTop: "30px" }}></div>
                             {clips?.length ? (
-                               Array.from({ length: 5 }, () =>
-              
+
                               clips?.map((cl, ind) => (
                                 <div
                                   className={`collapse-block ${
@@ -759,7 +758,7 @@ const Bookings = ({ accountType = null }) => {
                                     </div>
                                   </div>
                                 </div>
-                              )))
+                              ))
                             ) : (
                               <>
                                 <div
