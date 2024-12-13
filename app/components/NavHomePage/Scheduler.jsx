@@ -208,6 +208,7 @@ const Scheduler = () => {
   const [availability, setAvailability] = useState(
     userInfo.extraInfo?.availabilityInfo?.availability || initialDayValue
   );
+  console.log("userInfo",availability)
   const [timeZone, setTimeZone] = useState(
     userInfo.extraInfo?.availabilityInfo?.timeZone || currentTimeZone()
   );

@@ -314,8 +314,8 @@ const SelectedCategory = ({
                     <div className="col-sm-3 col-md-3 col-lg-2 col-xl-2">
                       <img
                         src={
-                          data?.profilePicture
-                            ? Utils?.getImageUrlOfS3(data?.profilePicture)
+                          data?.profile_picture
+                            ? Utils?.getImageUrlOfS3(data?.profile_picture)
                             : "/assets/images/avtar/statusMenuIcon.jpeg"
                         }
                         className="cardimg"
@@ -473,8 +473,8 @@ const TrainerSessionInfo = ({
           <div>
             <img
               src={
-                trainer && trainer.profilePicture
-                  ? Utils?.getImageUrlOfS3(trainer.profilePicture)
+                trainer && trainer.profile_picture
+                  ? Utils?.getImageUrlOfS3(trainer.profile_picture)
                   : "/assets/images/avtar/statusMenuIcon.jpeg"
               }
               width={100}
