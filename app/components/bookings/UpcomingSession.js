@@ -119,9 +119,7 @@ const UpcomingSession = ({ accountType = null }) => {
     };
   }, [isMobile]);
 
-  if(modal){
-    return <OrientationModal isOpen={modal}/>
-  }else{
+  
     return (
       <>
         <div>
@@ -193,7 +191,7 @@ const UpcomingSession = ({ accountType = null }) => {
         />
       </>
     );
-  }
+ 
  
 };
 export default UpcomingSession;

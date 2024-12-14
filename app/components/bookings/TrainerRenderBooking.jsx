@@ -9,7 +9,7 @@ import { Button } from "reactstrap";
 import { X } from "react-feather";
 import Modal from "../../common/modal";
 import { authState } from "../auth/auth.slice";
-import { CovertTimeAccordingToTimeZone, formatTimeInLocalZone, Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, formatTimeInLocalZone, navigateToMeeting, Utils } from "../../../utils/utils";
 import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
@@ -209,20 +209,12 @@ const TrainerRenderBooking = ({
                   }}
                   disabled={!isWithinTimeFrame}
                   onClick={() => {
-                    handleClick();
-                    setStartMeeting({
-                      ...startMeeting,
-                      id: _id,
-                      isOpenModal: true,
-                      traineeInfo: trainee_info,
-                      trainerInfo: trainer_info,
-                      iceServers: bookingInfo.iceServers,
-                      trainee_clip: bookingInfo.trainee_clips,
-                    });
+                    
                     console.log(
                       "start meeting set the booking info is ",
                       bookingInfo
                     );
+                    navigateToMeeting(_id)
                     sendNotifications({
                       title: notificiationTitles.sessionStrated,
                       description: `${trainer_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,

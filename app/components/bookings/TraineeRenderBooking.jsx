@@ -6,7 +6,7 @@ import {
   getScheduledMeetingDetailsAsync,
   updateBookedSessionScheduledMeetingAsync,
 } from "../common/common.slice";
-import { CovertTimeAccordingToTimeZone, Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, navigateToMeeting, Utils } from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
@@ -222,17 +222,7 @@ const TraineeRenderBooking = ({
                   }}
                   disabled={!isWithinTimeFrame}
                   onClick={() => {
-                    handleClick();
-                    setStartMeeting({
-                      ...startMeeting,
-                      id: _id,
-                      isOpenModal: true,
-                      traineeInfo: trainee_info,
-                      trainerInfo: trainer_info,
-                      iceServers: bookingInfo.iceServers,
-                      trainee_clip: bookingInfo.trainee_clips,
-                    });
-
+                    navigateToMeeting(_id)
                     sendNotifications({
                       title: notificiationTitles.sessionStrated,
                       description: `${trainee_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
