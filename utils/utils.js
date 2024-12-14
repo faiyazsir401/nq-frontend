@@ -1077,4 +1077,11 @@ export const convertTimesForDataArray = (dataArray) => {
       session_end_time: formattedEndTime
     };
   });
+
+  
+};
+
+export const navigateToMeeting = (_id) => {
+  const queryString = new URLSearchParams({ id: _id }).toString();
+  window.location.href = `/meeting?${queryString}`;
 };

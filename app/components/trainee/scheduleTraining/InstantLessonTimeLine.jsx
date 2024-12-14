@@ -189,7 +189,7 @@ const InstantLessonTimeLine = ({
             type="button"
             disabled={!selectedLesson}
             className="mt-3 btn btn-sm btn-primary"
-            onClick={() => {
+            onClick={async() => {
               if (!selectedLesson || !handleFormValidation()) {
                 return;
               }
@@ -208,10 +208,11 @@ const InstantLessonTimeLine = ({
                 endTime,
                 trainerInfo?.userInfo?.extraInfo?.hourly_rate
               );
+              let paymentIntentData;
               if (amountPayable > 0) {
                 if (isTokenExists) {
                   dispatch(authAction.updateIsAuthModalOpen(false));
-                  dispatch(
+                  paymentIntentData = await dispatch(
                     createPaymentIntentAsync({
                       amount: +amountPayable.toFixed(1),
                       destination: trainerInfo?.userInfo?.stripe_account_id,
@@ -219,7 +220,8 @@ const InstantLessonTimeLine = ({
                       customer: userInfo?.stripe_account_id,
                       couponCode: couponCode,
                     })
-                  );
+                  ).unwrap();
+                  
                 } else {
                   dispatch(authAction.updateIsAuthModalOpen(true));
                 }
@@ -230,7 +232,7 @@ const InstantLessonTimeLine = ({
                 }) + "Z";
                 const payload = {
                   slot_id: slot?._id,
-                  charging_price: amountPayable,
+                  charging_price: (paymentIntentData?.data?.result?.amount/100) ?? amountPayable,
                   trainer_id: trainerInfo?.userInfo?._id || trainerInfo?.userInfo?.trainer_id,
                   trainer_info: trainerInfo,
                   hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
