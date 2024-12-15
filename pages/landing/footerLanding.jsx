@@ -20,7 +20,7 @@ const FooterLanding = (masterRecords) => {
         <div className="row border border-#ffecf2 m-2 rounded">
           <div className="col-lg-2 col-sm-3 mb-2">
             <img
-              src="/assets/images/netquix_logo.png"
+              src="/assets/images/netquix_logo_beta.png"
               alt="logo"
               className="mt-2"
               style={{
@@ -51,7 +51,7 @@ const FooterLanding = (masterRecords) => {
           
             <div className="col-md-6 col-sm-2 col-lg-1">
               <img
-                src="/assets/images/netquix_logo.png"
+                src="/assets/images/netquix_logo_beta.png"
                 alt="logo"
                 className={`${tabletView ? "ml-5" : "ml-3"}`}
                 style={{

@@ -233,7 +233,7 @@ const Auth_SignUp = (props) => {
                         alt="images"
                       /> */}
                       <img
-                        src="/assets/images/netquix_logo.png"
+                        src="/assets/images/netquix_logo_beta.png"
                         alt="images"
                         className="header-image-logo"
                       />

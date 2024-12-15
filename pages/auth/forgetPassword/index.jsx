@@ -37,7 +37,7 @@ const ForgetPassword = () => {
                 <div className="login-content-header">
                     <Link href={routingPaths.landing}>
                       <img
-                        src="/assets/images/netquix_logo.png"
+                        src="/assets/images/netquix_logo_beta.png"
                         alt="images"
                         className="image-fluid header-image-logo"
                       />
