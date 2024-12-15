@@ -168,13 +168,17 @@ export class Utils {
     endTime,
     chargingRate = TRAINER_AMOUNT_USD
   ) => {
-    console.log(startTime , endTime , 'start endtime from here')
+    console.log(startTime, endTime, "start endtime from here");
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
-
-    const totalMinutes = (endHour - startHour) * 60 + (endMinute - startMinute);
+  
+    // Adjust endHour if the endTime is on the next day
+    const adjustedEndHour = endHour < startHour ? endHour + 24 : endHour;
+  
+    const totalMinutes =
+      (adjustedEndHour - startHour) * 60 + (endMinute - startMinute);
     const finalPrice = (totalMinutes / 60) * chargingRate;
-
+  
     return +finalPrice.toFixed(2);
   };
 

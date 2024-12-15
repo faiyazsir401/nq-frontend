@@ -190,6 +190,7 @@ const InstantLessonTimeLine = ({
             disabled={!selectedLesson}
             className="mt-3 btn btn-sm btn-primary"
             onClick={async() => {
+              console.log("!selectedLesson || !handleFormValidation()",!selectedLesson || !handleFormValidation())
               if (!selectedLesson || !handleFormValidation()) {
                 return;
               }
@@ -209,6 +210,7 @@ const InstantLessonTimeLine = ({
                 trainerInfo?.userInfo?.extraInfo?.hourly_rate
               );
               let paymentIntentData;
+              console.log("amountPayable", +amountPayable.toFixed(1),isTokenExists)
               if (amountPayable > 0) {
                 if (isTokenExists) {
                   dispatch(authAction.updateIsAuthModalOpen(false));

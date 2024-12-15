@@ -2654,18 +2654,23 @@ useEffect(() => {
                           // padding: "1px !important",
                           height: "100%",
                           padding: 0,
-                          margin:'auto'
+                          margin:'auto',
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "end"
                         }}
                       >
                        
                         <LazyVideo
                           id="selected-video-1"
                           style={{
-                            marginLeft: accountType === AccountType.TRAINER && !isPinned ? '10%' : '0%',
+                            
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
                             height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
-                            width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
-                            objectFit: "fill",
+                            width: "fit-content",
+                            objectFit: "fit",
+                            aspectRatio:"auto"
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
@@ -2749,7 +2754,11 @@ useEffect(() => {
                           // padding: "1px",
                           height: "100%",
                           padding: 0,
-                          margin:'auto'
+                          margin:'auto',
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "flex-start"
                         }}
                       >
 
@@ -2759,8 +2768,9 @@ useEffect(() => {
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
                             height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
-                            width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
-                            objectFit: "fill",
+                            width: "fit-content",
+                            objectFit: "fit",
+                            aspectRatio:"auto"
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}
@@ -3562,6 +3572,10 @@ useEffect(() => {
                           // padding: "1px !important",
                           height: "100%",
                           paddingRight: 0,
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "end"
                         }}
                       >
                         {/* {
@@ -3602,8 +3616,9 @@ useEffect(() => {
                           id="selected-video-1"
                           style={{
                             height: "95%",
-                            width: "100%",
-                            objectFit: "fill",
+                            width: "fit-content",
+                            objectFit: "fit",
+                            aspectRatio:"auto"
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
@@ -3687,6 +3702,11 @@ useEffect(() => {
                           // padding: "1px",
                           height: "100%",
                           paddingLeft: 0,
+                          
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "flex-start"
                         }}
                       >
                         {/* {
@@ -3727,8 +3747,9 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             height: "95%",
-                            width: "100%",
-                            objectFit: "fill",
+                            width: "fit-content",
+                            objectFit: "fit",
+                            aspectRatio:"auto"
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}

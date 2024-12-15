@@ -81,7 +81,7 @@ export const CanvasMenuBar = ({
     }
     setTraineeClips(arr);
   };
-  const mediaQuery = window.matchMedia("(min-width: 768px)");
+  const isMobileScreen = window.matchMedia("(max-width: 1000px)");
 
   var netquixVideos = [
     {
@@ -121,7 +121,7 @@ export const CanvasMenuBar = ({
         className="creationBarItem "
         // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{height: isIOS? "54vh" : "70vh",overflow: 'auto'}}>
+        <div className="CreationBarCustomizable" style={{overflow: 'auto'}}>
           <span></span>
           {/* free hand */}
           <span>
@@ -162,6 +162,11 @@ export const CanvasMenuBar = ({
                 onClick={() => {
                   setDisplayColorPicker(true);
                 }}
+                style={{
+                  height:isMobileScreen?"24px":"auto",
+                  width:isMobileScreen?"24px":"auto",
+                  padding:isMobileScreen?"5px":"auto"
+                }}
               >
                 <Image
                   src="/icons/color-wheel.png"
@@ -178,6 +183,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"auto",
+                width:isMobileScreen?"24px":"auto",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.FREE_HAND)
               }}
@@ -193,6 +203,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"auto",
+                width:isMobileScreen?"24px":"auto",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.LINE)
 
@@ -209,6 +224,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"auto",
+                width:isMobileScreen?"24px":"auto",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.CIRCLE)
               }}
@@ -224,6 +244,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"auto",
+                width:isMobileScreen?"24px":"auto",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.SQUARE)
               }}
@@ -232,7 +257,7 @@ export const CanvasMenuBar = ({
             </div>
           </span>
           {/* rectangle */}
-          <span>
+          {/* <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.RECTANGLE
@@ -250,9 +275,9 @@ export const CanvasMenuBar = ({
                 alt="rectangle"
               />
             </div>
-          </span>
+          </span> */}
           {/* oval */}
-          <span>
+          {/* <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.OVAL
@@ -263,12 +288,12 @@ export const CanvasMenuBar = ({
                 menuSelector(SHAPES.OVAL)
               }}
             >
-              {/* <i className="fa fa-long-arrow-right" /> */}
+              {/* <i className="fa fa-long-arrow-right" /> 
               <Image src="/icons/oval.png" width={20} height={20} alt="oval" />
             </div>
-          </span>
+          </span> */}
           {/* triangle */}
-          <span>
+          {/* <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.TRIANGLE
@@ -286,9 +311,9 @@ export const CanvasMenuBar = ({
                 alt="triangle"
               />
             </div>
-          </span>
+          </span> */}
           {/* arrows */}
-          <span>
+          {/* <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.ARROW_RIGHT
@@ -315,19 +340,29 @@ export const CanvasMenuBar = ({
             >
               <i className="fa fa-arrows-v rotate-90" />
             </div>
-          </span>
+          </span> */}
           <span>
             <div
               className={`icon-btn m-5  button-effect btn-sm my-3`}
               onClick={undoDrawing}
+              style={{
+                height:isMobileScreen?"24px":"auto",
+                width:isMobileScreen?"24px":"auto",
+                padding:isMobileScreen?"5px":"auto"
+              }}
             >
-              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" />
+              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"auto"}}/>
             </div>
           </span>
           <span>
             <div
               className={`icon-btn m-5  button-effect btn-sm my-3`}
               onClick={refreshDrawing}
+              style={{
+                height:isMobileScreen?"24px":"auto",
+                width:isMobileScreen?"24px":"auto",
+                padding:isMobileScreen?"5px":"auto"
+              }}
             >
               <RefreshCw />
             </div>
