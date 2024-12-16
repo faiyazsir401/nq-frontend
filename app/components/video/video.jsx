@@ -3106,7 +3106,7 @@ useEffect(() => {
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                     display:
                       displayMsg?.msg || isRemoteVideoOff ? "flex" : "none",
                   }}
@@ -3302,7 +3302,7 @@ useEffect(() => {
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                   }}
                 >
                   {fromUser?.profile_picture ? (
@@ -4017,7 +4017,7 @@ useEffect(() => {
                     alignItems: "center",
                     height: "100%",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                     display:
                       displayMsg?.msg || isRemoteVideoOff ? "flex" : "none",
                   }}
@@ -4134,7 +4134,7 @@ useEffect(() => {
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                   }}
                 >
                   {fromUser.profile_picture ? (
