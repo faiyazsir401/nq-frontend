@@ -190,65 +190,70 @@ const InstantLessonTimeLine = ({
             disabled={!selectedLesson}
             className="mt-3 btn btn-sm btn-primary"
             onClick={async() => {
-              console.log("!selectedLesson || !handleFormValidation()",!selectedLesson || !handleFormValidation())
-              if (!selectedLesson || !handleFormValidation()) {
-                return;
-              }
-
-              const slot1 = getTimeRange(selectedLesson.duration);
-
-              let startTime = isCommonBooking
-                ? DateTime.fromFormat(selectedSlot?.start, "h:mm a").toFormat("HH:mm")
-                : slot1?.sessionStartTime;
-              let endTime = isCommonBooking
-                ? DateTime.fromFormat(selectedSlot?.end, "h:mm a").toFormat("HH:mm")
-                : slot1?.sessionEndTime;
-
-              const amountPayable = Utils.getMinutesFromHourMM(
-                startTime,
-                endTime,
-                trainerInfo?.userInfo?.extraInfo?.hourly_rate
-              );
-              let paymentIntentData;
-              console.log("amountPayable", +amountPayable.toFixed(1),isTokenExists)
-              if (amountPayable > 0) {
-                if (isTokenExists) {
-                  dispatch(authAction.updateIsAuthModalOpen(false));
-                  paymentIntentData = await dispatch(
-                    createPaymentIntentAsync({
-                      amount: +amountPayable.toFixed(1),
-                      destination: trainerInfo?.userInfo?.stripe_account_id,
-                      commission: trainerInfo?.userInfo?.commission,
-                      customer: userInfo?.stripe_account_id,
-                      couponCode: couponCode,
-                    })
-                  ).unwrap();
-                  
-                } else {
-                  dispatch(authAction.updateIsAuthModalOpen(true));
+              try {
+                console.log("!selectedLesson || !handleFormValidation()",!selectedLesson || !handleFormValidation())
+                if (!selectedLesson || !handleFormValidation()) {
+                  return;
                 }
-
-                const today = DateTime.now().toISO({
-                  suppressMilliseconds: false,
-                  includeOffset: false,
-                }) + "Z";
-                const payload = {
-                  slot_id: slot?._id,
-                  charging_price: (paymentIntentData?.data?.result?.amount/100) ?? amountPayable,
-                  trainer_id: trainerInfo?.userInfo?._id || trainerInfo?.userInfo?.trainer_id,
-                  trainer_info: trainerInfo,
-                  hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
-                  status: BookedSession.booked,
-                  booked_date: today,
-                  session_start_time: startTime,
-                  session_end_time: endTime,
-                  start_time: convertTimesToISO(today, startTime),
-                  end_time: convertTimesToISO(today, endTime),
-                };
-                setBookSessionPayload(payload);
-                setAmount(amountPayable.toFixed(1));
-                onClose(false);
+  
+                const slot1 = getTimeRange(selectedLesson.duration);
+  
+                let startTime = isCommonBooking
+                  ? DateTime.fromFormat(selectedSlot?.start, "h:mm a").toFormat("HH:mm")
+                  : slot1?.sessionStartTime;
+                let endTime = isCommonBooking
+                  ? DateTime.fromFormat(selectedSlot?.end, "h:mm a").toFormat("HH:mm")
+                  : slot1?.sessionEndTime;
+  
+                const amountPayable = Utils.getMinutesFromHourMM(
+                  startTime,
+                  endTime,
+                  trainerInfo?.userInfo?.extraInfo?.hourly_rate
+                );
+                let paymentIntentData;
+                console.log("amountPayable", +amountPayable.toFixed(1),isTokenExists)
+                if (amountPayable > 0) {
+                  if (isTokenExists) {
+                    dispatch(authAction.updateIsAuthModalOpen(false));
+                    paymentIntentData = await dispatch(
+                      createPaymentIntentAsync({
+                        amount: +amountPayable.toFixed(1),
+                        destination: trainerInfo?.userInfo?.stripe_account_id,
+                        commission: trainerInfo?.userInfo?.commission,
+                        customer: userInfo?.stripe_account_id,
+                        couponCode: couponCode,
+                      })
+                    ).unwrap();
+                    
+                  } else {
+                    dispatch(authAction.updateIsAuthModalOpen(true));
+                  }
+  
+                  const today = DateTime.now().toISO({
+                    suppressMilliseconds: false,
+                    includeOffset: false,
+                  }) + "Z";
+                  const payload = {
+                    slot_id: slot?._id,
+                    charging_price: (paymentIntentData?.data?.result?.amount/100) ?? amountPayable,
+                    trainer_id: trainerInfo?.userInfo?._id || trainerInfo?.userInfo?.trainer_id,
+                    trainer_info: trainerInfo,
+                    hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
+                    status: BookedSession.booked,
+                    booked_date: today,
+                    session_start_time: startTime,
+                    session_end_time: endTime,
+                    start_time: convertTimesToISO(today, startTime),
+                    end_time: convertTimesToISO(today, endTime),
+                  };
+                  setBookSessionPayload(payload);
+                  setAmount(amountPayable.toFixed(1));
+                  onClose(false);
+                }
+              } catch (error) {
+                console.log("found the issue",error)
               }
+             
             }}
           >
             {isCommonBooking ? "Process to Checkout" : "Book Instant Lesson"}
