@@ -123,7 +123,7 @@ const BookingTable = ({
       setShowTransactionModal(true);
     }
 
-    if(transaction?.intent?.result?.skip){
+    if(transaction?.intent?.result?.skip && bookSessionPayload?.trainer_id){
       const payload = {
         ...bookSessionPayload,
         // payment_intent_id: transaction?.intent?.result?.id,
@@ -157,7 +157,9 @@ const BookingTable = ({
 
       setBookSessionPayload({});
     }
-  }, [transaction]);
+  }, [transaction,bookSessionPayload]);
+
+  console.log("newBookingDatatesting",bookSessionPayload)
 
   // useEffect(() => {
   //   if (status === STATUS.fulfilled) {

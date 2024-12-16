@@ -177,9 +177,11 @@ const InstantLessonTimeLine = ({
               className='mt-3 mb-0'
               style={{
                 border: '2px solid #000080',
-                color: '#000080'
+                color: '#000080',
+                width:"50%",
+                margin:"auto"
               }}
-              placeholder="Enter coupon code"
+              placeholder="Enter Promo code"
             />
           </FormGroup>
           {formError && <p style={{ color: 'red', fontSize: '14px' }}>{formError}</p>}
@@ -235,7 +237,7 @@ const InstantLessonTimeLine = ({
                   }) + "Z";
                   const payload = {
                     slot_id: slot?._id,
-                    charging_price: (paymentIntentData?.data?.result?.amount/100) ?? amountPayable,
+                    charging_price: paymentIntentData?.data?.result?.amount ?(paymentIntentData?.data?.result?.amount/100):null?? amountPayable,
                     trainer_id: trainerInfo?.userInfo?._id || trainerInfo?.userInfo?.trainer_id,
                     trainer_info: trainerInfo,
                     hourly_rate: trainerInfo?.userInfo?.extraInfo?.hourly_rate,
@@ -246,6 +248,7 @@ const InstantLessonTimeLine = ({
                     start_time: convertTimesToISO(today, startTime),
                     end_time: convertTimesToISO(today, endTime),
                   };
+                  console.log("payloadtesting",payload)
                   setBookSessionPayload(payload);
                   setAmount(amountPayable.toFixed(1));
                   onClose(false);
