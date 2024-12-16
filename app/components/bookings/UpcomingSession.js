@@ -145,7 +145,7 @@ const UpcomingSession = ({ accountType = null }) => {
                         activeTabs === tabName ? "text-primary" : "text-dark"
                       } text-capitalize`}
                       onClick={() => handleChangeBookingTab(tabName)}
-                      style={{ fontSize: "13px" }}
+                      style={{ fontSize: "13px",padding:width768?"8px":"8px 16px" }}
                     >
                       {tabName}
                     </NavLink>
