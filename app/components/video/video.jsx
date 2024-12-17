@@ -2668,9 +2668,9 @@ useEffect(() => {
                             
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
                             height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
-                            width: "max-content",
+                            width: "fit-content",
                             objectFit: "fit",
-                            aspectRatio:"auto"
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
@@ -2768,9 +2768,9 @@ useEffect(() => {
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
                             height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
-                            width: "max-content",
+                            width: "fit-content",
                             objectFit: "fit",
-                            aspectRatio:"auto"
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}
@@ -3616,9 +3616,9 @@ useEffect(() => {
                           id="selected-video-1"
                           style={{
                             height: "95%",
-                            width: "max-content",
+                            width: "fit-content",
                             objectFit: "fit",
-                            aspectRatio:"auto"
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
@@ -3747,9 +3747,9 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             height: "95%",
-                            width: "max-content",
+                            width: "fit-content",
                             objectFit: "fit",
-                            aspectRatio:"auto"
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}
