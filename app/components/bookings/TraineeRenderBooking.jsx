@@ -23,6 +23,7 @@ import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
 import { notificiationTitles } from "../../../utils/constant";
 import { DateTime } from "luxon";
+import { useMediaQuery } from "usehooks-ts";
 
 const TraineeRenderBooking = ({
   _id,
@@ -127,6 +128,8 @@ const TraineeRenderBooking = ({
     );
   };
 
+  const isMobileScreen = useMediaQuery('(max-width:600px)')
+
   return (
     <React.Fragment>
       {status !== BookedSession.canceled &&
@@ -161,8 +164,9 @@ const TraineeRenderBooking = ({
               {status !== BookedSession.canceled && (
                 <React.Fragment>
                   <button
-                    className="btn btn-success button-effect btn-sm mr-2 btn_cancel my-1"
+                    className={`btn btn-success button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
                     type="button"
+                    style={{paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"}}
                     onClick={() => {
                       if (trainee_clips?.length > 0)
                         setSelectedClips(trainee_clips);
@@ -174,11 +178,14 @@ const TraineeRenderBooking = ({
                   </button>
                   {status === BookedSession.booked ? (
                     <button
-                      className="btn btn-dark button-effect btn-sm mr-2 btn_cancel my-1"
+                    className={`btn btn-dark button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
+                    
                       type="button"
+                    
                       style={{
                         cursor:
                           status === BookedSession.booked && "not-allowed",
+                          paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                       }}
                       disabled={status === BookedSession.booked}
                     >
@@ -186,11 +193,13 @@ const TraineeRenderBooking = ({
                     </button>
                   ) : (
                     <button
-                      className="btn btn-primary button-effect btn-sm mr-2 my-1"
+                    className={`btn btn-primary button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
+            
                       type="button"
                       style={{
                         cursor:
                           status === BookedSession.confirmed && "not-allowed",
+                          paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                       }}
                       disabled={status === BookedSession.confirmed}
                     >
@@ -215,10 +224,12 @@ const TraineeRenderBooking = ({
               )}
               {status === BookedSession.confirmed && (
                 <button
-                  className="btn btn-primary button-effect btn-sm mr-2 my-1"
+                className={`btn btn-primary button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
+
                   type="button"
                   style={{
                     cursor: isWithinTimeFrame ? "pointer" : "not-allowed",
+                    paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                   }}
                   disabled={!isWithinTimeFrame}
                   onClick={() => {
@@ -236,13 +247,14 @@ const TraineeRenderBooking = ({
                 </button>
               )}
               <button
-                className={`btn btn-danger button-effect btn-sm btn_cancel my-1`}
+                className={`btn btn-danger button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
                 type="button"
                 style={{
                   cursor:
                     status === BookedSession.canceled || isStartButtonEnabled
                       ? "not-allowed"
                       : "pointer",
+                      paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                 }}
                 disabled={
                   status === BookedSession.canceled || isStartButtonEnabled
@@ -278,11 +290,12 @@ const TraineeRenderBooking = ({
           )}
           {isMeetingCanceled() && isMeetingDone && (
             <button
-              className="btn btn-danger button-effect btn-sm  my-1"
+             className={`btn btn-danger button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
               type="button"
               style={{
                 cursor:
                   status === BookedSession.canceled ? "not-allowed" : "pointer",
+                  paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
               }}
               disabled={isMeetingCanceled()}
             >

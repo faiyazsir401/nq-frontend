@@ -190,7 +190,7 @@ const NavHomePage = () => {
               minWidth: "97%",
             }}
           >
-            <div className="card-body">
+            <div className="card-body" style={{padding:width600?"5px":"auto"}}>
               <NavHomePageCenterContainer />
             </div>
           </div>
