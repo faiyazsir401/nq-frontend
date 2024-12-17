@@ -22,6 +22,7 @@ import { Tooltip } from "react-tippy";
 import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { isIOS } from "react-device-detect";
+import { useMediaQuery } from "usehooks-ts";
 
 export const CanvasMenuBar = ({
   isOpen,
@@ -81,7 +82,7 @@ export const CanvasMenuBar = ({
     }
     setTraineeClips(arr);
   };
-  const isMobileScreen = window.matchMedia("(max-width: 1000px)");
+  const isMobileScreen =useMediaQuery("(max-width: 1000px)");
 
   var netquixVideos = [
     {
@@ -115,13 +116,14 @@ export const CanvasMenuBar = ({
       setActiveTab(null);
     }
   }
+  console.log("isMobileScreen",isMobileScreen)
   return (
     <div style={{ margin: "1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
         // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{overflow: 'auto'}}>
+        <div className="CreationBarCustomizable" style={{height: !isMobileScreen ?(isIOS? "54vh" : "70vh"):"auto",overflow: 'auto'}}>
           <span></span>
           {/* free hand */}
           <span>
@@ -163,8 +165,8 @@ export const CanvasMenuBar = ({
                   setDisplayColorPicker(true);
                 }}
                 style={{
-                  height:isMobileScreen?"24px":"auto",
-                  width:isMobileScreen?"24px":"auto",
+                  height:isMobileScreen?"24px":"none",
+                  width:isMobileScreen?"24px":"none",
                   padding:isMobileScreen?"5px":"auto"
                 }}
               >
@@ -184,8 +186,8 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"auto",
-                width:isMobileScreen?"24px":"auto",
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
                 padding:isMobileScreen?"5px":"auto"
               }}
               onClick={() => {
@@ -204,8 +206,8 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"auto",
-                width:isMobileScreen?"24px":"auto",
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
                 padding:isMobileScreen?"5px":"auto"
               }}
               onClick={() => {
@@ -225,8 +227,8 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"auto",
-                width:isMobileScreen?"24px":"auto",
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
                 padding:isMobileScreen?"5px":"auto"
               }}
               onClick={() => {
@@ -245,8 +247,8 @@ export const CanvasMenuBar = ({
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"auto",
-                width:isMobileScreen?"24px":"auto",
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
                 padding:isMobileScreen?"5px":"auto"
               }}
               onClick={() => {
@@ -346,12 +348,12 @@ export const CanvasMenuBar = ({
               className={`icon-btn m-5  button-effect btn-sm my-3`}
               onClick={undoDrawing}
               style={{
-                height:isMobileScreen?"24px":"auto",
-                width:isMobileScreen?"24px":"auto",
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
                 padding:isMobileScreen?"5px":"auto"
               }}
             >
-              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"auto"}}/>
+              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"none"}}/>
             </div>
           </span>
           <span>
@@ -359,8 +361,8 @@ export const CanvasMenuBar = ({
               className={`icon-btn m-5  button-effect btn-sm my-3`}
               onClick={refreshDrawing}
               style={{
-                height:isMobileScreen?"24px":"auto",
-                width:isMobileScreen?"24px":"auto",
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
                 padding:isMobileScreen?"5px":"auto"
               }}
             >
