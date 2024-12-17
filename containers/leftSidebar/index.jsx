@@ -84,7 +84,7 @@ const Index = (props) => {
   // const [onlineUsers, setOnlineUsers] = useState(null);
 
   const { notifications, isLoading } = useAppSelector(notificationState)
-
+  const isMobileScreen  = useMediaQuery(600)
   console.log("notifications********>>>>>>>>>>>", notifications[0]?.isRead)
 
 
@@ -266,7 +266,7 @@ const Index = (props) => {
       if (isMobile) {
         getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '75px' : "0px";
       }
-      getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '65px' : "15px";
+      getBookingLesson.style.marginLeft = isMobileScreen ?openCloseToggleSideNav ? '65px' : "0px":"0px";
 
     }
 

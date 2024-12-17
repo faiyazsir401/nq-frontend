@@ -126,7 +126,7 @@ const Dashboard = () => {
 
       case leftSideBarOptions.TOPNAVBAR: {
         return (
-          <div id="get-navbar-tabs" className="get-navbar-tabs">
+          <div id="get-navbar-tabs" className="get-navbar-tabs"style={{overflow:"hidden"}}>
             {getNavbarTabs()}
           </div>
         );

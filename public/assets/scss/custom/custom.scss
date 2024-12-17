@@ -374,6 +374,8 @@ $canvas-z-index: 8;
 
 // slider CSS
 
+
+
 .recent-slider {
   padding: 20px $sidebar-spacing 0 0;
 
@@ -393,6 +395,10 @@ $canvas-z-index: 8;
       border-radius: $radious20 !important;
       position: relative !important;
       transition: all 0.3s ease !important;
+      @media (max-width: 576px) {
+        height: 100px !important;
+        width: 100px !important;
+      }
 
       // img {
       // 	height: 110px !important;
@@ -413,7 +419,12 @@ $canvas-z-index: 8;
         top: 0 !important;
         position: absolute !important;
         height: 200px !important;
-        width: 100% !important;
+     
+        width: 100% !important;   
+        @media (max-width: 576px) {
+          height: 100px !important;
+          width: 100px !important;
+        }
         border-radius: 15px !important;
         box-shadow: inset 0px -25px 40px 6px rgba(0, 0, 0, 0.8) !important;
       }
@@ -527,7 +538,7 @@ slick-slider .slick-list,
 // booking sections
 .bookings {
   padding: 30px;
-  width: 90%;
+  width: 100%;
   overflow: auto;
 }
 

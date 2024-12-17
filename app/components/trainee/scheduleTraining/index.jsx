@@ -147,7 +147,7 @@ const ScheduleTraining = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [err, setErr] = useState({ email: false, video: false });
-  const width768 = useMediaQuery(768);
+  const isMobileScreen = useMediaQuery(768);
   const handleSelectClip = () => {
     setIsModalOpen(true);
   };
@@ -728,7 +728,7 @@ const ScheduleTraining = () => {
       </Popover>
     ));
   };
-
+  console.log("isMobileScreen",isMobileScreen)
   const renderSearchMenu = () => (
     <div
       onScroll={() => {
@@ -740,7 +740,7 @@ const ScheduleTraining = () => {
       className="bookings custom-scroll custom-trainee-dashboard booking-container"
       id="booking-lesson"
     >
-      <div className="row">
+      <div className="row"  style={{margin:"0px"}}>
         <div className="trainer-recommended">
           <h1 style={{ marginBottom: "10px" }}>Book Your Lesson now</h1>
           <p>
@@ -810,24 +810,24 @@ const ScheduleTraining = () => {
         />
       </div>
       <div className="trainer-recommended Slider  " style={{ height: "90px" }}>
-        <div className="row">
-          <div className="col">
+        <div className="row" style={{margin:"0px"}}>
+          <div className="col" style={{display:"flex",justifyContent:"center"}}>
             <Slider {...settings}>
               {data?.category?.map((item, index) => (
                 <div key={`slider-item-${index}`}>
                   <span
                     className="badge badge-light lg"
                     style={{
-                      padding: "18px", // Add your desired padding here
-                      alignItems: "center",
-                      fontSize: "14px",
-                      color: "black",
-                      cursor: "pointer",
-                      width: "80%",
-                      height: "0",
-                      display: "flex",
-                      justifyContent: "center", // Center content horizontally
-                      flexDirection: "column",
+                      padding:isMobileScreen ? "10px":"18px", // Add your desired padding here
+                      alignItems:isMobileScreen ? "auto": "center",
+                      fontSize:isMobileScreen ? "auto": "14px",
+                      color: isMobileScreen ? "auto":"black",
+                      cursor:isMobileScreen ? "auto": "pointer",
+                      width:isMobileScreen ? "auto": "80%",
+                      height:isMobileScreen ? "auto": "0",
+                      display:isMobileScreen ? "auto": "flex",
+                      justifyContent: isMobileScreen ? "auto":"center", // Center content horizontally
+                      flexDirection: isMobileScreen ? "auto":"column",
                     }}
                     onClick={() => {
                       setTrainerInfo((prev) => ({
@@ -851,33 +851,34 @@ const ScheduleTraining = () => {
         </div>
       </div>
 
-      <div className="trainer-recommended REC">
+      <div className="text-center">
         <h2>Online Trainers</h2>
         <div
           className="Recommended"
-          style={{ display: "flex", flexDirection: "row" }}
+          style={{ display: "flex", flexDirection: "row",justifyContent:"center" }}
         >
           {onlineUsers && Object.values(onlineUsers)?.length ? (
-            Object.values(onlineUsers)?.length <= 3 ? (
               <>
                 <Row
+            
                   lg={4}
-                  md={4}
-                  sm={4}
-                  xs={4}
+                  md={1}
+                  sm={1}
+                  xs={1}
                   style={{
                     display:'flex',
                     flexDirection:"row",
                     // justifyContent:"center",
-                    width: width768 ? "94%" : "70%",
-                    marginLeft:"30px"
-                 
+                    width: isMobileScreen ? "100%" : "100%",
+                    padding:"0px",
+                    justifyContent:"center"
                   }}
                   className="recent-slider recent-chat"
                 >
-                  {Object.values(onlineUsers)?.map((trainer, index) => {
+                  
+                 {Object.values(onlineUsers)?.map((trainer, index) => {
                     return (
-                      <Col key={index} className="item">
+                      <Col key={index} className="item" style={{maxWidth:isMobileScreen?"130px":"230px",padding:"15px"}}>
                         <Trainer
                           trainer={trainer}
                           onClickFunc={() => {
@@ -895,20 +896,11 @@ const ScheduleTraining = () => {
                   })}
                 </Row>
               </>
-            ) : (
-              <TrainerSlider
-                list={Object.values(onlineUsers)}
-                isRecommended={true}
-                setTrainerInfo = {setTrainerInfo}
-                setSelectedTrainer = {setSelectedTrainer}
-                setParams = {setParams}
-                isOnlineFuncCall = {true}
-              />
-            )
+            
           ) : (
             <h3>There are no Active Trainers</h3>
           )}
-          <div
+          {/* <div
             className="card trainer-profile-card Home-main-Cont"
             style={{
               height: "100%",
@@ -921,7 +913,7 @@ const ScheduleTraining = () => {
             <div className="card-body">
               <ShareClipsCard />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <div style={{ height: "11vh" }} />
