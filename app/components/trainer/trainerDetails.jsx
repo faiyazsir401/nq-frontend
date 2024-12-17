@@ -130,7 +130,7 @@ export const TrainerDetails = ({
             (!trainerInfo?.isCategory && "media-body media-body text-right")
             }`}
         >
-          <div className="mr-2 mt-1">
+          <div className="mr-2 mt-1" style={{zIndex:999,position:"relative"}}>
             {!trainerInfo?.isCategory ? (
               <X
                 onClick={onClose}
@@ -213,7 +213,7 @@ const SelectedCategory = ({
     selectTrainer(data && data._id, data && data.trainer_id, data && data);
   };
   return (
-    <div className="row">
+    <div className="row" style={{margin:'0px'}}>
       <div className="col-12 col-lg-2 col-md-3 col-sm-3">
         <div className="d-flex justify-content-between">
           <h3>Filters </h3>
@@ -288,7 +288,7 @@ const SelectedCategory = ({
       </div>
       <div
         className="col-12 col-lg-px-5 col-lg-10 col-md-9 col-sm-9"
-        style={{ height: "89vh" }}
+        style={{marginTop:"20px",display:"flex",flexDirection:'column',alignItems:"center"}}
       >
         {!getTraineeSlots.length ? (
           <div
@@ -307,6 +307,7 @@ const SelectedCategory = ({
                 key={`trainers_${index}`}
                 style={{
                   borderRadius: "20px",
+                  width:"100%"
                 }}
               >
                 <div className="card-body" key={index}>

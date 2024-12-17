@@ -107,7 +107,7 @@ const settings = {
 
 const { isSidebarToggleEnabled } = bookingsAction;
 const { removePaymentIntent } = traineeAction;
-const ScheduleTraining = () => {
+const ScheduleTraining = ({openCloseToggleSideNav}) => {
   const socket = useContext(SocketContext);
   const masterRecords = useAppSelector(masterState).master;
   const [data, setData] = useState();
@@ -958,6 +958,12 @@ const ScheduleTraining = () => {
             ...prev,
             search: null,
           }));
+          setTimeout(() => {
+            let getBookingLesson = document.querySelector(".booking-container");
+            if(getBookingLesson){
+              getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '65px' : "0px";
+            }
+          }, 10);
         }}
         element={
           <BookingTable

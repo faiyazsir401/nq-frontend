@@ -40,7 +40,7 @@ const Dashboard = () => {
   const dispatch = useAppDispatch();
   const { sidebarActiveTab, topNavbarActiveTab } = useAppSelector(authState);
   const [accountType, setAccountType] = useState("");
-
+  const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
   useEffect(() => {
     WebPushRegister()
     setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
@@ -53,7 +53,7 @@ const Dashboard = () => {
   const getDashboard = () => {
     switch (accountType) {
       case AccountType.TRAINEE:
-        return <TraineeDashboardContainer />;
+        return <TraineeDashboardContainer openCloseToggleSideNav={openCloseToggleSideNav}/>;
       case AccountType.TRAINER:
         return <TrainerDashboardContainer accountType={accountType} />;
     }
@@ -162,7 +162,7 @@ const Dashboard = () => {
                 : "80px",
           }}
         >
-          <LeftSide />
+          <LeftSide setOpenCloseToggleSideNav={setOpenCloseToggleSideNav} openCloseToggleSideNav={openCloseToggleSideNav}/>
           {getActiveTabs()}
         </div>
         <NotificationPopup/>

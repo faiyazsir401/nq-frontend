@@ -66,7 +66,7 @@ const steps = [
   },
 ];
 
-const Index = (props) => {
+const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
   // const width = useWindowSize();
 
   const socket = useContext(SocketContext);
@@ -225,7 +225,7 @@ const Index = (props) => {
   };
 
   let isMobile = useMediaQuery(452)
-  const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
+
   
   useEffect(() => {
     const updateIsMobile = (event) => {
@@ -266,7 +266,7 @@ const Index = (props) => {
       if (isMobile) {
         getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '75px' : "0px";
       }
-      getBookingLesson.style.marginLeft = isMobileScreen ?openCloseToggleSideNav ? '65px' : "0px":"0px";
+      getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '65px' : "0px";
 
     }
 
@@ -335,7 +335,7 @@ const Index = (props) => {
     // }
     if (getNavbarTabs) {
       if (isMobile) {
-        getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '55px' : '0px';
+        getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '65px' : '0px';
         getNavbarTabs?.style?.setProperty('width', openCloseToggleSideNav ? 'calc(100vw - 55px)' : '100vw', 'important');
         if (openCloseToggleSideNav) {
           isNotification?.style?.setProperty('margin-left', '55px', '');
