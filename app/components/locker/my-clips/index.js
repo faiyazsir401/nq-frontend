@@ -42,6 +42,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
     maxWidth: "470px",
     height: "587px",
   });
+  const isMobileScreen= useMediaQuery(600)
 
   // console.log("allClips ========>*", allClips)
   useEffect(() => {
@@ -260,15 +261,16 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                   setSelectedId(clp?._id);
                                 }}
                                 style={{
-                                  padding: "10px",
+                                  padding: isMobileScreen?"5px":"10px",
+                                  paddingBottom:isMobileScreen?"0px":"10px",
                                   cursor: "pointer",
                                 }}
                               >
-                                <FaTrash />
+                                <FaTrash  size={isMobileScreen?15:18}/>
                               </div>
                               <div
                                 style={{
-                                  padding: "10px",
+                                  padding: isMobileScreen?"5px":"10px",
                                   paddingTop:"0px",
                                   cursor: "pointer",
                                 }}
@@ -283,7 +285,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                   }}
                                   target="_self"
                                 >
-                                  <FaDownload />
+                                  <FaDownload size={isMobileScreen?15:18}/>
                                 </a>
                               </div>
                             </div>
