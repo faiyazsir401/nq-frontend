@@ -2503,7 +2503,7 @@ useEffect(() => {
         /> */}
         <div
           className="row"
-          style={{ height: "100%", display: "flex", alignItems: "center", marginTop: "env(safe-area-inset-bottom)"}}
+          style={{ height: "100%", display: "flex", alignItems: "center"}}
         >
           <canvas
                 ref={canvasRef}
@@ -2614,7 +2614,7 @@ useEffect(() => {
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
                     padding: isPinned ? "10px" : "5px",
-                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '35px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '35px',
+                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '0px' : '35px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '0px' : '35px',
                     top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
                       // trainee
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
@@ -2667,7 +2667,7 @@ useEffect(() => {
                           style={{
                             
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "46vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: "auto",
                             maxWidth:"100%",
                             objectFit: "fit",
@@ -2768,7 +2768,7 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "46vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: "auto",
                             maxWidth:"100%",
                             objectFit: "fit",
