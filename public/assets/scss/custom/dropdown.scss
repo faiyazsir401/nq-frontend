@@ -124,14 +124,7 @@
   top: 40%;
 }
 
-.custom-dropdown-width {
-  width: 50vw;
-  @media (max-width: 575px) {
-    width: calc(100vw - 20px) !important;
-    max-width: 231px;
-    margin-right: 80px !important;
-  }
-}
+
 
 .custom-dropdown-width-landing {
   width: 50vw;

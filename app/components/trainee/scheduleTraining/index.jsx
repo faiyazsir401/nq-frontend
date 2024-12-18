@@ -742,8 +742,8 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
     >
       <div className="row"  style={{margin:"0px"}}>
         <div className="trainer-recommended">
-          <h1 style={{ marginBottom: "10px" }}>Book Your Lesson now</h1>
-          <p>
+          <h1 style={{ marginBottom: "10px",fontSize:isMobileScreen?"22px":"auto" }}>Book Your Lesson now</h1>
+          <p style={{fontSize:isMobileScreen?"14px":"20px"}}>
             Are you ready to embark on a transformative journey towards your
             personal and professional development? We are here to revolutionize
             the way you learn and connect with expert trainers. Our cutting-edge

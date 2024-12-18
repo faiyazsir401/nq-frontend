@@ -29,6 +29,7 @@ import ReviewCard from "../../common/reviewCard";
 // import TrainerSessionInfo from "./TrainerSessionInfo";
 import Ratings from "./Ratings";
 import { authState } from "../auth/auth.slice";
+import { useMediaQuery } from "usehooks-ts";
 
 
 export const TrainerDetails = ({
@@ -422,7 +423,7 @@ const TrainerSessionInfo = ({
   };
   const trainer = findTrainerDetails() || trainerInfo;
   console.log(trainer, trainer?.fullName, "trainer");
-
+  const isMobileScreen = useMediaQuery('(max-width:600px)')
   useEffect(() => {
     if (trainer && trainer.extraInfo) {
       setAccordionsData((prev) => ({
@@ -493,7 +494,8 @@ const TrainerSessionInfo = ({
               style={{
                 display: 'flex',
                 justifyContent: 'flex-start',
-                alignItems: 'center'
+                alignItems: isMobileScreen?"baseline":'center',
+                flexDirection:isMobileScreen?"column":"row"
               }}>
               <h2>
                 {trainer && trainer ? trainer.fullname || trainer?.fullName : null}

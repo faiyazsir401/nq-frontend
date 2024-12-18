@@ -50,8 +50,8 @@ const SearchableDropdown = ({
   console.log(onlineUsers, "onlineUsers");
   return (
     <div className={`dropdown ${customClasses.dropdown}`}>
-      <div className="row item-center">
-        <div className="col-10 p-0 m-0">
+      <div className="d-flex item-center">
+        <div className=" p-0 m-0">
           <div className="control">
             <div className="selected-value">
               <input
@@ -77,7 +77,7 @@ const SearchableDropdown = ({
             {/* <div className={`arrow ${isOpen ? 'open' : ''}`} /> */}
           </div>
         </div>
-        <div className="col-2 p-0 m-0">
+        <div className=" p-0 m-0">
           <button
             className={`btn btn-primary rounded-0 search_button ${customClasses.searchButton}`}
             onClick={() => onSearchClick(query)}
