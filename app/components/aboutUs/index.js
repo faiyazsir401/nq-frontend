@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, CardImg, CardBody, CardTitle, CardText } from 'reactstrap';
+import "./index.css"
 
 const teamMembers = [
   {
@@ -29,17 +30,12 @@ const teamMembers = [
 
 const AboutUs = () => {
   return (
+   
+  
     <Container className="about-us">
+        <h2 className="text-center mt-5">About Us</h2>
       <Row>
-      <Col md="12" style={{display:"flex"}} className='mt-4 mb-2'>
-      <div className="logo" style={{margin:"auto"}}>
-          <img
-            src="/assets/images/netquix_logo_beta.png"
-            alt="logo"
-            className="header-image-logo"
-          />
-        </div>
-        </Col>
+      
         <Col md="12">
           <p
             style={{
@@ -61,6 +57,16 @@ const AboutUs = () => {
           >
             Our mission is to foster a collaborative and supportive environment where both trainers and trainees can thrive. We are committed to delivering high-quality training and development opportunities.
           </p> */}
+        </Col>
+
+        <Col md="12" style={{display:"flex"}} className='mt-4 mb-2'>
+      <div className="logo" style={{margin:"auto"}}>
+          <img
+            src="/assets/images/netquix_logo_beta.png"
+            alt="logo"
+            className="header-image-logo"
+          />
+        </div>
         </Col>
       </Row>
       {/* <h2 className="mt-4 mb-4">Meet Our Team</h2>

@@ -75,7 +75,8 @@ const ContactUs = () => {
         isOpen={isWriteFormOpen}
         setIsWriteFormOpen={setIsWriteFormOpen}
       />
-      <h2 className="text-center mt-5">About Us</h2>
+     
+      
       <AboutUs />
     </>
   );
