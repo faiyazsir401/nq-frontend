@@ -816,13 +816,14 @@ export const CanvasMenuBar = ({
                                           // maxHeight: "150px",
                                           // height: "100%",
                                           marginBottom: "10px",
-                                          height: "200px",
+                                 
                                           width: "100%",
                                           border: sld
                                             ? "4px solid green"
                                             : "4px solid rgb(180, 187, 209)",
                                           borderRadius: "5px",
                                           objectFit: "cover",
+                                            aspectRatio:"1/1"
                                         }}
                                       >
                                         <source
@@ -885,13 +886,14 @@ export const CanvasMenuBar = ({
                                     // style={{ border: `${sld ? "2px" : "0px"} solid green`, width: "98%", maxHeight: "150px", height: "100%", marginBottom: "10px", display: "flex", justifyContent: "center" }}
                                     style={{
                                       marginBottom: "10px",
-                                      height: "200px",
+                            
                                       width: "100%",
                                       border: sld
                                         ? "4px solid green"
                                         : "4px solid rgb(180, 187, 209)",
                                       borderRadius: "5px",
                                       objectFit: "cover",
+                                        aspectRatio:"1/1"
                                     }}
                                   >
                                     <source

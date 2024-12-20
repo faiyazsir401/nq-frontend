@@ -406,12 +406,12 @@ const NavHomePage = () => {
               </div>
               <div
                 className="card-footer"
-                style={{ padding: width600 ? "5px" : "auto" }}
+                style={{ padding: width600 ? "5px" : "10px" }}
               >
-                <div className="row">
-                  <div className="row">
-                    <div className="col-11">{showRatingLabel(session.ratings)}</div>
-                    <div className="col-12 col-lg-auto">
+                <div className="">
+                  <div className="">
+                    <div className="">{showRatingLabel(session.ratings)}</div>
+                    <div className="">
                       {renderBooking(
                         session,
                         session.status,

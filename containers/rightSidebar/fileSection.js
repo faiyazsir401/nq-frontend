@@ -390,11 +390,12 @@ const FileSection = (props) => {
                           <Tooltip title={clp?.clips?.title} position="top" trigger="mouseenter">
                             <video style={{
                               position: "relative",
-                              height: "180px",
+                            
                               width: "100%",
                               border: "4px solid #b4bbd1",
                               borderRadius: "5px",
                               objectFit: "cover",
+                                aspectRatio:"1/1"
                             }}  >
                               <source src={Utils?.generateVideoURL(clp?.clips)} type="video/mp4" />
                             </video>
