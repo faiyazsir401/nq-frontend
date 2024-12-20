@@ -86,7 +86,11 @@ const TraineeRenderBooking = ({
     // Compare the current date and time (date + hour:minute) with start and end time
     const isDateSame = currentDate === startDate && currentDate === endDate;
     const isWithinTimeFrame  = isDateSame && currentTimeOnly >= startTimeOnly && currentTimeOnly <= endTimeOnly;
-  
+    const isCurrentTimeAfterEndTime= currentTime > endTime
+    console.log("currentTime",currentTime)
+    console.log("endTime",endTime)
+    console.log("isCurrentTimeAfterEndTime",isCurrentTimeAfterEndTime)
+
     console.log('Is the current date the same as start and end date?', isDateSame); 
     console.log('Is the current time within the time range?', isWithinTimeFrame);
   const canShowRatingButton =
@@ -129,13 +133,14 @@ const TraineeRenderBooking = ({
   };
 
   const isMobileScreen = useMediaQuery('(max-width:600px)')
-
+  console.log("ratings_id+",_id,bookingInfo)
   return (
     <React.Fragment>
       {status !== BookedSession.canceled &&
         activeTabs !== BookedSession.canceled &&
-        isMeetingDone && <h3 className="mt-1">Completed</h3>}
-      {canShowRatingButton && status === BookedSession.completed ? (
+        isMeetingDone && ratings && <h3 className="mt-1">Completed</h3>}
+      {!ratings &&
+           (isCurrentTimeAfterEndTime ||isMeetingDone)&& status !== BookedSession.canceled ?  (
         <button
           className={`btn btn-success button-effect btn-sm mr-2 my-1`}
           type="button"

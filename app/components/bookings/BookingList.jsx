@@ -128,7 +128,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         dispatch(getScheduledMeetingDetailsAsync(payload));
       }
     }
-  }, [tabBook, activeCenterContainerTab]);
+  }, [tabBook,activeCenterContainerTab]);
 
   const showRatingLabel = (ratingInfo) => {
     // for trainee we're showing recommends
@@ -174,6 +174,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
   const handleAddRatingModelState = (data) => {
     dispatch(addRating(data));
+   
   };
 
   const renderBooking = (
@@ -455,6 +456,8 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       />
     );
   };
+
+  console.log("scheduledMeetingDetails",scheduledMeetingDetails)
   return (
     <div>
       {!scheduledMeetingDetails.length ? (

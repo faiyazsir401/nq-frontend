@@ -54,7 +54,7 @@ const TrainerRenderBooking = ({
   const dispatch = useAppDispatch();
 
   const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
-
+  console.log("ratings_id+",_id,bookingInfo)
   // Parse the start_time and end_time in UTC
   const startTime = DateTime.fromISO(bookingInfo.start_time, { zone: 'utc' });
   const endTime = DateTime.fromISO(bookingInfo.end_time, { zone: 'utc' });
@@ -75,6 +75,8 @@ const TrainerRenderBooking = ({
 
   console.log('Is the current date the same as start and end date?', isDateSame); 
   console.log('Is the current time within the time range?', isWithinTimeFrame);
+
+  const isCurrentTimeAfterEndTime = currentTime > endTime;
 
   const isCompleted =
     has24HoursPassedSinceBooking || bookingInfo?.ratings?.trainee;
@@ -109,9 +111,10 @@ const TrainerRenderBooking = ({
   const sendNotifications = (data) => {
     socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
   };
+  
   return (
     <React.Fragment>
-      {status !== BookedSession.canceled && isMeetingDone && (
+      {ratings && status !== BookedSession.canceled && isMeetingDone && (
         <h3 className="mt-1">Completed</h3>
       )}
       <span>
@@ -146,12 +149,8 @@ const TrainerRenderBooking = ({
             : "Cancel"}
         </button>
       )}
-      {!isUpcomingSession &&
-      !isCurrentDateBefore &&
-      status === BookedSession.confirmed &&
-      !isStartButtonEnabled &&
-      Utils.compairDateGraterOrNot(start_time) &&
-      !isMeetingDone&& status === BookedSession.completed ? (
+      {!ratings &&
+      (isCurrentTimeAfterEndTime ||isMeetingDone)&& status !== BookedSession.canceled ? (
         <button
           className={`btn btn-success button-effect btn-sm mr-2 my-1`}
           type="button"
