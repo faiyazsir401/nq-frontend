@@ -2620,7 +2620,7 @@ useEffect(() => {
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
                     // overflow: 'hidden',
                     height:
-                      !isPinned && selectedClips?.length ? (isIOS ? "55vh" : "73vh") : '12vw',
+                      !isPinned && selectedClips?.length ? (isIOS ? "60vh" : "73vh") : '12vw',
                     width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
@@ -2667,7 +2667,7 @@ useEffect(() => {
                           style={{
                             
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "46vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "50vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: "auto",
                             maxWidth:"100%",
                             objectFit: "fit",
@@ -2768,7 +2768,7 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "46vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "50vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
                             width: "auto",
                             maxWidth:"100%",
                             objectFit: "fit",
