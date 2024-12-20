@@ -810,7 +810,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         />
       </div>
       <div className="trainer-recommended Slider  " style={{ height: "90px" }}>
-        <div className="row" style={{margin:"0px"}}>
+        <div className="row" style={{margin:"0px",width:"60vw",display:"flex",justifyContent:"center",margin:"auto"}}>
           <div className="col" style={{display:"flex",justifyContent:"center"}}>
             <Slider {...settings}>
               {data?.category?.map((item, index) => (

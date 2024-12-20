@@ -20,12 +20,10 @@
   border-spacing: 0px;
 }
 
-@media (max-width:600px) {
   .slick-slide{
-    width: fit-content !important;
+    width: auto !important;
   }
 
-}
 
 
 .rc-table th,

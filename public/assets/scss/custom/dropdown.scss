@@ -41,6 +41,11 @@
   width: 100%;
 }
 
+.dropdown .selected-value{
+  width: 50vw;
+  max-width: 1024px;
+}
+
 @media (max-width: 425px) {
   .dropdown .selected-value input {
     line-height: 1.5;
@@ -132,6 +137,10 @@
     width: 69vw !important;
     padding: 10px !important;
   }
+}
+
+.custom-dropdown-width-landing > :first-child {
+  justify-content: center;
 }
 
 .option-item {
