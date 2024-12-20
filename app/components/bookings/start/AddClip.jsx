@@ -19,13 +19,11 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
   }, []);
 
 
-  const midIndex = Math.ceil(allClips.length / 2);
-  const firstRowClips = allClips.slice(0, midIndex);
-  const secondRowClips = allClips.slice(midIndex);
-  console.log("firstRowClips",firstRowClips)
+ 
+
   return (
     <Modal isOpen={isOpen} overflowHidden element={
-      <div className='d-flex justify-content-center align-items-center flex-column' style={{width:'100%' , height:'100%'}}>
+      <div className='d-flex align-items-center flex-column' style={{width:'100%' , height:'100%'}}>
         <div className='d-flex flex-row-reverse align-items-center'>
           <div className="theme-title">
             <div className="media">
@@ -55,19 +53,17 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
             className='d-flex'
             style={{
               gap: 10,
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
+              flexWrap:"wrap"
              
             }}
           >
             {clips?.length ? (
 
                 <div
-                  className={`d-inline `}
-                  style={{ display: 'inline-block'}}
+                
                 >
-                  <div className='d-flex' style={{ gap: 10 }}>
-                    {firstRowClips.map((clp, index) => {
+                  <div className='d-flex' style={{ gap: 10,flexWrap:"wrap",justifyContent:"center" }}>
+                    {allClips.map((clp, index) => {
                       const isSelected = selectedClipsCopy.some(
                         (val) => val?._id === clp?._id
                       );
@@ -106,46 +102,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                       );
                     })}
                   </div>
-                  <div className='d-flex' style={{ gap: 10 }}>
-                    {secondRowClips.map((clp, index) => {
-                      const isSelected = selectedClipsCopy.some(
-                        (val) => val?._id === clp?._id
-                      );
-                      return (
-                        <div
-                          key={index}
-                          style={{ borderRadius: 5 }}
-                          onClick={() => {
-                            if (isSelected) {
-                              // Remove clip if it's already selected
-                              setSelectedClipsCopy((prev) =>
-                                prev.filter((val) => val?._id !== clp?._id)
-                              );
-                            } else if (selectedClipsCopy.length < 2) {
-                              // Add clip if not selected and less than 2 selected
-                              setSelectedClipsCopy((prev) => [...prev, clp]);
-                            }
-                          }}
-                        >
-                          <video
-                            poster={Utils.generateThumbnailURL(clp)}
-                            style={{
-                              border: `${isSelected ? "4px solid green" : "4px solid #b4bbd1"}`,
-                              height: isMobileScreen?"100px":"200px",
-                              width: isMobileScreen?"100px":"200px",
-                              borderRadius: "5px",
-                              objectFit: "cover",
-                            }}
-                          >
-                            <source
-                              src={Utils?.generateVideoURL(clp)}
-                              type="video/mp4"
-                            />
-                          </video>
-                        </div>
-                      );
-                    })}
-                  </div>
+                  
                 </div>
           
             ) : null}
