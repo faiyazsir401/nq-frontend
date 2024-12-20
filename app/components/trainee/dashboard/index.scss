@@ -132,12 +132,12 @@
 }
 
 .upcoming_session{
-  background: rgba(17, 110, 34, 0.589);
+  background: white;
   display: flex;
   flex-direction: column;
   margin:0px 20px;
   margin-top: 20px;
-  box-shadow: rgba(0, 0, 0, 0.753) 2px 5px 15px;
+  box-shadow: rgba(150, 150, 150, 0.753) 2px 2px 10px;
   border: 0;
   border-radius: 10px !important;
 
@@ -147,8 +147,8 @@
     margin: 10px;
     line-height: 1.2;
     text-align: center;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); // Example of text shadow
+    color: black;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5); // Example of text shadow
 
     span {
       font-size: 24px !important;
@@ -162,7 +162,8 @@
 
 
   .upcoming_session_content{
-    max-width: 500px;
+    width: 100%;
+    max-width: 600px;
     margin: auto;
     border: 1px solid white;
     padding: 10px;
@@ -203,7 +204,7 @@
   }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 600px) {
   .upcoming_session {
    
     margin-left: 5px;
@@ -217,7 +218,7 @@
   }
 
   .upcoming_session .upcoming_session_content {
-    width: 80% !important;
+    width: 98% !important;
   }
 }
 

@@ -7,13 +7,19 @@ import InviteFriendsCard from "../invite-friends";
 import RecentUsers from "../recent-users";
 import UserInfoCard from "../cards/user-card";
 import { useMediaQuery } from "../../hook/useMediaQuery";
-import { AccountType, LIST_OF_ACCOUNT_TYPE } from "../../common/constants";
+import {
+  AccountType,
+  bookingButton,
+  LIST_OF_ACCOUNT_TYPE,
+} from "../../common/constants";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";
 import "./index.css";
 import Slider from "react-slick";
 import OnlineUserCard from "./banner";
 import {
+  addTraineeClipInBookedSessionAsync,
+  bookingsAction,
   bookingsState,
   getScheduledMeetingDetailsAsync,
 } from "../common/common.slice";
@@ -21,6 +27,10 @@ import {
 import { formatTimeInLocalZone, Utils } from "../../../utils/utils";
 import { Button } from "reactstrap";
 import { DateTime } from "luxon";
+import { traineeAction } from "../trainee/trainee.slice";
+import { addRating } from "../common/common.api";
+import TrainerRenderBooking from "../bookings/TrainerRenderBooking";
+import TraineeRenderBooking from "../bookings/TraineeRenderBooking";
 const NavHomePage = () => {
   const [progress, setProgress] = useState(0);
   const width2000 = useMediaQuery(2000);
@@ -28,7 +38,21 @@ const NavHomePage = () => {
   const width900 = useMediaQuery(900);
 
   const width600 = useMediaQuery(700);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenID, setIsOpenID] = useState("");
+  const [selectedClips, setSelectedClips] = useState([]);
+  const [bookedSession, setBookedSession] = useState({
+    id: "",
+    booked_status: "",
+  });
+  const [bIndex, setBIndex] = useState(0);
+  const [tabBook, setTabBook] = useState(bookingButton[0]);
+  const { removeNewBookingData } = traineeAction;
+  const { isLoading, configs, startMeeting } = useAppSelector(bookingsState);
   const { accountType, onlineUsers } = useAppSelector(authState);
+    const [userTimeZone, setUserTimeZone] = useState(
+      Intl.DateTimeFormat().resolvedOptions().timeZone
+    );
   const dispatch = useAppDispatch();
   const { scheduledMeetingDetails } = useAppSelector(bookingsState);
   useEffect(() => {
@@ -104,8 +128,159 @@ const NavHomePage = () => {
       isDateSame &&
       currentTimeOnly >= startTimeOnly &&
       currentTimeOnly <= endTimeOnly;
-    return status === "confirmed" && isWithinTimeFrame;
+    return isWithinTimeFrame;
   });
+
+  const addTraineeClipInBookedSession = async (selectedClips) => {
+    const payload = {
+      id: isOpenID,
+      trainee_clip: selectedClips?.map((val) => val?._id),
+    };
+    dispatch(addTraineeClipInBookedSessionAsync(payload));
+    dispatch(removeNewBookingData());
+    setIsOpen(false);
+    // setIsModalOpen(false);
+  };
+
+  const MeetingSetter = (payload) => {
+    dispatch(bookingsAction.setStartMeeting(payload));
+  };
+
+  const handleAddRatingModelState = (data) => {
+    dispatch(addRating(data));
+  };
+
+    const showRatingLabel = (ratingInfo) => {
+      // for trainee we're showing recommends
+      return ratingInfo &&
+        ratingInfo[accountType.toLowerCase()] &&
+        (ratingInfo[accountType.toLowerCase()].sessionRating ||
+          ratingInfo[accountType.toLowerCase()].sessionRating) ? (
+        <div className="d-flex items-center">
+          {" "}
+          {/* You rated{" "} */}
+          You rated this session{" "}
+          <b className="pl-2">
+            {ratingInfo[accountType.toLowerCase()].sessionRating ||
+              ratingInfo[accountType.toLowerCase()].sessionRating}
+          </b>
+          <Star color="#FFC436" size={28} className="star-container star-svg" />{" "}
+          stars
+          {/* to this {accountType?.toLowerCase()}. */}
+        </div>
+      ) : null;
+    };
+
+  const renderBooking = (
+    bookingInfo,
+    status,
+    booking_index,
+    booked_date,
+    session_start_time,
+    session_end_time,
+    _id,
+    trainee_info,
+    trainer_info,
+    ratings,
+    trainee_clips,
+    report,
+    start_time,
+    end_time
+  ) => {
+    const availabilityInfo = Utils.meetingAvailability(
+      booked_date,
+      session_start_time,
+      session_end_time,
+      userTimeZone,
+      start_time,
+      end_time
+    );
+    const {
+      isStartButtonEnabled,
+      has24HoursPassedSinceBooking,
+      isCurrentDateBefore,
+      isUpcomingSession,
+    } = availabilityInfo;
+
+    switch (accountType) {
+      case AccountType.TRAINER:
+        return (
+          <TrainerRenderBooking
+            _id={_id}
+            status={status}
+            trainee_info={trainee_info}
+            trainer_info={trainer_info}
+            isCurrentDateBefore={isCurrentDateBefore}
+            isStartButtonEnabled={true}
+            isMeetingDone={false}
+            isUpcomingSession={isUpcomingSession}
+            ratings={ratings}
+            booking_index={booking_index}
+            has24HoursPassedSinceBooking={has24HoursPassedSinceBooking}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            selectedClips={selectedClips}
+            setSelectedClips={setSelectedClips}
+            setIsOpenID={setIsOpenID}
+            addTraineeClipInBookedSession={addTraineeClipInBookedSession}
+            trainee_clips={trainee_clips}
+            report={report}
+            bookedSession={bookedSession}
+            setBookedSession={setBookedSession}
+            tabBook={tabBook}
+            setStartMeeting={MeetingSetter}
+            startMeeting={startMeeting}
+            handleAddRatingModelState={handleAddRatingModelState}
+            updateParentState={(value) => {
+              setBIndex(value);
+            }}
+            activeTabs={bookingButton[0]}
+            start_time={start_time}
+            bookingInfo={bookingInfo}
+          />
+        );
+      case AccountType.TRAINEE:
+        return (
+          <TraineeRenderBooking
+            _id={_id}
+            status={status}
+            trainee_info={trainee_info}
+            trainer_info={trainer_info}
+            isCurrentDateBefore={isCurrentDateBefore}
+            isStartButtonEnabled={isStartButtonEnabled}
+            isMeetingDone={false}
+            isUpcomingSession={isUpcomingSession}
+            ratings={ratings}
+            booking_index={booking_index}
+            has24HoursPassedSinceBooking={has24HoursPassedSinceBooking}
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            selectedClips={selectedClips}
+            setSelectedClips={setSelectedClips}
+            setIsOpenID={setIsOpenID}
+            isOpenID={isOpenID}
+            addTraineeClipInBookedSession={addTraineeClipInBookedSession}
+            trainee_clips={trainee_clips}
+            report={report}
+            bookedSession={bookedSession}
+            setBookedSession={setBookedSession}
+            tabBook={tabBook}
+            setStartMeeting={MeetingSetter}
+            startMeeting={startMeeting}
+            handleAddRatingModelState={handleAddRatingModelState}
+            updateParentState={(value) => {
+              setBIndex(value);
+            }}
+            accountType={AccountType.TRAINEE}
+            activeTabs={bookingButton[0]}
+            start_time={start_time}
+            bookingInfo={bookingInfo}
+          />
+        );
+      default:
+        break;
+    }
+  };
   return (
     <div className="container-fluid">
       {/* top  baaner */}
@@ -133,87 +308,126 @@ const NavHomePage = () => {
         </div>
       ) : null}
 
-      {accountType === AccountType.TRAINEE &&
-      filteredSessions &&
-      filteredSessions?.length ? (
+      {filteredSessions && filteredSessions?.length ? (
         <div className="upcoming_session">
           <h1>Active Sessions</h1>
-          {filteredSessions.map((session) => (
-            <div className="upcoming_session_content mb-3">
-              <div className="">
-                <div className="">
-                  <div className="" style={{ display: "flex" }}>
-                    <div
-                      style={{
-                        width: "80px",
-                        height: "80px",
-                        border: "2px solid rgb(0, 0, 128)",
-                        borderRadius: "5px",
-                        padding: "5px",
-                      }}
-                    >
-                      <img
-                        src={
-                          session.trainer_info
-                            .profile_picture
-                            ? Utils.getImageUrlOfS3(
-                                session.trainer_info
-                                  .profile_picture
-                              )
-                            : "/assets/images/demoUser.png"
-                        }
-                        alt="trainer_image"
-                        className="rounded"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                          borderRadius: "50%",
-                          transition: "all 0.6s linear",
-                        }}
-                        onError={(e) => {
-                          e.target.src = "/assets/images/demoUser.png";
-                        }}
-                      />
+          {filteredSessions.map((session,booking_index) => (
+            <div
+              className="card mb-4 mt-4 trainer-bookings-card upcoming_session_content"
+              key={`booking-schedule-training`}
+            >
+              <div className="card-body">
+                <div className="d-flex justify-content-between">
+                  <div className="">
+                    <div className="">
+                      <dl className="">
+                        <dt className="">
+                          <div
+                            style={{
+                              width: "80px",
+                              height: "80px",
+                              border: "2px solid rgb(0, 0, 128)",
+                              borderRadius: "5px",
+                              padding: "5px",
+                            }}
+                          >
+                            <img
+                              src={
+                                session.trainer_info.profile_picture ||
+                                session.trainee_info.profile_picture
+                                  ? Utils.getImageUrlOfS3(
+                                    accountType === AccountType.TRAINER
+                                        ?session.trainee_info.profile_picture
+                                        :  session.trainer_info.profile_picture
+                                    )
+                                  : "/assets/images/demoUser.png"
+                              }
+                              alt="trainer_image"
+                              className="rounded"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "contain",
+                                borderRadius: "50%",
+                                transition: "all 0.6s linear",
+                              }}
+                              onError={(e) => {
+                                e.target.src = "/assets/images/demoUser.png";
+                              }}
+                            />
+                          </div>
+                        </dt>
+                      </dl>
                     </div>
-                    <div>
-                      <div className="d-flex">
-                        <h4 className="ml-3" style={{ color: "white" }}>
-                          Trainer :
-                        </h4>
-                        <h4 className="ml-1" style={{ color: "white" }}>
-                          {session.trainer_info.fullname}
-                        </h4>
-                      </div>
-                      <a href={"/meeting?id=" + session._id}>
-                        <div className="ml-3 mt-2 instant">
-                          <h5>Join Meeting Now </h5>
-                        </div>
-                      </a>
+                    <div className="">
+                      <dl className="d-flex">
+                        <dd className="">
+                          {accountType === AccountType.TRAINER
+                            ? "Trainee:"
+                            : "Trainer:"}
+                        </dd>
+                        <dt className="ml-1">
+                          {accountType === AccountType.TRAINER
+                            ? session.trainee_info.fullname
+                            : session.trainer_info.fullname}
+                        </dt>
+                      </dl>
                     </div>
                   </div>
 
-                  <div className="d-flex mt-2" style={{flexDirection:width600?"column":"row"}}>
-                    <div className="d-flex">
-                      <h4 style={{ color: "white" }}>Date :</h4>
-                      <h4 className="ml-1" style={{ color: "white" }}>
-                        {Utils.getDateInFormat(
-                          session.booked_date
-                        )}
-                      </h4>
+                  <div className="d-flex flex-column justify-content-center">
+                    <div className="">
+                      <dl
+                        className={`d-flex ${
+                          width600 ? "flex-column" : "flex-row"
+                        }`}
+                      >
+                        <dd>Date :</dd>
+                        <dt className="ml-1">
+                          {Utils.getDateInFormat(session.booked_date)}
+                        </dt>
+                      </dl>
                     </div>
-                    <div className="d-flex">
-                      <h4 className="ml-3" style={{ color: "white" }}>
-                        Time Durations :
-                      </h4>
-                      <h4
-                        className="ml-1"
-                        style={{ color: "white" }}
-                      >{`${formatTimeInLocalZone(
-                        session.start_time
-                      )} - ${formatTimeInLocalZone(
+
+                    <div className="">
+                      <dl
+                        className={`d-flex ${
+                          width600 ? "flex-column" : "flex-row"
+                        }`}
+                      >
+                        <dd className="">Time Durations :</dd>
+                        <dt className="ml-1">{`${formatTimeInLocalZone(
+                          session.start_time
+                        )} - ${formatTimeInLocalZone(session.end_time)}`}</dt>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div
+                className="card-footer"
+                style={{ padding: width600 ? "5px" : "auto" }}
+              >
+                <div className="row">
+                  <div className="row">
+                    <div className="col-11">{showRatingLabel(session.ratings)}</div>
+                    <div className="col-12 col-lg-auto">
+                      {renderBooking(
+                        session,
+                        session.status,
+                        booking_index,
+                        session.booked_date,
+                        session.session_start_time,
+                        session.session_end_time,
+                        session._id,
+                        session.trainee_info,
+                        session.trainer_info,
+                        session.ratings,
+                        session.trainee_clips,
+                        session.report,
+                        session.start_time,
                         session.end_time
-                      )}`}</h4>
+                      )}
                     </div>
                   </div>
                 </div>
