@@ -831,6 +831,7 @@ export const CanvasMenuBar = ({
                                           objectFit: "cover",
                                             aspectRatio:"1/1"
                                         }}
+                                        preload="none"
                                       >
                                         <source
                                           src={Utils?.generateVideoURL(clp?.clips)}
