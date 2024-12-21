@@ -316,7 +316,7 @@ const NavHomePage = () => {
               className="card mb-4 mt-2 trainer-bookings-card upcoming_session_content"
               key={`booking-schedule-training`}
             >
-              <div className="card-body">
+              <div className="card-body" style={{padding:"5px"}}>
                 <div className="d-flex justify-content-center " style={{gap:width600?"10px":"30px"}}>
                   <div className="">
                     <div className="">
@@ -406,7 +406,7 @@ const NavHomePage = () => {
               </div>
               <div
                 className="card-footer"
-                style={{ padding: width600 ? "5px" : "10px",display:'flex',justifyContent:"center" }}
+                style={{ padding: width600 ? "5px" : "5px",display:'flex',justifyContent:"center" }}
               >
                 <div className="">
                   <div className="">
