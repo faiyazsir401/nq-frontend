@@ -60,36 +60,38 @@ const ImageCropper = ({ image: imgSrc, isModalOpen, setIsModalOpen, setCroppedIm
   const previewCanvasRef = useRef(null);
   const [crop, setCrop] = useState();
 
-  const createBlobFromCanvas = (canvas) => {
-    return new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(blob);
-        } else {
-          reject(new Error("Canvas is empty"));
-        }
-      }, "image/png");
-    });
+  const createBlobFromDataUrl = (dataUrl) => {
+    return fetch(dataUrl)
+      .then((res) => res.blob())
+      .catch((err) => {
+        console.error("Error converting Data URL to Blob:", err);
+        throw err;
+      });
   };
 
   const handleCreateBlob = async () => {
     try {
-      const blob = await createBlobFromCanvas(previewCanvasRef.current);
-      console.log(blob);
+      const dataUrl = previewCanvasRef.current.toDataURL();
+      console.log("dataUrl=====>", dataUrl);
 
-      const bloburl = URL.createObjectURL(blob);
+      // Convert the dataUrl (base64) to a Blob
+      const blob = await createBlobFromDataUrl(dataUrl);
+
+      console.log("Blob:", blob);
+
       handleSavePicture(blob);
 
-
       setCroppedImage(blob);
-      setDisplayedImage(bloburl);
-      setIsModalOpen(false);
 
-      // You can now use the blob, e.g., upload it or display it
+      const blobUrl = URL.createObjectURL(blob);
+      setDisplayedImage(blobUrl);
+
+      setIsModalOpen(false);
     } catch (error) {
-      console.error("Error creating blob:", error);
+      console.error("Error creating Blob:", error);
     }
   };
+;
 
   const onImageLoad = (e) => {
     const { width, height } = e.currentTarget;
@@ -179,9 +181,7 @@ const ImageCropper = ({ image: imgSrc, isModalOpen, setIsModalOpen, setCroppedIm
                     imgRef.current.height
                   )
                 );
-                const dataUrl = previewCanvasRef.current.toDataURL();
-
-                console.log("dataUrl=====>", dataUrl)
+             
 
                 handleCreateBlob();
               }}

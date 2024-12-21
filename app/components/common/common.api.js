@@ -250,7 +250,7 @@ export async function pushProfilePhotoToS3(
       },
     })
     .then((response) => {
-      cb();
+      cb()
     })
     .catch((error) => {
       console.error("Error:", error);

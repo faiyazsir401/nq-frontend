@@ -134,8 +134,9 @@ const UserInfoCard = () => {
   };
 
   const handleSavePicture = async (croppedImage) => {
+    console.log("croppedImage",croppedImage)
     if (croppedImage) {
-      const newFileObj = await Utils?.blobToFile(
+      const newFileObj = Utils?.blobToFile(
         croppedImage,
         `${profile?.fullname}.png`,
         "image/png"
@@ -145,7 +146,7 @@ const UserInfoCard = () => {
   };
 
   const handelSelectFile = async (selectedImage, bolb) => {
-
+    console.log("selectedImage",selectedImage)
     if (!selectedImage) {
       toast.error("Please select a Image");
       return;
@@ -253,13 +254,13 @@ const UserInfoCard = () => {
                   profile?.extraInfo?.hourly_rate
                 )}
               </h3>
-              <a
+              <button
                 className="icon-btn btn-outline-light btn-sm edit-btn Trainer"
-                href="#"
+                type="button"
                 onClick={isEditing ? handleSaveClick : handleEditClick}
               >
                 {isEditing ? <Save /> : <Edit />}
-              </a>
+              </button>
             </div>
           )}
 
