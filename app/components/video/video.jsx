@@ -3687,7 +3687,7 @@ useEffect(() => {
                                     style={{
                                       margin: 0,
                                       marginLeft: "10px",
-                                      fontSize: "16px",
+                                    
                                     }}
                                   >
                                     {videoTime?.remainingTime1}
