@@ -310,18 +310,18 @@ const NavHomePage = () => {
 
       {filteredSessions && filteredSessions?.length ? (
         <div className="upcoming_session">
-          <h1>Active Sessions</h1>
+          <h2 className="text-center">Active Sessions</h2>
           {filteredSessions.map((session,booking_index) => (
             <div
-              className="card mb-4 mt-4 trainer-bookings-card upcoming_session_content"
+              className="card mb-4 mt-2 trainer-bookings-card upcoming_session_content"
               key={`booking-schedule-training`}
             >
               <div className="card-body">
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-center " style={{gap:width600?"10px":"30px"}}>
                   <div className="">
                     <div className="">
-                      <dl className="">
-                        <dt className="">
+                      <div className="">
+                        <div className="">
                           <div
                             style={{
                               width: "80px",
@@ -356,57 +356,57 @@ const NavHomePage = () => {
                               }}
                             />
                           </div>
-                        </dt>
-                      </dl>
+                        </div>
+                      </div>
                     </div>
                     <div className="">
-                      <dl className="d-flex">
-                        <dd className="">
+                      <div className="d-flex">
+                        <div className="">
                           {accountType === AccountType.TRAINER
                             ? "Trainee:"
                             : "Trainer:"}
-                        </dd>
+                        </div>
                         <dt className="ml-1">
                           {accountType === AccountType.TRAINER
                             ? session.trainee_info.fullname
                             : session.trainer_info.fullname}
                         </dt>
-                      </dl>
+                      </div>
                     </div>
                   </div>
 
                   <div className="d-flex flex-column justify-content-center">
                     <div className="">
-                      <dl
+                      <div
                         className={`d-flex ${
                           width600 ? "flex-column" : "flex-row"
                         }`}
                       >
-                        <dd>Date :</dd>
+                        <div>Date :</div>
                         <dt className="ml-1">
                           {Utils.getDateInFormat(session.booked_date)}
                         </dt>
-                      </dl>
+                      </div>
                     </div>
 
                     <div className="">
-                      <dl
+                      <div
                         className={`d-flex ${
                           width600 ? "flex-column" : "flex-row"
                         }`}
                       >
-                        <dd className="">Time Durations :</dd>
+                        <div className="">Time Durations :</div>
                         <dt className="ml-1">{`${formatTimeInLocalZone(
                           session.start_time
                         )} - ${formatTimeInLocalZone(session.end_time)}`}</dt>
-                      </dl>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div
                 className="card-footer"
-                style={{ padding: width600 ? "5px" : "10px" }}
+                style={{ padding: width600 ? "5px" : "10px",display:'flex',justifyContent:"center" }}
               >
                 <div className="">
                   <div className="">
