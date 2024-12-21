@@ -68,16 +68,36 @@ const Details = (props) => {
             defaultValue={values.category}
           >
             <option>Choose category</option>
-            {categories && Array.isArray(categories.category) ? categories.category.map((category, index) => {
-              return (
-                <option key={index} value={category}>
-                  {category}
-                </option>
-              );
-            }): <> No categories available </>}
+            {categories && Array.isArray(categories.category) ? (
+              categories.category.map((category, index) => {
+                return (
+                  <option key={index} value={category}>
+                    {category}
+                  </option>
+                );
+              })
+            ) : (
+              <> No categories available </>
+            )}
           </select>
         </div>
       )}
+      <div className="form-group d-flex" style={{ gap: "10px" }}>
+        <input
+          className="form-control"
+          onChange={handleChange}
+          type="checkbox"
+          name="tcpa"
+          style={{ width: "20px", height: "20px" }}
+          required={true}
+        />
+        <label className="col-form-label">
+          I agree to receive SMS and Emails from netqwix.com for alerts,
+          notifications and promotions. I understand that I can opt-out at any
+          time by texting STOP to the SMS (carrier charges may apply) or
+          clicking the unsubscribe link in the email.
+        </label>
+      </div>
     </React.Fragment>
   );
 };
