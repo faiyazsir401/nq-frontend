@@ -131,7 +131,7 @@ export const TrainerDetails = ({
             (!trainerInfo?.isCategory && "media-body media-body text-right")
             }`}
         >
-          <div className="mr-2 mt-1" style={{zIndex:999,position:"relative"}}>
+          <div className="ml-2 mt-3" style={{zIndex:999,position:"relative"}}>
             {!trainerInfo?.isCategory ? (
               <X
                 onClick={onClose}
@@ -161,7 +161,7 @@ export const TrainerDetails = ({
           </div>
         </div>
       )}
-      <div className={`custom-trainer-scroll `+isUserOnline&&`recent-user`} style={{ marginTop: "24px" }}>
+      <div className={`custom-trainer-scroll `+isUserOnline&&`recent-user`} >
         {trainerDetails?.select_trainer ? (
           <TrainerSessionInfo
             accordionData={accordionData}
