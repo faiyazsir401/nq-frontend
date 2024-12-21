@@ -313,7 +313,7 @@ const NavHomePage = () => {
           <h2 className="text-center">Active Sessions</h2>
           {filteredSessions.map((session,booking_index) => (
             <div
-              className="card mb-4 mt-2 trainer-bookings-card upcoming_session_content"
+              className="card mt-2 trainer-bookings-card upcoming_session_content"
               key={`booking-schedule-training`}
             >
               <div className="card-body" style={{padding:"5px"}}>
@@ -454,13 +454,14 @@ const NavHomePage = () => {
               : width2000
               ? "col-sm-3"
               : ""
-          }  my-3`}
+          } my-3`}
           style={{
             width: "auto !important",
             padding: "0px",
             height: "100%",
             display: width1200 || width600 ? "flex" : "block",
             gap: width600 ? "30px" : "0px",
+            
           }}
         >
           <div

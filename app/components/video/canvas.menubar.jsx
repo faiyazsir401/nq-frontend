@@ -258,8 +258,10 @@ export const CanvasMenuBar = ({
               <i className="fa fa-square-o" />
             </div>
           </span>
+          {!isMobileScreen &&
+          <>
           {/* rectangle */}
-          {/* <span>
+          <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.RECTANGLE
@@ -277,9 +279,9 @@ export const CanvasMenuBar = ({
                 alt="rectangle"
               />
             </div>
-          </span> */}
+          </span> 
           {/* oval */}
-          {/* <span>
+          <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.OVAL
@@ -290,12 +292,12 @@ export const CanvasMenuBar = ({
                 menuSelector(SHAPES.OVAL)
               }}
             >
-              {/* <i className="fa fa-long-arrow-right" /> 
+           
               <Image src="/icons/oval.png" width={20} height={20} alt="oval" />
             </div>
-          </span> */}
+          </span> 
           {/* triangle */}
-          {/* <span>
+          <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.TRIANGLE
@@ -313,9 +315,10 @@ export const CanvasMenuBar = ({
                 alt="triangle"
               />
             </div>
-          </span> */}
+          </span> 
           {/* arrows */}
-          {/* <span>
+          
+          <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
                 activeTab === SHAPES.ARROW_RIGHT
@@ -342,7 +345,8 @@ export const CanvasMenuBar = ({
             >
               <i className="fa fa-arrows-v rotate-90" />
             </div>
-          </span> */}
+          </span>
+          </>}
           <span>
             <div
               className={`icon-btn m-5  button-effect btn-sm my-3`}
