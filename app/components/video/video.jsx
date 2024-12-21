@@ -76,12 +76,12 @@ let selectedShape = null;
 let canvasConfigs = {
   sender: {
     strokeStyle: "red",
-    lineWidth: 5,
+    lineWidth: 3,
     lineCap: "round",
   },
   receiver: {
     strokeStyle: "green",
-    lineWidth: 5,
+    lineWidth: 3,
     lineCap: "round",
   },
 };
