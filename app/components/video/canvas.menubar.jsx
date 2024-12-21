@@ -617,10 +617,12 @@ export const CanvasMenuBar = ({
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => {
-                      setSelectedClips(selectClips);
+                      if(selectClips && selectClips?.length){
+                        setSelectedClips(selectClips);
+                        setClipSelectNote(false);
+                        resetInitialPinnedUser()
+                      }
                       setIsOpen(false);
-                      setClipSelectNote(false);
-                      resetInitialPinnedUser()
                     }}
                   >
                     <X />
