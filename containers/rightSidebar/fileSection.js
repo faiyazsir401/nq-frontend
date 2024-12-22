@@ -388,7 +388,7 @@ const FileSection = (props) => {
                           }}
                         >
                           <Tooltip title={clp?.clips?.title} position="top" trigger="mouseenter">
-                            <video style={{
+                            <video poster={Utils?.generateThumbnailURL(clp?.clips)} style={{
                               position: "relative",
                             
                               width: "100%",
