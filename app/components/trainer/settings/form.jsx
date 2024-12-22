@@ -9,6 +9,7 @@ import {
   validationMessage,
 } from "../../../common/constants";
 import { MinusCircle, PlusCircle } from "react-feather";
+import { useMediaQuery } from "usehooks-ts";
 
 export const UpdateSettingProfileForm = ({
   userInfo,
@@ -24,7 +25,8 @@ export const UpdateSettingProfileForm = ({
     curriculum: "",
     media: [{ title: "", description: "", type: "", url: "", thumbnail: "" }],
   };
-
+  const isMobileScreen = useMediaQuery('(max-width:700px)')
+  const [selectedFile,setSelectedFile] = useState("")
   useEffect(() => {
     if (formRef && formRef.current) {
       formRef.current.setValues({
@@ -125,6 +127,109 @@ export const UpdateSettingProfileForm = ({
     ),
   });
 
+  const handleUploadChange = (e) => {
+    console.log("event details:", e);
+    try {
+      const file = e.target.files?.[0];
+      console.log("selected file:", file);
+      if (!file) return;
+  
+      const fileType = file.type.split("/")[0]; // Get 'image' or 'video'
+      const reader = new FileReader();
+  
+      reader.addEventListener("load", () => {
+        const url = reader.result?.toString() || "";
+  
+        if (fileType === "image") {
+          const imageElement = new Image();
+          imageElement.src = url;
+  
+          imageElement.addEventListener("load", (event) => {
+            const { naturalWidth, naturalHeight } = event.currentTarget;
+            if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
+              console.log("Image must be at least 150 x 150 pixels.");
+              return setSelectedFile(""); // Clear selection
+            }
+            setSelectedFile(file);
+          });
+        } else if (fileType === "video") {
+          const videoElement = document.createElement("video");
+          videoElement.src = url;
+  
+          videoElement.addEventListener("loadedmetadata", () => {
+            const { videoWidth, videoHeight } = videoElement;
+            if (videoWidth < MIN_DIMENSION || videoHeight < MIN_DIMENSION) {
+              console.log("Video must be at least 150 x 150 pixels.");
+              return setSelectedFile(""); // Clear selection
+            }
+            setSelectedFile(file);
+          });
+        }
+      });
+  
+      reader.readAsDataURL(file); // Reads the file as a base64 string
+      // handleUpload();
+    } catch (error) {
+      console.error("Error processing file:", error);
+    }
+  };
+
+    // const handleUpload = async () => {
+    //   if (!selectedFile || selectedFile.length === 0) {
+    //     toast.error("Please select at least one video file.");
+    //     return;
+    //   }
+    
+    //   if (!thumbnail?.fileType) {
+    //     toast.error("Please select a thumbnail.");
+    //     return;
+    //   }
+  
+    //   let IsTrainer  = userInfo.account_type === AccountType.TRAINER; 
+    
+    //     var payload = {
+    //     filename: selectedFile?.name,
+    //     fileType: selectedFile?.type,
+    //     thumbnail: thumbnail?.fileType,
+    //     title: title,
+    //     category: IsTrainer ? userInfo.category : category,
+    //     };
+        
+    //     if(shareWith === shareWithConstants.myFriends){
+    //       payload.user_id = selectedFriends;
+    //     }else if(shareWith === shareWithConstants.newUsers){
+    //       payload.invites = selectedEmails
+    //     }
+    //     setLoading(true)
+    //     const data = await getS3SignUrl(payload);
+    
+    //     if (data?.url) {
+    //       try{
+    //         await pushProfilePhotoToS3(data.url, selectedFile, 'video');
+    //         // Create a new file input element
+    //         await pushProfilePhotoToS3(data.thumbnailURL, thumbnail.thumbnailFile);
+    //         const newFileInput = document.createElement("input");
+    //         newFileInput.type = "file";
+    //         newFileInput.id = "fileUpload";
+    //         newFileInput.name = "file";
+    //         newFileInput.onchange = handleFileChange;
+    //         newFileInput.style.width = "67%";
+    //         // Replace the existing file input with the new one
+    //         const existingFileInput = document.getElementById("fileUpload");
+    //         existingFileInput.parentNode.replaceChild(
+    //           newFileInput,
+    //           existingFileInput
+    //         );
+    //         toast.success("Clip upload successfully.");
+    //       }catch(err){
+    //         console.log(err);
+    //       }finally{
+    //         setLoading(false)
+    //       }
+    //   }
+    // };
+  
+
   return (
     <Formik
       innerRef={formRef}
@@ -205,13 +310,13 @@ export const UpdateSettingProfileForm = ({
                       </div>
                     </div>
                     <div className="row">
-                      <div className="col-10">
+                      <div className="col-12">
                         {values.media &&
                           values.media.length > 0 &&
                           values.media.map((mediaInfo, index) => (
                             <div className="">
-                              <div className="row mb-3">
-                                <div className="col-6">
+                              <div className="row">
+                                <div className="col-12">
                                   <label className="col-form-label">
                                     Title
                                   </label>
@@ -301,7 +406,7 @@ export const UpdateSettingProfileForm = ({
                                 className="row mb-4 items-center"
                                 key={`media-list-${index}`}
                               >
-                                <div className="col-4">
+                                <div className="col-6" style={{paddingLeft:"15px",paddingRight:isMobileScreen?"5px":"15px"}}>
                                   <select
                                     defaultValue={"image"}
                                     name="media_type"
@@ -330,33 +435,22 @@ export const UpdateSettingProfileForm = ({
                                     <option value="video">Video</option>
                                   </select>
                                 </div>
-                                <div className="col-6">
-                                  <input
-                                    type="url"
-                                    className="form-control "
-                                    onChange={(event) => {
-                                      const { value } = event.target;
-                                      if (
-                                        values.media[index].type === "video"
-                                      ) {
-                                        setFieldValue(
-                                          `media.${index}.thumbnail`,
-                                          DUMMY_URLS.YOUTUBE
-                                        );
-                                      } else {
-                                        setFieldValue(
-                                          `media.${index}.thumbnail`,
-                                          value
-                                        );
-                                      }
-                                      setFieldValue(
-                                        `media.${index}.url`,
-                                        value
-                                      );
-                                    }}
-                                    value={values.media[index].url}
-                                    placeholder="Link"
-                                  />
+                                <div className="col-4" style={{paddingLeft:isMobileScreen?"5px":"15px",paddingRight:isMobileScreen?"5px":"15px",display:"flex",justifyContent:"center"}}>
+                                  <>
+                                    <label
+                                      htmlFor="upload"
+                                      className="btn btn-primary btn-sm"
+                                    >
+                                      Upload
+                                    </label>
+                                    <input
+                                      id="upload"
+                                      type="file"
+                                      accept={values.media[index].type === "image" ? "image/*" : "video/*"}
+                                      style={{ display: "none" }}
+                                      onChange={handleUploadChange}
+                                    />
+                                  </>
                                 </div>
 
                                 <div
@@ -364,6 +458,7 @@ export const UpdateSettingProfileForm = ({
                                   onClick={() => {
                                     remove(index);
                                   }}
+                                  style={{paddingLeft:isMobileScreen?"5px":"15px",paddingRight:isMobileScreen?"5px":"15px"}}
                                 >
                                   <MinusCircle />
                                 </div>
