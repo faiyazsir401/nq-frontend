@@ -61,7 +61,7 @@ const MyCommunity = (props) => {
   const [accountType, setAccountType] = useState("");
 
   const isMobileScreen = useMediaQuery("(max-width:1000px)");
-
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
   }, []);
@@ -143,7 +143,7 @@ const MyCommunity = (props) => {
         if (request.receiverId._id === userId) {
           return true;
         }
-        return false
+        return false;
       })
     );
     return friendRequests.some((request) => request.senderId._id === userId);
@@ -164,8 +164,8 @@ const MyCommunity = (props) => {
           className={`form-inline`}
           onSubmit={async (e) => {
             e.preventDefault();
-            console.log("e12", e.target[0].value);
-            const data = await getAllUsers({ search: e.target[0].value });
+            console.log("e12", searchTerm);
+            const data = await getAllUsers({ search: searchTerm });
             setSearchData(data.result);
             setActiveTab("search");
             console.log("searchTerm", data);
@@ -174,24 +174,33 @@ const MyCommunity = (props) => {
           <div
             className="form-group"
             style={{
-              flex: isMobileScreen ? 1 : "auto",
+              width: "100%",
               display: "flex",
-              gap: 5,
+              alignItems: "center", // Aligns items vertically in the center
+              justifyContent: "space-between", // Ensures elements are spaced correctly
+              gap: "8px", // Adds a gap between the input and button
             }}
           >
             <input
               className="form-control-plaintext"
               type="search"
               placeholder="Search..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               style={{
-                width: isMobileScreen ? "100%" : "auto",
+                flex: "1", // Allows the input to take up available space
                 borderBottom: "2px solid gray",
+                borderRadius: "0px",
               }}
             />
             <button
               className="btn btn-primary btn-sm"
-              style={{ fontSize: isMobileScreen ? "revert-layer" : "12px" }}
+              style={{
+                fontSize: isMobileScreen ? "revert-layer" : "12px",
+                whiteSpace: "nowrap", // Prevents the button text from wrapping
+              }}
               type="submit"
+              disabled={!searchTerm.trim()}
             >
               Search
             </button>
@@ -242,7 +251,7 @@ const MyCommunity = (props) => {
                   }}
                   style={{ width: "100%" }}
                 >
-                  Pending Requests
+                  Requests
                 </NavLink>
               </NavItem>
             </div>
@@ -485,91 +494,84 @@ const MyCommunity = (props) => {
               }}
             >
               {friendRequests && friendRequests.length ? (
-                friendRequests?.map(
-                  (request, index) =>
-                 (
-                      <div
-                        style={{
-                          cursor: "pointer",
-                          border: "2px solid rgb(0, 0, 128)",
-                          borderRadius: "5px",
-                          display: "flex",
-                          gap: "10px",
-                          maxWidth: 300,
-                          width: isMobileScreen ? "100%" : 300,
-                          padding: 5,
+                friendRequests?.map((request, index) => (
+                  <div
+                    style={{
+                      cursor: "pointer",
+                      border: "2px solid rgb(0, 0, 128)",
+                      borderRadius: "5px",
+                      display: "flex",
+                      gap: "10px",
+                      maxWidth: 300,
+                      width: isMobileScreen ? "100%" : 300,
+                      padding: 5,
+                    }}
+                    key={index}
+                  >
+                    <div>
+                      <img
+                        height={100}
+                        width={100}
+                        src={
+                          Utils?.getImageUrlOfS3(
+                            request.senderId?.profile_picture
+                          ) || "/assets/images/userdemo.png"
+                        }
+                        alt="Card image cap"
+                        onError={(e) => {
+                          e.target.src = "/assets/images/demoUser.png"; // Set default image on error
                         }}
-                        key={index}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 5,
+                        marginTop: 10,
+                      }}
+                    >
+                      <h5>
+                        Name: <b>{request.senderId?.fullname}</b>
+                      </h5>
+                      <h5>
+                        Type: <b>{request.senderId?.account_type}</b>
+                      </h5>
+
+                      <button
+                        style={{
+                          padding: 5,
+                          width: 100,
+                          marginTop: 5,
+                          fontSize: isMobileScreen ? "revert-layer" : "12px",
+                        }}
+                        className="btn btn-success btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAcceptFriendRequest(request?._id);
+                        }}
                       >
-                        <div>
-                          <img
-                            height={100}
-                            width={100}
-                            src={
-                              Utils?.getImageUrlOfS3(
-                                request.senderId?.profile_picture
-                              ) || "/assets/images/userdemo.png"
-                            }
-                            alt="Card image cap"
-                            onError={(e) => {
-                              e.target.src = "/assets/images/demoUser.png"; // Set default image on error
-                            }}
-                          />
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 5,
-                            marginTop: 10,
-                          }}
-                        >
-                          <h5>
-                            Name: <b>{request.senderId?.fullname}</b>
-                          </h5>
-                          <h5>
-                            Type: <b>{request.senderId?.account_type}</b>
-                          </h5>
-
-                          <button
-                            style={{
-                              padding: 5,
-                              width: 100,
-                              marginTop: 5,
-                              fontSize: isMobileScreen
-                                ? "revert-layer"
-                                : "12px",
-                            }}
-                            className="btn btn-success btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAcceptFriendRequest(request?._id);
-                            }}
-                          >
-                            Accept
-                          </button>
-                          <button
-                            style={{
-                              padding: 5,
-                              width: 100,
-                              marginTop: 5,
-                              fontSize: isMobileScreen
-                                ? "revert-layer"
-                                : "12px",
-                            }}
-                            className="btn btn-danger btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRejectFriendRequest(request?._id);
-                            }}
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      </div>
-                    )
-                )
+                        Accept
+                      </button>
+                      <button
+                        style={{
+                          padding: 5,
+                          width: 100,
+                          marginTop: 5,
+                          fontSize: isMobileScreen ? "revert-layer" : "12px",
+                        }}
+                        className="btn btn-danger btn-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRejectFriendRequest(request?._id);
+                        }}
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ))
               ) : (
                 <>
                   <div

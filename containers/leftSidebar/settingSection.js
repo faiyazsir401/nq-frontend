@@ -559,8 +559,7 @@ const SettingSection = (props) => {
 
                       <p>
                         {" "}
-                        <b>Note : </b>turn on this setting to whether your
-                        contact can be your friend or not.
+                        <b>Note : </b>Turn you account private. People will not be able to add you as friend in the community. Your existing friends will stay connected.
                       </p>
                     </li>
                     {/* <li>
