@@ -88,6 +88,28 @@ export const acceptFriendRequest = async (payload) => {
   }
 };
 
+export const cancelFriendRequest = async (payload) => {
+  try {
+    const response = await axiosInstance({
+      url: `/user/cancel-friend-request`,
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${Utils.getToken(
+          LOCAL_STORAGE_KEYS.ACCESS_TOKEN
+        )}`,
+      },
+      data: payload,
+    });
+    console.log("response", response.data);
+    return response.data;
+  } catch (err) {
+    toast.error(err.response.data.error);
+    throw err;
+  }
+};
+
 export const rejectFriendRequest = async (payload) => {
   try {
     const response = await axiosInstance({

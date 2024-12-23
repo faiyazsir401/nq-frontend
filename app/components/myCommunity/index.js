@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Nav, NavLink, NavItem, TabContent, TabPane } from "reactstrap";
 
 import "photoswipe/style.css";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import VideoUpload from "../../../app/components/videoupload";
 import { useMediaQuery } from "usehooks-ts";
 import { Utils } from "../../../utils/utils";
@@ -19,15 +19,17 @@ import {
   getFriendRequests,
   removeFriend,
   getFriends,
+  cancelFriendRequest,
 } from "../../common/common.api";
 import { toast } from "react-toastify";
+import { authState } from "../auth/auth.slice";
 
 const MyCommunity = (props) => {
   const dispatch = useAppDispatch();
   const [friends, setFriends] = useState([]);
   const [searchData, setSearchData] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
-
+  const { userInfo } = useAppSelector(authState);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStudentData, SetselectedStudentData] = useState({});
   const [recentStudentClips, setRecentStudentClips] = useState([]);
@@ -110,6 +112,26 @@ const MyCommunity = (props) => {
     }
   };
 
+  const handleCancelFriendRequest = async (requestId) => {
+    try {
+      await cancelFriendRequest({ receiverId: requestId });
+      console.log("searchData", searchData,requestId);
+      setSearchData((prevData) =>{
+
+        const data = prevData.map((user) =>
+          user._id === requestId ? { ...user, requestSent: false } : user
+        )
+        console.log("searchData123",data)
+        return data;
+      }
+      );
+      toast.success("Friend request cancelled");
+      getFriendRequestsApi();
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
   const handleRejectFriendRequest = async (requestId) => {
     try {
       await rejectFriendRequest({ requestId });
@@ -134,19 +156,18 @@ const MyCommunity = (props) => {
     return friends.some((friend) => friend._id === userId);
   };
 
-  const isRequestSent = (userId) => {
+  const isRequestSent = (index) => {
     console.log(
       "isRequestSent",
-      userId,
-      friendRequests.some((request) => {
-        console.log("request", request);
-        if (request.receiverId._id === userId) {
-          return true;
-        }
-        return false;
+      userInfo._id,
+      index,
+      searchData[index].friendRequests.some((request) => {
+        console.log("request"+index, request);
       })
     );
-    return friendRequests.some((request) => request.senderId._id === userId);
+    return searchData[index].friendRequests.some(
+      (request) => request.senderId === userInfo._id
+    );
   };
 
   return (
@@ -285,8 +306,10 @@ const MyCommunity = (props) => {
                         padding: 5,
                       }}
                       onClick={() => {
-                        handleCourseClick(data, index, data?._id);
-                        SetselectedStudentData({ ...data });
+                        if(isFriend(data?._id)){
+                          handleCourseClick(data, index, data?._id);
+                          SetselectedStudentData({ ...data });
+                        }
                       }}
                     >
                       <div>
@@ -323,7 +346,7 @@ const MyCommunity = (props) => {
                           <button
                             style={{
                               padding: 5,
-                              width: 100,
+                              width: 110,
                               marginTop: 5,
                               fontSize: isMobileScreen
                                 ? "revert-layer"
@@ -337,26 +360,29 @@ const MyCommunity = (props) => {
                           >
                             Remove Friend
                           </button>
-                        ) : isRequestSent(data?._id) || data.requestSent ? (
+                        ) : isRequestSent(index) || data.requestSent ? (
                           <button
                             style={{
                               padding: 5,
-                              width: 100,
+                              width: 110,
                               marginTop: 5,
                               fontSize: isMobileScreen
                                 ? "revert-layer"
                                 : "12px",
                             }}
-                            className="btn btn-secondary btn-sm"
-                            disabled
+                            className="btn btn-danger btn-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCancelFriendRequest(data?._id);
+                            }}
                           >
-                            Already Sent
+                            Cancel Request
                           </button>
                         ) : (
                           <button
                             style={{
                               padding: 5,
-                              width: 100,
+                              width: 110,
                               marginTop: 5,
                               fontSize: isMobileScreen
                                 ? "revert-layer"
@@ -539,36 +565,38 @@ const MyCommunity = (props) => {
                         Type: <b>{request.senderId?.account_type}</b>
                       </h5>
 
-                      <button
-                        style={{
-                          padding: 5,
-                          width: 100,
-                          marginTop: 5,
-                          fontSize: isMobileScreen ? "revert-layer" : "12px",
-                        }}
-                        className="btn btn-success btn-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAcceptFriendRequest(request?._id);
-                        }}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        style={{
-                          padding: 5,
-                          width: 100,
-                          marginTop: 5,
-                          fontSize: isMobileScreen ? "revert-layer" : "12px",
-                        }}
-                        className="btn btn-danger btn-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRejectFriendRequest(request?._id);
-                        }}
-                      >
-                        Reject
-                      </button>
+                      <div className="d-flex" style={{ gap: 5 }}>
+                        <button
+                          style={{
+                            padding: 5,
+
+                            marginTop: 5,
+                            fontSize: isMobileScreen ? "revert-layer" : "12px",
+                          }}
+                          className="btn btn-success btn-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAcceptFriendRequest(request?._id);
+                          }}
+                        >
+                          Accept
+                        </button>
+                        <button
+                          style={{
+                            padding: 5,
+
+                            marginTop: 5,
+                            fontSize: isMobileScreen ? "revert-layer" : "12px",
+                          }}
+                          className="btn btn-danger btn-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRejectFriendRequest(request?._id);
+                          }}
+                        >
+                          Reject
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))
