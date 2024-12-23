@@ -797,6 +797,13 @@ export class Utils {
     return !!OnlineTrainers[selectedTrainerId];
   };
 
+  static isTrainerOnlineArray = (selectedTrainerId, OnlineTrainers) => {
+    if (!OnlineTrainers || !OnlineTrainers.length) {
+      return false;
+    }
+    return OnlineTrainers.some((trainer) => trainer.trainer_info._id === selectedTrainerId);
+  };
+
   static formatTimeAgo = (time) => {
     moment.locale("en");
     const now = moment();

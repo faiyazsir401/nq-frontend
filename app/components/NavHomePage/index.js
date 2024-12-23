@@ -31,6 +31,7 @@ import { traineeAction } from "../trainee/trainee.slice";
 import { addRating } from "../common/common.api";
 import TrainerRenderBooking from "../bookings/TrainerRenderBooking";
 import TraineeRenderBooking from "../bookings/TraineeRenderBooking";
+import { fetchAllLatestOnlineUsers } from "../auth/auth.api";
 const NavHomePage = () => {
   const [progress, setProgress] = useState(0);
   const width2000 = useMediaQuery(2000);
@@ -50,6 +51,17 @@ const NavHomePage = () => {
   const { removeNewBookingData } = traineeAction;
   const { isLoading, configs, startMeeting } = useAppSelector(bookingsState);
   const { accountType, onlineUsers } = useAppSelector(authState);
+  const [activeTrainer, setActiveTrainer] = useState([]);
+
+  const getAllLatestActiveTrainer = async () => {
+    const response = await fetchAllLatestOnlineUsers();
+
+    if (response.code === 200) {
+      setActiveTrainer(response.result);
+    }
+  };
+
+
     const [userTimeZone, setUserTimeZone] = useState(
       Intl.DateTimeFormat().resolvedOptions().timeZone
     );
@@ -57,6 +69,7 @@ const NavHomePage = () => {
   const { scheduledMeetingDetails } = useAppSelector(bookingsState);
   useEffect(() => {
     dispatch(getScheduledMeetingDetailsAsync({ status: "upcoming" }));
+    getAllLatestActiveTrainer()
   }, []);
 
   var settings = {
@@ -286,8 +299,8 @@ const NavHomePage = () => {
       {/* top  baaner */}
 
       {accountType === AccountType.TRAINEE &&
-      onlineUsers &&
-      Object.values(onlineUsers)?.length ? (
+      activeTrainer &&
+      activeTrainer?.length ? (
         <div className="banner">
           <h1>
             Coaches online <span>Now!</span>
@@ -295,11 +308,11 @@ const NavHomePage = () => {
 
           <div className="banner_Slider">
             <Slider {...settings}>
-              {onlineUsers &&
-                Object?.values(onlineUsers)?.map((info, index) => {
+              {activeTrainer &&
+                activeTrainer?.map((info, index) => {
                   return (
-                    <div key={`slider-${info?._id}-${index}`}>
-                      <OnlineUserCard trainer={info} />
+                    <div key={`slider-${info.trainer_info?._id}-${index}`}>
+                      <OnlineUserCard trainer={info.trainer_info} />
                     </div>
                   );
                 })}

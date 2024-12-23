@@ -70,6 +70,7 @@ import ShareClipsCard from "../../share-clips";
 import BookingTable from "./BookingTable";
 import Trainer from "./Trainer";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
+import { fetchAllLatestOnlineUsers } from "../../auth/auth.api";
 
 const settings = {
   autoplay: false,
@@ -111,12 +112,22 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   const socket = useContext(SocketContext);
   const masterRecords = useAppSelector(masterState).master;
   const [data, setData] = useState();
-  const { userInfo, sidebarModalActiveTab, onlineUsers, selectedOnlineUser } =
+  const { userInfo, sidebarModalActiveTab,  selectedOnlineUser } =
     useAppSelector(authState);
 
   useEffect(() => {
     setData(masterRecords?.masterData);
   }, [masterRecords]);
+  const [activeTrainer, setActiveTrainer] = useState([]);
+
+  const getAllLatestActiveTrainer = async () => {
+    const response = await fetchAllLatestOnlineUsers();
+
+    if (response.code === 200) {
+      setActiveTrainer(response.result);
+    }
+  };
+
 
   const dispatch = useAppDispatch();
   const { status, getTraineeSlots, transaction } = useAppSelector(traineeState);
@@ -157,6 +168,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
 
   useEffect(() => {
     getmyClips();
+    getAllLatestActiveTrainer();
   }, []);
 
   const addTraineeClipInBookedSession = async () => {
@@ -807,6 +819,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
           handleChange={(value) => {
             setParams({ search: value });
           }}
+          activeTrainer={activeTrainer}
         />
       </div>
       <div className="trainer-recommended Slider  " style={{ height: "90px" }}>
@@ -857,7 +870,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
           className="Recommended"
           style={{ display: "flex", flexDirection: "row",justifyContent:"center" }}
         >
-          {onlineUsers && Object.values(onlineUsers)?.length ? (
+          {activeTrainer && activeTrainer?.length ? (
               <>
                 <Row
             
@@ -876,20 +889,21 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                   className="recent-slider recent-chat"
                 >
                   
-                 {Object.values(onlineUsers)?.map((trainer, index) => {
+                 {activeTrainer?.map((data, index) => {
                     return (
                       <Col key={index} className="item" style={{maxWidth:isMobileScreen?"130px":"230px",padding:"15px"}}>
                         <Trainer
-                          trainer={trainer}
+                          trainer={data.trainer_info}
                           onClickFunc={() => {
                             setTrainerInfo((prev) => ({
                               ...prev,
-                              userInfo: trainer,
+                              userInfo: data.trainer_info,
                               selected_category: null,
                             }));
-                            setSelectedTrainer(trainer);
-                            setParams({ search: trainer?.fullname });
+                            setSelectedTrainer(data.trainer_info);
+                            setParams({ search: data.trainer_info?.fullname });
                           }}
+                          
                         />
                       </Col>
                     );
@@ -972,8 +986,10 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
             setStartDate={setStartDate}
             startDate={startDate}
             getParams={getParams}
+            isUserOnline={true}
           />
         }
+        isUserOnline={true}
       />
     );
   };

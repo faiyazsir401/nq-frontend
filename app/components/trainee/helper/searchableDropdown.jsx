@@ -15,6 +15,7 @@ const SearchableDropdown = ({
   selectedOption,
   searchValue,
   onSearchClick,
+  activeTrainer
 }) => {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -128,7 +129,7 @@ const SearchableDropdown = ({
                             }}
                           >
                             <b> Trainer </b>{" "}
-                            {onlineUsers &&
+                            {activeTrainer &&
                               (() => {
                                 const trainerId =
                                   option?.id ||
@@ -136,9 +137,9 @@ const SearchableDropdown = ({
                                   option?.userInfo?.trainer_id ||
                                   option?.trainer_id ||
                                   option?.userInfo?.id;
-                                return Utils.isTrainerOnline(
+                                return Utils.isTrainerOnlineArray(
                                   trainerId,
-                                  onlineUsers
+                                  activeTrainer
                                 ) ? (
                                   <div
                                     className="dot-btn dot-danger grow"
