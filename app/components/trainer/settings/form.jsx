@@ -248,7 +248,7 @@ export const UpdateSettingProfileForm = ({
         isValid,
         handleChange,
       }) => (
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={(e)=>{e.preventDefault();handleSubmit(e)}}>
           <div className="container mb-3">
             {/* about */}
             <>
