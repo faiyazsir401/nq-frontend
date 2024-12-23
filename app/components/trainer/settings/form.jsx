@@ -435,23 +435,34 @@ export const UpdateSettingProfileForm = ({
                                     <option value="video">Video</option>
                                   </select>
                                 </div>
-                                <div className="col-4" style={{paddingLeft:isMobileScreen?"5px":"15px",paddingRight:isMobileScreen?"5px":"15px",display:"flex",justifyContent:"center"}}>
-                                  <>
-                                    <label
-                                      htmlFor="upload"
-                                      className="btn btn-primary btn-sm"
-                                    >
-                                      Upload
-                                    </label>
-                                    <input
-                                      id="upload"
-                                      type="file"
-                                      accept={values.media[index].type === "image" ? "image/*" : "video/*"}
-                                      style={{ display: "none" }}
-                                      onChange={handleUploadChange}
-                                    />
-                                  </>
-                                </div>
+                                <div className="col-4">
+                                  <input
+                                    type="url"
+                                    className="form-control "
+                                    onChange={(event) => {
+                                      const { value } = event.target;
+                                      if (
+                                        values.media[index].type === "video"
+                                      ) {
+                                        setFieldValue(
+                                          `media.${index}.thumbnail`,
+                                          DUMMY_URLS.YOUTUBE
+                                        );
+                                      } else {
+                                        setFieldValue(
+                                          `media.${index}.thumbnail`,
+                                          value
+                                        );
+                                      }
+                                      setFieldValue(
+                                        `media.${index}.url`,
+                                        value
+                                      );
+                                    }}
+                                    value={values.media[index].url}
+                                    placeholder="Link"
+                                  />
+                                  </div>
 
                                 <div
                                   className="col-2 mt-2 items-center"
