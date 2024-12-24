@@ -23,6 +23,7 @@ import {
 } from "../../common/common.api";
 import { toast } from "react-toastify";
 import { authState } from "../auth/auth.slice";
+import { MdPersonRemoveAlt1 } from "react-icons/md";
 
 const MyCommunity = (props) => {
   const dispatch = useAppDispatch();
@@ -304,6 +305,7 @@ const MyCommunity = (props) => {
                         maxWidth: 300,
                         width: isMobileScreen ? "100%" : 300,
                         padding: 5,
+                        position: "relative",
                       }}
                       onClick={() => {
                         if(isFriend(data?._id)){
@@ -333,6 +335,7 @@ const MyCommunity = (props) => {
                           flexDirection: "column",
                           gap: 5,
                           marginTop: 10,
+              
                         }}
                       >
                         <h5>
@@ -344,22 +347,26 @@ const MyCommunity = (props) => {
 
                         {isFriend(data?._id) ? (
                           <button
-                            style={{
-                              padding: 5,
-                              width: 110,
-                              marginTop: 5,
-                              fontSize: isMobileScreen
-                                ? "revert-layer"
-                                : "12px",
-                            }}
-                            className="btn btn-danger btn-sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveFriend(data?._id);
-                            }}
-                          >
-                            Remove Friend
-                          </button>
+                          style={{
+                            position: "absolute",
+                            padding: 5,
+                            top: 0,
+                            backgroundColor: "red",
+                            color: "white",
+                            border:"none",
+                            right:0,
+                            fontSize: isMobileScreen
+                              ? "revert-layer"
+                              : "12px",
+                          }}
+                     
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveFriend(data?._id);
+                          }}
+                        >
+                          <MdPersonRemoveAlt1 size={15}/>
+                        </button>
                         ) : isRequestSent(index) || data.requestSent ? (
                           <button
                             style={{
@@ -439,6 +446,7 @@ const MyCommunity = (props) => {
                         maxWidth: 300,
                         width: isMobileScreen ? "100%" : 300,
                         padding: 5,
+                        position: "relative",
                       }}
                       onClick={() => {
                         handleCourseClick(data, index, data?._id);
@@ -476,20 +484,26 @@ const MyCommunity = (props) => {
                         </h5>
 
                         <button
-                          style={{
-                            padding: 5,
-                            width: 100,
-                            marginTop: 5,
-                            fontSize: isMobileScreen ? "revert-layer" : "12px",
-                          }}
-                          className="btn btn-danger btn-sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveFriend(data?._id);
-                          }}
-                        >
-                          Remove Friend
-                        </button>
+                            style={{
+                              position: "absolute",
+                              padding: 5,
+                              top: 0,
+                              backgroundColor: "red",
+                              color: "white",
+                              border:"none",
+                              right:0,
+                              fontSize: isMobileScreen
+                                ? "revert-layer"
+                                : "12px",
+                            }}
+                       
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFriend(data?._id);
+                            }}
+                          >
+                            <MdPersonRemoveAlt1 size={15}/>
+                          </button>
                       </div>
                     </div>
                   );
