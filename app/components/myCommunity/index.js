@@ -260,8 +260,9 @@ const MyCommunity = (props) => {
             </div>
             <div
               className="col text-right"
-              style={{ padding: "0px", marginTop: "10px" }}
+              style={{ padding: "0px", marginTop: "10px",position:"relative" }}
             >
+              <div style={{position:"absolute",zIndex:2,right:5,top:-5, background:"red",height:20,width:20 , borderRadius:"100%",display:"flex",justifyContent:"center", alignItems:"center",color:"white",fontWeight:"bold"}}>{friendRequests.length}</div>
               <NavItem className="ml-5px">
                 <NavLink
                   className={`button-effect ${
