@@ -33,7 +33,7 @@ const OnlineUserCard = ({ trainer }) => {
                 />
             </div>
             <div className="card-info">
-                <h4>Name: {trainer?.fullname}</h4>
+                <h4>Name: {trainer?.fullName}</h4>
                 <h4>Price: ${trainer?.extraInfo?.hourly_rate}</h4>
                 <div onClick={handleTraineInstantLesson} className="instant">
                     <h5 >INSTANT LESSON</h5>
