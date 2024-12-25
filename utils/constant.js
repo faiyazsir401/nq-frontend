@@ -16,6 +16,7 @@ export const notificiationTitles = {
   sessionStrated: 'Session Started',
   sessionCancelattion: 'Session Cancellation',
   feedBackReceived:"Feedback Received",
+  friendRequestReceived:"Received Friend Request",
   sessionConfirmation: "Session Confirmation",
   newBookingRequest:'New Booking Request',
   gamePlanReport:'Game Plan Report'

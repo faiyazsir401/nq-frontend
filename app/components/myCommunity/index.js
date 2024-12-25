@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Nav, NavLink, NavItem, TabContent, TabPane } from "reactstrap";
 
 import "photoswipe/style.css";
@@ -24,9 +24,12 @@ import {
 import { toast } from "react-toastify";
 import { authState } from "../auth/auth.slice";
 import { MdPersonRemoveAlt1 } from "react-icons/md";
-
+import { EVENTS } from "../../../helpers/events";
+import { SocketContext } from "../socket";
+import { notificiationTitles } from "../../../utils/constant";
 const MyCommunity = (props) => {
   const dispatch = useAppDispatch();
+  const socket = useContext(SocketContext);
   const [friends, setFriends] = useState([]);
   const [searchData, setSearchData] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
@@ -88,10 +91,22 @@ const MyCommunity = (props) => {
     }
   };
 
+    const sendNotifications = (data) => {
+      socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
+    };
+  
+
   const handleSendFriendRequest = async (userId) => {
     try {
       await sendFriendRequest({ receiverId: userId });
       toast.success("Friend request sent");
+      sendNotifications({
+        title: notificiationTitles.friendRequestReceived,
+        description:
+          userInfo?.fullname+" sent you a friend request.",
+        senderId: userInfo?._id,
+        receiverId: userId,
+      });
       setSearchData((prevData) =>
         prevData.map((user) =>
           user._id === userId ? { ...user, requestSent: true } : user
