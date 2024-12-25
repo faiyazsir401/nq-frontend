@@ -1631,20 +1631,14 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const globalProgressBarToggler = (e) => {
     setVideoController(!videoController);
-    selectedVideoRef1.current.currentTime = 0
-    selectedVideoRef2.current.currentTime = 0
+  
     setIsPlaying({
       isPlayingAll: false,
       number: "",
       isPlaying1: false,
       isPlaying2: false,
     })
-    setVideoTime({
-      currentTime1: "00:00",
-      currentTime2: "00:00",
-      remainingTime1: "00:00",
-      remainingTime2: "00:00",
-    })
+  
   };
 
   const handleGlobalProgressBarChange = (e) => {
