@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import NavHomePageCenterContainer from "./NavHomePageCenterContainer";
-import "./index.scss";
+import "./home.scss";
 import ShareClipsCard from "../share-clips";
 import UploadClipCard from "../videoupload/UploadClipCard";
 import InviteFriendsCard from "../invite-friends";

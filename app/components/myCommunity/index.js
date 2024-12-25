@@ -639,7 +639,7 @@ const MyCommunity = (props) => {
           <div className="container media-gallery portfolio-section grid-portfolio ">
             <div className="theme-title">
               <div className="media mb-4">
-                <div className="logo" style={{ marginLeft: "70px" }}>
+                <div className="logo" >
                   <img
                     src="/assets/images/netquix_logo_beta.png"
                     alt="Left Logo"
