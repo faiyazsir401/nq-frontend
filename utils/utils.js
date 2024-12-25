@@ -127,8 +127,9 @@ export class Utils {
   }
 
   static getDateInFormat = (date = "") => {
-    const newDate = date ? date : new Date();
-    return moment(newDate).format("MM-DD-YYYY");
+    console.log("datetest",date)
+    const newDate = date ? DateTime.fromISO(date, { zone: 'utc' }) : DateTime.now();
+    return newDate.toFormat("MM-dd-yyyy");
   };
 
   static getDateInFormatIOS = (date = "") => {
