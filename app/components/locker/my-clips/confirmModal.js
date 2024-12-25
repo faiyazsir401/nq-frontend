@@ -7,6 +7,7 @@ const ConfirmModal = (
         selectedId,
         deleteFunc,
         closeModal,
+        message
     }
 ) => {
   return (
@@ -17,7 +18,7 @@ const ConfirmModal = (
             style={{
             fontSize : "22px !important"
           }}
-            >Are you sure, you want to delete it</h5>
+            >{`Are you sure, ${message??"you want to delete it"}`}</h5>
           </ModalHeader>
           <ModalBody>
             <div className="row"

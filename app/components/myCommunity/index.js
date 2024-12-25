@@ -27,6 +27,8 @@ import { MdPersonRemoveAlt1 } from "react-icons/md";
 import { EVENTS } from "../../../helpers/events";
 import { SocketContext } from "../socket";
 import { notificiationTitles } from "../../../utils/constant";
+import ConfirmModal from "../locker/my-clips/confirmModal";
+import { set } from "lodash";
 const MyCommunity = (props) => {
   const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
@@ -37,7 +39,8 @@ const MyCommunity = (props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStudentData, SetselectedStudentData] = useState({});
   const [recentStudentClips, setRecentStudentClips] = useState([]);
-
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState("");
   const getFriendsApi = async () => {
     try {
       let res = await getFriends();
@@ -159,6 +162,7 @@ const MyCommunity = (props) => {
       await removeFriend({ friendId: userId });
       toast.success("Friend removed");
       getFriendsApi();
+      setIsDeleteOpen(false);
     } catch (error) {
       toast.error(error);
     }
@@ -191,6 +195,7 @@ const MyCommunity = (props) => {
       }}
       id="files"
     >
+        <ConfirmModal closeModal={()=>setIsDeleteOpen(false) } deleteFunc={handleRemoveFriend} isModelOpen={isDeleteOpen} message={"You want to Unfriend?"} selectedId={selectedId} setIsModelOpen={setIsDeleteOpen}/>
       {!isMobileScreen && <h2 className="mb-3">My Community</h2>}
       <div>
         <form
@@ -394,7 +399,8 @@ const MyCommunity = (props) => {
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRemoveFriend(data?._id);
+                              setSelectedId(data?._id);
+                              setIsDeleteOpen(true);
                             }}
                           >
                             <MdPersonRemoveAlt1 size={15} />
@@ -528,7 +534,8 @@ const MyCommunity = (props) => {
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleRemoveFriend(data?._id);
+                            setSelectedId(data?._id);
+                            setIsDeleteOpen(true);
                           }}
                         >
                           <MdPersonRemoveAlt1 size={15} />
