@@ -91,10 +91,9 @@ const MyCommunity = (props) => {
     }
   };
 
-    const sendNotifications = (data) => {
-      socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
-    };
-  
+  const sendNotifications = (data) => {
+    socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
+  };
 
   const handleSendFriendRequest = async (userId) => {
     try {
@@ -102,8 +101,7 @@ const MyCommunity = (props) => {
       toast.success("Friend request sent");
       sendNotifications({
         title: notificiationTitles.friendRequestReceived,
-        description:
-          userInfo?.fullname+" sent you a friend request.",
+        description: userInfo?.fullname + " sent you a friend request.",
         senderId: userInfo?._id,
         receiverId: userId,
       });
@@ -131,16 +129,14 @@ const MyCommunity = (props) => {
   const handleCancelFriendRequest = async (requestId) => {
     try {
       await cancelFriendRequest({ receiverId: requestId });
-      console.log("searchData", searchData,requestId);
-      setSearchData((prevData) =>{
-
+      console.log("searchData", searchData, requestId);
+      setSearchData((prevData) => {
         const data = prevData.map((user) =>
           user._id === requestId ? { ...user, requestSent: false } : user
-        )
-        console.log("searchData123",data)
+        );
+        console.log("searchData123", data);
         return data;
-      }
-      );
+      });
       toast.success("Friend request cancelled");
       getFriendRequestsApi();
     } catch (error) {
@@ -178,7 +174,7 @@ const MyCommunity = (props) => {
       userInfo._id,
       index,
       searchData[index].friendRequests.some((request) => {
-        console.log("request"+index, request);
+        console.log("request" + index, request);
       })
     );
     return searchData[index].friendRequests.some(
@@ -275,9 +271,31 @@ const MyCommunity = (props) => {
             </div>
             <div
               className="col text-right"
-              style={{ padding: "0px", marginTop: "10px",position:"relative" }}
+              style={{
+                padding: "0px",
+                marginTop: "10px",
+                position: "relative",
+              }}
             >
-              <div style={{position:"absolute",zIndex:2,right:5,top:-5, background:"red",height:20,width:20 , borderRadius:"100%",display:"flex",justifyContent:"center", alignItems:"center",color:"white",fontWeight:"bold"}}>{friendRequests.length}</div>
+              <div
+                style={{
+                  position: "absolute",
+                  zIndex: 2,
+                  right: 5,
+                  top: -5,
+                  background: "red",
+                  height: 20,
+                  width: 20,
+                  borderRadius: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  color: "white",
+                  fontWeight: "bold",
+                }}
+              >
+                {friendRequests.length}
+              </div>
               <NavItem className="ml-5px">
                 <NavLink
                   className={`button-effect ${
@@ -324,7 +342,7 @@ const MyCommunity = (props) => {
                         position: "relative",
                       }}
                       onClick={() => {
-                        if(isFriend(data?._id)){
+                        if (isFriend(data?._id)) {
                           handleCourseClick(data, index, data?._id);
                           SetselectedStudentData({ ...data });
                         }
@@ -351,7 +369,6 @@ const MyCommunity = (props) => {
                           flexDirection: "column",
                           gap: 5,
                           marginTop: 10,
-              
                         }}
                       >
                         <h5>
@@ -363,26 +380,25 @@ const MyCommunity = (props) => {
 
                         {isFriend(data?._id) ? (
                           <button
-                          style={{
-                            position: "absolute",
-                            padding: 5,
-                            top: 0,
-                            backgroundColor: "red",
-                            color: "white",
-                            border:"none",
-                            right:0,
-                            fontSize: isMobileScreen
-                              ? "revert-layer"
-                              : "12px",
-                          }}
-                     
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemoveFriend(data?._id);
-                          }}
-                        >
-                          <MdPersonRemoveAlt1 size={15}/>
-                        </button>
+                            style={{
+                              position: "absolute",
+                              padding: 5,
+                              top: 0,
+                              backgroundColor: "red",
+                              color: "white",
+                              border: "none",
+                              right: 0,
+                              fontSize: isMobileScreen
+                                ? "revert-layer"
+                                : "12px",
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveFriend(data?._id);
+                            }}
+                          >
+                            <MdPersonRemoveAlt1 size={15} />
+                          </button>
                         ) : isRequestSent(index) || data.requestSent ? (
                           <button
                             style={{
@@ -500,26 +516,23 @@ const MyCommunity = (props) => {
                         </h5>
 
                         <button
-                            style={{
-                              position: "absolute",
-                              padding: 5,
-                              top: 0,
-                              backgroundColor: "red",
-                              color: "white",
-                              border:"none",
-                              right:0,
-                              fontSize: isMobileScreen
-                                ? "revert-layer"
-                                : "12px",
-                            }}
-                       
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveFriend(data?._id);
-                            }}
-                          >
-                            <MdPersonRemoveAlt1 size={15}/>
-                          </button>
+                          style={{
+                            position: "absolute",
+                            padding: 5,
+                            top: 0,
+                            backgroundColor: "red",
+                            color: "white",
+                            border: "none",
+                            right: 0,
+                            fontSize: isMobileScreen ? "revert-layer" : "12px",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRemoveFriend(data?._id);
+                          }}
+                        >
+                          <MdPersonRemoveAlt1 size={15} />
+                        </button>
                       </div>
                     </div>
                   );
@@ -654,15 +667,26 @@ const MyCommunity = (props) => {
           <div className="container media-gallery portfolio-section grid-portfolio ">
             <div className="theme-title">
               <div className="media mb-4">
-                <div className="logo" >
+                <div
+                  className="logo"
+                  style={{
+                    margin: isMobileScreen && "auto",
+                  }}
+                >
                   <img
                     src="/assets/images/netquix_logo_beta.png"
                     alt="Left Logo"
                     height="75px"
                     width="246px"
+                    style={{
+                      height: isMobileScreen ? "50px" : "75px",
+                      width: isMobileScreen ? "150px" : "246px",
+                      objectFit: isMobileScreen ? "contain" : "contain",
+                      margin: isMobileScreen && "auto",
+                    }}
                   />
                 </div>
-                <div className="media-body media-body text-right">
+                <div className="media-body media-body text-right" style={{flex:isMobileScreen?"none":"auto"}}>
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => {
