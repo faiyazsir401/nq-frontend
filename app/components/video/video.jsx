@@ -475,7 +475,7 @@ useEffect(() => {
       });
 
       peer.on("error", (error) => {
-        // console.error("Peer error:", error);
+        console.error("Peer error:", error);
       });
 
       peer.on("call", (call) => {
