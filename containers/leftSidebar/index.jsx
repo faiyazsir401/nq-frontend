@@ -771,7 +771,7 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                     <p className="menu-name px-2">Contact Us</p>
                   </li>
 
-                  {/* Practice Session */}
+                  {/* Practice Session 
 
                   <li>
 
@@ -783,10 +783,10 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                       <i class="fa fa-commenting-o" aria-hidden="true" />
                     </NavLink>
 
-                    {/* </div> */}
+                  
                     <p className="menu-name px-2">Practice Session</p>
                     
-                  </li>
+                  </li>*/}
                 </>}
 
                 <li>
