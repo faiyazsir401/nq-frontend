@@ -530,61 +530,63 @@ export const CourseItems = [
 ];
 
 export const QUICK_ACCESS = [
-  {
-    id: 1,
-    label: "What we offer",
-  },
-  {
-    id: 1,
-    label: "Careers",
-  },
-  {
-    id: 1,
-    label: "Leadership",
-  },
-  {
-    id: 1,
-    label: "About",
-  },
-  {
-    id: 1,
-    label: "Catalog",
-  },
-  {
-    id: 1,
-    label: "Degrees",
-  },
-  {
-    id: 1,
-    label: "For Enterprise",
-  },
-  {
-    id: 1,
-    label: "For Government",
-  },
-  {
-    id: 1,
-    label: "For Campus",
-  },
-  {
-    id: 1,
-    label: "Become a partner",
-  },
-  {
-    id: 1,
-    label: "Terms",
-  },
-  {
-    id: 1,
-    label: "Accessibility",
-  },
+  // {
+  //   id: 1,
+  //   label: "What we offer",
+  // },
+  // {
+  //   id: 1,
+  //   label: "Careers",
+  // },
+  // {
+  //   id: 1,
+  //   label: "Leadership",
+  // },
+  // {
+  //   id: 1,
+  //   label: "About",
+  // },
+  // {
+  //   id: 1,
+  //   label: "Catalog",
+  // },
+  // {
+  //   id: 1,
+  //   label: "Degrees",
+  // },
+  // {
+  //   id: 1,
+  //   label: "For Enterprise",
+  // },
+  // {
+  //   id: 1,
+  //   label: "For Government",
+  // },
+  // {
+  //   id: 1,
+  //   label: "For Campus",
+  // },
+  // {
+  //   id: 1,
+  //   label: "Become a partner",
+  // },
+  // {
+  //   id: 1,
+  //   label: "Terms",
+  // },
+  // {
+  //   id: 1,
+  //   label: "Accessibility",
+  // },
   {
     id: 1,
     label: "Privacy Policy",
+    link: "/privacy-policy",
   },
   {
     id: 1,
     label: "Terms & Conditions",
+    link: "/t&c",
   },
 ];
 export const NEW_COMMENTS = [
