@@ -41,6 +41,11 @@
   width: 100%;
 }
 
+.dropdown .selected-value{
+  width: 50vw;
+  max-width: 1024px;
+}
+
 @media (max-width: 425px) {
   .dropdown .selected-value input {
     line-height: 1.5;
@@ -124,14 +129,7 @@
   top: 40%;
 }
 
-.custom-dropdown-width {
-  width: 50vw;
-  @media (max-width: 575px) {
-    width: calc(100vw - 20px) !important;
-    max-width: 231px;
-    margin-right: 80px !important;
-  }
-}
+
 
 .custom-dropdown-width-landing {
   width: 50vw;
@@ -139,6 +137,10 @@
     width: 69vw !important;
     padding: 10px !important;
   }
+}
+
+.custom-dropdown-width-landing > :first-child {
+  justify-content: center;
 }
 
 .option-item {

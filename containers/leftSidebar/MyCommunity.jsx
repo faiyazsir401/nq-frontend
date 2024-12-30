@@ -1,6 +1,7 @@
 import React from 'react'
 import { X } from "react-feather";
 import MyCommunity from '../../app/components/myCommunity';
+import { authAction } from '../../app/components/auth/auth.slice';
 
 function MyCommunitySideBar(props) {
 
@@ -10,8 +11,13 @@ function MyCommunitySideBar(props) {
 
   return (
     <div className={`notification-tab dynemic-sidebar custom-scroll ${props.tab === "about_us" ? "active" : ""}`} id="about_us">
-      <div className="theme-title">
+     
+      <div className="theme-title ml-3 mb-2">
         <div className="media">
+          <div>
+            <h2>My Community</h2>
+            {/* <h4>Shared Media</h4> */}
+          </div>
           <div className="media-body text-right">
             {" "}
             <a
@@ -26,7 +32,8 @@ function MyCommunitySideBar(props) {
           </div>
         </div>
       </div>
-      <div style={{ maxHeight: '85vh', overflowY: 'auto',  }} className='transaction-table' >
+     
+      <div style={{ maxHeight: '85vh', overflowY: 'auto'  }} className='transaction-table' >
       <MyCommunity />
       </div>
     </div>

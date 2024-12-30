@@ -376,11 +376,7 @@ const NavHomePageCenterContainer = () => {
 
 
           <TabContent activeTab={activeTab}>
-           { modal?
-          <Image src={'/assets/images/rotate.png'} alt='Rotate Image' height="200" width="250" style={{
-            objectFit:"contain"
-          }} />
-          :
+           { 
             allTabs?.map((el, index) => {
               return (
                 <TabPane key={index} tabId={el?.value}>

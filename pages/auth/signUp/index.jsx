@@ -233,7 +233,7 @@ const Auth_SignUp = (props) => {
                         alt="images"
                       /> */}
                       <img
-                        src="/assets/images/netquix_logo.png"
+                        src="/assets/images/netquix_logo_beta.png"
                         alt="images"
                         className="header-image-logo"
                       />
@@ -313,8 +313,8 @@ const Auth_SignUp = (props) => {
                   </form>
                   <div className="termscondition">
                     <h4 className="mb-0">
-                      <span>*</span>Terms and conditions<b>&amp;</b>
-                      Privacy policy
+                    <a href="/t&c"><span>*</span>Terms and conditions<b>&amp;</b></a>
+                    <a href="/privacy-policy">Privacy policy</a>
                     </h4>
                   </div>
                 </div>

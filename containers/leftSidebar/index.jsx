@@ -66,7 +66,7 @@ const steps = [
   },
 ];
 
-const Index = (props) => {
+const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
   // const width = useWindowSize();
 
   const socket = useContext(SocketContext);
@@ -84,7 +84,7 @@ const Index = (props) => {
   // const [onlineUsers, setOnlineUsers] = useState(null);
 
   const { notifications, isLoading } = useAppSelector(notificationState)
-
+  const isMobileScreen  = useMediaQuery(600)
   console.log("notifications********>>>>>>>>>>>", notifications[0]?.isRead)
 
 
@@ -225,7 +225,7 @@ const Index = (props) => {
   };
 
   let isMobile = useMediaQuery(452)
-  const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
+
   
   useEffect(() => {
     const updateIsMobile = (event) => {
@@ -266,7 +266,7 @@ const Index = (props) => {
       if (isMobile) {
         getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '75px' : "0px";
       }
-      getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '65px' : "15px";
+      getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '65px' : "0px";
 
     }
 
@@ -335,7 +335,7 @@ const Index = (props) => {
     // }
     if (getNavbarTabs) {
       if (isMobile) {
-        getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '55px' : '0px';
+        getNavbarTabs.style.marginLeft = openCloseToggleSideNav ? '65px' : '0px';
         getNavbarTabs?.style?.setProperty('width', openCloseToggleSideNav ? 'calc(100vw - 55px)' : '100vw', 'important');
         if (openCloseToggleSideNav) {
           isNotification?.style?.setProperty('margin-left', '55px', '');
@@ -511,7 +511,7 @@ const Index = (props) => {
                     <i className="fa fa-calendar" />
                   </NavLink>
 
-                  <p className="menu-name px-2">Bookings</p>
+                  <p className="menu-name px-2">Upcoming Sessions</p>
                 </li>}
                 {accountType === AccountType?.TRAINEE && <li>
 
@@ -741,7 +741,7 @@ const Index = (props) => {
 
                   {/* About Us */}
 
-                  <li>
+                  {/* <li>
 
                     <NavLink id="sidebar-item-setting"
                       className={`icon-btn btn-light button-effect step2 ${activeTab === "about_us" ? "active" : ""
@@ -751,9 +751,9 @@ const Index = (props) => {
                       <i class="fa fa-address-card" aria-hidden="true" />
                     </NavLink>
 
-                    {/* </div> */}
+                    {/* </div> 
                     <p className="menu-name px-2">About Us</p>
-                  </li>
+                  </li> */}
 
                   {/* Contact Us */}
 
@@ -771,25 +771,22 @@ const Index = (props) => {
                     <p className="menu-name px-2">Contact Us</p>
                   </li>
 
-                  {/* Practice Session */}
+                  {/* Practice Session 
 
-                  {/* <li>
-                    <Tooltip
-                      title="Practice Session"
-                      position="top-end"
-                      size="small"
-                      trigger="mouseenter"
+                  <li>
+
+                  <NavLink id="sidebar-item-setting"
+                      className={`icon-btn btn-light button-effect step2 ${activeTab === "practice_session" ? "active" : ""
+                        }`}
+                      onClick={() => ToggleTab("practice_session")}
                     >
-                      <NavLink id="sidebar-item-setting"
-                        className={`icon-btn btn-light button-effect step2 ${activeTab === "practice_session" ? "active" : ""
-                          }`}
-                        onClick={() => ToggleTab("practice_session")}
-                      >
-                        <i class="fa fa-object-group" aria-hidden="true" />
-                      </NavLink>
-                    </Tooltip>
+                      <i class="fa fa-commenting-o" aria-hidden="true" />
+                    </NavLink>
+
+                  
                     <p className="menu-name px-2">Practice Session</p>
-                  </li> */}
+                    
+                  </li>*/}
                 </>}
 
                 <li>

@@ -29,6 +29,7 @@ import ReviewCard from "../../common/reviewCard";
 // import TrainerSessionInfo from "./TrainerSessionInfo";
 import Ratings from "./Ratings";
 import { authState } from "../auth/auth.slice";
+import { useMediaQuery } from "usehooks-ts";
 
 
 export const TrainerDetails = ({
@@ -130,7 +131,7 @@ export const TrainerDetails = ({
             (!trainerInfo?.isCategory && "media-body media-body text-right")
             }`}
         >
-          <div className="mr-2 mt-1">
+          <div className="ml-2 mt-3" style={{zIndex:999,position:"relative"}}>
             {!trainerInfo?.isCategory ? (
               <X
                 onClick={onClose}
@@ -160,7 +161,7 @@ export const TrainerDetails = ({
           </div>
         </div>
       )}
-      <div className={`custom-trainer-scroll `+isUserOnline&&`recent-user`} style={{ marginTop: "24px" }}>
+      <div className={`custom-trainer-scroll `+isUserOnline&&`recent-user`} >
         {trainerDetails?.select_trainer ? (
           <TrainerSessionInfo
             accordionData={accordionData}
@@ -213,7 +214,7 @@ const SelectedCategory = ({
     selectTrainer(data && data._id, data && data.trainer_id, data && data);
   };
   return (
-    <div className="row">
+    <div className="row" style={{margin:'0px'}}>
       <div className="col-12 col-lg-2 col-md-3 col-sm-3">
         <div className="d-flex justify-content-between">
           <h3>Filters </h3>
@@ -288,7 +289,7 @@ const SelectedCategory = ({
       </div>
       <div
         className="col-12 col-lg-px-5 col-lg-10 col-md-9 col-sm-9"
-        style={{ height: "89vh" }}
+        style={{marginTop:"20px",display:"flex",flexDirection:'column',alignItems:"center"}}
       >
         {!getTraineeSlots.length ? (
           <div
@@ -307,6 +308,7 @@ const SelectedCategory = ({
                 key={`trainers_${index}`}
                 style={{
                   borderRadius: "20px",
+                  width:"100%"
                 }}
               >
                 <div className="card-body" key={index}>
@@ -314,8 +316,8 @@ const SelectedCategory = ({
                     <div className="col-sm-3 col-md-3 col-lg-2 col-xl-2">
                       <img
                         src={
-                          data?.profilePicture
-                            ? Utils?.getImageUrlOfS3(data?.profilePicture)
+                          data?.profile_picture
+                            ? Utils?.getImageUrlOfS3(data?.profile_picture)
                             : "/assets/images/avtar/statusMenuIcon.jpeg"
                         }
                         className="cardimg"
@@ -421,7 +423,7 @@ const TrainerSessionInfo = ({
   };
   const trainer = findTrainerDetails() || trainerInfo;
   console.log(trainer, trainer?.fullName, "trainer");
-
+  const isMobileScreen = useMediaQuery('(max-width:600px)')
   useEffect(() => {
     if (trainer && trainer.extraInfo) {
       setAccordionsData((prev) => ({
@@ -473,8 +475,8 @@ const TrainerSessionInfo = ({
           <div>
             <img
               src={
-                trainer && trainer.profilePicture
-                  ? Utils?.getImageUrlOfS3(trainer.profilePicture)
+                trainer && trainer.profile_picture
+                  ? Utils?.getImageUrlOfS3(trainer.profile_picture)
                   : "/assets/images/avtar/statusMenuIcon.jpeg"
               }
               width={100}
@@ -492,7 +494,8 @@ const TrainerSessionInfo = ({
               style={{
                 display: 'flex',
                 justifyContent: 'flex-start',
-                alignItems: 'center'
+                alignItems: isMobileScreen?"baseline":'center',
+                flexDirection:isMobileScreen?"column":"row"
               }}>
               <h2>
                 {trainer && trainer ? trainer.fullname || trainer?.fullName : null}

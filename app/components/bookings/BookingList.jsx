@@ -27,6 +27,7 @@ import ReactStrapModal from "../../common/modal";
 import { commonState } from "../../common/common.slice";
 import { traineeAction, traineeState } from "../trainee/trainee.slice";
 import OrientationModal from "../modalComponent/OrientationModal";
+import { useMediaQuery } from "usehooks-ts";
 
 
 
@@ -127,7 +128,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         dispatch(getScheduledMeetingDetailsAsync(payload));
       }
     }
-  }, [tabBook, activeCenterContainerTab]);
+  }, [tabBook,activeCenterContainerTab]);
 
   const showRatingLabel = (ratingInfo) => {
     // for trainee we're showing recommends
@@ -173,6 +174,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
   const handleAddRatingModelState = (data) => {
     dispatch(addRating(data));
+   
   };
 
   const renderBooking = (
@@ -268,6 +270,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             selectedClips={selectedClips}
             setSelectedClips={setSelectedClips}
             setIsOpenID={setIsOpenID}
+            isOpenID= {isOpenID}
             addTraineeClipInBookedSession={addTraineeClipInBookedSession}
             trainee_clips={trainee_clips}
             report={report}
@@ -314,7 +317,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     const localEndTime = formatTimeInLocalZone(end_time);
     
     console.log("bookingInfo:" + _id, localStartTime); // Displaying the converted start time
-
+    const isMobileScreen = useMediaQuery('(max-width:600px)')
     return (
       <div
         className="card mb-4 mt-4 trainer-bookings-card"
@@ -349,7 +352,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             </div>
           </div>
         </div>
-        <div className="card-footer">
+        <div className="card-footer" style={{padding:isMobileScreen?"5px":"auto"}}>
           <div className="row">
             <div className="col-11">{showRatingLabel(ratings)}</div>
             <div className="col-12 col-lg-auto">
@@ -453,6 +456,8 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
       />
     );
   };
+
+  console.log("scheduledMeetingDetails",scheduledMeetingDetails)
   return (
     <div>
       {!scheduledMeetingDetails.length ? (

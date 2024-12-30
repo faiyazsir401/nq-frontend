@@ -76,13 +76,13 @@ export const getScheduledMeetingDetails = async (payload) => {
     });
 
     // Filter based on the status provided in payload
-    if (payload.status === "upcoming") {
+    if (payload?.status === "upcoming") {
       filteredData = filteredData.filter(
         (item) => item.status === "booked" || item.status === "confirmed"
       );
-    } else if (payload.status === "canceled") {
+    } else if (payload?.status === "canceled") {
       filteredData = filteredData.filter((item) => item.status === "canceled");
-    } else if (payload.status === "completed") {
+    } else if (payload?.status === "completed") {
       filteredData = filteredData.filter((item) => item.status === "completed");
     }
 
@@ -250,7 +250,7 @@ export async function pushProfilePhotoToS3(
       },
     })
     .then((response) => {
-      cb();
+      cb()
     })
     .catch((error) => {
       console.error("Error:", error);

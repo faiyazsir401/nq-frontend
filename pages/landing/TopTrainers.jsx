@@ -6,11 +6,7 @@ import {
   CardText,
   CardTitle,
   Container,
-  Modal,
-  ModalBody,
-  Nav,
-  NavItem,
-  NavLink,
+
 } from "reactstrap";
 import { useDispatch } from "react-redux";
 import { getTraineeWithSlotsAsync } from "../../app/components/trainee/trainee.slice";
@@ -22,6 +18,7 @@ import { Utils } from "../../utils/utils";
 import BookingTable from "../../app/components/trainee/scheduleTraining/BookingTable";
 import { object } from "prop-types";
 import { useMediaQuery } from "usehooks-ts";
+import Modal from "../../app/common/modal";
 
 const filter = (category, trainers) => {
   const filteredTrainers = trainers.filter(
@@ -77,7 +74,7 @@ const TopTrainers = (props) => {
       }
     })();
   }, []);
-
+  console.log("trainerInfo?.userInfo",trainerInfo?.userInfo)
   return (
     <Container>
       <div className="text-center mb-5 d-flex flex-column">
@@ -103,54 +100,51 @@ const TopTrainers = (props) => {
 
       {/* Trainer Details Modal */}
       {trainerInfo?.userInfo && (
-        <Modal className="recent-user-modal" isOpen={isModalOpen}>
-          <ModalBody style={{minHeight:"100vh"}}>
-            <TrainerDetails
-              selectOption={trainerInfo}
-              isPopoverOpen={props.isPopoverOpen}
-              categoryList={props.categoryList}
-              key={`trainerDetails`}
-              trainerInfo={trainerInfo?.userInfo}
-              selectTrainer={(_id, trainer_id, data) => {
-                if (_id) {
-                  setSelectedTrainer({
-                    ...selectedTrainer,
-                    id: _id,
-                    trainer_id,
-                    data,
-                  });
-                }
-                setTrainerInfo((prev) => ({
-                  ...prev,
-                  userInfo: {
-                    ...prev?.userInfo,
-                    ...data,
-                  },
-                }));
-              }}
-              onClose={() => {
-                setTrainerInfo((prev) => ({
-                  ...prev,
-                  userInfo: undefined,
-                }));
-                setParams((prev) => ({
-                  ...prev,
-                  search: null,
-                }));
-                setIsModalOpen(false);
-              }}
-              element={
-                <BookingTable
-                  selectedTrainer={selectedTrainer}
-                  trainerInfo={trainerInfo}
-                  setStartDate={setStartDate}
-                  startDate={startDate}
-                  getParams={getParams}
-                />
-              }
+        <Modal className="recent-user-modal" allowFullWidth={true} isOpen={isModalOpen} element={<TrainerDetails
+          selectOption={trainerInfo}
+          isPopoverOpen={props.isPopoverOpen}
+          categoryList={props.categoryList}
+          key={`trainerDetails`}
+          trainerInfo={trainerInfo?.userInfo}
+          selectTrainer={(_id, trainer_id, data) => {
+            if (_id) {
+              setSelectedTrainer({
+                ...selectedTrainer,
+                id: _id,
+                trainer_id,
+                data,
+              });
+            }
+            setTrainerInfo((prev) => ({
+              ...prev,
+              userInfo: {
+                ...prev?.userInfo,
+                ...data,
+              },
+            }));
+          }}
+          onClose={() => {
+            setTrainerInfo((prev) => ({
+              ...prev,
+              userInfo: undefined,
+            }));
+            setParams((prev) => ({
+              ...prev,
+              search: null,
+            }));
+            setIsModalOpen(false);
+          }}
+          element={
+            <BookingTable
+              selectedTrainer={selectedTrainer}
+              trainerInfo={trainerInfo}
+              setStartDate={setStartDate}
+              startDate={startDate}
+              getParams={getParams}
             />
-          </ModalBody>
-        </Modal>
+          }
+        />}/>
+
       )}
     </Container>
   );
@@ -274,6 +268,7 @@ const TrainerCard = ({ trainer, setter }) => {
           className="text-white py-2 px-3 rounded width-fit btn-primary"
           style={{ cursor: "pointer", fontSize: isMobileScreen?10:14 }}
           onClick={() => {
+            console.log("setter.setTrainerInfo",trainer)
             setter.setTrainerInfo((prev) => ({
               ...prev,
               userInfo: trainer,

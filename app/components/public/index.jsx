@@ -1127,7 +1127,7 @@ const SelectedCategory = ({
       </div>
       <div
         className="col-12 col-lg-px-5 col-lg-10 col-md-9 col-sm-9"
-        style={{ height: "89vh" }}
+        style={{marginTop:"20px",display:"flex",flexDirection:'column',alignItems:"center"}}
       >
         {!getTraineeSlots.length ? (
           <div

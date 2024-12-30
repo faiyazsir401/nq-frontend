@@ -335,11 +335,12 @@ const FileSection = (props) => {
                               poster={Utils?.generateThumbnailURL(clp)}
                               style={{
                                 position: "relative",
-                                height: "180px",
+                              
                                 width: "100%",
                                 border: "4px solid #b4bbd1",
                                 borderRadius: "5px",
                                 objectFit: "cover",
+                                aspectRatio:"1/1"
                               }}  >
                               <source src={Utils?.generateVideoURL(clp)} type="video/mp4" />
                             </video>
@@ -387,13 +388,14 @@ const FileSection = (props) => {
                           }}
                         >
                           <Tooltip title={clp?.clips?.title} position="top" trigger="mouseenter">
-                            <video style={{
+                            <video poster={Utils?.generateThumbnailURL(clp?.clips)} style={{
                               position: "relative",
-                              height: "180px",
+                            
                               width: "100%",
                               border: "4px solid #b4bbd1",
                               borderRadius: "5px",
                               objectFit: "cover",
+                                aspectRatio:"1/1"
                             }}  >
                               <source src={Utils?.generateVideoURL(clp?.clips)} type="video/mp4" />
                             </video>

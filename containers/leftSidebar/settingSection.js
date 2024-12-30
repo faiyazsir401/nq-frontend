@@ -9,7 +9,7 @@ import config from "../../config/customizerConfig";
 import * as Yup from "yup";
 
 import { useAppDispatch, useAppSelector } from "../../app/store";
-import { authState } from "../../app/components/auth/auth.slice";
+import { authState, getMeAsync } from "../../app/components/auth/auth.slice";
 import {
   AccountType,
   LOCAL_STORAGE_KEYS,
@@ -41,6 +41,7 @@ import { UpdateHourlyRateForm } from "../../app/components/trainer/settings/hour
 import TimePicker from "rc-time-picker";
 import { SettalInBankAccount } from "../../app/components/trainer/settings/settal_in_bank";
 import { settelReqestToBankAccount } from "../../app/components/trainer/trainer.api";
+import { updateAccountPrivacy } from "../../app/common/common.api";
 
 const SettingSection = (props) => {
   const dispatch = useAppDispatch();
@@ -302,6 +303,17 @@ const SettingSection = (props) => {
     alert(result?.msg);
   };
 
+  const updatePrivateAccount = async (isPrivate) => {
+    try {
+      const result = await updateAccountPrivacy({isPrivate})
+       dispatch(getMeAsync());
+      toast.success(result?.msg);
+    } catch (error) {
+      toast.error("updateAccountPrivacy -> error");
+      console.log("updateAccountPrivacy -> error", error);
+    }
+  }
+
   return (
     <div
       className={`settings-tab submenu-width dynemic-sidebar custom-scroll ${
@@ -448,7 +460,7 @@ const SettingSection = (props) => {
           className={`block ${
             settingTab === "account" ? "open custom-block-height" : ""
           }`}
-          style={{ maxWidth: "98%" }}
+          style={{ maxWidth: "95%" }}
         >
           <div className="media">
             <div className="media-body">
@@ -510,7 +522,7 @@ const SettingSection = (props) => {
                 </div>
               </div>
             </div>
-            {/* <div className="card">
+            <div className="card">
               <div
                 className="card-header"
                 onClick={() =>
@@ -532,7 +544,25 @@ const SettingSection = (props) => {
               <div className={`collapse ${collapseShow.privacy ? "show" : ""}`}>
                 <div className="card-body">
                   <ul className="privacy">
-                    <li>
+                    <li className="d-flex flex-column">
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div className="media-body">
+                          <h5 className="pt-0">Private Account</h5>
+                        </div>
+                        <div className="media-right">
+                          <Label className="switch mb-0">
+                            <Input type="checkbox" checked={userInfo.isPrivate} onChange={(e)=>updatePrivateAccount(e.target.checked)}/>
+                            <span className="switch-state"></span>
+                          </Label>
+                        </div>
+                      </div>
+
+                      <p>
+                        {" "}
+                        <b>Note : </b>Turn you account private. People will not be able to add you as friend in the community. Your existing friends will stay connected.
+                      </p>
+                    </li>
+                    {/* <li>
                       <div className="media-body">
                         <h5>Last seen</h5>
                       </div>
@@ -627,11 +657,11 @@ const SettingSection = (props) => {
                           <span className="switch-state"></span>
                         </Label>
                       </div>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </div>
-            </div> */}
+            </div>
             <div className="card">
               <div
                 className="card-header collapsed"
@@ -752,6 +782,7 @@ const SettingSection = (props) => {
                 </div>
               </div>
             </div>
+
             {accountType === AccountType.TRAINER ? (
               <React.Fragment>
                 <div className="card">
@@ -1065,7 +1096,7 @@ const SettingSection = (props) => {
             className={`block ${
               settingTab === "my-profile" ? "open custom-block-height" : ""
             }`}
-            style={{ maxWidth: "98%",paddingBottom:"80px" }}
+            style={{ maxWidth: "95%", paddingBottom: "80px" }}
           >
             <div className="media">
               <div className="media-body">
@@ -1309,7 +1340,7 @@ const SettingSection = (props) => {
               className={`block ${
                 settingTab === "integratin" ? "open custom-block-height" : ""
               }`}
-              style={{ maxWidth: "98%" }}
+              style={{ maxWidth: "95%" }}
             >
               <div className="media">
                 <div className="media-body">
@@ -1341,7 +1372,7 @@ const SettingSection = (props) => {
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={(value) => {
-                  console.log(value)
+                  console.log(value);
                   const payload = {
                     ...userInfo?.extraInfo,
                     social_media_links: value,
@@ -1866,7 +1897,7 @@ const SettingSection = (props) => {
             className={`block ${
               settingTab === "help" ? "open custom-block-height" : ""
             }`}
-            style={{ maxWidth: "98%" }}
+            style={{ maxWidth: "95%" }}
           >
             <div className="media">
               <div className="media-body">

@@ -44,6 +44,7 @@
     "prop-types": "^15.8.1",
     "rc-time-picker": "^3.7.3",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.10.7",
     "react-color": "^2.19.3",
     "react-copy-to-clipboard": "^5.0.4",
     "react-datepicker": "^4.16.0",

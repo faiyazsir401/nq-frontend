@@ -5,6 +5,7 @@ import { authState } from "../auth/auth.slice";
 import { AccountType, LOCAL_STORAGE_KEYS } from "../../common/constants";
 import {
   getRecentStudent,
+  getRecentTrainers,
   getTraineeClips,
 } from "../NavHomePage/navHomePage.api";
 import Modal from "../../common/modal";
@@ -22,6 +23,8 @@ const placeholderImageUrl = "/assets/images/demoUser.png"; // Placeholder image 
 const RecentUsers = () => {
   const [accountType, setAccountType] = useState("");
   const [recentStudent, setRecentStudent] = useState([]);
+  const [recentTrainer, setRecentTrainer] = useState([]);
+
   const [recentFriends, setRecentFriends] = useState(
     Array.from({ length: 5 }, () => placeholderImageUrl)
   );
@@ -32,6 +35,7 @@ const RecentUsers = () => {
   
   useEffect(() => {
     getRecentStudentApi();
+    getRecentTrainerApi();
     setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE));
   }, []);
 
@@ -39,6 +43,15 @@ const RecentUsers = () => {
     try {
       let res = await getRecentStudent();
       setRecentStudent(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getRecentTrainerApi = async () => {
+    try {
+      let res = await getRecentTrainers();
+      setRecentTrainer(res?.data);
     } catch (error) {
       console.log(error);
     }
@@ -68,7 +81,7 @@ const RecentUsers = () => {
         className="Recent-Heading"
         style={{ textAlign: "center", fontSize: "20px" }}
       >
-        Recent {accountType === AccountType?.TRAINER ? "Students" : "Friends"}
+        Recent {accountType === AccountType?.TRAINER ? "Students" : "Trainers"}
       </h2>
       <div
         className="card-body Recent"
@@ -105,7 +118,7 @@ const RecentUsers = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    border: "2px solid rgb(0, 0, 128)",
+                    
                     // padding : "5px",
                     textAlign: "center",
                     overflow: "hidden",
@@ -114,7 +127,8 @@ const RecentUsers = () => {
                   <img
                     className="Image-Division"
                     style={{
-                      marginRight: "0px"
+                      marginRight: "0px",
+                      border: "2px solid rgb(0, 0, 128)",
                     }}
                     key={index}
                     // src={item?.profile_picture}
@@ -131,19 +145,19 @@ const RecentUsers = () => {
                       SetselectedStudentData({ ...item });
                     }}
                   />
-                  <h5 class="d-inline-block text-truncate" style={{ maxWidth: "80px", marginBottom: "5px" }}>{item?.fullname}</h5>
+                  <h5 class="d-inline-block" style={{ maxWidth: "80px", marginBottom: "5px" }}>{item?.fullname}</h5>
                 </div>
               ))}
 
             {accountType === AccountType?.TRAINEE &&
-              recentFriends?.map((item, index) => (
+              recentTrainer?.map((item, index) => (
                 <div
                   style={{
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    border: "2px solid rgb(0, 0, 128)",
+                    
                     // padding: "5px",
                     textAlign: "center",
                     overflow:"hidden"
@@ -152,16 +166,17 @@ const RecentUsers = () => {
                   <img
                     className="Image-Division"
                     style={{
-                      marginRight: "0px"
+                      marginRight: "0px",
+                      border: "2px solid rgb(0, 0, 128)",
                     }}
                     key={index}
                     // src={item || '/assets/images/demoUser.png'}
                     src={
-                      Utils?.getImageUrlOfS3(item) ||
+                      Utils?.getImageUrlOfS3(item.profile_picture) ||
                       "/assets/images/demoUser.png"
                     }
                     onClick={() =>
-                      handleStudentClick({ profile_picture: item })
+                      handleStudentClick({ profile_picture: item.profile_picture })
                     }
                     onError={(e) => {
                       e.target.src = "/assets/images/demoUser.png"; // Set default image on error
@@ -169,8 +184,8 @@ const RecentUsers = () => {
                     alt={`Recent Trainee ${index + 1}`}
 
                   />
-                  <h5 class="d-inline-block text-truncate" style={{ maxWidth: "80px", marginBottom: "5px" }}>
-                    Student {index + 1}
+                  <h5 class="d-inline-block " style={{ maxWidth: "80px", marginBottom: "5px" }}>
+                    {item.fullname}
                   </h5>
                 </div>
               ))}

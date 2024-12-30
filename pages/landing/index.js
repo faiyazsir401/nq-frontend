@@ -28,6 +28,7 @@ import YourCourses from "./yourCourses";
 import { SocketContext } from "../../app/components/socket";
 import { authAction } from "../../app/components/auth/auth.slice";
 import TopTrainers from "./TopTrainers";
+import FAQ from "./Faq";
 
 const Landing = () => {
   const socket = useContext(SocketContext);
@@ -89,6 +90,7 @@ const Landing = () => {
       {/* <YourCourses /> */}
       <HowItWorks />
       <WhyChooseUs />
+      <FAQ/>
       <FooterLanding masterRecords={data} />
       {/* </div> */}
     </React.Fragment>

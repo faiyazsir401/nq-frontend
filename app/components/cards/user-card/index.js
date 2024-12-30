@@ -103,28 +103,35 @@ const UserInfoCard = () => {
   };
 
   const handlePictureChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.addEventListener("load", () => {
-      const imageElement = new Image();
-      const imageUrl = reader.result?.toString() || "";
-      imageElement.src = imageUrl;
-
-      imageElement.addEventListener("load", (e) => {
-        // if (error) setError("");
-        const { naturalWidth, naturalHeight } = e.currentTarget;
-        if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
-          // setError("Image must be at least 150 x 150 pixels.");
-          return setSelectedImage("");
-        }
+    console.log("errorinevent",e)
+    try {
+      const file = e.target.files?.[0];
+      console.log("errorinfile",file)
+      if (!file) return;
+  
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        const imageElement = new Image();
+        const imageUrl = reader.result?.toString() || "";
+        imageElement.src = imageUrl;
+  
+        imageElement.addEventListener("load", (e) => {
+          // if (error) setError("");
+          const { naturalWidth, naturalHeight } = e.currentTarget;
+          if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
+            // setError("Image must be at least 150 x 150 pixels.");
+            return setSelectedImage("");
+          }
+        });
+        setSelectedImage(imageUrl);
+        setIsModalOpen(true);
       });
-      setSelectedImage(imageUrl);
-    });
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+  
+    } catch (error) {
+      console.log("errorincrop",error)
+    }
 
-    setIsModalOpen(true);
   };
 
   const handleRemovePreview = () => {
@@ -134,8 +141,9 @@ const UserInfoCard = () => {
   };
 
   const handleSavePicture = async (croppedImage) => {
+    console.log("croppedImage",croppedImage)
     if (croppedImage) {
-      const newFileObj = await Utils?.blobToFile(
+      const newFileObj = Utils?.blobToFile(
         croppedImage,
         `${profile?.fullname}.png`,
         "image/png"
@@ -145,7 +153,7 @@ const UserInfoCard = () => {
   };
 
   const handelSelectFile = async (selectedImage, bolb) => {
-
+    console.log("selectedImage",selectedImage)
     if (!selectedImage) {
       toast.error("Please select a Image");
       return;
@@ -253,13 +261,13 @@ const UserInfoCard = () => {
                   profile?.extraInfo?.hourly_rate
                 )}
               </h3>
-              <a
+              <button
                 className="icon-btn btn-outline-light btn-sm edit-btn Trainer"
-                href="#"
+                type="button"
                 onClick={isEditing ? handleSaveClick : handleEditClick}
               >
                 {isEditing ? <Save /> : <Edit />}
-              </a>
+              </button>
             </div>
           )}
 

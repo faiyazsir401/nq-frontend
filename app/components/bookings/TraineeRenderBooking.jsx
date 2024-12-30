@@ -6,7 +6,7 @@ import {
   getScheduledMeetingDetailsAsync,
   updateBookedSessionScheduledMeetingAsync,
 } from "../common/common.slice";
-import { CovertTimeAccordingToTimeZone, Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, navigateToMeeting, Utils } from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
@@ -23,6 +23,7 @@ import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
 import { notificiationTitles } from "../../../utils/constant";
 import { DateTime } from "luxon";
+import { useMediaQuery } from "usehooks-ts";
 
 const TraineeRenderBooking = ({
   _id,
@@ -41,6 +42,7 @@ const TraineeRenderBooking = ({
   selectedClips,
   setSelectedClips,
   setIsOpenID,
+  isOpenID,
   addTraineeClipInBookedSession,
   trainee_clips,
   report,
@@ -84,7 +86,11 @@ const TraineeRenderBooking = ({
     // Compare the current date and time (date + hour:minute) with start and end time
     const isDateSame = currentDate === startDate && currentDate === endDate;
     const isWithinTimeFrame  = isDateSame && currentTimeOnly >= startTimeOnly && currentTimeOnly <= endTimeOnly;
-  
+    const isCurrentTimeAfterEndTime= currentTime > endTime
+    console.log("currentTime",currentTime)
+    console.log("endTime",endTime)
+    console.log("isCurrentTimeAfterEndTime",isCurrentTimeAfterEndTime)
+
     console.log('Is the current date the same as start and end date?', isDateSame); 
     console.log('Is the current time within the time range?', isWithinTimeFrame);
   const canShowRatingButton =
@@ -126,12 +132,15 @@ const TraineeRenderBooking = ({
     );
   };
 
+  const isMobileScreen = useMediaQuery('(max-width:600px)')
+  console.log("ratings_id+",_id,bookingInfo)
   return (
     <React.Fragment>
       {status !== BookedSession.canceled &&
         activeTabs !== BookedSession.canceled &&
-        isMeetingDone && <h3 className="mt-1">Completed</h3>}
-      {canShowRatingButton && status === BookedSession.completed ? (
+        isMeetingDone && ratings && <h3 className="mt-1">Completed</h3>}
+      {!ratings &&
+           (isCurrentTimeAfterEndTime ||isMeetingDone)&& status === BookedSession.completed ?  (
         <button
           className={`btn btn-success button-effect btn-sm mr-2 my-1`}
           type="button"
@@ -160,8 +169,9 @@ const TraineeRenderBooking = ({
               {status !== BookedSession.canceled && (
                 <React.Fragment>
                   <button
-                    className="btn btn-success button-effect btn-sm mr-2 btn_cancel my-1"
+                    className={`btn btn-success button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
                     type="button"
+                    style={{paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"}}
                     onClick={() => {
                       if (trainee_clips?.length > 0)
                         setSelectedClips(trainee_clips);
@@ -173,11 +183,14 @@ const TraineeRenderBooking = ({
                   </button>
                   {status === BookedSession.booked ? (
                     <button
-                      className="btn btn-dark button-effect btn-sm mr-2 btn_cancel my-1"
+                    className={`btn btn-dark button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
+                    
                       type="button"
+                    
                       style={{
                         cursor:
                           status === BookedSession.booked && "not-allowed",
+                          paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                       }}
                       disabled={status === BookedSession.booked}
                     >
@@ -185,17 +198,20 @@ const TraineeRenderBooking = ({
                     </button>
                   ) : (
                     <button
-                      className="btn btn-primary button-effect btn-sm mr-2 my-1"
+                    className={`btn btn-primary button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
+            
                       type="button"
                       style={{
                         cursor:
                           status === BookedSession.confirmed && "not-allowed",
+                          paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                       }}
                       disabled={status === BookedSession.confirmed}
                     >
                       {BookedSession.confirmed}
                     </button>
                   )}
+                  {isOpenID === _id &&
                   <AddClip
                     isOpen={isOpen}
                     onClose={() => {
@@ -208,29 +224,21 @@ const TraineeRenderBooking = ({
                     clips={clips}
                     shareFunc={addTraineeClipInBookedSession}
                     sendNotfication={null}
-                  />
+                  />}
                 </React.Fragment>
               )}
               {status === BookedSession.confirmed && (
                 <button
-                  className="btn btn-primary button-effect btn-sm mr-2 my-1"
+                className={`btn btn-primary button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
+
                   type="button"
                   style={{
                     cursor: isWithinTimeFrame ? "pointer" : "not-allowed",
+                    paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                   }}
                   disabled={!isWithinTimeFrame}
                   onClick={() => {
-                    handleClick();
-                    setStartMeeting({
-                      ...startMeeting,
-                      id: _id,
-                      isOpenModal: true,
-                      traineeInfo: trainee_info,
-                      trainerInfo: trainer_info,
-                      iceServers: bookingInfo.iceServers,
-                      trainee_clip: bookingInfo.trainee_clips,
-                    });
-
+                    navigateToMeeting(_id)
                     sendNotifications({
                       title: notificiationTitles.sessionStrated,
                       description: `${trainee_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
@@ -244,13 +252,14 @@ const TraineeRenderBooking = ({
                 </button>
               )}
               <button
-                className={`btn btn-danger button-effect btn-sm btn_cancel my-1`}
+                className={`btn btn-danger button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
                 type="button"
                 style={{
                   cursor:
                     status === BookedSession.canceled || isStartButtonEnabled
                       ? "not-allowed"
                       : "pointer",
+                      paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
                 }}
                 disabled={
                   status === BookedSession.canceled || isStartButtonEnabled
@@ -286,11 +295,12 @@ const TraineeRenderBooking = ({
           )}
           {isMeetingCanceled() && isMeetingDone && (
             <button
-              className="btn btn-danger button-effect btn-sm  my-1"
+             className={`btn btn-danger button-effect btn-sm ${isMobileScreen?"mr-1": "mr-2"} btn_cancel my-1 `}
               type="button"
               style={{
                 cursor:
                   status === BookedSession.canceled ? "not-allowed" : "pointer",
+                  paddingLeft:isMobileScreen?"5px":"auto",paddingRight:isMobileScreen?"5px":"auto"
               }}
               disabled={isMeetingCanceled()}
             >

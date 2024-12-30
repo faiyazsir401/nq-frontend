@@ -70,6 +70,7 @@ import ShareClipsCard from "../../share-clips";
 import BookingTable from "./BookingTable";
 import Trainer from "./Trainer";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
+import { fetchAllLatestOnlineUsers } from "../../auth/auth.api";
 
 const settings = {
   autoplay: false,
@@ -107,16 +108,26 @@ const settings = {
 
 const { isSidebarToggleEnabled } = bookingsAction;
 const { removePaymentIntent } = traineeAction;
-const ScheduleTraining = () => {
+const ScheduleTraining = ({openCloseToggleSideNav}) => {
   const socket = useContext(SocketContext);
   const masterRecords = useAppSelector(masterState).master;
   const [data, setData] = useState();
-  const { userInfo, sidebarModalActiveTab, onlineUsers, selectedOnlineUser } =
+  const { userInfo, sidebarModalActiveTab,  selectedOnlineUser } =
     useAppSelector(authState);
 
   useEffect(() => {
     setData(masterRecords?.masterData);
   }, [masterRecords]);
+  const [activeTrainer, setActiveTrainer] = useState([]);
+
+  const getAllLatestActiveTrainer = async () => {
+    const response = await fetchAllLatestOnlineUsers();
+
+    if (response.code === 200) {
+      setActiveTrainer(response.result);
+    }
+  };
+
 
   const dispatch = useAppDispatch();
   const { status, getTraineeSlots, transaction } = useAppSelector(traineeState);
@@ -147,7 +158,7 @@ const ScheduleTraining = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [err, setErr] = useState({ email: false, video: false });
-  const width768 = useMediaQuery(768);
+  const isMobileScreen = useMediaQuery(768);
   const handleSelectClip = () => {
     setIsModalOpen(true);
   };
@@ -157,6 +168,7 @@ const ScheduleTraining = () => {
 
   useEffect(() => {
     getmyClips();
+    getAllLatestActiveTrainer();
   }, []);
 
   const addTraineeClipInBookedSession = async () => {
@@ -728,7 +740,7 @@ const ScheduleTraining = () => {
       </Popover>
     ));
   };
-
+  console.log("isMobileScreen",isMobileScreen)
   const renderSearchMenu = () => (
     <div
       onScroll={() => {
@@ -740,10 +752,10 @@ const ScheduleTraining = () => {
       className="bookings custom-scroll custom-trainee-dashboard booking-container"
       id="booking-lesson"
     >
-      <div className="row">
+      <div className="row"  style={{margin:"0px"}}>
         <div className="trainer-recommended">
-          <h1 style={{ marginBottom: "10px" }}>Book Your Lesson now</h1>
-          <p>
+          <h1 style={{ marginBottom: "10px",fontSize:isMobileScreen?"22px":"auto" }}>Book Your Lesson now</h1>
+          <p style={{fontSize:isMobileScreen?"14px":"20px"}}>
             Are you ready to embark on a transformative journey towards your
             personal and professional development? We are here to revolutionize
             the way you learn and connect with expert trainers. Our cutting-edge
@@ -807,27 +819,28 @@ const ScheduleTraining = () => {
           handleChange={(value) => {
             setParams({ search: value });
           }}
+          activeTrainer={activeTrainer}
         />
       </div>
       <div className="trainer-recommended Slider  " style={{ height: "90px" }}>
-        <div className="row">
-          <div className="col">
+        <div className="row" style={{margin:"0px",width:"60vw",display:"flex",justifyContent:"center",margin:"auto"}}>
+          <div className="col" style={{display:"flex",justifyContent:"center"}}>
             <Slider {...settings}>
               {data?.category?.map((item, index) => (
                 <div key={`slider-item-${index}`}>
                   <span
                     className="badge badge-light lg"
                     style={{
-                      padding: "18px", // Add your desired padding here
-                      alignItems: "center",
-                      fontSize: "14px",
-                      color: "black",
-                      cursor: "pointer",
-                      width: "80%",
-                      height: "0",
-                      display: "flex",
-                      justifyContent: "center", // Center content horizontally
-                      flexDirection: "column",
+                      padding:isMobileScreen ? "10px":"18px", // Add your desired padding here
+                      alignItems:isMobileScreen ? "auto": "center",
+                      fontSize:isMobileScreen ? "auto": "14px",
+                      color: isMobileScreen ? "auto":"black",
+                      cursor:isMobileScreen ? "auto": "pointer",
+                      width:isMobileScreen ? "auto": "80%",
+                      height:isMobileScreen ? "auto": "0",
+                      display:isMobileScreen ? "auto": "flex",
+                      justifyContent: isMobileScreen ? "auto":"center", // Center content horizontally
+                      flexDirection: isMobileScreen ? "auto":"column",
                     }}
                     onClick={() => {
                       setTrainerInfo((prev) => ({
@@ -851,64 +864,57 @@ const ScheduleTraining = () => {
         </div>
       </div>
 
-      <div className="trainer-recommended REC">
+      <div className="text-center">
         <h2>Online Trainers</h2>
         <div
           className="Recommended"
-          style={{ display: "flex", flexDirection: "row" }}
+          style={{ display: "flex", flexDirection: "row",justifyContent:"center" }}
         >
-          {onlineUsers && Object.values(onlineUsers)?.length ? (
-            Object.values(onlineUsers)?.length <= 3 ? (
+          {activeTrainer && activeTrainer?.length ? (
               <>
                 <Row
+            
                   lg={4}
-                  md={4}
-                  sm={4}
-                  xs={4}
+                  md={1}
+                  sm={1}
+                  xs={1}
                   style={{
                     display:'flex',
                     flexDirection:"row",
                     // justifyContent:"center",
-                    width: width768 ? "94%" : "70%",
-                    marginLeft:"30px"
-                 
+                    width: isMobileScreen ? "100%" : "100%",
+                    padding:"0px",
+                    justifyContent:"center"
                   }}
                   className="recent-slider recent-chat"
                 >
-                  {Object.values(onlineUsers)?.map((trainer, index) => {
+                  
+                 {activeTrainer?.map((data, index) => {
                     return (
-                      <Col key={index} className="item">
+                      <Col key={index} className="item" style={{maxWidth:isMobileScreen?"130px":"230px",padding:"15px"}}>
                         <Trainer
-                          trainer={trainer}
+                          trainer={data.trainer_info}
                           onClickFunc={() => {
                             setTrainerInfo((prev) => ({
                               ...prev,
-                              userInfo: trainer,
+                              userInfo: data.trainer_info,
                               selected_category: null,
                             }));
-                            setSelectedTrainer(trainer);
-                            setParams({ search: trainer?.fullname });
+                            setSelectedTrainer(data.trainer_info);
+                            setParams({ search: data.trainer_info?.fullname });
                           }}
+                          
                         />
                       </Col>
                     );
                   })}
                 </Row>
               </>
-            ) : (
-              <TrainerSlider
-                list={Object.values(onlineUsers)}
-                isRecommended={true}
-                setTrainerInfo = {setTrainerInfo}
-                setSelectedTrainer = {setSelectedTrainer}
-                setParams = {setParams}
-                isOnlineFuncCall = {true}
-              />
-            )
+            
           ) : (
             <h3>There are no Active Trainers</h3>
           )}
-          <div
+          {/* <div
             className="card trainer-profile-card Home-main-Cont"
             style={{
               height: "100%",
@@ -921,7 +927,7 @@ const ScheduleTraining = () => {
             <div className="card-body">
               <ShareClipsCard />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <div style={{ height: "11vh" }} />
@@ -966,6 +972,12 @@ const ScheduleTraining = () => {
             ...prev,
             search: null,
           }));
+          setTimeout(() => {
+            let getBookingLesson = document.querySelector(".booking-container");
+            if(getBookingLesson){
+              getBookingLesson.style.marginLeft = openCloseToggleSideNav ? '65px' : "0px";
+            }
+          }, 10);
         }}
         element={
           <BookingTable
@@ -974,8 +986,10 @@ const ScheduleTraining = () => {
             setStartDate={setStartDate}
             startDate={startDate}
             getParams={getParams}
+            isUserOnline={true}
           />
         }
+        isUserOnline={true}
       />
     );
   };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, CardImg, CardBody, CardTitle, CardText } from 'reactstrap';
+import "./index.css"
 
 const teamMembers = [
   {
@@ -29,19 +30,25 @@ const teamMembers = [
 
 const AboutUs = () => {
   return (
+   
+  
     <Container className="about-us">
+        <h2 className="text-center mt-5">About Us</h2>
       <Row>
+      
         <Col md="12">
           <p
             style={{
               fontSize: '16px',
               margin: '10px 0',
               fontWeight: '500',
+              textAlign:"center"
             }}
+            
           >
-            Welcome to our trainee and trainer session site! Our goal is to provide top-notch training programs that help individuals achieve their professional aspirations.
+            NetQwix is a community where passionate Experts and Enthusiasts meet LIVE for “Qwick Sessions over the Net”
           </p>
-          <p
+          {/* <p
             style={{
               fontSize: '16px',
               margin: '10px 0',
@@ -49,10 +56,20 @@ const AboutUs = () => {
             }}
           >
             Our mission is to foster a collaborative and supportive environment where both trainers and trainees can thrive. We are committed to delivering high-quality training and development opportunities.
-          </p>
+          </p> */}
+        </Col>
+
+        <Col md="12" style={{display:"flex"}} className='mt-4 mb-2'>
+      <div className="logo" style={{margin:"auto"}}>
+          <img
+            src="/assets/images/netquix_logo_beta.png"
+            alt="logo"
+            className="header-image-logo"
+          />
+        </div>
         </Col>
       </Row>
-      <h2 className="mt-4 mb-4">Meet Our Team</h2>
+      {/* <h2 className="mt-4 mb-4">Meet Our Team</h2>
       <Row>
         {teamMembers.map((member) => (
           <Col md="4" key={member.id} className="mb-4">
@@ -87,7 +104,7 @@ const AboutUs = () => {
             </Card>
           </Col>
         ))}
-      </Row>
+      </Row> */}
     </Container>
   );
 };

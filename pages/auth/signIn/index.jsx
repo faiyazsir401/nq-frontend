@@ -57,7 +57,7 @@ const Auth_SignIn = ({isRedirect = true}) => {
                     <Link href={routingPaths.landing}>
                       {/* <div className="chitchat-loader"> */}
                       <img
-                        src="/assets/images/netquix_logo.png"
+                        src="/assets/images/netquix_logo_beta.png"
                         alt="images"
                         className="image-fluid header-image-logo"
                       />
@@ -161,9 +161,9 @@ const Auth_SignIn = ({isRedirect = true}) => {
                     </ul>
                   </div>
                   <div className="termscondition">
-                    <h4 className="mb-0">
-                      <span>*</span>Terms and condition<b>&amp;</b>Privacy
-                      policy
+                  <h4 className="mb-0">
+                    <a href="/t&c"><span>*</span>Terms and conditions<b>&amp;</b></a>
+                    <a href="/privacy-policy">Privacy policy</a>
                     </h4>
                   </div>
                 </div>

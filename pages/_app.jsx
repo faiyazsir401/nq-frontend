@@ -85,7 +85,7 @@ export default function MyAppComponent({ Component, pageProps }) {
               //   <h3>Simple, secure messaging for fast connect to world..!</h3>
               // </div>
               <div className="chitchat-loader">
-                <img src="/assets/images/netquix_logo.png" alt="images" />
+                <img src="/assets/images/netquix_logo_beta.png" alt="images" />
               </div>
             )}
             <div>

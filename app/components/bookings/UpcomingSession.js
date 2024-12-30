@@ -119,13 +119,7 @@ const UpcomingSession = ({ accountType = null }) => {
     };
   }, [isMobile]);
 
-  const sendNotifications = (data) => {
-    socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
-  };
-
-  if(modal){
-    return <OrientationModal isOpen={modal}/>
-  }else{
+  
     return (
       <>
         <div>
@@ -151,7 +145,7 @@ const UpcomingSession = ({ accountType = null }) => {
                         activeTabs === tabName ? "text-primary" : "text-dark"
                       } text-capitalize`}
                       onClick={() => handleChangeBookingTab(tabName)}
-                      style={{ fontSize: "13px" }}
+                      style={{ fontSize: "13px",padding:width768?"8px":"8px 16px" }}
                     >
                       {tabName}
                     </NavLink>
@@ -194,19 +188,10 @@ const UpcomingSession = ({ accountType = null }) => {
           setSelectedClips={setSelectedClips}
           clips={clips}
           shareFunc={addTraineeClipInBookedSession}
-          sendNotfication={() =>{
-              sendNotifications({
-                title: notificiationTitles.newBookingRequest,
-                description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
-                senderId: userInfo?._id,
-                receiverId: newBookingData?.trainer_id,
-                bookingInfo:null
-              });
-          }}
         />
       </>
     );
-  }
+ 
  
 };
 export default UpcomingSession;

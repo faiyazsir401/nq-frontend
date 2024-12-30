@@ -17,10 +17,10 @@ const menuItems = [
   { label: 'Book Trainer', value: topNavbarOptions?.BOOK_LESSON, topNavbarTab: topNavbarOptions?.BOOK_LESSON, accessBy: [AccountType?.TRAINEE,] },
   // { label: 'Upcoming Lessons', value: "scheduleTraining", leftSideBarTab: leftSideBarOptions?.SCHEDULE_TRAINING, accessBy: [AccountType?.TRAINEE] },
   { label: 'Students', value: 'Student', topNavbarTab: topNavbarOptions?.STUDENT, accessBy: [AccountType?.TRAINER] },
-  { label: 'Friends', value: 'Friends', topNavbarTab: topNavbarOptions?.Friends, accessBy: [AccountType?.TRAINEE] },
+  { label: 'Trainer', value: 'Trainer', topNavbarTab: topNavbarOptions?.Friends, accessBy: [AccountType?.TRAINEE] },
   { label: 'Upcoming Sessions', value: 'Upcoming Session', topNavbarTab: topNavbarOptions?.UPCOMING_SESSION, accessBy: [AccountType?.TRAINER] },
   { label: 'My Community', value: "myCommunity", topNavbarTab: topNavbarOptions?.MY_COMMUNITY, accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER] },
-  { label: 'About Us', value: "aboutUs", topNavbarTab: topNavbarOptions?.ABOUT_US, accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER] },
+  // { label: 'About Us', value: "aboutUs", topNavbarTab: topNavbarOptions?.ABOUT_US, accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER] },
   { label: 'Contact Us', value: "contactUs", topNavbarTab: topNavbarOptions?.CONTACT_US, accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER] },
   { label: 'Practice Session', value: "practiceSession", topNavbarTab: topNavbarOptions?.PRACTICE_SESSION, accessBy: [AccountType?.TRAINER] },
   { label: '', value: topNavbarOptions?.MEETING_ROOM, topNavbarTab: topNavbarOptions?.MEETING_ROOM, accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER] },
@@ -130,7 +130,7 @@ const Header = () => {
       <div id="navbar-wrapper" className={`navbar-wrapper ${isSticky ? 'sticky' : ''}`}>
         <div className="logo">
           <img
-            src="/assets/images/netquix_logo.png"
+            src="/assets/images/netquix_logo_beta.png"
             alt="logo"
             className="header-image-logo"
           />

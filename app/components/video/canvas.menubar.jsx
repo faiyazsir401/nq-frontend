@@ -22,6 +22,7 @@ import { Tooltip } from "react-tippy";
 import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { isIOS } from "react-device-detect";
+import { useMediaQuery } from "usehooks-ts";
 
 export const CanvasMenuBar = ({
   isOpen,
@@ -81,7 +82,7 @@ export const CanvasMenuBar = ({
     }
     setTraineeClips(arr);
   };
-  const mediaQuery = window.matchMedia("(min-width: 768px)");
+  const isMobileScreen =useMediaQuery("(max-width: 1000px)");
 
   var netquixVideos = [
     {
@@ -115,13 +116,14 @@ export const CanvasMenuBar = ({
       setActiveTab(null);
     }
   }
+  console.log("isMobileScreen",isMobileScreen)
   return (
     <div style={{ margin: "1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
         // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{height: isIOS? "54vh" : "70vh",overflow: 'auto'}}>
+        <div className="CreationBarCustomizable" style={{height: !isMobileScreen ?(isIOS? "54vh" : "70vh"):"auto",overflow: 'auto'}}>
           <span></span>
           {/* free hand */}
           <span>
@@ -162,6 +164,11 @@ export const CanvasMenuBar = ({
                 onClick={() => {
                   setDisplayColorPicker(true);
                 }}
+                style={{
+                  height:isMobileScreen?"24px":"none",
+                  width:isMobileScreen?"24px":"none",
+                  padding:isMobileScreen?"5px":"auto"
+                }}
               >
                 <Image
                   src="/icons/color-wheel.png"
@@ -178,6 +185,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.FREE_HAND)
               }}
@@ -193,6 +205,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.LINE)
 
@@ -209,6 +226,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.CIRCLE)
               }}
@@ -224,6 +246,11 @@ export const CanvasMenuBar = ({
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
+              style={{
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
+                padding:isMobileScreen?"5px":"auto"
+              }}
               onClick={() => {
                 menuSelector(SHAPES.SQUARE)
               }}
@@ -231,6 +258,8 @@ export const CanvasMenuBar = ({
               <i className="fa fa-square-o" />
             </div>
           </span>
+          {!isMobileScreen &&
+          <>
           {/* rectangle */}
           <span>
             <div
@@ -250,7 +279,7 @@ export const CanvasMenuBar = ({
                 alt="rectangle"
               />
             </div>
-          </span>
+          </span> 
           {/* oval */}
           <span>
             <div
@@ -263,10 +292,10 @@ export const CanvasMenuBar = ({
                 menuSelector(SHAPES.OVAL)
               }}
             >
-              {/* <i className="fa fa-long-arrow-right" /> */}
+           
               <Image src="/icons/oval.png" width={20} height={20} alt="oval" />
             </div>
-          </span>
+          </span> 
           {/* triangle */}
           <span>
             <div
@@ -286,8 +315,9 @@ export const CanvasMenuBar = ({
                 alt="triangle"
               />
             </div>
-          </span>
+          </span> 
           {/* arrows */}
+          
           <span>
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${
@@ -316,18 +346,29 @@ export const CanvasMenuBar = ({
               <i className="fa fa-arrows-v rotate-90" />
             </div>
           </span>
+          </>}
           <span>
             <div
               className={`icon-btn m-5  button-effect btn-sm my-3`}
               onClick={undoDrawing}
+              style={{
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
+                padding:isMobileScreen?"5px":"auto"
+              }}
             >
-              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" />
+              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"none"}}/>
             </div>
           </span>
           <span>
             <div
               className={`icon-btn m-5  button-effect btn-sm my-3`}
               onClick={refreshDrawing}
+              style={{
+                height:isMobileScreen?"24px":"none",
+                width:isMobileScreen?"24px":"none",
+                padding:isMobileScreen?"5px":"auto"
+              }}
             >
               <RefreshCw />
             </div>
@@ -576,10 +617,12 @@ export const CanvasMenuBar = ({
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => {
-                      setSelectedClips(selectClips);
+                      if(selectClips && selectClips?.length){
+                        setSelectedClips(selectClips);
+                        setClipSelectNote(false);
+                        resetInitialPinnedUser()
+                      }
                       setIsOpen(false);
-                      setClipSelectNote(false);
-                      resetInitialPinnedUser()
                     }}
                   >
                     <X />
@@ -686,13 +729,14 @@ export const CanvasMenuBar = ({
                                           // maxHeight: "150px",
                                           // height: "100%",
                                           marginBottom: "10px",
-                                          height: "200px",
+                                          // height: "200px",
                                           width: "100%",
                                           border: sld
                                             ? "4px solid green"
                                             : "4px solid rgb(180, 187, 209)",
                                           borderRadius: "5px",
                                           objectFit: "cover",
+                                          aspectRatio:"1/1"
                                         }}
                                       >
                                         <source
@@ -778,14 +822,16 @@ export const CanvasMenuBar = ({
                                           // maxHeight: "150px",
                                           // height: "100%",
                                           marginBottom: "10px",
-                                          height: "200px",
+                                 
                                           width: "100%",
                                           border: sld
                                             ? "4px solid green"
                                             : "4px solid rgb(180, 187, 209)",
                                           borderRadius: "5px",
                                           objectFit: "cover",
+                                            aspectRatio:"1/1"
                                         }}
+                                        preload="none"
                                       >
                                         <source
                                           src={Utils?.generateVideoURL(clp?.clips)}
@@ -847,13 +893,14 @@ export const CanvasMenuBar = ({
                                     // style={{ border: `${sld ? "2px" : "0px"} solid green`, width: "98%", maxHeight: "150px", height: "100%", marginBottom: "10px", display: "flex", justifyContent: "center" }}
                                     style={{
                                       marginBottom: "10px",
-                                      height: "200px",
+                            
                                       width: "100%",
                                       border: sld
                                         ? "4px solid green"
                                         : "4px solid rgb(180, 187, 209)",
                                       borderRadius: "5px",
                                       objectFit: "cover",
+                                        aspectRatio:"1/1"
                                     }}
                                   >
                                     <source

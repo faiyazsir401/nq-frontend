@@ -127,8 +127,9 @@ export class Utils {
   }
 
   static getDateInFormat = (date = "") => {
-    const newDate = date ? date : new Date();
-    return moment(newDate).format("MM-DD-YYYY");
+    console.log("datetest",date)
+    const newDate = date ? DateTime.fromISO(date, { zone: 'utc' }) : DateTime.now();
+    return newDate.toFormat("MM-dd-yyyy");
   };
 
   static getDateInFormatIOS = (date = "") => {
@@ -797,6 +798,13 @@ export class Utils {
     return !!OnlineTrainers[selectedTrainerId];
   };
 
+  static isTrainerOnlineArray = (selectedTrainerId, OnlineTrainers) => {
+    if (!OnlineTrainers || !OnlineTrainers.length) {
+      return false;
+    }
+    return OnlineTrainers.some((trainer) => trainer.trainer_info._id === selectedTrainerId);
+  };
+
   static formatTimeAgo = (time) => {
     moment.locale("en");
     const now = moment();
@@ -1077,4 +1085,11 @@ export const convertTimesForDataArray = (dataArray) => {
       session_end_time: formattedEndTime
     };
   });
+
+  
+};
+
+export const navigateToMeeting = (_id) => {
+  const queryString = new URLSearchParams({ id: _id }).toString();
+  window.location.href = `/meeting?${queryString}`;
 };

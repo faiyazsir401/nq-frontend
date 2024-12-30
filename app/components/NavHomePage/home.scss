@@ -406,6 +406,12 @@
 
 }
 
+.slick-slider .slick-list .slick-track {
+
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+
 
 @media(max-width: 767px) {
   #navHomePageCenterContainer {
@@ -463,7 +469,7 @@
     maxHeight: '70vh'
   }
 
-  .slick-slider .slick-list {
+  .slick-slider .slick-list .slick-track {
     transform: translate3d(0, 0, 0);
     height: 80px !important;
     margin-top: 5px;

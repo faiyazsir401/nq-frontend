@@ -7,15 +7,23 @@ import { X } from 'react-feather';
 import { Button } from 'reactstrap';
 import { useMediaQuery } from 'usehooks-ts';
 
-const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedClips, shareFunc , sendNotfication }) => {
+const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedClips, shareFunc  }) => {
 
   const [selectedClipsCopy, setSelectedClipsCopy] = useState([]);
   const dispatch = useAppDispatch();
   const { removeNewBookingData } = traineeAction;
   const isMobileScreen = useMediaQuery("(max-width:1000px)")
+
+  const allClips = clips.reduce((acc, category) => {
+    return acc.concat(category.clips);
+  }, []);
+
+
+ 
+
   return (
-    <Modal isOpen={isOpen} element={
-      <div className='d-flex justify-content-center align-items-center flex-column' style={{width:'100vw' , height:'100vh'}}>
+    <Modal isOpen={isOpen} overflowHidden element={
+      <div className='d-flex align-items-center flex-column' style={{width:'100%' , height:'100%'}}>
         <div className='d-flex flex-row-reverse align-items-center'>
           <div className="theme-title">
             <div className="media">
@@ -25,11 +33,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                   onClick={() => {
                     onClose();
                     dispatch(removeNewBookingData());
-                    if(sendNotfication){
-                      sendNotfication();
-                  console.log('sendNotfiicaiotn ' , sendNotfication)
-
-                    }
+                   
                   }}
                 >
                   <X />
@@ -49,20 +53,17 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
             className='d-flex'
             style={{
               gap: 10,
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
-              height: '200px',
+              flexWrap:"wrap"
+             
             }}
           >
             {clips?.length ? (
-              clips.map((cl, ind) => (
+
                 <div
-                  key={ind}
-                  className={`d-inline ${cl?.show ? "" : "open"}`}
-                  style={{ display: 'inline-block'}}
+                
                 >
-                  <div className='d-flex' style={{ gap: 10 }}>
-                    {cl?.clips.map((clp, index) => {
+                  <div className='d-flex' style={{ gap: 10,flexWrap:"wrap",justifyContent:"center" }}>
+                    {allClips.map((clp, index) => {
                       const isSelected = selectedClipsCopy.some(
                         (val) => val?._id === clp?._id
                       );
@@ -86,8 +87,8 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                             poster={Utils.generateThumbnailURL(clp)}
                             style={{
                               border: `${isSelected ? "4px solid green" : "4px solid #b4bbd1"}`,
-                              height: "180px",
-                              width: isMobileScreen?"200px":"300px",
+                              height: isMobileScreen?"100px":"200px",
+                              width: isMobileScreen?"100px":"200px",
                               borderRadius: "5px",
                               objectFit: "cover",
                             }}
@@ -101,8 +102,9 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                       );
                     })}
                   </div>
+                  
                 </div>
-              ))
+          
             ) : null}
           </div>
           {clips?.length ? (
@@ -112,11 +114,6 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                 onClick={() => {
                   setSelectedClips(selectedClipsCopy);
                   shareFunc(selectedClipsCopy);
-                  console.log('sendNotfiicaiotn ' , sendNotfication)
-                  if(sendNotfication){
-                    console.log('triggering send')
-                    sendNotfication();
-                  }
                 }}
               >
                 Share

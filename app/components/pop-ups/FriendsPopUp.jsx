@@ -19,10 +19,11 @@ import { useSelector } from "react-redux";
 import { AccountType } from "../../common/constants";
 // Sample friend data
 import './common.css'
+import { getFriends } from "../../common/common.api";
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
-  const [friendsList, setFreinds] = useState([]);
+  const [friends, setFriends] = useState([]);
   const userInfo = useSelector((state) => state.auth.userInfo);
 
   // Toggle the popup
@@ -43,32 +44,19 @@ const FriendsPopup = ({ props }) => {
     toggle(); // Close the modal
   };
 
-  const fetchRecentStudents = async () => {
+  const fetchFriends = async () => {
     try {
-      const response = await getRecentStudent();
-      setFreinds(response?.data); // Set the fetched students in state
-      console.log("fetched data", response.data);
+      const response = await getFriends();
+      setFriends(response?.friends); // Set the fetched students in state
+      console.log("fetched data", response?.friends);
     } catch (error) {
       console.log("Error fetching recent students:", error);
     }
   };
 
-  const getRecentTrainersApi = async () => {
-    try {
-      let res = await getRecentTrainers();
-      setFreinds(res?.data); // Store trainers in the same state variable
-      console.log("Recent Trainers:", res);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   useEffect(() => {
-    if (userInfo.account_type === AccountType.TRAINEE) {
-      getRecentTrainersApi();
-    } else {
-      fetchRecentStudents();
-    }
+    fetchFriends()
   }, []);
 
   useEffect(() => {
@@ -104,7 +92,7 @@ const FriendsPopup = ({ props }) => {
               justifyContent:'center'
             }}
           >
-            {friendsList.map((friend) => (
+            {friends.map((friend) => (
               <Card
                 key={friend._id}
                 style={{

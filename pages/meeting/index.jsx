@@ -20,7 +20,7 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
   const id = router?.query?.id;
 
   // Get the state slices
-  const { scheduledMeetingDetails, loading } = useAppSelector(bookingsState); // Assuming `loading` indicates the fetching state
+  const { scheduledMeetingDetails, loading ,startMeeting} = useAppSelector(bookingsState); // Assuming `loading` indicates the fetching state
   const { accountType } = useAppSelector(authState);
 
   // Find the meeting details using the id
@@ -32,6 +32,18 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
   const MeetingSetter = (payload) => {
     dispatch(bookingsAction.setStartMeeting(payload));
   };
+
+  useEffect(()=>{
+    MeetingSetter({
+      ...startMeeting,
+      id: meetingDetails._id,
+      isOpenModal: true,
+      traineeInfo: meetingDetails.trainee_info,
+      trainerInfo: meetingDetails.trainer_info,
+      iceServers: meetingDetails.iceServers,
+      trainee_clip: meetingDetails.trainee_clips,
+    });
+  },[meetingDetails])
 
   console.log("meetingDetails", meetingDetails, accountType);
   return (

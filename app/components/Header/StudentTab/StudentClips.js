@@ -244,7 +244,7 @@ const StudentClips = ({ activeCenterContainerTab }) => {
                                         }}
                                     >
                                         <Tooltip title={clp?.title} position="top" trigger="mouseenter">
-                                            <video id="Home-page-vid" style={{ width: "184px", height: "100px" }}  >
+                                            <video id="Home-page-vid" style={{ width: "184px",aspectRatio:"1/1",}}  >
                                                 <source src={Utils?.generateVideoURL(clp)} type="video/mp4" />
                                             </video>
                                         </Tooltip>

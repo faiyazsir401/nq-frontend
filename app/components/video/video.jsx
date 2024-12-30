@@ -76,12 +76,12 @@ let selectedShape = null;
 let canvasConfigs = {
   sender: {
     strokeStyle: "red",
-    lineWidth: 5,
+    lineWidth: 3,
     lineCap: "round",
   },
   receiver: {
     strokeStyle: "green",
-    lineWidth: 5,
+    lineWidth: 3,
     lineCap: "round",
   },
 };
@@ -475,7 +475,7 @@ useEffect(() => {
       });
 
       peer.on("error", (error) => {
-        // console.error("Peer error:", error);
+        console.error("Peer error:", error);
       });
 
       peer.on("call", (call) => {
@@ -1631,20 +1631,14 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 
   const globalProgressBarToggler = (e) => {
     setVideoController(!videoController);
-    selectedVideoRef1.current.currentTime = 0
-    selectedVideoRef2.current.currentTime = 0
+  
     setIsPlaying({
       isPlayingAll: false,
       number: "",
       isPlaying1: false,
       isPlaying2: false,
     })
-    setVideoTime({
-      currentTime1: "00:00",
-      currentTime2: "00:00",
-      remainingTime1: "00:00",
-      remainingTime2: "00:00",
-    })
+  
   };
 
   const handleGlobalProgressBarChange = (e) => {
@@ -2503,7 +2497,7 @@ useEffect(() => {
         /> */}
         <div
           className="row"
-          style={{ height: "100%", display: "flex", alignItems: "center", marginTop: "env(safe-area-inset-bottom)"}}
+          style={{ height: "100%", display: "flex", alignItems: "center"}}
         >
           <canvas
                 ref={canvasRef}
@@ -2614,13 +2608,13 @@ useEffect(() => {
                     backgroundColor: isPinned ? "#353535" : "",
                     borderRadius: isPinned ? "10px" : "",
                     padding: isPinned ? "10px" : "5px",
-                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '35px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '10px' : '35px',
+                    marginTop: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-1" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '0px' : '35px' : isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? (isIOS ? "100px" : "65px") : !isPinned && selectedClips?.length ? '0px' : '35px',
                     top: accountType === AccountType.TRAINER ? isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '0px' : '' :
                       // trainee
                       isPinned && selectedClips?.length && pinnedUser === "user-video-2" ? '' : '0px',
                     // overflow: 'hidden',
                     height:
-                      !isPinned && selectedClips?.length ? (isIOS ? "55vh" : "73vh") : '12vw',
+                      !isPinned && selectedClips?.length ? (isIOS ? "60vh" : "73vh") : '12vw',
                     width: !isPinned && selectedClips?.length ? '90%' : ''
 
                   }}
@@ -2654,18 +2648,24 @@ useEffect(() => {
                           // padding: "1px !important",
                           height: "100%",
                           padding: 0,
-                          margin:'auto'
+                          margin:'auto',
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "end"
                         }}
                       >
                        
                         <LazyVideo
                           id="selected-video-1"
                           style={{
-                            marginLeft: accountType === AccountType.TRAINER && !isPinned ? '10%' : '0%',
+                            
                             // height: isPinned ? "100%" :  accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
-                            width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
-                            objectFit: "fill",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ?  (isIOS ? "50vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
+                            width: "auto",
+                            maxWidth:"100%",
+                            objectFit: "fit",
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
@@ -2749,7 +2749,11 @@ useEffect(() => {
                           // padding: "1px",
                           height: "100%",
                           padding: 0,
-                          margin:'auto'
+                          margin:'auto',
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "flex-start"
                         }}
                       >
 
@@ -2758,9 +2762,11 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             // height: isPinned ? "100%" : accountType === AccountType.TRAINER ? "28vw" :"34.5vw",
-                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "45vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
-                            width: accountType === AccountType.TRAINER && !isPinned ? "90%" : '100%',
-                            objectFit: "fill",
+                            height: isPinned ? "95%" : accountType === AccountType.TRAINER ? (isIOS ? "50vh" : "63vh")  :  (isIOS ? "55vh" : "63vh") ,
+                            width: "auto",
+                            maxWidth:"100%",
+                            objectFit: "fit",
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}
@@ -3096,7 +3102,7 @@ useEffect(() => {
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                     display:
                       displayMsg?.msg || isRemoteVideoOff ? "flex" : "none",
                   }}
@@ -3292,7 +3298,7 @@ useEffect(() => {
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                   }}
                 >
                   {fromUser?.profile_picture ? (
@@ -3562,6 +3568,10 @@ useEffect(() => {
                           // padding: "1px !important",
                           height: "100%",
                           paddingRight: 0,
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "end"
                         }}
                       >
                         {/* {
@@ -3602,8 +3612,10 @@ useEffect(() => {
                           id="selected-video-1"
                           style={{
                             height: "95%",
-                            width: "100%",
-                            objectFit: "fill",
+                            width: "auto",
+                            maxWidth:"100%",
+                            objectFit: "fit",
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef1}
                           onTimeUpdate={handleTimeUpdate1}
@@ -3669,7 +3681,7 @@ useEffect(() => {
                                     style={{
                                       margin: 0,
                                       marginLeft: "10px",
-                                      fontSize: "16px",
+                                    
                                     }}
                                   >
                                     {videoTime?.remainingTime1}
@@ -3687,6 +3699,11 @@ useEffect(() => {
                           // padding: "1px",
                           height: "100%",
                           paddingLeft: 0,
+                          
+                          display:"flex",
+                          flexDirection: "column",
+                          gap: "10px",
+                          alignItems: "flex-start"
                         }}
                       >
                         {/* {
@@ -3727,8 +3744,10 @@ useEffect(() => {
                           id="selected-video-2"
                           style={{
                             height: "95%",
-                            width: "100%",
-                            objectFit: "fill",
+                            width: "auto",
+                            maxWidth:"100%",
+                            objectFit: "fit",
+                            aspectRatio:"9 / 16"
                           }}
                           ref={selectedVideoRef2}
                           onTimeUpdate={handleTimeUpdate2}
@@ -3996,7 +4015,7 @@ useEffect(() => {
                     alignItems: "center",
                     height: "100%",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                     display:
                       displayMsg?.msg || isRemoteVideoOff ? "flex" : "none",
                   }}
@@ -4113,7 +4132,7 @@ useEffect(() => {
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "rgb(53,53,53)",
-                    borderRadius: "20px",
+                    borderRadius: "10px",
                   }}
                 >
                   {fromUser.profile_picture ? (

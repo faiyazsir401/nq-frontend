@@ -20,6 +20,12 @@
   border-spacing: 0px;
 }
 
+  .slick-slide{
+    width: auto !important;
+  }
+
+
+
 .rc-table th,
 .table td {
   position: relative;
@@ -503,6 +509,10 @@ table.table-bordered>tbody>tr>td {
 @media (max-width:480px) {
   .theme-tab>.nav-tabs>.nav-item .nav-link {
     padding: 7px 30px;
+  }
+
+  .select_date{
+    font-size: 11px !important;
   }
 
   .theme-tab {
