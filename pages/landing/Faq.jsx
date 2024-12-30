@@ -1,14 +1,19 @@
-import React from 'react';
-import { Accordion } from 'react-bootstrap';
-import { useMediaQuery } from 'usehooks-ts';
+import React from "react";
+// import { Accordion } from 'react-bootstrap';
+import { useMediaQuery } from "usehooks-ts";
 
 const faqs = [
   {
     question: "Who are the Experts at NetQwix?",
     answer: (
       <>
-        NetQwix Experts are professionals are highly qualified in their subject areas, passionate about their field of expertise, and carefully vetted by NetQwix community.  Experts have extensive experience and credentials as displayed by their profiles.  But there is nothing like direct feedback from community members who have taken sessions.  Each coach is categorically rated so it is easier to select the expert that is best for you.
-
+        NetQwix Experts are professionals are highly qualified in their subject
+        areas, passionate about their field of expertise, and carefully vetted
+        by NetQwix community. Experts have extensive experience and credentials
+        as displayed by their profiles. But there is nothing like direct
+        feedback from community members who have taken sessions. Each coach is
+        categorically rated so it is easier to select the expert that is best
+        for you.
       </>
     ),
   },
@@ -16,7 +21,14 @@ const faqs = [
     question: "How do I get started?",
     answer: (
       <>
-        After joining at <a  href='https://netqwix.com' >www.netqwix.com</a>, browse Experts by category to find the right one for you.  You can review each Experts’ profile to read about their teaching style, experience, and methods. Many include demo videos of their instruction.  From the Experts’ profile, you can Book a Session in advance or you can request an INSTANT SESSION if your Expert is ‘Online Now’.  Once your Expert confirms their availability, you will be brought into the LIVE session right away.  
+        After joining at <a href="https://netqwix.com">www.netqwix.com</a>,
+        browse Experts by category to find the right one for you. You can review
+        each Experts’ profile to read about their teaching style, experience,
+        and methods. Many include demo videos of their instruction. From the
+        Experts’ profile, you can Book a Session in advance or you can request
+        an INSTANT SESSION if your Expert is ‘Online Now’. Once your Expert
+        confirms their availability, you will be brought into the LIVE session
+        right away.
       </>
     ),
   },
@@ -24,8 +36,9 @@ const faqs = [
     question: "Uploading Game Footage",
     answer: (
       <>
-        You can upload videos that your Expert will be able to go over with you during the session.  The instructor can also pull up their own library of relevant videos and do a comparative analysis live in front of you. 
-
+        You can upload videos that your Expert will be able to go over with you
+        during the session. The instructor can also pull up their own library of
+        relevant videos and do a comparative analysis live in front of you.
       </>
     ),
   },
@@ -33,51 +46,68 @@ const faqs = [
     question: "What else should I know?",
     answer: (
       <>
-       • <b>Time zones</b> are converted automatically. Experts’ schedules and your session times will appear according to your region. <br/>
-       • NetQwix has a <b>24-hour cancellation policy.</b> You may schedule, reschedule, and cancel sessions up to 24 hours before session start time. After the 24-hour mark, you may not change a scheduled session.
+        • <b>Time zones</b> are converted automatically. Experts’ schedules and
+        your session times will appear according to your region. <br />• NetQwix
+        has a <b>24-hour cancellation policy.</b> You may schedule, reschedule,
+        and cancel sessions up to 24 hours before session start time. After the
+        24-hour mark, you may not change a scheduled session.
       </>
     ),
   },
-//   {
-//     question: "How does Session recording work?",
-//     answer: (
-//       <>
-//         Sessions on NetQwix can be recorded for later review. The recording process automatically stops when the meeting ends, and the video file is automatically attached to the Session and stored in your locker. You can find the video file(s) by going to the individual Sessions, under the "Saved Sessions" tab. You will receive an email with the subject line “NetQwix Gameplan” along with the name of the expert and the date. 
-//         **At the moment, recording can only occur if the Enthusiast is using a laptop computer.  NetQwix is working on a mobile solution for recording sessions
-//       </>
-//     ),
-//   },
-//   {
-//     question: "Are there gift certificates on NetQwix?",
-//     answer: (
-//       <>
-//        Yes, you can create a <a href="https://www.lessonface.com/give">gift certificate for sessions</a> in any amount on NetQwix here.
-//       </>
-//     ),
-//   },
+  //   {
+  //     question: "How does Session recording work?",
+  //     answer: (
+  //       <>
+  //         Sessions on NetQwix can be recorded for later review. The recording process automatically stops when the meeting ends, and the video file is automatically attached to the Session and stored in your locker. You can find the video file(s) by going to the individual Sessions, under the "Saved Sessions" tab. You will receive an email with the subject line “NetQwix Gameplan” along with the name of the expert and the date.
+  //         **At the moment, recording can only occur if the Enthusiast is using a laptop computer.  NetQwix is working on a mobile solution for recording sessions
+  //       </>
+  //     ),
+  //   },
+  //   {
+  //     question: "Are there gift certificates on NetQwix?",
+  //     answer: (
+  //       <>
+  //        Yes, you can create a <a href="https://www.lessonface.com/give">gift certificate for sessions</a> in any amount on NetQwix here.
+  //       </>
+  //     ),
+  //   },
   {
     question: "How do I start my session?",
     answer: (
       <>
-You will receive a reminder email before your session start time that will contain a unique link to the session.  You can use that link to join the session, or you can log into your NetQwix account and visit ‘Bookings’.  The Start Button will become active when it is time for your session.  5 minutes before your scheduled session, we will text message you a reminder along with a link to join the session. 
-
+        You will receive a reminder email before your session start time that
+        will contain a unique link to the session. You can use that link to join
+        the session, or you can log into your NetQwix account and visit
+        ‘Bookings’. The Start Button will become active when it is time for your
+        session. 5 minutes before your scheduled session, we will text message
+        you a reminder along with a link to join the session.
       </>
     ),
   },
   {
-    question: "Will I be able to rejoin my session if I have connectivity issues or other technical difficulties?",
+    question:
+      "Will I be able to rejoin my session if I have connectivity issues or other technical difficulties?",
     answer: (
       <>
-Yes.  If you lose your connection, you can rejoin by clicking link again or there will an Active Sessions link in your locker with a button to rejoin. 
-</>
+        Yes. If you lose your connection, you can rejoin by clicking link again
+        or there will an Active Sessions link in your locker with a button to
+        rejoin.
+      </>
     ),
   },
   {
-    question: "Will I get a refund if there was bad Internet connection and I was unable to have a successful session?",
+    question:
+      "Will I get a refund if there was bad Internet connection and I was unable to have a successful session?",
     answer: (
       <>
-Yes.  If you have a bad experience for any reason, we will refund your money.  Let us know within two business days of attending the session unsuccessfully.  We do encourage you to test your set-up before your first session, so that you won’t use session time addressing connectivity problems.  When technical problems arise during a session, experts are typically very willing to reschedule and try again.  The goal is to get you connected and learning, but if it's not possible, you will get your money back. 
-
+        Yes. If you have a bad experience for any reason, we will refund your
+        money. Let us know within two business days of attending the session
+        unsuccessfully. We do encourage you to test your set-up before your
+        first session, so that you won’t use session time addressing
+        connectivity problems. When technical problems arise during a session,
+        experts are typically very willing to reschedule and try again. The goal
+        is to get you connected and learning, but if it's not possible, you will
+        get your money back.
       </>
     ),
   },
@@ -85,8 +115,10 @@ Yes.  If you have a bad experience for any reason, we will refund your money.  L
     question: "How do I pay my expert on NetQwix?",
     answer: (
       <>
-       With a major credit card or Apple Pay or Paypal account.  Choose the expert and the time under Book a Session and then go through the check-out process.  The expert is paid after the session has been successfully completed.
-
+        With a major credit card or Apple Pay or Paypal account. Choose the
+        expert and the time under Book a Session and then go through the
+        check-out process. The expert is paid after the session has been
+        successfully completed.
       </>
     ),
   },
@@ -94,8 +126,9 @@ Yes.  If you have a bad experience for any reason, we will refund your money.  L
     question: "What equipment do I need to take a session on NetQwix?",
     answer: (
       <>
-       Most users will join using their regular smart phone.  User may also use their computer or tablet with webcams.  It's a good idea to have a notepad and cold drink close by so you are prepared.
-
+        Most users will join using their regular smart phone. User may also use
+        their computer or tablet with webcams. It's a good idea to have a
+        notepad and cold drink close by so you are prepared.
       </>
     ),
   },
@@ -103,8 +136,10 @@ Yes.  If you have a bad experience for any reason, we will refund your money.  L
     question: "How do I choose a expert on NetQwix?",
     answer: (
       <>
-       Go to your locker and click Book Expert on the left hand side.  Use the search criteria to find the expert who is best matched to your favorite sport/activity and to read their profiles.  Experts are searchable by rating, desired price range, and by availability.  
-
+        Go to your locker and click Book Expert on the left hand side. Use the
+        search criteria to find the expert who is best matched to your favorite
+        sport/activity and to read their profiles. Experts are searchable by
+        rating, desired price range, and by availability.
       </>
     ),
   },
@@ -112,7 +147,11 @@ Yes.  If you have a bad experience for any reason, we will refund your money.  L
     question: "How do I register as a expert?",
     answer: (
       <>
-        Click the "Sign Up" button at the top right hand side of the page, use your email address to register (not one of the social accounts options) and choose the "Expert” option to start the expert application.  You will then be asked to select your area of expertise as well as your KYC information including information related to paying you. 
+        Click the "Sign Up" button at the top right hand side of the page, use
+        your email address to register (not one of the social accounts options)
+        and choose the "Expert” option to start the expert application.  You
+        will then be asked to select your area of expertise as well as your KYC
+        information including information related to paying you.
       </>
     ),
   },
@@ -120,70 +159,69 @@ Yes.  If you have a bad experience for any reason, we will refund your money.  L
     question: "How will NetQwix help me find students to teach?",
     answer: (
       <>
-       Through creating a detailed profile, NetQwix increases the exposure of your teaching practice.  The site also enables you to establish a clean, professional online presence easily and free of charge.  Furthermore, NetQwix’s customized LIVE SESSION technology and user-friendly scheduling system allow you to extend a professional-quality teaching studio to your existing clientele. 
-
+        Through creating a detailed profile, NetQwix increases the exposure of
+        your teaching practice. The site also enables you to establish a clean,
+        professional online presence easily and free of charge. Furthermore,
+        NetQwix’s customized LIVE SESSION technology and user-friendly
+        scheduling system allow you to extend a professional-quality teaching
+        studio to your existing clientele.
       </>
     ),
   },
 ];
 
- function Section({
-    id,
-    title,
-    subtitle,
-    description,
-    children,
-    className,
-  }) {
-    const sectionId = title ? title.toLowerCase().replace(/\s+/g, "-") : id;
-  
-    return (
-      <section id={id || sectionId}>
-        <div className={className}>
-          <div className="container py-5">
-            <div className="text-center mb-5">
-              {title && (
-                <h2 className="text-uppercase text-primary font-mono font-weight-bold text-muted">
-                  {title}
-                </h2>
-              )}
-              {subtitle && (
-                <h3 className="mt-4 mb-3 h2 font-weight-bold">{subtitle}</h3>
-              )}
-              {description && (
-                <p className="mt-4 mx-auto text-muted lead" style={{ maxWidth: '650px' }}>
-                  {description}
-                </p>
-              )}
-            </div>
-            {children}
+function Section({ id, title, subtitle, description, children, className }) {
+  const sectionId = title ? title.toLowerCase().replace(/\s+/g, "-") : id;
+
+  return (
+    <section id={id || sectionId}>
+      <div className={className}>
+        <div className="container py-5">
+          <div className="text-center mb-5">
+            {title && (
+              <h2 className="text-uppercase text-primary font-mono font-weight-bold text-muted">
+                {title}
+              </h2>
+            )}
+            {subtitle && (
+              <h3 className="mt-4 mb-3 h2 font-weight-bold">{subtitle}</h3>
+            )}
+            {description && (
+              <p
+                className="mt-4 mx-auto text-muted lead"
+                style={{ maxWidth: "650px" }}
+              >
+                {description}
+              </p>
+            )}
           </div>
+          {children}
         </div>
-      </section>
-    );
-  }
-  
-  
+      </div>
+    </section>
+  );
+}
+
 export default function FAQ() {
-    const isMobileScreen = useMediaQuery("(max-width: 768px)");
-    return (
-      <Section title="FAQ" subtitle="Frequently asked questions">
-        <div className="container my-5">
-          <ol style={{padding:isMobileScreen?0:'auto'}} >
-            {faqs.map((faq, idx) => (
-              <li eventKey={String(idx)} key={idx}>
-                <h5 className='mb-1'>{faq.question}</h5>
-                <p style={{fontWeight:400}}>{faq.answer}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-        <h4 className="text-center text-muted">
-          Still have questions? Email us at{" "}
-          <a href="mailto:phil@netqwix.com" className="text-decoration-underline">
-            phil[@]netqwix.com
-          </a>
-        </h4>
-      </Section>
-    );
-  }
+  const isMobileScreen = useMediaQuery("(max-width: 768px)");
+  return (
+    <Section title="FAQ" subtitle="Frequently asked questions">
+      <div className="container my-5">
+        <ol style={{ padding: isMobileScreen ? 0 : "auto" }}>
+          {faqs.map((faq, idx) => (
+            <li eventKey={String(idx)} key={idx}>
+              <h5 className="mb-1">{faq.question}</h5>
+              <p style={{ fontWeight: 400 }}>{faq.answer}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <h4 className="text-center text-muted">
+        Still have questions? Email us at{" "}
+        <a href="mailto:phil@netqwix.com" className="text-decoration-underline">
+          phil[@]netqwix.com
+        </a>
+      </h4>
+    </Section>
+  );
+}
