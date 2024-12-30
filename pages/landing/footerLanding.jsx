@@ -30,10 +30,8 @@ const FooterLanding = (masterRecords) => {
           </div>
           <div className="col-sm-9 col-lg-10 ">
             <p className="mt-4">
-              Are you ready to embark on a transformative journey towards your
-              personal and professional development? We are here to
-              revolutionize the way you learn and connect with expert trainers.
-              Our cutting-edge platform.
+              NetQwix is a community where passionate Experts and Enthusiasts
+              meet LIVE for “Qwick Sessions over the Net”
             </p>
           </div>
         </div>
@@ -60,6 +58,26 @@ const FooterLanding = (masterRecords) => {
                 })}
               </ul>
             </div>
+            {/* <div className="col-md-4 col-sm-2 col-lg-4">
+              <div>
+                {" "}
+                <b>New Comments</b>
+              </div>
+              <div className="mt-2">
+                {NEW_COMMENTS.map((commentInfo, index) => {
+                  return (
+                    <div className="card bg-light my-2 " key={`item-${index}`}>
+                      <div className="card-content p-2">
+                        <div>
+                          <b>{commentInfo.label}</b>
+                          <p>{commentInfo.comment}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>  */}
           </div>
         </div>
 

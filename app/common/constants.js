@@ -76,9 +76,9 @@ export const weekDays = [
 export const bookingButton = ["upcoming", "canceled", "completed"];
 
 export const not_data_for_booking = {
-  upcoming: 'No upcoming Session available',
-  canceled: 'No canceled booking',
-  completed: 'No completed booking',
+  upcoming: "No upcoming Session available",
+  canceled: "No canceled booking",
+  completed: "No completed booking",
 };
 
 export const debouncedConfigs = {
@@ -106,7 +106,7 @@ export const BookedSession = {
   confirm: "confirm",
   confirmed: "confirmed",
   booked: "booked",
-  canceled: "canceled", 
+  canceled: "canceled",
   completed: "completed",
   start: "start",
 };
@@ -119,7 +119,7 @@ export const leftSideBarOptions = {
   STATUS: "status",
   SCHEDULE_TRAINING: "scheduleTraining",
   CHATS: "chats",
-  TOPNAVBAR: "topNavbar"
+  TOPNAVBAR: "topNavbar",
 };
 
 export const topNavbarOptions = {
@@ -128,12 +128,12 @@ export const topNavbarOptions = {
   ABOUT_US: "aboutUs",
   CONTACT_US: "contactUs",
   STUDENT: "student",
-  Friends:"friends",
-  UPCOMING_SESSION:"Upcoming Session",
+  Friends: "friends",
+  UPCOMING_SESSION: "Upcoming Session",
   BOOK_LESSON: "bookLesson",
   MEETING_ROOM: "meetingRoom",
   PRACTICE_SESSION: "practice Session",
-}
+};
 export const filterOption = {
   day: "Day",
   week: "Week",
@@ -613,14 +613,14 @@ export const WHY_CHOOSE_US = [
     icon: "🚀",
     title: "Seamless Trainer Booking",
     content:
-      "Discover a diverse community of experienced trainers spanning various fields. Browse profiles, read reviews, and select the perfect trainer to help you achieve your goals.",
+      "NetQwix serves as host to a diverse community of experienced trainers in many walks of life. Search profiles, read reviews, and select the perfect trainer to help you achieve your goals.",
   },
   {
     id: 2,
     icon: "🎯",
     title: "Tailored Learning Plans",
     content:
-      "Say goodbye to one-size-fits-all approaches. Our trainers create personalized learning plans that cater to your unique needs and aspirations.",
+      "Say goodbye to one-size-fits-all approaches. Our Expert Trainers create personalized learning plans that cater to your unique needs and aspirations.",
   },
   {
     id: 3,
@@ -632,23 +632,23 @@ export const WHY_CHOOSE_US = [
   {
     id: 4,
     icon: "🖌️",
-    title: "Interactive Learning Tools",
+    title: "Instant Session",
     content:
-      " Immerse yourself in engaging sessions with our unique interactive features. Draw freehand, create shapes, and annotate live video feeds to enhance your understanding and retention.",
+      "With NetQwix’s Instant Session feature, you can request a Session any time you see your favorite Expert online and when they accept, you are brought right into the Session.  How’s that for instant gratification?",
   },
   {
     id: 5,
     icon: "📹",
-    title: "Clip Share",
+    title: "Review Game Footage",
     content:
-      "Capture the moments of your sessions and easily share them with your trainer. Make feedback and progress tracking a breeze.",
+      "Capture the key moments while you are doing your thing and then upload them for the Session so you can review and huddle LIVE with your Expert to make a NetQwix Gameplan for improved performance.  Make feedback and tracking progress easy.",
   },
   {
     id: 6,
     icon: "🌐",
     title: "Connect from Anywhere",
     content:
-      "Whether you're at home, in the office, or on the go, LearnConnect's web application allows you to connect with your trainer seamlessly, anytime, anywhere.",
+      "Whether you're at home, in the office, or on the go, NetQwix’s LIVE Lesson pplication allows you to connect with your trainer seamlessly, anytime, anywhere on any device.",
   },
 ];
 
@@ -656,52 +656,51 @@ export const HOW_IT_WORKS = [
   {
     id: 1,
     icon: "1",
-    title: "Sign Up",
-    content:
-      "Create your account in a few simple steps. Tell us about your goals, interests, and preferences, so we can match you with the perfect trainer.",
+    title: "Get Started",
+    content: "Users open an account either as an Enthusiast or an Expert.",
   },
   {
     id: 2,
     icon: "2",
-    title: "Browse Trainers",
+    title: "Experts",
     content:
-      "Explore our diverse range of trainers. Filter by category, reviews, and availability to find your ideal mentor.",
+      "Experts build a profile and open their schedule for Enthusiasts to book Live Sessions on NetQwix.  ",
   },
   {
     id: 3,
     icon: "3",
-    title: "Book a Session",
+    title: "Enthusiasts",
     content:
-      "Once you've found your perfect match, book a session at your convenience. Our flexible scheduling ensures you get the training you need, when you need it.",
+      "Enthusiasts receive a ‘Locker’ from which they can search and book Live Sessions with Experts, play uploaded footage, watch a recording of their Live Sessions, and view each Game Plan generated by their Expert after each session.",
   },
   {
     id: 4,
     icon: "4",
-    title: "Interactive Learning",
+    title: "Book Sessions",
     content:
-      "Engage in interactive sessions like never before. Draw, highlight, and shape your learning experience directly on the live video feed. It's a hands-on approach to learning like you've never seen.",
+      "Enthusiasts are prompted to pay for the Live Session while they are booking in reservation system.",
   },
   {
     id: 5,
     icon: "5",
-    title: "Clip and Share",
+    title: "Live Lesson",
     content:
-      "Capture important moments during your sessions and share them with your trainer for feedback and improvement.",
+      "Experts and enthusiasts are each brought into NetQwix’s proprietary web-conferencing system for the LIVE interactive session.  NetQwix’s revolutionary system magically allows Experts to diagram and analyze selected videos and also to use both webcams to visually interact with the Trainees in all ways.",
   },
   {
     id: 6,
     icon: "6",
-    title: "Track Progress",
+    title: "Game Plan",
     content:
-      "Monitor your progress and watch yourself grow with our progress tracking tools. Achieve your goals faster and more efficiently.",
+      "The Expert generates a printable Game Plan reflecting the Live Session experience and placed in the Enthusiast’s Locker for future reference.",
   },
-  {
-    id: 7,
-    icon: "7",
-    title: "Connect and Learn",
-    content:
-      "Build a strong connection with your trainer and enhance your skills through personalized guidance and support.",
-  },
+  // {
+  //   id: 7,
+  //   icon: "7",
+  //   title: "Connect and Learn",
+  //   content:
+  //     "Build a strong connection with your trainer and enhance your skills through personalized guidance and support.",
+  // },
 ];
 export const YOURCOURSES = [
   {

@@ -82,7 +82,7 @@ const Details = (props) => {
           </select>
         </div>
       )}
-           <div className="form-group d-flex" style={{ gap: "10px" }}>
+      <div className="form-group d-flex" style={{ gap: "10px" }}>
         <input
           className="form-control"
           onChange={handleChange}

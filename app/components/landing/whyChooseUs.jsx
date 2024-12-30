@@ -9,12 +9,10 @@ export const WhyChooseUs = () => {
             <div className="section-head col-sm-12">
               <h6>Why Choose Us?</h6>
               <p>
-                Are you ready to embark on a transformative journey towards your
-                personal and professional development? We are here to
-                revolutionize the way you learn and connect with expert
-                trainers. Our cutting-edge platform empowers you to take
-                interactive sessions with skilled professionals, enhancing your
-                skills and knowledge like never before.
+                NetQwix will revolutionize the way you learn by connecting LIVE
+                with your Expert. Our cutting-edge platform empowers you to take
+                LIVE Interactive Sessions with your favorite professionals,
+                enhancing your skills and knowledge like never before.
               </p>
             </div>
             {WHY_CHOOSE_US.map((info, index) => {
