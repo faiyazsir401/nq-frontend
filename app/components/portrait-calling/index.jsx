@@ -200,18 +200,23 @@ let canvasConfigs = {
 let selectedShape = null;
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 
-const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
+const VideoContainer = ({ drawingMode, isMaximized, canvasRef }) => {
   const videoRef = useRef(null);
-
-  console.log("canvas12",canvasRef)
+  const videoContainerRef = useRef(null);
+  console.log("canvas12", canvasRef);
   const state = {
     mousedown: false,
   };
 
   useEffect(() => {
     const video = videoRef.current;
+    const videoContainer = videoContainerRef.current;
     const canvas = canvasRef?.current;
-    console.log("canvas", canvas);  // This should now log the canvas element correctly.
+    if (canvas && videoContainer) {
+      canvas.width = video.clientWidth;
+      canvas.height = video.clientHeight;
+    }
+    console.log("canvas", canvas); // This should now log the canvas element correctly.
     const context = canvas?.getContext("2d");
     if (!context) return;
 
@@ -223,10 +228,15 @@ const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
       requestAnimationFrame(drawFrame);
     };
 
-
     const startDrawing = (event) => {
-      console.log("clientWidth".document.getElementById("video-container")?.clientWidth)
-      console.log("clientHeight",document.getElementById("video-container")?.clientHeight)
+      console.log(
+        "clientWidth",
+        document.getElementById("video-container")?.clientWidth
+      );
+      console.log(
+        "clientHeight",
+        document.getElementById("video-container")?.clientHeight
+      );
       event.preventDefault();
       isDrawing = true;
       if (!context) return;
@@ -240,7 +250,7 @@ const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
       strikes.push(savedPos);
       const mousePos = event.type.includes("touchstart")
         ? getTouchPos(event)
-        : getMosuePositionOnCanvas(event);
+        : getMousePositionOnCanvas(event);
       context.strokeStyle = canvasConfigs.sender.strokeStyle;
       context.lineWidth = canvasConfigs.sender.lineWidth;
       context.lineCap = "round";
@@ -256,7 +266,7 @@ const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
       if (!isDrawing || !context || !state.mousedown) return;
       const mousePos = event.type.includes("touchmove")
         ? getTouchPos(event)
-        : getMosuePositionOnCanvas(event);
+        : getMousePositionOnCanvas(event);
       currPos = { x: mousePos?.x, y: mousePos.y };
 
       if (selectedShape !== SHAPES.FREE_HAND) {
@@ -293,27 +303,41 @@ const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
     };
   }, [canvasRef]);
 
-  const getMosuePositionOnCanvas = (event) => {
+  const getMousePositionOnCanvas = (event) => {
     const canvas = canvasRef?.current;
-    var rect = canvas.getBoundingClientRect();
-    var x = event?.clientX - rect?.left;
-    var y = event?.clientY - rect?.top;
-    return { x: x || 0, y: y || 0 };
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width; // Scale factor for width
+    const scaleY = canvas.height / rect.height; // Scale factor for height
+
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
+    return { x, y };
   };
 
   const getTouchPos = (touchEvent) => {
     const canvas = canvasRef?.current;
-    var rect = canvas.getBoundingClientRect();
-    var x = touchEvent?.changedTouches[0]?.clientX - rect?.left;
-    var y = touchEvent?.changedTouches[0]?.clientY - rect?.top;
-    return { x: x || 0, y: y || 0 };
-  };
+    if (!canvas) return { x: 0, y: 0 };
 
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = (touchEvent.changedTouches[0].clientX - rect.left) * scaleX;
+    const y = (touchEvent.changedTouches[0].clientY - rect.top) * scaleY;
+
+    return { x, y };
+  };
   return (
     <>
       <div
         id="video-container"
-        className={`relative border rounded-lg overflow-hidden ${isMaximized ? "" : "mb-3"}`}
+        ref={videoContainerRef}
+        className={`relative border rounded-lg overflow-hidden ${
+          isMaximized ? "" : "mb-3"
+        }`}
         style={{
           height: isMaximized ? "50vh" : "40vh",
           width: "100vw",
@@ -326,7 +350,16 @@ const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
       >
         <TransformWrapper disabled={drawingMode}>
           <TransformComponent>
-            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               <video
                 ref={videoRef}
                 src="https://www.w3schools.com/html/mov_bbb.mp4"
@@ -337,19 +370,27 @@ const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
           </TransformComponent>
         </TransformWrapper>
 
-        <canvas ref={canvasRef} id="drawing-canvas" className="canvas" style={{ display: drawingMode ? "block" : 'none' }} />
+        <canvas
+          ref={canvasRef}
+          id="drawing-canvas"
+          className="canvas"
+          style={{ display: drawingMode ? "block" : "none" }}
+        />
       </div>
     </>
   );
 };
 
-
-const ClipModeCall = ({ timeRemaining, isMaximized, setIsMaximized }) => {
+const ClipModeCall = ({
+  timeRemaining,
+  isMaximized,
+  setIsMaximized,
+  clips,
+}) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const canvasRef = useRef(null);
-  const canvasRef2 = useRef(null);
-
+  const canvasRef2 = useRef(null)
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
     g: 112,
@@ -483,8 +524,8 @@ const ClipModeCall = ({ timeRemaining, isMaximized, setIsMaximized }) => {
                   <div
                     style={{
                       position: "absolute",
-                      zIndex:99,
-                      top:24
+                      zIndex: 99,
+                      top: 24,
                     }}
                   >
                     <CanvasMenuBar
@@ -542,16 +583,17 @@ const ClipModeCall = ({ timeRemaining, isMaximized, setIsMaximized }) => {
             </div>
           </div>
           <div>
-            <VideoContainer
-              drawingMode={drawingMode}
-              isMaximized
-              canvasRef={canvasRef} 
-            />
-            <VideoContainer
-              drawingMode={drawingMode}
-              isMaximized
-              canvasRef={canvasRef2}
-            />
+  
+              <VideoContainer
+                drawingMode={drawingMode}
+                isMaximized
+                canvasRef={canvasRef}
+              />
+               <VideoContainer
+                drawingMode={drawingMode}
+                isMaximized
+                canvasRef={canvasRef2}
+              />
           </div>
         </div>
       ) : (
@@ -579,8 +621,8 @@ const ClipModeCall = ({ timeRemaining, isMaximized, setIsMaximized }) => {
                   <div
                     style={{
                       position: "absolute",
-                      zIndex:99,
-                      top:24
+                      zIndex: 99,
+                      top: 24,
                     }}
                   >
                     <CanvasMenuBar
@@ -651,16 +693,9 @@ const ClipModeCall = ({ timeRemaining, isMaximized, setIsMaximized }) => {
             // onClick={handleUserClick}
             selected={false}
           />
-           <VideoContainer
-              drawingMode={drawingMode}
- 
-              canvasRef={canvasRef} 
-            />
-            <VideoContainer
-              drawingMode={drawingMode}
-      
-              canvasRef={canvasRef2}
-            />
+          
+            <VideoContainer drawingMode={drawingMode} canvasRef={canvasRef} />
+            <VideoContainer drawingMode={drawingMode} canvasRef={canvasRef2} />
         </>
       )}
     </>
@@ -672,6 +707,7 @@ const VideoCallUI = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isShowVideos, setIsShowVideos] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+  const [clips, setClips] = useState([0, 1]);
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeRemaining((prev) => (prev > 0 ? prev - 1 : 0));
@@ -699,6 +735,7 @@ const VideoCallUI = () => {
           timeRemaining={timeRemaining}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
+          clips={clips}
         />
       )}
       {!isMaximized && (
