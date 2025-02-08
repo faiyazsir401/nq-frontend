@@ -1,0 +1,161 @@
+.video-call-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+
+}
+
+.time-container {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin: 10px 0px;
+}
+
+.profile-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #333;
+  border-radius: 10px;
+  padding: 20px;
+  height: 40vh;
+  /* margin: 10px 0px; */
+  width: 95vw;
+  border-radius: 20px;
+  border: 2px solid white;
+}
+
+.profile-box.mini {
+  position: absolute;
+  z-index: 9999;
+  bottom:120px;
+  right: 10px;
+  width: 100px;
+  height: 150px;
+}
+
+.profile-box.mini1 {
+  position: absolute;
+  z-index: 9999;
+  bottom:120px;
+  left: 10px;
+  width: 100px;
+  height: 150px;
+}
+
+.profile-box.mini2 {
+  position: absolute;
+  z-index: 9999;
+  bottom:120px;
+  right: 10px;
+  width: 100px;
+  height: 150px;
+}
+
+.profile-box.mini1 .profile-img {
+  width: 50px;
+  height: 50px;
+}
+
+.profile-box.mini2 .profile-img {
+  width: 50px;
+  height: 50px;
+}
+
+.profile-box.mini .profile-img {
+  width: 50px;
+  height: 50px;
+}
+
+.profile-box.large {
+  width: 200px;
+  height: 200px;
+}
+
+.profile-img {
+  border-radius: 99px;
+  width: 100px;
+  height: 100px;
+}
+
+.profile-name {
+  color: white;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.controls {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.control-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.control-btn.red {
+  background-color: red;
+  color: white;
+}
+
+.control-btn.gray {
+  background-color: lightgray;
+  color: black;
+}
+
+.selected {
+  width: 90vw;
+  height: 80vh;
+  object-fit: contain;
+  border-radius: 0;
+  border-radius: 20px;
+}
+
+.hidden{
+  display: none;
+}
+
+.movable-user-box{
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+.react-transform-wrapper.transform-component-module_wrapper__SPB86{
+  height:100%;
+  width:100%
+}
+
+.react-transform-component.transform-component-module_content__FBWxo{
+  height:100%;
+  width:100%
+} 
+
+.canvas{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+}

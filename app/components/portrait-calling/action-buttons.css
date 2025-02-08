@@ -1,0 +1,53 @@
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+  color: black;
+}
+
+
+
+/* Individual Button Styling */
+.mic-toggle {
+    color: white;
+    background-color: red;
+}
+
+.feed-toggle {
+
+}
+
+.end-call {
+  color: white;
+  background-color: red;
+}
+
+.external-link {
+
+}
+
+.video-lock {
+
+}
+
+.aperture {
+
+}
+
+.file-add {
+
+}

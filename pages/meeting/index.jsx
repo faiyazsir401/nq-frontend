@@ -14,6 +14,7 @@ import { LOCAL_STORAGE_KEYS, topNavbarOptions } from "../../app/common/constants
 import { useMediaQuery } from "usehooks-ts";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
 import OrientationModal from "../../app/components/modalComponent/OrientationModal";
+import VideoCallUI from "../../app/components/portrait-calling";
 const RenderVideoCall = ({height,width,isRotatedInitally}) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -48,7 +49,7 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
   console.log("meetingDetails", meetingDetails, accountType);
   return (
     height > width && !isRotatedInitally ?
-    <OrientationModal isOpen={true} /> 
+    <VideoCallUI/>
     :
     <StartMeeting
       id={meetingDetails._id}
