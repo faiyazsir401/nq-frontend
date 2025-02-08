@@ -223,7 +223,10 @@ const VideoContainer = ({ drawingMode, isMaximized,canvasRef })=>{
       requestAnimationFrame(drawFrame);
     };
 
+
     const startDrawing = (event) => {
+      console.log("clientWidth".document.getElementById("video-container")?.clientWidth)
+      console.log("clientHeight",document.getElementById("video-container")?.clientHeight)
       event.preventDefault();
       isDrawing = true;
       if (!context) return;
