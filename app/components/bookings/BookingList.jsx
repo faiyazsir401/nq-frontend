@@ -379,8 +379,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
-  const renderVideoCall = (height, width, isRotatedInitally) => height > width && !isRotatedInitally ?
-    <OrientationModal isOpen={true} /> :
+  const renderVideoCall = (height, width, isRotatedInitally) => 
       <StartMeeting
         id={startMeeting.id}
         accountType={accountType}
