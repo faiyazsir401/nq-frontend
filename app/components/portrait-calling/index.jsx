@@ -365,6 +365,7 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef }) => {
                 src="https://www.w3schools.com/html/mov_bbb.mp4"
                 controls
                 className="w-full h-full object-cover"
+                playsInline
               />
             </div>
           </TransformComponent>
