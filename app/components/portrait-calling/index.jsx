@@ -339,7 +339,7 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef }) => {
           isMaximized ? "" : "mb-3"
         }`}
         style={{
-          height: isMaximized ? "50vh" : "40vh",
+          height: isMaximized ? "50dvh" : "40dvh",
           width: "100vw",
           display: "flex",
           justifyContent: "center",
