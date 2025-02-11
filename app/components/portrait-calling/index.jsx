@@ -12,6 +12,8 @@ import "./index.css";
 import { Tooltip } from "react-tippy";
 import {
   Aperture,
+  ArrowDown,
+  ChevronDown,
   ExternalLink,
   FilePlus,
   Maximize,
@@ -261,6 +263,133 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef }) => {
       startPos = { x: mousePos.x, y: mousePos.y };
     };
 
+    const findDistance = () => {
+      let dis = Math.sqrt(
+        Math.pow(currPos.x - startPos.x, 2) +
+          Math.pow(currPos.y - startPos.y, 2)
+      );
+      return dis;
+    };
+
+    const drawShapes = () => {
+      switch (selectedShape) {
+        case SHAPES.LINE: {
+          context.moveTo(startPos.x, startPos.y);
+          context.lineTo(currPos.x, currPos.y);
+          break;
+        }
+        case SHAPES.CIRCLE: {
+          let distance = findDistance(startPos, currPos);
+          context.arc(startPos.x, startPos.y, distance, 0, 2 * Math.PI, false);
+          break;
+        }
+        case SHAPES.SQUARE: {
+          let w = currPos.x - startPos.x;
+          let h = currPos.y - startPos.y;
+          context.rect(startPos.x, startPos.y, w, h);
+          break;
+        }
+        case SHAPES.RECTANGLE: {
+          let w = currPos.x - startPos.x;
+          let h = currPos.y - startPos.y;
+          context.rect(startPos.x, startPos.y, w, h);
+          break;
+        }
+        case SHAPES.OVAL: {
+          const transform = context.getTransform();
+          let w = currPos.x - startPos.x;
+          let h = currPos.y - startPos.y;
+          context.fillStyle = "#FFFFFF";
+          context.fillStyle = "rgba(0, 0, 0, 0)";
+          const radiusX = w * transform.a;
+          const radiusY = h * transform.d;
+          if (radiusX > 0 && radiusY > 0) {
+            context.ellipse(
+              currPos.x,
+              currPos.y,
+              radiusX,
+              radiusY,
+              0,
+              0,
+              2 * Math.PI
+            );
+            context.fill();
+          }
+          break;
+        }
+        case SHAPES.TRIANGLE: {
+          context.moveTo(startPos.x + (currPos.x - startPos.x) / 2, startPos.y);
+          context.lineTo(startPos.x, currPos.y);
+          context.lineTo(currPos.x, currPos.y);
+          context.closePath();
+          break;
+        }
+        case SHAPES.ARROW_RIGHT: {
+          const arrowSize = 10;
+          const direction = Math.atan2(
+            currPos.y - startPos.y,
+            currPos.x - startPos.x
+          );
+          // Calculate the coordinates of the arrowhead
+          const arrowheadX = currPos.x + length * Math.cos(direction);
+          const arrowheadY = currPos.y + length * Math.sin(direction);
+          // Draw the line of the arrow
+          context.moveTo(startPos.x, startPos.y);
+          context.lineTo(currPos.x, currPos.y);
+          // Draw the arrowhead
+          context.moveTo(arrowheadX, arrowheadY);
+          context.lineTo(
+            currPos.x - arrowSize * Math.cos(direction - Math.PI / 6),
+            currPos.y - arrowSize * Math.sin(direction - Math.PI / 6)
+          );
+          context.moveTo(currPos.x, currPos.y);
+          context.lineTo(
+            currPos.x - arrowSize * Math.cos(direction + Math.PI / 6),
+            currPos.y - arrowSize * Math.sin(direction + Math.PI / 6)
+          );
+          context.stroke();
+          break;
+        }
+        case SHAPES.TWO_SIDE_ARROW: {
+          const x1 = startPos.x;
+          const y1 = startPos.y;
+          const x2 = currPos.x;
+          const y2 = currPos.y;
+          const size = 10;
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          const arrowPoints = [
+            {
+              x: x2 - size * Math.cos(angle - Math.PI / 6),
+              y: y2 - size * Math.sin(angle - Math.PI / 6),
+            },
+            {
+              x: x2 - size * Math.cos(angle + Math.PI / 6),
+              y: y2 - size * Math.sin(angle + Math.PI / 6),
+            },
+            {
+              x: x1 + size * Math.cos(angle - Math.PI / 6),
+              y: y1 + size * Math.sin(angle - Math.PI / 6),
+            },
+            {
+              x: x1 + size * Math.cos(angle + Math.PI / 6),
+              y: y1 + size * Math.sin(angle + Math.PI / 6),
+            },
+          ];
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          context.moveTo(arrowPoints[0].x, arrowPoints[0].y);
+          context.lineTo(x2, y2);
+          context.lineTo(arrowPoints[1].x, arrowPoints[1].y);
+          context.moveTo(arrowPoints[2].x, arrowPoints[2].y);
+          context.lineTo(x1, y1);
+          context.lineTo(arrowPoints[3].x, arrowPoints[3].y);
+
+          context.stroke();
+          break;
+        }
+      }
+    };
+
     const draw = (event) => {
       event.preventDefault();
       if (!isDrawing || !context || !state.mousedown) return;
@@ -389,9 +518,11 @@ const ClipModeCall = ({
   clips,
 }) => {
   const [drawingMode, setDrawingMode] = useState(false);
+  const [showDrawingTools, setShowDrawingTools] = useState(false);
+
   const [isOpen, setIsOpen] = useState(false);
   const canvasRef = useRef(null);
-  const canvasRef2 = useRef(null)
+  const canvasRef2 = useRef(null);
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
     g: 112,
@@ -405,14 +536,25 @@ const ClipModeCall = ({
   const [countClipNoteOpen, setCountClipNoteOpen] = useState(false);
 
   const clearCanvas = () => {
-    const canvas = canvasRef?.current;
-    const context = canvas?.getContext("2d");
-    if (!context || !canvas) return;
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    const canvas1 = canvasRef?.current;
+    const canvas2 = canvasRef2?.current;
+
+    const context1 = canvas1?.getContext("2d");
+    const context2 = canvas2?.getContext("2d");
+
+    if (context1 && canvas1) {
+      context1.clearRect(0, 0, canvas1.width, canvas1.height);
+    };
+
+    if (context2 && canvas2) {
+      context2.clearRect(0, 0, canvas2.width, canvas2.height);
+    }
   };
 
   const sendDrawEvent = () => {
     const canvas = canvasRef?.current;
+    const canvas2 = canvasRef2?.current;
+
     if (!canvas) return;
     const { width, height } = canvas;
 
@@ -432,6 +574,26 @@ const ClipModeCall = ({
       };
       reader.readAsArrayBuffer(blob);
     });
+
+    if (!canvas2) return;
+    const { width2, height2 } = canvas2;
+
+    canvas2.toBlob((blob) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (!(event && event.target)) return;
+        const binaryData = event.target.result;
+        // console.log(`emit draw event---`);
+        socket.emit(EVENTS.DRAW, {
+          userInfo: { from_user: fromUser._id, to_user: toUser._id },
+          // storedEvents,
+          // canvasConfigs,
+          strikes: binaryData,
+          canvasSize: { width2, height2 },
+        });
+      };
+      reader.readAsArrayBuffer(blob);
+    });
   };
 
   const undoDrawing = async (
@@ -439,58 +601,73 @@ const ClipModeCall = ({
     extraCoordinateConfig,
     removeLastCoordinate = true
   ) => {
-    const canvas = canvasRef?.current;
-    const context = canvas?.getContext("2d");
-    if (!context || !canvas) return;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    if (removeLastCoordinate) storedLocalDrawPaths.sender.splice(-1, 1);
-    // draw all the paths in the paths array
-    await senderConfig.coordinates.forEach((path) => {
-      context.beginPath();
-      context.strokeStyle = senderConfig.theme.strokeStyle;
-      context.lineWidth = senderConfig.theme.lineWidth;
-      context.lineCap = "round";
-      if (path && Array.isArray(path)) {
-        // context.
-        context.moveTo(path[0][0], path[0][1]);
-        for (let i = 0; i < path.length; i++) {
-          context.lineTo(path[i][0], path[i][1]);
-        }
-        context.stroke();
-      }
-    });
-
-    await extraCoordinateConfig.coordinates.forEach((path) => {
-      context.beginPath();
-      context.strokeStyle = extraCoordinateConfig.theme.strokeStyle;
-      context.lineWidth = extraCoordinateConfig.theme.lineWidth;
-      context.lineCap = "round";
-
-      // context.beginPath();
-      if (path && Array.isArray(path)) {
-        // context.
-        context.moveTo(path[0][0], path[0][1]);
-        for (let i = 0; i < path.length; i++) {
-          context.lineTo(path[i][0], path[i][1]);
-        }
-        context.stroke();
-      }
-    });
-
-    if (strikes.length <= 0) return;
-    context.putImageData(strikes[strikes.length - 1], 0, 0);
-    strikes.pop();
-
-    // sending event to end user
+    const canvas1 = canvasRef?.current || null;
+    const canvas2 = canvasRef2?.current || null;
+  
+    const context1 = canvas1 ? canvas1.getContext("2d") : null;
+    const context2 = canvas2 ? canvas2.getContext("2d") : null;
+  
+    if (!context1 && !context2) return; // Exit if both canvases are missing.
+  
+    // Function to clear canvas safely
+    const clearCanvas = (ctx, canvas) => {
+      if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+  
+    // Clear only the available canvases
+    clearCanvas(context1, canvas1);
+    clearCanvas(context2, canvas2);
+  
     if (removeLastCoordinate) {
-      // socket.emit(EVENTS.EMIT_UNDO, {
-      //     sender: storedLocalDrawPaths.sender,
-      //     receiver: extraCoordinateConfig.coordinates,
-      //     userInfo: { from_user: fromUser._id, to_user: toUser._id },
-      // });
+      storedLocalDrawPaths.sender.splice(-1, 1);
+    }
+  
+    // Function to redraw paths for a specific canvas
+    const redrawPaths = (ctx, coordinates, theme) => {
+      if (!ctx || !coordinates) return;
+  
+      ctx.strokeStyle = theme.strokeStyle;
+      ctx.lineWidth = theme.lineWidth;
+      ctx.lineCap = "round";
+  
+      for (const path of coordinates) {
+        if (path && Array.isArray(path)) {
+          ctx.beginPath();
+          ctx.moveTo(path[0][0], path[0][1]);
+          for (let i = 1; i < path.length; i++) {
+            ctx.lineTo(path[i][0], path[i][1]);
+          }
+          ctx.stroke();
+        }
+      }
+    };
+  
+    // **Redraw paths separately for each canvas**
+    if (context1) {
+      redrawPaths(context1, senderConfig.coordinates, senderConfig.theme);
+      redrawPaths(context1, extraCoordinateConfig.coordinates, extraCoordinateConfig.theme);
+    }
+  
+    if (context2) {
+      redrawPaths(context2, senderConfig.coordinates, senderConfig.theme);
+      redrawPaths(context2, extraCoordinateConfig.coordinates, extraCoordinateConfig.theme);
+    }
+  
+    // **Restore previous stroke only if available**
+    if (strikes.length > 0) {
+      const lastStrike = strikes.pop();
+      if (context1) context1.putImageData(lastStrike, 0, 0);
+      if (context2) context2.putImageData(lastStrike, 0, 0);
+    }
+  
+    // **Emit undo event (if required)**
+    if (removeLastCoordinate) {
+      // socket.emit(EVENTS.EMIT_UNDO, { ... });
       // sendEmitUndoEvent();
     }
   };
+  
+  
 
   function resetInitialPinnedUser() {}
   return (
@@ -517,16 +694,41 @@ const ClipModeCall = ({
               >
                 <div
                   className="button ml-3"
-                  onClick={() => setDrawingMode(!drawingMode)}
+                  onClick={() => {
+                    setDrawingMode(!drawingMode);
+                    setShowDrawingTools(false);
+                  }}
                 >
                   <PenTool size={18} color={drawingMode ? "blue" : "black"} />
                 </div>
+              </div>
+
+              <div
+                style={{
+                  position: "relative",
+                }}
+              >
                 {drawingMode && (
+                  <div
+                    className="button ml-1"
+                    onClick={() => {
+                      setShowDrawingTools(!showDrawingTools);
+                    }}
+                  >
+                    <ChevronDown
+                      size={18}
+                      color={drawingMode ? "blue" : "black"}
+                    />
+                  </div>
+                )}
+
+                {showDrawingTools && (
                   <div
                     style={{
                       position: "absolute",
                       zIndex: 99,
                       top: 24,
+                      left: -10,
                     }}
                   >
                     <CanvasMenuBar
@@ -584,17 +786,16 @@ const ClipModeCall = ({
             </div>
           </div>
           <div>
-  
-              <VideoContainer
-                drawingMode={drawingMode}
-                isMaximized
-                canvasRef={canvasRef}
-              />
-               <VideoContainer
-                drawingMode={drawingMode}
-                isMaximized
-                canvasRef={canvasRef2}
-              />
+            <VideoContainer
+              drawingMode={drawingMode}
+              isMaximized
+              canvasRef={canvasRef}
+            />
+            <VideoContainer
+              drawingMode={drawingMode}
+              isMaximized
+              canvasRef={canvasRef2}
+            />
           </div>
         </div>
       ) : (
@@ -614,16 +815,41 @@ const ClipModeCall = ({
               >
                 <div
                   className="button ml-3"
-                  onClick={() => setDrawingMode(!drawingMode)}
+                  onClick={() => {
+                    setDrawingMode(!drawingMode);
+                    setShowDrawingTools(false);
+                  }}
                 >
                   <PenTool size={18} color={drawingMode ? "blue" : "black"} />
                 </div>
+              </div>
+
+              <div
+                style={{
+                  position: "relative",
+                }}
+              >
                 {drawingMode && (
+                  <div
+                    className="button ml-1"
+                    onClick={() => {
+                      setShowDrawingTools(!showDrawingTools);
+                    }}
+                  >
+                    <ChevronDown
+                      size={18}
+                      color={drawingMode ? "blue" : "black"}
+                    />
+                  </div>
+                )}
+
+                {showDrawingTools && (
                   <div
                     style={{
                       position: "absolute",
                       zIndex: 99,
                       top: 24,
+                      left: -10,
                     }}
                   >
                     <CanvasMenuBar
@@ -694,9 +920,9 @@ const ClipModeCall = ({
             // onClick={handleUserClick}
             selected={false}
           />
-          
-            <VideoContainer drawingMode={drawingMode} canvasRef={canvasRef} />
-            <VideoContainer drawingMode={drawingMode} canvasRef={canvasRef2} />
+
+          <VideoContainer drawingMode={drawingMode} canvasRef={canvasRef} />
+          <VideoContainer drawingMode={drawingMode} canvasRef={canvasRef2} />
         </>
       )}
     </>
