@@ -86,7 +86,8 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
 
   // Play/pause video
   const togglePlayPause = () => {
-    const video = videoRef.current;
+    const video = videoRef?.current;
+    console.log("video hai",video)
     if(video){
       if (video.paused) {
         video.play();
