@@ -211,6 +211,7 @@ const ClipModeCall = ({
   };
 
   function resetInitialPinnedUser() {}
+  const isSingle= selectedClips?.length ===1;
   return (
     <>
       {isMaximized ? (
@@ -362,6 +363,7 @@ const ClipModeCall = ({
                     videoRef={videoRef}
                     setIsPlaying={setIsPlayingBoth}
                     isFixed={isLock}
+              
                   />
                 )}
               </>
@@ -375,6 +377,7 @@ const ClipModeCall = ({
                 clip={selectedClips[0]}
                 isPlaying={isPlaying1}
                 setIsPlaying={setIsPlaying1}
+                isSingle={isSingle}
               />
             )}
           </div>
@@ -549,6 +552,7 @@ const ClipModeCall = ({
                 clip={selectedClips[0]}
                 isPlaying={isPlaying1}
                 setIsPlaying={setIsPlaying1}
+                isSingle={isSingle}
               />
             )}
           </div>

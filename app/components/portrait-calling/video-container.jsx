@@ -47,7 +47,8 @@ const VideoContainer = ({
   index,
   videoRef,
   isPlaying,
-  setIsPlaying
+  setIsPlaying,
+  isSingle
 }) => {
   const videoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -382,7 +383,12 @@ const VideoContainer = ({
           isMaximized ? "" : "mb-3"
         }`}
         style={{
-          height: isMaximized ?isLock?"47dvh": "50dvh" : isLock?"38dvh": "40dvh",
+          height: isSingle
+          ? (isMaximized ? "100dvh" : "85dvh") // If isSingle is true
+          : (isMaximized
+              ? (isLock ? "47dvh" : "50dvh") // If isMaximized is true and isSingle is false
+              : (isLock ? "38dvh" : "40dvh") // If isMaximized is false and isSingle is false
+          ),
           width: "100vw",
           display: "flex",
           justifyContent: "center",

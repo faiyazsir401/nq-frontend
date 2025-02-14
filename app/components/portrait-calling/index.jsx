@@ -209,7 +209,7 @@ const VideoCallUI = ({
           timeRemaining={timeRemaining}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
-          selectedClips={selectedClips}
+          selectedClips={[selectedClips[0]]}
           setSelectedClips={setSelectedClips}
           isLock={isLockMode}
         />
