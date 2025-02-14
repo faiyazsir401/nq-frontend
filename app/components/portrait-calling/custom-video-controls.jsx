@@ -41,7 +41,7 @@ const CustomVideoControls = ({
         <div style={{ position: "absolute", bottom: "10px", left: "50%", transform: "translateX(-50%)",display:"flex",alignItems:'Center',justifyContent:"center",gap:"5px" }}>
           {/* Toggle Controls Button */}
           
-            
+
           <AnimatePresence>
             {controlsVisible && (
               <motion.div
@@ -69,7 +69,7 @@ const CustomVideoControls = ({
                 </button>
     
                 {/* Volume Control */}
-                <div style={{ position: "relative" }}>
+                {/* <div style={{ position: "relative" }}>
                   <button
                     onClick={() => setShowVolume(!showVolume)}
                     style={{ background: "none", border: "none", color: "white", fontSize: "22px", cursor: "pointer" }}
@@ -94,7 +94,7 @@ const CustomVideoControls = ({
                       }}
                     />
                   )}
-                </div>
+                </div> */}
     
                 {/* Progress Bar */}
                 <input

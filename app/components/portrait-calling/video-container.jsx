@@ -41,6 +41,7 @@ let storedLocalDrawPaths = { sender: [], receiver: [] };
 const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
   const videoRef = useRef(null);
   const videoContainerRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true); // Track if the video is loading
 
   const [isPlaying, setIsPlaying] = useState(false); // Track video playback state
   const [volume, setVolume] = useState(1); // Track video volume
@@ -418,6 +419,14 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
           position: "relative",
         }}
       >
+
+                {/* Show loading spinner while video is loading */}
+                {isLoading && (
+          <div className="absolute flex items-center justify-center w-full h-full bg-gray-700 opacity-75 z-10">
+            <div className="animate-spin border-4 border-t-4 border-blue-600 rounded-full w-16 h-16"></div>
+          </div>
+        )}
+
         <TransformWrapper disabled={drawingMode}>
           <TransformComponent>
             <div
