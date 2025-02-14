@@ -495,6 +495,10 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef }) => {
                 controls
                 className="w-full h-full object-cover"
                 playsInline
+                webkit-playsinline="true"
+                style={{
+                  touchAction:"manipulation"
+                }}
               />
             </div>
           </TransformComponent>
