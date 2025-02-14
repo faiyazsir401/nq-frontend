@@ -50,6 +50,7 @@ const VideoCallUI = ({
   const [isRemoteVideoOff, setRemoteVideoOff] = useState(false);
   const [isOpenReport, setIsOpenReport] = useState(false);
   const remoteVideoRef = useRef(null);
+  const [isLockMode,setIsLockMode] = useState(false)
   // selects trainee clips on load
 
 
@@ -210,12 +211,15 @@ const VideoCallUI = ({
           setIsMaximized={setIsMaximized}
           selectedClips={selectedClips}
           setSelectedClips={setSelectedClips}
+          isLock={isLockMode}
         />
       )}
       {!isMaximized && (
         <ActionButtons
           isShowVideos={isShowVideos}
           setIsShowVideos={setIsShowVideos}
+          setIsLockMode={setIsLockMode}
+          isLockMode={isLockMode}
         />
       )}
     </div>

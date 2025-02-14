@@ -4,9 +4,9 @@ import { FaLock, FaUnlock } from "react-icons/fa";
 import { Tooltip } from "react-tippy";
 
 
-const ActionButtons = ({ isShowVideos, setIsShowVideos }) => {
+const ActionButtons = ({ isShowVideos, setIsShowVideos,isLockMode,setIsLockMode }) => {
   const isFeedStopped = true;
-  const videoController = true;
+
   return (
     <div className="action-buttons">
       <Tooltip>
@@ -40,8 +40,8 @@ const ActionButtons = ({ isShowVideos, setIsShowVideos }) => {
       </Tooltip>
 
       <Tooltip>
-        <div className="button video-lock">
-          {videoController ? <FaLock size={16} /> : <FaUnlock size={16} />}
+        <div className="button video-lock" onClick={()=>setIsLockMode(!isLockMode)}>
+          {isLockMode ? <FaLock size={16} /> : <FaUnlock size={16} />}
         </div>
       </Tooltip>
 

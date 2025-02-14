@@ -26,10 +26,11 @@ const CustomVideoControls = ({
   isFullscreen,
   toggleFullscreen,
   setIsPlaying,
+  isFixed,
 }) => {
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
-  console.log("volume", volume);
+
   useEffect(() => {
     const handleEnded = () => setIsPlaying(false);
     if (videoRef.current) {
@@ -42,17 +43,17 @@ const CustomVideoControls = ({
     };
   }, [videoRef]);
 
-  const GetVolumeIcon = () => {
-    if (volume === 0) return <FaVolumeMute />;
-    if (volume < 0.6) return <FaVolumeDown />;
-    return <FaVolumeUp />;
-  };
+//   const GetVolumeIcon = () => {
+//     if (volume === 0) return <FaVolumeMute />;
+//     if (volume < 0.6) return <FaVolumeDown />;
+//     return <FaVolumeUp />;
+//   };
 
   return (
     <div
       style={{
-        position: "absolute",
-        bottom: "10px",
+        position: isFixed?"relative":'absolute',
+        bottom: isFixed?"0px":"10px",
         left: "50%",
         transform: "translateX(-50%)",
         display: "flex",
@@ -131,14 +132,13 @@ const CustomVideoControls = ({
               value={videoRef.current?.currentTime || 0}
               max={videoRef.current?.duration || 100}
               onChange={handleSeek}
-              onMouseDown={handleSeekMouseDown}
-              onMouseUp={handleSeekMouseUp}
+
               style={{
                 flex: 1,
                 cursor: "pointer",
                 height: "5px",
                 appearance: "none",
-                background: `linear-gradient(to right, #ff0000 ${
+                background: `linear-gradient(to right, #2566e8 ${
                   ((videoRef.current?.currentTime || 0) /
                     (videoRef.current?.duration || 100)) *
                   100
@@ -150,8 +150,9 @@ const CustomVideoControls = ({
             />
 
             {/* Fullscreen Button */}
+            {isFullscreen !== undefined &&
             <button
-              onClick={toggleFullscreen}
+              onClick={()=>toggleFullscreen&& toggleFullscreen()}
               style={{
                 background: "none",
                 border: "none",
@@ -161,31 +162,32 @@ const CustomVideoControls = ({
               }}
             >
               {isFullscreen ? <FaCompress /> : <FaExpand />}
-            </button>
+            </button>}
           </motion.div>
         )}
       </AnimatePresence>
-
-      <button
-        onClick={() => setControlsVisible(!controlsVisible)}
-        style={{
-          background: "none",
-          border: "none",
-          color: "black",
-          fontSize: "22px",
-          cursor: "pointer",
-          marginBottom: "5px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          //   border:"2px solid black",
-          backgroundColor: "white",
-          aspectRatio: "1",
-          borderRadius: 99,
-        }}
-      >
-        {controlsVisible ? <FaChevronDown /> : <FaChevronUp />}
-      </button>
+      {!isFixed && (
+        <button
+          onClick={() => setControlsVisible(!controlsVisible)}
+          style={{
+            background: "none",
+            border: "none",
+            color: "black",
+            fontSize: "22px",
+            cursor: "pointer",
+            marginBottom: "5px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            //   border:"2px solid black",
+            backgroundColor: "white",
+            aspectRatio: "1",
+            borderRadius: 99,
+          }}
+        >
+          {controlsVisible ? <FaChevronDown /> : <FaChevronUp />}
+        </button>
+      )}
     </div>
   );
 };

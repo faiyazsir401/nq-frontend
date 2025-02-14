@@ -5,6 +5,7 @@ import VideoContainer from "./video-container";
 import { UserBoxMini } from "./user-box";
 import TimeRemaining from "./time-remaining";
 import { useRef } from "react";
+import CustomVideoControls from "./custom-video-controls";
 
 const ClipModeCall = ({
   timeRemaining,
@@ -12,6 +13,7 @@ const ClipModeCall = ({
   setIsMaximized,
   selectedClips,
   setSelectedClips,
+  isLock
 }) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [showDrawingTools, setShowDrawingTools] = useState(false);
@@ -19,6 +21,8 @@ const ClipModeCall = ({
   const [isOpen, setIsOpen] = useState(false);
   const canvasRef = useRef(null);
   const canvasRef2 = useRef(null);
+  const videoRef = useRef(null);
+  const videoRef2 = useRef(null);
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
     g: 112,
@@ -30,6 +34,41 @@ const ClipModeCall = ({
   const [micNote, setMicNote] = useState(false);
   const [clipSelectNote, setClipSelectNote] = useState(false);
   const [countClipNoteOpen, setCountClipNoteOpen] = useState(false);
+
+  const [isPlayingBoth, setIsPlayingBoth] = useState(false); // Track video playback state
+  const [isPlaying1, setIsPlaying1] = useState(false); // Track video playback state
+  const [isPlaying2, setIsPlaying2] = useState(false); // Track video playback state
+
+  const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen state
+
+  // Play/pause video
+  const togglePlayPause = () => {
+    const video1 = videoRef.current;
+    const video2 = videoRef2.current;
+    if (video1 && video2) {
+      if (video1.paused) {
+        video1.play();
+        video2.play();
+        setIsPlayingBoth(true);
+      } else {
+        video1.pause();
+        video2.pause();
+        setIsPlayingBoth(false);
+      }
+    }
+  };
+
+  // Handle seeking for both videos when locked
+  const handleSeek = (e) => {
+    const progress = e.target.value;
+    console.log("progress",progress)
+    const video1 = videoRef.current;
+    const video2 = videoRef2.current;
+    if (video1 && video2) {
+      video1.currentTime = progress;
+      video2.currentTime = progress;
+    }
+  };
 
   const clearCanvas = () => {
     const canvas1 = canvasRef?.current;
@@ -293,22 +332,49 @@ const ClipModeCall = ({
                 <VideoContainer
                   drawingMode={drawingMode}
                   isMaximized
+                  isLock={isLock}
+                  index={1}
                   canvasRef={canvasRef}
+                  videoRef={videoRef}
                   clip={selectedClips[0]}
+                  isPlaying={isLock?isPlayingBoth:isPlaying1}
+                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying1}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
                   isMaximized
+                  isLock={isLock}
+                  index={2}
                   canvasRef={canvasRef2}
+                  videoRef={videoRef2}
                   clip={selectedClips[1]}
+                  isPlaying={isLock?isPlayingBoth:isPlaying2}
+                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying2}
                 />
+
+                {isLock && (
+                  <CustomVideoControls
+                    handleSeek={handleSeek}
+                    isPlaying={isPlayingBoth}
+                    // toggleFullscreen={toggleFullscreen}
+                    // toggleMute={toggleMute}
+                    togglePlayPause={togglePlayPause}
+                    videoRef={videoRef}
+                    setIsPlaying={setIsPlayingBoth}
+                    isFixed={isLock}
+                  />
+                )}
               </>
             ) : (
               <VideoContainer
                 drawingMode={drawingMode}
                 isMaximized
+                index={1}
                 canvasRef={canvasRef}
+                videoRef={videoRef}
                 clip={selectedClips[0]}
+                isPlaying={isPlaying1}
+                setIsPlaying={setIsPlaying1}
               />
             )}
           </div>
@@ -436,26 +502,53 @@ const ClipModeCall = ({
             selected={false}
           />
 
-          <div>
-            {selectedClips?.length > 1 ? (
+<div>
+            {selectedClips.length > 1 ? (
               <>
                 <VideoContainer
                   drawingMode={drawingMode}
+             
+                  isLock={isLock}
+                  index={1}
                   canvasRef={canvasRef}
+                  videoRef={videoRef}
                   clip={selectedClips[0]}
+                  isPlaying={isLock?isPlayingBoth:isPlaying1}
+                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying1}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
+              
+                  isLock={isLock}
+                  index={2}
                   canvasRef={canvasRef2}
+                  videoRef={videoRef2}
                   clip={selectedClips[1]}
+                  isPlaying={isLock?isPlayingBoth:isPlaying2}
+                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying2}
                 />
+
+                {isLock && (
+                  <CustomVideoControls
+                    handleSeek={handleSeek}
+                    isPlaying={isPlayingBoth}
+                    // toggleFullscreen={toggleFullscreen}
+                    // toggleMute={toggleMute}
+                    togglePlayPause={togglePlayPause}
+                    videoRef={videoRef}
+                    setIsPlaying={setIsPlayingBoth}
+                    isFixed={isLock}
+                  />
+                )}
               </>
             ) : (
               <VideoContainer
                 drawingMode={drawingMode}
-                isMaximized
                 canvasRef={canvasRef}
+                videoRef={videoRef}
                 clip={selectedClips[0]}
+                isPlaying={isPlaying1}
+                setIsPlaying={setIsPlaying1}
               />
             )}
           </div>

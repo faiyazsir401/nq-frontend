@@ -38,57 +38,24 @@ let canvasConfigs = {
 let selectedShape = null;
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 
-const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
-  const videoRef = useRef(null);
+const VideoContainer = ({
+  drawingMode,
+  isMaximized,
+  canvasRef,
+  clip,
+  isLock,
+  index,
+  videoRef,
+  isPlaying,
+  setIsPlaying
+}) => {
   const videoContainerRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(true); // Track if the video is loading
-
-  const [isPlaying, setIsPlaying] = useState(false); // Track video playback state
-  const [volume, setVolume] = useState(1); // Track video volume
-  const [isMuted, setIsMuted] = useState(false); // Track mute state
-  const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen state
-  const [currentTime, setCurrentTime] = useState(0); // Track current time of the video
-  const [duration, setDuration] = useState(0); // Track video duration
-  const [seeking, setSeeking] = useState(false); // Track if the user is seeking
-
-  useEffect(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef?.current;
-
-    if (canvas) {
-      canvas.width = video.clientWidth;
-      canvas.height = video.clientHeight;
-    }
-
-    const handleTimeUpdate = () => {
-      if (!seeking) {
-        setCurrentTime(video.currentTime); // Update current time when video plays
-      }
-    };
-
-    const handleDurationChange = () => {
-      console.log("video.duration", video.duration);
-      setDuration(video.duration); // Update video duration when it loads
-    };
-
-    if (video) {
-      video.addEventListener("timeupdate", handleTimeUpdate); // Listen for time updates
-      video.addEventListener("durationchange", handleDurationChange); // Listen for duration changes
-    }
-
-    return () => {
-      if (video) {
-        video.removeEventListener("timeupdate", handleTimeUpdate); // Clean up
-        video.removeEventListener("durationchange", handleDurationChange);
-      }
-    };
-  }, [canvasRef, seeking]);
-
+  const [isFullscreen, setIsFullscreen] = useState(false);
   // Play/pause video
   const togglePlayPause = () => {
     const video = videoRef?.current;
-    console.log("video hai",video)
-    if(video){
+    console.log("video hai", video);
+    if (video) {
       if (video.paused) {
         video.play();
         setIsPlaying(true);
@@ -96,27 +63,27 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
         video.pause();
         setIsPlaying(false);
       }
-    }else{
-      console.log("video not loaded yet")
+    } else {
+      console.log("video not loaded yet");
     }
   };
 
-  // Handle volume change
-  const changeVolume = (e) => {
-    const volume = parseFloat(e.target.value);
-    const video = videoRef.current;
-    if(video){
-      video.volume = volume;
-      setVolume(volume);
-    }
-  };
+  // // Handle volume change
+  // const changeVolume = (e) => {
+  //   const volume = parseFloat(e.target.value);
+  //   const video = videoRef.current;
+  //   if (video) {
+  //     video.volume = volume;
+  //     setVolume(volume);
+  //   }
+  // };
 
-  // Mute/unmute video
-  const toggleMute = () => {
-    const video = videoRef.current;
-    video.muted = !video.muted;
-    setIsMuted(!isMuted);
-  };
+  // // Mute/unmute video
+  // const toggleMute = () => {
+  //   const video = videoRef.current;
+  //   video.muted = !video.muted;
+  //   setIsMuted(!isMuted);
+  // };
 
   // Toggle fullscreen mode
   const toggleFullscreen = () => {
@@ -415,7 +382,7 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
           isMaximized ? "" : "mb-3"
         }`}
         style={{
-          height: isMaximized ? "50dvh" : "40dvh",
+          height: isMaximized ?isLock?"47dvh": "50dvh" : isLock?"38dvh": "40dvh",
           width: "100vw",
           display: "flex",
           justifyContent: "center",
@@ -424,14 +391,6 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
           position: "relative",
         }}
       >
-
-                {/* Show loading spinner while video is loading */}
-                {isLoading && (
-          <div className="absolute flex items-center justify-center w-full h-full bg-gray-700 opacity-75 z-10">
-            <div className="animate-spin border-4 border-t-4 border-blue-600 rounded-full w-16 h-16"></div>
-          </div>
-        )}
-
         <TransformWrapper disabled={drawingMode}>
           <TransformComponent>
             <div
@@ -472,22 +431,17 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
           className="canvas"
           style={{ display: drawingMode ? "block" : "none" }}
         />
-
-        <CustomVideoControls
-          changeVolume={changeVolume}
-          volume={volume}
-          handleSeek={handleSeek}
-          handleSeekMouseDown={handleSeekMouseDown}
-          handleSeekMouseUp={handleSeekMouseUp}
-          isFullscreen={isFullscreen}
-          isMuted={isMuted}
-          isPlaying={isPlaying}
-          toggleFullscreen={toggleFullscreen}
-          toggleMute={toggleMute}
-          togglePlayPause={togglePlayPause}
-          videoRef={videoRef}
-          setIsPlaying={setIsPlaying}
-        />
+        {!isLock && (
+          <CustomVideoControls
+            handleSeek={handleSeek}
+            isFullscreen={isFullscreen}
+            isPlaying={isPlaying}
+            toggleFullscreen={toggleFullscreen}
+            togglePlayPause={togglePlayPause}
+            videoRef={videoRef}
+            setIsPlaying={setIsPlaying}
+          />
+        )}
       </div>
     </>
   );
