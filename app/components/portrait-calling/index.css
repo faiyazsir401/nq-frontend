@@ -31,7 +31,7 @@
   background-color: #333;
   border-radius: 10px;
   padding: 20px;
-  height: 40vh;
+  height: 40dvh;
   /* margin: 10px 0px; */
   width: 95vw;
   border-radius: 20px;
@@ -127,7 +127,7 @@
 
 .selected {
   width: 90vw;
-  height: 80vh;
+  height: 80dvh;
   object-fit: contain;
   border-radius: 0;
   border-radius: 20px;
@@ -140,7 +140,7 @@
 .movable-user-box{
   position: absolute;
   top: 0;
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
 }
 
