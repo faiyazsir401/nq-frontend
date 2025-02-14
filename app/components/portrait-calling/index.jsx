@@ -43,19 +43,19 @@ const VideoCallUI = ({
   const [localStream, setLocalStream] = useState(null);
   const [displayMsg, setDisplayMsg] = useState({ showMsg: false, msg: "" });
   const [remoteStream, setRemoteStream] = useState(null);
+
   const [timeRemaining, setTimeRemaining] = useState(51 * 60 + 3); // 51:03 in seconds
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isShowVideos, setIsShowVideos] = useState(false);
+  const [isShowVideos, setIsShowVideos] = useState(true);
   const [isMaximized, setIsMaximized] = useState(false);
   const [isRemoteVideoOff, setRemoteVideoOff] = useState(false);
   const [isOpenReport, setIsOpenReport] = useState(false);
   const remoteVideoRef = useRef(null);
-  const [isLockMode,setIsLockMode] = useState(false)
+  const [isLockMode, setIsLockMode] = useState(false);
+
+  const [isLocalStreamOff, setIsLocalStreamOff] = useState(false);
+  const [isRemoteStreamOff, setIsRemoteStreamOff] = useState(false);
   // selects trainee clips on load
-
-
-
-
 
   useEffect(() => {
     if (isTraineeJoined) {
@@ -65,9 +65,9 @@ const VideoCallUI = ({
         setSelectedClips([]);
       } // Set the selected clips immediately
     }
-  }, [accountType, startMeeting,isTraineeJoined]); // Dependencies to ensure it updates correctly
-  
-  console.log("selectedClips", selectedClips,accountType,startMeeting);
+  }, [accountType, startMeeting, isTraineeJoined]); // Dependencies to ensure it updates correctly
+
+  console.log("selectedClips", selectedClips, accountType, startMeeting);
 
   // Handle start call
   const handleStartCall = async () => {
@@ -83,7 +83,9 @@ const VideoCallUI = ({
         showMsg: true,
         msg: `Waiting for ${toUser?.fullname} to join...`,
       });
-      // videoRef.current.srcObject = stream;
+      if (videoRef?.current) {
+        videoRef.current.srcObject = stream;
+      }
 
       const peer = new Peer(fromUser._id, {
         config: startMeeting.iceServers,
@@ -107,6 +109,8 @@ const VideoCallUI = ({
         call.on("stream", (remoteStream) => {
           setIsTraineeJoined(true);
           setDisplayMsg({ showMsg: false, msg: "" });
+          if (remoteVideoRef?.current)
+            remoteVideoRef.current.srcObject = remoteStream;
           setRemoteStream(remoteStream);
         });
       });
@@ -131,16 +135,19 @@ const VideoCallUI = ({
   const connectToPeer = (peer, peerId) => {
     if (!(videoRef && videoRef?.current)) return;
     const call = peer.call(peerId, videoRef?.current?.srcObject);
-    call.on("stream", (remoteStream) => {
+    call?.on("stream", (remoteStream) => {
       // console.log(`setting remoteStream for 2nd user here ---- `);
       setDisplayMsg({ showMsg: false, msg: "" });
       setIsTraineeJoined(true);
-      remoteVideoRef.current.srcObject = remoteStream;
+      console.log("remoteVideoRef", remoteVideoRef?.current);
+      if (remoteVideoRef?.current) {
+        remoteVideoRef.current.srcObject = remoteStream;
+      }
       setRemoteStream(remoteStream);
       // accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
     });
   };
-
+  console.log("isTraineeJoined", isTraineeJoined);
   useEffect(() => {
     socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
       setTimeout(() => {
@@ -172,7 +179,7 @@ const VideoCallUI = ({
     });
 
     socket.on(EVENTS.VIDEO_CALL.STOP_FEED, ({ feedStatus }) => {
-      setRemoteVideoOff(feedStatus);
+      setIsRemoteStreamOff(feedStatus);
     });
   }, [socket]);
 
@@ -192,17 +199,34 @@ const VideoCallUI = ({
     }
   }, [fromUser, toUser]);
 
+  console.log("refs", videoRef, remoteVideoRef, remoteStream);
+
   return (
     <div
       className="video-call-container"
       style={{ alignItems: isMaximized ? "normal" : "center" }}
     >
-      {selectedClips && selectedClips?.length === 0 ? (
+      {displayMsg?.msg ? (
+        <div
+        >
+          {displayMsg?.msg}
+        </div>
+      ) : null}
+      {isShowVideos ? (
         <OneOnOneCall
           timeRemaining={timeRemaining}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
           videoRef={videoRef}
+          remoteVideoRef={remoteVideoRef}
+          toUser={toUser}
+          fromUser={fromUser}
+          localStream={localStream}
+          remoteStream={remoteStream}
+          isLocalStreamOff={isLocalStreamOff}
+          setIsLocalStreamOff={setIsLocalStreamOff}
+          isRemoteStreamOff={isRemoteStreamOff}
+          setIsRemoteStreamOff={setIsRemoteStreamOff}
         />
       ) : (
         <ClipModeCall
@@ -212,16 +236,28 @@ const VideoCallUI = ({
           selectedClips={[selectedClips[0]]}
           setSelectedClips={setSelectedClips}
           isLock={isLockMode}
+          localVideoRef={videoRef}
+          remoteVideoRef={remoteVideoRef}
+          toUser={toUser}
+          fromUser={fromUser}
+          localStream={localStream}
+          remoteStream={remoteStream}
         />
       )}
-      {!isMaximized && (
-        <ActionButtons
-          isShowVideos={isShowVideos}
-          setIsShowVideos={setIsShowVideos}
-          setIsLockMode={setIsLockMode}
-          isLockMode={isLockMode}
-        />
-      )}
+      {!isMaximized &&
+       
+          <ActionButtons
+            isShowVideos={isShowVideos}
+            setIsShowVideos={setIsShowVideos}
+            setIsLockMode={setIsLockMode}
+            isLockMode={isLockMode}
+            isVideoOff={isLocalStreamOff}
+            setIsVideoOff={setIsLocalStreamOff}
+            stream={localStream}
+            fromUser={fromUser}
+            toUser={toUser}
+          />
+      }
     </div>
   );
 };

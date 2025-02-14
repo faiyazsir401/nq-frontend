@@ -418,7 +418,7 @@ const VideoContainer = ({
                 style={{
                   touchAction: "manipulation",
                 }}
-                id={clip.id}
+                id={clip?.id}
                 muted={true}
                 poster={Utils?.generateThumbnailURL(clip)}
                 preload="metadata"

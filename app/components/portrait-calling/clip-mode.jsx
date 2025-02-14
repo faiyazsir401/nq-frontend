@@ -13,7 +13,13 @@ const ClipModeCall = ({
   setIsMaximized,
   selectedClips,
   setSelectedClips,
-  isLock
+  isLock,
+  localVideoRef,
+  remoteVideoRef,
+  toUser,
+  fromUser,
+  localStream,
+  remoteStream,
 }) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [showDrawingTools, setShowDrawingTools] = useState(false);
@@ -61,7 +67,7 @@ const ClipModeCall = ({
   // Handle seeking for both videos when locked
   const handleSeek = (e) => {
     const progress = e.target.value;
-    console.log("progress",progress)
+    console.log("progress", progress);
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
     if (video1 && video2) {
@@ -211,7 +217,7 @@ const ClipModeCall = ({
   };
 
   function resetInitialPinnedUser() {}
-  const isSingle= selectedClips?.length ===1;
+  const isSingle = selectedClips?.length === 1;
   return (
     <>
       {isMaximized ? (
@@ -338,8 +344,8 @@ const ClipModeCall = ({
                   canvasRef={canvasRef}
                   videoRef={videoRef}
                   clip={selectedClips[0]}
-                  isPlaying={isLock?isPlayingBoth:isPlaying1}
-                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying1}
+                  isPlaying={isLock ? isPlayingBoth : isPlaying1}
+                  setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying1}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
@@ -349,8 +355,8 @@ const ClipModeCall = ({
                   canvasRef={canvasRef2}
                   videoRef={videoRef2}
                   clip={selectedClips[1]}
-                  isPlaying={isLock?isPlayingBoth:isPlaying2}
-                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying2}
+                  isPlaying={isLock ? isPlayingBoth : isPlaying2}
+                  setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying2}
                 />
 
                 {isLock && (
@@ -363,7 +369,6 @@ const ClipModeCall = ({
                     videoRef={videoRef}
                     setIsPlaying={setIsPlayingBoth}
                     isFixed={isLock}
-              
                   />
                 )}
               </>
@@ -493,42 +498,40 @@ const ClipModeCall = ({
             <TimeRemaining timeRemaining={timeRemaining} />
           </div>
           <UserBoxMini
-            id={"1"}
-            name={"Trainer"}
-            // onClick={handleUserClick}
-            selected={false}
+            id={toUser._id}
+            videoRef={remoteVideoRef}
+            stream= {remoteStream}
+            user={fromUser}
           />
           <UserBoxMini
-            id={"2"}
-            name={"Trainee"}
-            // onClick={handleUserClick}
-            selected={false}
+            id={toUser._id} 
+            videoRef={localVideoRef}
+            stream= {localStream}
+            user={fromUser}
           />
 
-<div>
+          <div>
             {selectedClips.length > 1 ? (
               <>
                 <VideoContainer
                   drawingMode={drawingMode}
-             
                   isLock={isLock}
                   index={1}
                   canvasRef={canvasRef}
                   videoRef={videoRef}
                   clip={selectedClips[0]}
-                  isPlaying={isLock?isPlayingBoth:isPlaying1}
-                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying1}
+                  isPlaying={isLock ? isPlayingBoth : isPlaying1}
+                  setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying1}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
-              
                   isLock={isLock}
                   index={2}
                   canvasRef={canvasRef2}
                   videoRef={videoRef2}
                   clip={selectedClips[1]}
-                  isPlaying={isLock?isPlayingBoth:isPlaying2}
-                  setIsPlaying={isLock?setIsPlayingBoth:setIsPlaying2}
+                  isPlaying={isLock ? isPlayingBoth : isPlaying2}
+                  setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying2}
                 />
 
                 {isLock && (
