@@ -133,7 +133,20 @@ const CustomVideoControls = ({
               onChange={handleSeek}
               onMouseDown={handleSeekMouseDown}
               onMouseUp={handleSeekMouseUp}
-              style={{ flex: 1, cursor: "pointer", height: "5px" }}
+              style={{
+                flex: 1,
+                cursor: "pointer",
+                height: "5px",
+                appearance: "none",
+                background: `linear-gradient(to right, #ff0000 ${
+                  ((videoRef.current?.currentTime || 0) /
+                    (videoRef.current?.duration || 100)) *
+                  100
+                }%, #ccc 0%)`,
+                borderRadius: "5px",
+                outline: "none",
+                transition: "background 0.3s ease",
+              }}
             />
 
             {/* Fullscreen Button */}
