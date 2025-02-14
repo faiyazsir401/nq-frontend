@@ -447,7 +447,6 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
               <video
                 controls={false} // Hide built-in controls
                 ref={videoRef}
-                src={Utils?.generateVideoURL(clip)}
                 className="w-full h-full object-cover"
                 playsInline
                 webkit-playsinline="true"
@@ -459,7 +458,10 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
                 poster={Utils?.generateThumbnailURL(clip)}
                 preload="metadata"
                 crossOrigin="anonymous"
-              />
+              >
+                <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
           </TransformComponent>
         </TransformWrapper>
