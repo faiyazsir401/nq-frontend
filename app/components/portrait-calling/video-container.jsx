@@ -87,12 +87,16 @@ const VideoContainer = ({ drawingMode, isMaximized, canvasRef, clip }) => {
   // Play/pause video
   const togglePlayPause = () => {
     const video = videoRef.current;
-    if (video.paused) {
-      video.play();
-      setIsPlaying(true);
-    } else {
-      video.pause();
-      setIsPlaying(false);
+    if(video){
+      if (video.paused) {
+        video.play();
+        setIsPlaying(true);
+      } else {
+        video.pause();
+        setIsPlaying(false);
+      }
+    }else{
+      console.log("video not loaded yet")
     }
   };
 
