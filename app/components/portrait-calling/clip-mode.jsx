@@ -20,6 +20,8 @@ const ClipModeCall = ({
   fromUser,
   localStream,
   remoteStream,
+  isRemoteStreamOff,
+  isLocalStreamOff
 }) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [showDrawingTools, setShowDrawingTools] = useState(false);
@@ -501,13 +503,19 @@ const ClipModeCall = ({
             id={toUser._id}
             videoRef={remoteVideoRef}
             stream= {remoteStream}
-            user={fromUser}
+            user={toUser}
+            isStreamOff={
+             isRemoteStreamOff
+            }
           />
           <UserBoxMini
-            id={toUser._id} 
+            id={fromUser._id} 
             videoRef={localVideoRef}
             stream= {localStream}
             user={fromUser}
+            isStreamOff={
+              isLocalStreamOff
+            }
           />
 
           <div>

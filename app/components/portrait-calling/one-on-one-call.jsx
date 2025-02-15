@@ -56,14 +56,14 @@ const OneOnOneCall = ({
       </div>
       {selectedUser && (
         <UserBoxMini
-          id={selectedUser === toUser._id ? fromUser._id : toUser._id}
+          id={selectedUser === toUser._id ? toUser._id : fromUser._id}
           onClick={handleUserClick}
           selected={false}
           videoRef={selectedUser === toUser._id ? remoteVideoRef : videoRef}
           stream={selectedUser === toUser._id ? remoteStream : localStream}
-          user={selectedUser === toUser._id ? fromUser : toUser}
+          user={selectedUser === toUser._id ? toUser : fromUser}
           isStreamOff={
-            selectedUser === toUser._id ? isLocalStreamOff : isRemoteStreamOff
+            selectedUser === toUser._id ? isRemoteStreamOff : isLocalStreamOff
           }
         />
       )}

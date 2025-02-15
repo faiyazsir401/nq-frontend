@@ -65,7 +65,7 @@ export const UserBoxMini = ({ name, onClick, selected, id,videoRef,user,stream,i
     if(videoRef?.current){
       videoRef.current.srcObject = stream
     }
-  },[videoRef,stream])
+  },[videoRef,stream,isStreamOff])
   return (
     <Draggable bounds="parent">
     

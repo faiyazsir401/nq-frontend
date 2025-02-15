@@ -242,6 +242,8 @@ const VideoCallUI = ({
           fromUser={fromUser}
           localStream={localStream}
           remoteStream={remoteStream}
+          isRemoteStreamOff={isRemoteStreamOff}
+          isLocalStreamOff={isLocalStreamOff}
         />
       )}
       {!isMaximized &&
