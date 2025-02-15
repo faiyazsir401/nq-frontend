@@ -27,7 +27,7 @@ const OneOnOneCall = ({ timeRemaining, selectedUser, setSelectedUser,videoRef,re
             selected={selectedUser === fromUser._id}
             notSelected={selectedUser}
             videoRef={videoRef}
-            user={toUser}
+            user={fromUser}
             stream={localStream}
             isStreamOff={isLocalStreamOff}
           />
@@ -37,7 +37,7 @@ const OneOnOneCall = ({ timeRemaining, selectedUser, setSelectedUser,videoRef,re
             selected={selectedUser === toUser._id}
             notSelected={selectedUser}
             videoRef={remoteVideoRef}
-            user={fromUser}
+            user={toUser}
             stream={remoteStream}
             isStreamOff={isRemoteStreamOff}
           />
@@ -50,7 +50,7 @@ const OneOnOneCall = ({ timeRemaining, selectedUser, setSelectedUser,videoRef,re
             selected={false}
             videoRef={selectedUser === toUser._id ? remoteVideoRef : videoRef}
             stream= {selectedUser === toUser._id ? remoteStream : localStream}
-            user={selectedUser === toUser._id ? toUser :  fromUser}
+            user={selectedUser === toUser._id ? fromUser :  toUser}
             isStreamOff={selectedUser === toUser._id ? isLocalStreamOff : isRemoteStreamOff}
           />
         )}
