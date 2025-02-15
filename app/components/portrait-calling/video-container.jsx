@@ -7,42 +7,7 @@ import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
 import { authState } from "../auth/auth.slice";
 import { useAppSelector } from "../../store";
-import { AccountType } from "../../common/constants";
-
-const SHAPES = {
-  FREE_HAND: "hand",
-  LINE: "line",
-  CIRCLE: "circle",
-  SQUARE: "square",
-  OVAL: "oval",
-  RECTANGLE: "rectangle",
-  TRIANGLE: "triangle",
-  ARROW_RIGHT: "arrow_right",
-  TWO_SIDE_ARROW: "two_side_arrow",
-};
-
-let isDrawing = false;
-let savedPos;
-let startPos;
-let currPos;
-let strikes = [];
-let extraStream;
-let localVideoRef;
-let Peer;
-let canvasConfigs = {
-  sender: {
-    strokeStyle: "red",
-    lineWidth: 3,
-    lineCap: "round",
-  },
-  receiver: {
-    strokeStyle: "green",
-    lineWidth: 3,
-    lineCap: "round",
-  },
-};
-let selectedShape = null;
-let storedLocalDrawPaths = { sender: [], receiver: [] };
+import { AccountType, SHAPES } from "../../common/constants";
 
 const VideoContainer = ({
   drawingMode,
@@ -57,6 +22,17 @@ const VideoContainer = ({
   isSingle,
   fromUser,
   toUser,
+  isDrawing,
+  savedPos,
+  startPos,
+  currPos,
+  strikes,
+  extraStream,
+  localVideoRef,
+  Peer,
+  canvasConfigs,
+  selectedShape,
+  storedLocalDrawPaths,
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -93,7 +69,6 @@ const VideoContainer = ({
   useEffect(() => {
     const video = videoRef?.current;
 
-
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
       if (data?.videoId === clip?._id && data?.isPlaying) {
         // Only play if the video matches and the action is play
@@ -104,10 +79,8 @@ const VideoContainer = ({
       }
     });
 
-
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
       if (data?.videoId === clip?._id && !data?.isPlaying) {
-   
         if (video?.play) {
           video.pause();
           setIsPlaying(false);
@@ -117,8 +90,7 @@ const VideoContainer = ({
 
     socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
       if (data?.videoId === clip?._id) {
-   
-        video.currentTime = data.progress
+        video.currentTime = data.progress;
       }
     });
 
@@ -126,7 +98,6 @@ const VideoContainer = ({
     return () => {
       socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
       socket?.off(EVENTS?.ON_VIDEO_TIME);
-
     };
   }, [socket, clip?._id, videoRef]);
 
@@ -194,6 +165,7 @@ const VideoContainer = ({
     const video = videoRef.current;
     const videoContainer = videoContainerRef.current;
     const canvas = canvasRef?.current;
+    console.log("canvas123",canvas)
     if (canvas && videoContainer) {
       canvas.width = video.clientWidth;
       canvas.height = video.clientHeight;
@@ -213,20 +185,21 @@ const VideoContainer = ({
     const startDrawing = (event) => {
       console.log(
         "clientWidth",
-        document.getElementById("video-container")?.clientWidth
+        videoContainerRef?.current?.clientWidth
       );
       console.log(
         "clientHeight",
-        document.getElementById("video-container")?.clientHeight
+        videoContainerRef?.current?.clientHeight
       );
       event.preventDefault();
       isDrawing = true;
+      console.log("context",context)
       if (!context) return;
       savedPos = context?.getImageData(
         0,
         0,
-        document.getElementById("video-container")?.clientWidth,
-        document.getElementById("video-container")?.clientHeight
+        videoContainerRef?.current?.clientWidth,
+        videoContainerRef?.current?.clientHeight
       );
       if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
       strikes.push(savedPos);

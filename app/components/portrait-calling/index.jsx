@@ -43,7 +43,8 @@ const VideoCallUI = ({
   const [localStream, setLocalStream] = useState(null);
   const [displayMsg, setDisplayMsg] = useState({ showMsg: false, msg: "" });
   const [remoteStream, setRemoteStream] = useState(null);
-
+  const [micStream, setMicStream] = useState(null);
+  const [isMuted,setIsMuted] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(51 * 60 + 3); // 51:03 in seconds
   const [selectedUser, setSelectedUser] = useState(null);
   const [isShowVideos, setIsShowVideos] = useState(true);
@@ -212,7 +213,7 @@ const VideoCallUI = ({
           {displayMsg?.msg}
         </div>
       ) : null}
-      {isShowVideos ? (
+      {selectedClips && selectedClips === 0 ? (
         <OneOnOneCall
           timeRemaining={timeRemaining}
           selectedUser={selectedUser}
@@ -258,6 +259,8 @@ const VideoCallUI = ({
             stream={localStream}
             fromUser={fromUser}
             toUser={toUser}
+            isMuted={isMuted}
+            setIsMuted={setIsMuted}
           />
       }
     </div>

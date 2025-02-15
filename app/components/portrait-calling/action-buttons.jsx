@@ -26,19 +26,40 @@ const ActionButtons = ({
   stream,
   fromUser,
   toUser,
+  setIsMuted,
+  isMuted
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   return (
     <div className="action-buttons">
       <Tooltip>
-        <div className="button mic-toggle">
+        <div
+          className={`button mic-toggle ${isMuted?"off":""}`}
+          onClick={() => {
+
+            if (stream) {
+              const audioTracks = stream.getAudioTracks();
+              if (audioTracks.length > 0) {
+                audioTracks[0].enabled = !audioTracks[0].enabled;
+                setIsMuted(!audioTracks[0].enabled);
+              }
+            }
+            // if (micStream) {
+            //   const audioTracks = micStream.getAudioTracks();
+            //   if (audioTracks.length > 0) {
+            //     audioTracks[0].enabled = !audioTracks[0].enabled;
+            //     setIsMuted(!audioTracks[0].enabled);
+            //   }
+            // }
+          }}
+        >
           <MicOff size={16} />
         </div>
       </Tooltip>
       <Tooltip>
         <div
-          className="button feed-toggle"
+          className={`button video-toggle ${isVideoOff ? "off" : ""}`}
           onClick={() => {
             if (stream) {
               // console.log("inside of local stream  statement");
@@ -58,7 +79,7 @@ const ActionButtons = ({
       </Tooltip>
 
       <Tooltip>
-        <div className="button end-call">
+        <div className="button end-call off">
           <Phone size={16} />
         </div>
       </Tooltip>

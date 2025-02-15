@@ -22,16 +22,17 @@
 
 
 /* Individual Button Styling */
-.mic-toggle {
+.mic-toggle.off {
     color: white;
     background-color: red;
 }
 
-.feed-toggle {
-
+.video-toggle.off {
+  color: white;
+  background-color: red;
 }
 
-.end-call {
+.end-call.off {
   color: white;
   background-color: red;
 }
