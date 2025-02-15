@@ -44,7 +44,7 @@ const VideoCallUI = ({
   const [displayMsg, setDisplayMsg] = useState({ showMsg: false, msg: "" });
   const [remoteStream, setRemoteStream] = useState(null);
   const [micStream, setMicStream] = useState(null);
-  const [isMuted,setIsMuted] = useState(false)
+  const [isMuted, setIsMuted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(51 * 60 + 3); // 51:03 in seconds
   const [selectedUser, setSelectedUser] = useState(null);
   const [isShowVideos, setIsShowVideos] = useState(true);
@@ -207,29 +207,8 @@ const VideoCallUI = ({
       className="video-call-container"
       style={{ alignItems: isMaximized ? "normal" : "center" }}
     >
-      {displayMsg?.msg ? (
-        <div
-        >
-          {displayMsg?.msg}
-        </div>
-      ) : null}
-      {selectedClips && selectedClips === 0 ? (
-        <OneOnOneCall
-          timeRemaining={timeRemaining}
-          selectedUser={selectedUser}
-          setSelectedUser={setSelectedUser}
-          videoRef={videoRef}
-          remoteVideoRef={remoteVideoRef}
-          toUser={toUser}
-          fromUser={fromUser}
-          localStream={localStream}
-          remoteStream={remoteStream}
-          isLocalStreamOff={isLocalStreamOff}
-          setIsLocalStreamOff={setIsLocalStreamOff}
-          isRemoteStreamOff={isRemoteStreamOff}
-          setIsRemoteStreamOff={setIsRemoteStreamOff}
-        />
-      ) : (
+      {displayMsg?.msg ? <div>{displayMsg?.msg}</div> : null}
+      {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
           timeRemaining={timeRemaining}
           isMaximized={isMaximized}
@@ -246,23 +225,38 @@ const VideoCallUI = ({
           isRemoteStreamOff={isRemoteStreamOff}
           isLocalStreamOff={isLocalStreamOff}
         />
+      ) : (
+        <OneOnOneCall
+          timeRemaining={timeRemaining}
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
+          videoRef={videoRef}
+          remoteVideoRef={remoteVideoRef}
+          toUser={toUser}
+          fromUser={fromUser}
+          localStream={localStream}
+          remoteStream={remoteStream}
+          isLocalStreamOff={isLocalStreamOff}
+          setIsLocalStreamOff={setIsLocalStreamOff}
+          isRemoteStreamOff={isRemoteStreamOff}
+          setIsRemoteStreamOff={setIsRemoteStreamOff}
+        />
       )}
-      {!isMaximized &&
-       
-          <ActionButtons
-            isShowVideos={isShowVideos}
-            setIsShowVideos={setIsShowVideos}
-            setIsLockMode={setIsLockMode}
-            isLockMode={isLockMode}
-            isVideoOff={isLocalStreamOff}
-            setIsVideoOff={setIsLocalStreamOff}
-            stream={localStream}
-            fromUser={fromUser}
-            toUser={toUser}
-            isMuted={isMuted}
-            setIsMuted={setIsMuted}
-          />
-      }
+      {!isMaximized && (
+        <ActionButtons
+          isShowVideos={isShowVideos}
+          setIsShowVideos={setIsShowVideos}
+          setIsLockMode={setIsLockMode}
+          isLockMode={isLockMode}
+          isVideoOff={isLocalStreamOff}
+          setIsVideoOff={setIsLocalStreamOff}
+          stream={localStream}
+          fromUser={fromUser}
+          toUser={toUser}
+          isMuted={isMuted}
+          setIsMuted={setIsMuted}
+        />
+      )}
     </div>
   );
 };
