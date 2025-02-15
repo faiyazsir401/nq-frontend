@@ -17,7 +17,8 @@ export const UserBox = ({
     if(videoRef?.current){
       videoRef.current.srcObject = stream
     }
-  },[videoRef,stream,isStreamOff])
+  },[videoRef,stream,isStreamOff,id])
+  
   return (
     <div
       className={`${false?"": "profile-box"} ${
