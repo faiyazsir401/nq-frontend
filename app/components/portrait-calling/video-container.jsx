@@ -5,6 +5,9 @@ import CustomVideoControls from "./custom-video-controls";
 import { useContext } from "react";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
+import { authState } from "../auth/auth.slice";
+import { useAppSelector } from "../../store";
+import { AccountType } from "../../common/constants";
 
 const SHAPES = {
   FREE_HAND: "hand",
@@ -55,6 +58,7 @@ const VideoContainer = ({
   fromUser,
   toUser
 }) => {
+  const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   const videoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -489,7 +493,8 @@ const VideoContainer = ({
           className="canvas"
           style={{ display: drawingMode ? "block" : "none" }}
         />
-        {!isLock && (
+
+        {accountType===AccountType.TRAINER && !isLock && (
           <CustomVideoControls
             handleSeek={handleSeek}
             isFullscreen={isFullscreen}

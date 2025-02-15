@@ -12,6 +12,9 @@ import { Tooltip } from "react-tippy";
 import { EVENTS } from "../../../helpers/events";
 import { useContext } from "react";
 import { SocketContext } from "../socket";
+import { useAppSelector } from "../../store";
+import { authState } from "../auth/auth.slice";
+import { AccountType } from "../../common/constants";
 
 const ActionButtons = ({
   isShowVideos,
@@ -22,9 +25,10 @@ const ActionButtons = ({
   setIsVideoOff,
   stream,
   fromUser,
-  toUser
+  toUser,
 }) => {
-  const socket = useContext(SocketContext)
+  const { accountType } = useAppSelector(authState);
+  const socket = useContext(SocketContext);
   return (
     <div className="action-buttons">
       <Tooltip>
@@ -49,11 +53,7 @@ const ActionButtons = ({
             }
           }}
         >
-          {!isVideoOff ? (
-            <PauseCircle size={16} />
-          ) : (
-            <PlayCircle size={16} />
-          )}
+          {!isVideoOff ? <PauseCircle size={16} /> : <PlayCircle size={16} />}
         </div>
       </Tooltip>
 
@@ -63,35 +63,39 @@ const ActionButtons = ({
         </div>
       </Tooltip>
 
-      <Tooltip>
-        <div className="button external-link">
-          <ExternalLink
-            size={16}
-            onClick={() => setIsShowVideos(!isShowVideos)}
-          />
-        </div>
-      </Tooltip>
+      {accountType === AccountType.TRAINER && (
+        <>
+          <Tooltip>
+            <div className="button external-link">
+              <ExternalLink
+                size={16}
+                onClick={() => setIsShowVideos(!isShowVideos)}
+              />
+            </div>
+          </Tooltip>
 
-      <Tooltip>
-        <div
-          className="button video-lock"
-          onClick={() => setIsLockMode(!isLockMode)}
-        >
-          {isLockMode ? <FaLock size={16} /> : <FaUnlock size={16} />}
-        </div>
-      </Tooltip>
+          <Tooltip>
+            <div
+              className="button video-lock"
+              onClick={() => setIsLockMode(!isLockMode)}
+            >
+              {isLockMode ? <FaLock size={16} /> : <FaUnlock size={16} />}
+            </div>
+          </Tooltip>
 
-      <Tooltip>
-        <div className="button aperture">
-          <Aperture size={16} />
-        </div>
-      </Tooltip>
+          <Tooltip>
+            <div className="button aperture">
+              <Aperture size={16} />
+            </div>
+          </Tooltip>
 
-      <Tooltip>
-        <div className="button file-add">
-          <FilePlus size={16} />
-        </div>
-      </Tooltip>
+          <Tooltip>
+            <div className="button file-add">
+              <FilePlus size={16} />
+            </div>
+          </Tooltip>
+        </>
+      )}
     </div>
   );
 };

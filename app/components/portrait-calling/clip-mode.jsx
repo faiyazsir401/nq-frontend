@@ -6,6 +6,9 @@ import { UserBoxMini } from "./user-box";
 import TimeRemaining from "./time-remaining";
 import { useRef } from "react";
 import CustomVideoControls from "./custom-video-controls";
+import { AccountType } from "../../common/constants";
+import { useAppSelector } from "../../store";
+import { authState } from "../auth/auth.slice";
 
 const ClipModeCall = ({
   timeRemaining,
@@ -21,11 +24,11 @@ const ClipModeCall = ({
   localStream,
   remoteStream,
   isRemoteStreamOff,
-  isLocalStreamOff
+  isLocalStreamOff,
 }) => {
   const [drawingMode, setDrawingMode] = useState(false);
   const [showDrawingTools, setShowDrawingTools] = useState(false);
-
+  const { accountType } = useAppSelector(authState);
   const [isOpen, setIsOpen] = useState(false);
   const canvasRef = useRef(null);
   const canvasRef2 = useRef(null);
@@ -224,117 +227,123 @@ const ClipModeCall = ({
     <>
       {isMaximized ? (
         <div className="">
-          <div
-            className="d-flex  justify-content-start top-0 absolute align-items-center pr-4 pl-4 mt-2 w-100"
-            style={{
-              zIndex: 99,
-            }}
-          >
-            <div className="d-flex">
-              <div
-                className="button"
-                onClick={() => setIsMaximized(!isMaximized)}
-              >
-                {isMaximized ? <Minimize size={18} /> : <Maximize size={18} />}
-              </div>
-              <div
-                style={{
-                  position: "relative",
-                }}
-              >
+          {accountType === AccountType.TRAINER && (
+            <div
+              className="d-flex  justify-content-start top-0 absolute align-items-center pr-4 pl-4 mt-2 w-100"
+              style={{
+                zIndex: 99,
+              }}
+            >
+              <div className="d-flex">
                 <div
-                  className="button ml-3"
-                  onClick={() => {
-                    setDrawingMode(!drawingMode);
-                    setShowDrawingTools(false);
+                  className="button"
+                  onClick={() => setIsMaximized(!isMaximized)}
+                >
+                  {isMaximized ? (
+                    <Minimize size={18} />
+                  ) : (
+                    <Maximize size={18} />
+                  )}
+                </div>
+                <div
+                  style={{
+                    position: "relative",
                   }}
                 >
-                  <PenTool size={18} color={drawingMode ? "blue" : "black"} />
+                  <div
+                    className="button ml-3"
+                    onClick={() => {
+                      setDrawingMode(!drawingMode);
+                      setShowDrawingTools(false);
+                    }}
+                  >
+                    <PenTool size={18} color={drawingMode ? "blue" : "black"} />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    position: "relative",
+                  }}
+                >
+                  {drawingMode && (
+                    <div
+                      className="button ml-1"
+                      onClick={() => {
+                        setShowDrawingTools(!showDrawingTools);
+                      }}
+                    >
+                      <ChevronDown
+                        size={18}
+                        color={drawingMode ? "blue" : "black"}
+                      />
+                    </div>
+                  )}
+
+                  {showDrawingTools && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        zIndex: 99,
+                        top: 24,
+                        left: -10,
+                      }}
+                    >
+                      <CanvasMenuBar
+                        isOpen={isOpen}
+                        setIsOpen={setIsOpen}
+                        setSketchPickerColor={(rgb) => {
+                          setSketchPickerColor(rgb);
+                        }}
+                        undoDrawing={() => {
+                          undoDrawing(
+                            {
+                              coordinates: storedLocalDrawPaths.sender,
+                              theme: canvasConfigs.sender,
+                            },
+                            {
+                              coordinates: storedLocalDrawPaths.receiver,
+                              theme: {
+                                lineWidth: canvasConfigs.receiver.lineWidth,
+                                strokeStyle: canvasConfigs.receiver.strokeStyle,
+                              },
+                            }
+                          );
+                        }}
+                        sketchPickerColor={sketchPickerColor}
+                        canvasConfigs={canvasConfigs}
+                        setCanvasConfigs={(config) => {
+                          canvasConfigs = config;
+                        }}
+                        drawShapes={(shapeType) => {
+                          selectedShape = shapeType;
+                        }}
+                        refreshDrawing={() => {
+                          // deleting the canvas drawing
+                          storedLocalDrawPaths.sender = [];
+                          storedLocalDrawPaths.receiver = [];
+                          clearCanvas();
+                          // sendClearCanvasEvent();
+                        }}
+                        selectedClips={selectedClips}
+                        setSelectedClips={setSelectedClips}
+                        toUser={{
+                          fullname: "",
+                        }}
+                        isCanvasMenuNoteShow={isCanvasMenuNoteShow}
+                        setIsCanvasMenuNoteShow={setIsCanvasMenuNoteShow}
+                        setMicNote={setMicNote}
+                        setClipSelectNote={setClipSelectNote}
+                        clipSelectNote={clipSelectNote}
+                        setCountClipNoteOpen={setCountClipNoteOpen}
+                        resetInitialPinnedUser={resetInitialPinnedUser}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
-
-              <div
-                style={{
-                  position: "relative",
-                }}
-              >
-                {drawingMode && (
-                  <div
-                    className="button ml-1"
-                    onClick={() => {
-                      setShowDrawingTools(!showDrawingTools);
-                    }}
-                  >
-                    <ChevronDown
-                      size={18}
-                      color={drawingMode ? "blue" : "black"}
-                    />
-                  </div>
-                )}
-
-                {showDrawingTools && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      zIndex: 99,
-                      top: 24,
-                      left: -10,
-                    }}
-                  >
-                    <CanvasMenuBar
-                      isOpen={isOpen}
-                      setIsOpen={setIsOpen}
-                      setSketchPickerColor={(rgb) => {
-                        setSketchPickerColor(rgb);
-                      }}
-                      undoDrawing={() => {
-                        undoDrawing(
-                          {
-                            coordinates: storedLocalDrawPaths.sender,
-                            theme: canvasConfigs.sender,
-                          },
-                          {
-                            coordinates: storedLocalDrawPaths.receiver,
-                            theme: {
-                              lineWidth: canvasConfigs.receiver.lineWidth,
-                              strokeStyle: canvasConfigs.receiver.strokeStyle,
-                            },
-                          }
-                        );
-                      }}
-                      sketchPickerColor={sketchPickerColor}
-                      canvasConfigs={canvasConfigs}
-                      setCanvasConfigs={(config) => {
-                        canvasConfigs = config;
-                      }}
-                      drawShapes={(shapeType) => {
-                        selectedShape = shapeType;
-                      }}
-                      refreshDrawing={() => {
-                        // deleting the canvas drawing
-                        storedLocalDrawPaths.sender = [];
-                        storedLocalDrawPaths.receiver = [];
-                        clearCanvas();
-                        // sendClearCanvasEvent();
-                      }}
-                      selectedClips={selectedClips}
-                      setSelectedClips={setSelectedClips}
-                      toUser={{
-                        fullname: "",
-                      }}
-                      isCanvasMenuNoteShow={isCanvasMenuNoteShow}
-                      setIsCanvasMenuNoteShow={setIsCanvasMenuNoteShow}
-                      setMicNote={setMicNote}
-                      setClipSelectNote={setClipSelectNote}
-                      clipSelectNote={clipSelectNote}
-                      setCountClipNoteOpen={setCountClipNoteOpen}
-                      resetInitialPinnedUser={resetInitialPinnedUser}
-                    />
-                  </div>
-                )}
-              </div>
             </div>
-          </div>
+          )}
           <div>
             {selectedClips.length > 1 ? (
               <>
@@ -398,6 +407,7 @@ const ClipModeCall = ({
       ) : (
         <>
           <div className="d-flex justify-content-between align-items-center pr-4 pl-4 mt-2 w-100">
+          {accountType === AccountType.TRAINER && (
             <div className="d-flex">
               <div
                 className="button"
@@ -501,27 +511,23 @@ const ClipModeCall = ({
                   </div>
                 )}
               </div>
-            </div>
+            </div>)}
 
             <TimeRemaining timeRemaining={timeRemaining} />
           </div>
           <UserBoxMini
             id={toUser._id}
             videoRef={remoteVideoRef}
-            stream= {remoteStream}
+            stream={remoteStream}
             user={toUser}
-            isStreamOff={
-             isRemoteStreamOff
-            }
+            isStreamOff={isRemoteStreamOff}
           />
           <UserBoxMini
-            id={fromUser._id} 
+            id={fromUser._id}
             videoRef={localVideoRef}
-            stream= {localStream}
+            stream={localStream}
             user={fromUser}
-            isStreamOff={
-              isLocalStreamOff
-            }
+            isStreamOff={isLocalStreamOff}
           />
 
           <div>
@@ -552,7 +558,7 @@ const ClipModeCall = ({
                   toUser={toUser}
                 />
 
-                {isLock && (
+                {accountType === AccountType.TRAINER && isLock && (
                   <CustomVideoControls
                     handleSeek={handleSeek}
                     isPlaying={isPlayingBoth}
