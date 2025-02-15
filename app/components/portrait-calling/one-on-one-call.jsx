@@ -37,6 +37,7 @@ const OneOnOneCall = ({
           id={fromUser._id}
           onClick={handleUserClick}
           selected={selectedUser === toUser._id}
+          selectedUser={selectedUser}
           notSelected={selectedUser}
           videoRef={videoRef}
           user={fromUser}
@@ -46,6 +47,7 @@ const OneOnOneCall = ({
         <UserBox
           id={toUser._id}
           onClick={handleUserClick}
+          selectedUser={selectedUser}
           selected={selectedUser === fromUser._id}
           notSelected={selectedUser}
           videoRef={remoteVideoRef}

@@ -1,6 +1,7 @@
 import Draggable from "react-draggable";
 import { Utils } from "../../../utils/utils";
 import { useEffect } from "react";
+import { useCallback } from "react";
 
 export const UserBox = ({
   onClick,
@@ -10,15 +11,30 @@ export const UserBox = ({
   videoRef,
   user,
   stream,
-  isStreamOff
+  isStreamOff,
+  selectedUser
 }) => {
-  console.log("user",user)
+  console.log("user",id)
+
+  const setVideoRef = useCallback(
+    (node) => {
+      if (node) {
+        videoRef.current = node;
+        if (stream) {
+          videoRef.current.srcObject = stream;
+        }
+      }
+    },
+    [stream]
+  );
   useEffect(()=>{
+
+    console.log("ideoRef?.current",videoRef?.current)
     if(videoRef?.current){
       videoRef.current.srcObject = stream
     }
-  },[videoRef,stream,isStreamOff,id])
-  
+  },[videoRef,stream,isStreamOff,selectedUser])
+
   return (
     <div
       className={`${false?"": "profile-box"} ${
@@ -33,7 +49,7 @@ export const UserBox = ({
         <video
           playsInline
           autoPlay
-          ref={videoRef}
+          ref={setVideoRef}
           style={{
             height: "100%",
             width: "100%",
