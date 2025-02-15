@@ -66,6 +66,8 @@ const VideoContainer = ({
   toUser,
   stopDrawing,
 }) => {
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   const videoContainerRef = useRef(null);
@@ -126,10 +128,21 @@ const VideoContainer = ({
       }
     });
 
+    socket?.on(EVENTS?.ON_VIDEO_ZOOM_PAN, (data) => {
+      if (data?.videoId === clip?._id) {
+        console.log("Received zoom:", data.zoom, "Received pan:", data.pan);
+  
+        // Apply the zoom and pan changes to the state
+        setZoomLevel(data.zoom);
+        setPanPosition(data.pan);
+      }
+    });
+
     // Clean up on unmount
     return () => {
       socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
       socket?.off(EVENTS?.ON_VIDEO_TIME);
+      socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
     };
   }, [socket, clip?._id, videoRef]);
 
@@ -462,7 +475,35 @@ const VideoContainer = ({
           position: "relative",
         }}
       >
-        <TransformWrapper disabled={drawingMode}>
+        <TransformWrapper
+          disabled={drawingMode}
+          initialScale={zoomLevel} // Set initial zoom level
+          initialPositionX={panPosition.x} // Set initial pan X position
+          initialPositionY={panPosition.y} // Set initial pan Y position
+          scale={zoomLevel} // Dynamically set zoom level based on state
+          positionX={panPosition.x} // Dynamically set pan X position
+          positionY={panPosition.y} // Dynamically set pan Y position
+          onZoomStop={(e) => {
+            console.log("Zoom level:", e.state.scale);
+            setZoomLevel(e.state.scale);
+            socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
+              userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+              videoId: clip._id,
+              zoom: e.state.scale,
+              pan: panPosition,
+            });
+          }}
+          onPanningStop={(e) => {
+            console.log("Pan position:", e.state.positionX, e.state.positionY);
+            setPanPosition({ x: e.state.positionX, y: e.state.positionY });
+            socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
+              userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+              videoId: clip._id,
+              zoom: zoomLevel,
+              pan: { x: e.state.positionX, y: e.state.positionY },
+            });
+          }}
+        >
           <TransformComponent>
             <div
               style={{
@@ -630,27 +671,31 @@ const ClipModeCall = ({
   };
 
   const sendDrawEvent = () => {
-    const canvas = canvasRef?.current;
+    try {
+      const canvas = canvasRef?.current;
 
-    if (!canvas) return;
-    const { width, height } = canvas;
+      if (!canvas) return;
+      const { width, height } = canvas;
 
-    canvas.toBlob((blob) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (!(event && event.target)) return;
-        const binaryData = event.target.result;
-        // console.log(`emit draw event---`);
-        socket.emit(EVENTS.DRAW, {
-          userInfo: { from_user: fromUser._id, to_user: toUser._id },
-          // storedEvents,
-          // canvasConfigs,
-          strikes: binaryData,
-          canvasSize: { width, height },
-        });
-      };
-      reader.readAsArrayBuffer(blob);
-    });
+      canvas.toBlob((blob) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (!(event && event.target)) return;
+          const binaryData = event.target.result;
+          // console.log(`emit draw event---`);
+          socket.emit(EVENTS.DRAW, {
+            userInfo: { from_user: fromUser._id, to_user: toUser._id },
+            // storedEvents,
+            // canvasConfigs,
+            strikes: binaryData,
+            canvasSize: { width, height },
+          });
+        };
+        reader.readAsArrayBuffer(blob);
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
   };
 
   socket.on(EVENTS.EMIT_DRAWING_CORDS, ({ strikes, canvasSize }) => {

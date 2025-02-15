@@ -31,5 +31,6 @@ export const EVENTS = {
     PUSH_NOTIFICATIONS : {
         ON_SEND : 'send',
         ON_RECEIVE : 'receive'
-    }
+    },
+    ON_VIDEO_ZOOM_PAN:"ON_VIDEO_ZOOM_PAN"
 }
