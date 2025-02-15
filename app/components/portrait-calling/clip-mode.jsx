@@ -66,12 +66,96 @@ const VideoContainer = ({
   toUser,
   stopDrawing,
 }) => {
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   const videoContainerRef = useRef(null);
+  const movingVideoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const [scale, setScale] = useState(1); // Zoom level (scale)
+  const [lastTouch, setLastTouch] = useState(0);
+  const [translate, setTranslate] = useState({
+    x: 0,
+    y: 0,
+  });
+  const [dragStart, setDragStart] = useState(null);
+
+  // Zoom logic
+  const onWheel = (e) => {
+    if (accountType === AccountType.TRAINEE) return;
+
+    const delta = e.deltaY;
+    const zoomFactor = delta < 0 ? 1.1 : 0.9;
+    const newScale = Math.max(1, Math.min(5, scale * zoomFactor));
+
+    setScale(newScale);
+
+    socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
+      videoId: clip._id,
+      zoom: newScale,
+      pan: translate,
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+    });
+  };
+
+  const handleTouchMove = (e) => {
+    if (accountType === AccountType.TRAINEE) return;
+
+    if (e.touches.length === 2) {
+      // Zoom Handling
+      const [touch1, touch2] = Array.from(e.touches);
+      const currentDistance = Math.hypot(
+        touch2.pageX - touch1.pageX,
+        touch2.pageY - touch1.pageY
+      );
+
+      if (lastTouch) {
+        const scaleChange = currentDistance / lastTouch;
+        const newScale = Math.max(1, Math.min(5, scale * scaleChange));
+
+        setScale(newScale);
+      }
+      setLastTouch(currentDistance);
+    } else if (e.touches.length === 1 && dragStart) {
+      // Panning Handling
+      const touch = e.touches[0];
+      const deltaX = touch.pageX - dragStart.x;
+      const deltaY = touch.pageY - dragStart.y;
+
+      let newX = translate.x + deltaX;
+      let newY =  translate.y + deltaY;
+
+      setTranslate({ x: newX, y: newY });
+      setDragStart({ x: touch.pageX, y: touch.pageY });
+
+      socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
+        videoId: clip._id,
+        zoom: scale,
+        pan: { x: newX, y: newY },
+        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+      });
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    if (accountType === AccountType.TRAINEE) return;
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      setDragStart({ x: touch.pageX, y: touch.pageY });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (accountType === AccountType.TRAINEE) return;
+    setLastTouch(0);
+    setDragStart(null);
+  };
+
+  // Apply CSS transformations directly to the element
+  const transformStyle = {
+    transform: `scale(${scale}) translate(${translate.x}px, ${translate.y}px)`,
+  };
+
   // const [cu,setCurrentTime]
   // Play/pause video
   const togglePlayPause = () => {
@@ -127,16 +211,34 @@ const VideoContainer = ({
         video.currentTime = data.progress;
       }
     });
-
-    socket?.on(EVENTS?.ON_VIDEO_ZOOM_PAN, (data) => {
+    const handleZoomPanChange = (data) => {
       if (data?.videoId === clip?._id) {
-        console.log("Received zoom:", data.zoom, "Received pan:", data.pan);
-  
-        // Apply the zoom and pan changes to the state
-        setZoomLevel(data.zoom);
-        setPanPosition(data.pan);
+        console.log(
+          "Received zoom:",
+          data.zoom,
+          "Received pan:",
+          data.pan,
+          "Clip Video ID:",
+          clip?._id
+        );
+
+        // If the current user is the Trainee, apply the zoom and pan changes
+        if (accountType === AccountType.TRAINEE) {
+          // Only update if the zoom or pan values are different to avoid unnecessary re-renders
+          if (
+            data.zoom !== scale ||
+            data.pan?.x !== translate.x ||
+            data.pan?.y !== translate.y
+          ) {
+            setScale(data.zoom);
+            setTranslate(data.pan);
+          }
+        }
       }
-    });
+    };
+
+    // Listen for the ON_VIDEO_ZOOM_PAN event from the socket
+    socket?.on(EVENTS?.ON_VIDEO_ZOOM_PAN, handleZoomPanChange);
 
     // Clean up on unmount
     return () => {
@@ -145,6 +247,11 @@ const VideoContainer = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
     };
   }, [socket, clip?._id, videoRef]);
+
+  console.log("sky.zoom", scale);
+  console.log("sky.pan", translate);
+  console.log("sky.dragStart", dragStart);
+  console.log("sky.lastTouch", lastTouch);
 
   // // Handle volume change
   // const changeVolume = (e) => {
@@ -189,16 +296,6 @@ const VideoContainer = ({
         progress,
       });
     }
-  };
-
-  // Handle mouse down to indicate seeking
-  const handleSeekMouseDown = () => {
-    setSeeking(true);
-  };
-
-  // Handle mouse up to stop seeking
-  const handleSeekMouseUp = () => {
-    setSeeking(false);
   };
 
   // console.log("canvas12", canvasRef);
@@ -475,68 +572,51 @@ const VideoContainer = ({
           position: "relative",
         }}
       >
-        <TransformWrapper
-          disabled={drawingMode}
-          initialScale={zoomLevel} // Set initial zoom level
-          initialPositionX={panPosition.x} // Set initial pan X position
-          initialPositionY={panPosition.y} // Set initial pan Y position
-          scale={zoomLevel} // Dynamically set zoom level based on state
-          positionX={panPosition.x} // Dynamically set pan X position
-          positionY={panPosition.y} // Dynamically set pan Y position
-          onZoomStop={(e) => {
-            console.log("Zoom level:", e.state.scale);
-            setZoomLevel(e.state.scale);
-            socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
-              userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-              videoId: clip._id,
-              zoom: e.state.scale,
-              pan: panPosition,
-            });
+        <div
+          onWheel={onWheel}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            ...transformStyle,
+            width: "fit-content",
+            height: "100%",
+            touchAction: "none", // Prevent default touch actions like scrolling
           }}
-          onPanningStop={(e) => {
-            console.log("Pan position:", e.state.positionX, e.state.positionY);
-            setPanPosition({ x: e.state.positionX, y: e.state.positionY });
-            socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
-              userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-              videoId: clip._id,
-              zoom: zoomLevel,
-              pan: { x: e.state.positionX, y: e.state.positionY },
-            });
-          }}
+          ref={movingVideoContainerRef}
         >
-          <TransformComponent>
-            <div
+          <div
+            style={{
+              position: "relative",
+              width: "fit-content",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <video
+              controls={false} // Hide built-in controls
+              ref={videoRef}
+              playsInline
+              webkit-playsinline="true"
               style={{
-                position: "relative",
-                width: "100%",
+                touchAction: "manipulation",
+                width: "fit-content",
                 height: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
+                aspectRatio: "auto",
               }}
+              id={clip?.id}
+              muted={true}
+              poster={Utils?.generateThumbnailURL(clip)}
+              preload="metadata"
+              crossOrigin="anonymous"
             >
-              <video
-                controls={false} // Hide built-in controls
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                playsInline
-                webkit-playsinline="true"
-                style={{
-                  touchAction: "manipulation",
-                }}
-                id={clip?.id}
-                muted={true}
-                poster={Utils?.generateThumbnailURL(clip)}
-                preload="metadata"
-                crossOrigin="anonymous"
-              >
-                <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </TransformComponent>
-        </TransformWrapper>
-
+              <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
         <canvas
           ref={canvasRef}
           id="drawing-canvas"

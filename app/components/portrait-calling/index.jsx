@@ -124,14 +124,7 @@ const VideoCallUI = ({
     }
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTimeRemaining((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    intervalRef.current = interval;
 
-    return () => clearInterval(intervalRef.current); // Clear interval on cleanup
-  }, []);
 
   const connectToPeer = (peer, peerId) => {
     if (!(videoRef && videoRef?.current)) return;
