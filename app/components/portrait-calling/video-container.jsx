@@ -68,7 +68,7 @@ const VideoContainer = ({
         video.play();
         setIsPlaying(true);
         socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
-          videoId: clip?.id,
+          videoId: clip?._id,
           userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
           isPlaying: true,
         });
@@ -76,7 +76,7 @@ const VideoContainer = ({
         video.pause();
         setIsPlaying(false);
         socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
-          videoId: clip?.id,
+          videoId: clip?._id,
           userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
           isPlaying: false,
         });
@@ -91,7 +91,7 @@ const VideoContainer = ({
   
     // Listen for play and pause event
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
-      if (data?.videoId === clip?.id && data?.isPlaying) {
+      if (data?.videoId === clip?._id && data?.isPlaying) {
         // Only play if the video matches and the action is play
         if (video?.paused) {
           video.play();
@@ -102,7 +102,7 @@ const VideoContainer = ({
 
     // Listen for play and pause event
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
-      if (data?.videoId === clip?.id && !data?.isPlaying) {
+      if (data?.videoId === clip?._id && !data?.isPlaying) {
         // Only play if the video matches and the action is play
         if (video?.play) {
           video.pause();
@@ -115,7 +115,7 @@ const VideoContainer = ({
     return () => {
       socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
     };
-  }, [socket, clip?.id, videoRef]);
+  }, [socket, clip?._id, videoRef]);
 
   // // Handle volume change
   // const changeVolume = (e) => {
