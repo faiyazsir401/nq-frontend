@@ -56,7 +56,7 @@ const VideoContainer = ({
   setIsPlaying,
   isSingle,
   fromUser,
-  toUser
+  toUser,
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -92,8 +92,8 @@ const VideoContainer = ({
 
   useEffect(() => {
     const video = videoRef?.current;
-  
-    // Listen for play and pause event
+
+
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
       if (data?.videoId === clip?._id && data?.isPlaying) {
         // Only play if the video matches and the action is play
@@ -104,20 +104,29 @@ const VideoContainer = ({
       }
     });
 
-    // Listen for play and pause event
+
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
       if (data?.videoId === clip?._id && !data?.isPlaying) {
-        // Only play if the video matches and the action is play
+   
         if (video?.play) {
           video.pause();
           setIsPlaying(false);
         }
       }
     });
-  
+
+    socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
+      if (data?.videoId === clip?._id) {
+   
+        video.currentTime = data.progress
+      }
+    });
+
     // Clean up on unmount
     return () => {
       socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
+      socket?.off(EVENTS?.ON_VIDEO_TIME);
+
     };
   }, [socket, clip?._id, videoRef]);
 
@@ -158,6 +167,11 @@ const VideoContainer = ({
       const progress = e.target.value;
 
       video.currentTime = progress;
+      socket?.emit(EVENTS?.ON_VIDEO_TIME, {
+        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+        videoId: clip._id,
+        progress,
+      });
     }
   };
 
@@ -494,7 +508,7 @@ const VideoContainer = ({
           style={{ display: drawingMode ? "block" : "none" }}
         />
 
-        {accountType===AccountType.TRAINER && !isLock && (
+        {accountType === AccountType.TRAINER && !isLock && (
           <CustomVideoControls
             handleSeek={handleSeek}
             isFullscreen={isFullscreen}
