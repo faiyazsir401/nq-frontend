@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Utils } from "../../../utils/utils";
 import CustomVideoControls from "./custom-video-controls";
+import { useContext } from "react";
+import { SocketContext } from "../socket";
+import { EVENTS } from "../../../helpers/events";
 
 const SHAPES = {
   FREE_HAND: "hand",
@@ -48,10 +51,14 @@ const VideoContainer = ({
   videoRef,
   isPlaying,
   setIsPlaying,
-  isSingle
+  isSingle,
+  fromUser,
+  toUser
 }) => {
+  const socket = useContext(SocketContext);
   const videoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  // const [cu,setCurrentTime]
   // Play/pause video
   const togglePlayPause = () => {
     const video = videoRef?.current;
@@ -60,14 +67,55 @@ const VideoContainer = ({
       if (video.paused) {
         video.play();
         setIsPlaying(true);
+        socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
+          videoId: clip?.id,
+          userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+          isPlaying: true,
+        });
       } else {
         video.pause();
         setIsPlaying(false);
+        socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
+          videoId: clip?.id,
+          userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+          isPlaying: false,
+        });
       }
     } else {
       console.log("video not loaded yet");
     }
   };
+
+  useEffect(() => {
+    const video = videoRef?.current;
+  
+    // Listen for play and pause event
+    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+      if (data?.videoId === clip?.id && data?.isPlaying) {
+        // Only play if the video matches and the action is play
+        if (video?.paused) {
+          video.play();
+          setIsPlaying(true);
+        }
+      }
+    });
+
+    // Listen for play and pause event
+    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+      if (data?.videoId === clip?.id && !data?.isPlaying) {
+        // Only play if the video matches and the action is play
+        if (video?.play) {
+          video.pause();
+          setIsPlaying(false);
+        }
+      }
+    });
+  
+    // Clean up on unmount
+    return () => {
+      socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
+    };
+  }, [socket, clip?.id, videoRef]);
 
   // // Handle volume change
   // const changeVolume = (e) => {
@@ -106,7 +154,6 @@ const VideoContainer = ({
       const progress = e.target.value;
 
       video.currentTime = progress;
-      setCurrentTime(progress);
     }
   };
 
@@ -384,11 +431,16 @@ const VideoContainer = ({
         }`}
         style={{
           height: isSingle
-          ? (isMaximized ? "100dvh" : "85dvh") // If isSingle is true
-          : (isMaximized
-              ? (isLock ? "47dvh" : "50dvh") // If isMaximized is true and isSingle is false
-              : (isLock ? "38dvh" : "40dvh") // If isMaximized is false and isSingle is false
-          ),
+            ? isMaximized
+              ? "100dvh"
+              : "85dvh" // If isSingle is true
+            : isMaximized
+            ? isLock
+              ? "47dvh"
+              : "50dvh" // If isMaximized is true and isSingle is false
+            : isLock
+            ? "38dvh"
+            : "40dvh", // If isMaximized is false and isSingle is false
           width: "100vw",
           display: "flex",
           justifyContent: "center",

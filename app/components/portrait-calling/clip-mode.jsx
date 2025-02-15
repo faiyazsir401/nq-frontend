@@ -348,6 +348,8 @@ const ClipModeCall = ({
                   clip={selectedClips[0]}
                   isPlaying={isLock ? isPlayingBoth : isPlaying1}
                   setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying1}
+                  fromUser={fromUser}
+                  toUser={toUser}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
@@ -359,6 +361,8 @@ const ClipModeCall = ({
                   clip={selectedClips[1]}
                   isPlaying={isLock ? isPlayingBoth : isPlaying2}
                   setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying2}
+                  fromUser={fromUser}
+                  toUser={toUser}
                 />
 
                 {isLock && (
@@ -385,6 +389,8 @@ const ClipModeCall = ({
                 isPlaying={isPlaying1}
                 setIsPlaying={setIsPlaying1}
                 isSingle={isSingle}
+                fromUser={fromUser}
+                toUser={toUser}
               />
             )}
           </div>
@@ -530,6 +536,8 @@ const ClipModeCall = ({
                   clip={selectedClips[0]}
                   isPlaying={isLock ? isPlayingBoth : isPlaying1}
                   setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying1}
+                  fromUser={fromUser}
+                  toUser={toUser}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
@@ -540,6 +548,8 @@ const ClipModeCall = ({
                   clip={selectedClips[1]}
                   isPlaying={isLock ? isPlayingBoth : isPlaying2}
                   setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying2}
+                  fromUser={fromUser}
+                  toUser={toUser}
                 />
 
                 {isLock && (
@@ -564,6 +574,8 @@ const ClipModeCall = ({
                 isPlaying={isPlaying1}
                 setIsPlaying={setIsPlaying1}
                 isSingle={isSingle}
+                fromUser={fromUser}
+                toUser={toUser}
               />
             )}
           </div>

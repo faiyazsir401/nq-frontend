@@ -78,6 +78,18 @@ export const UserBox = ({
 
 export const UserBoxMini = ({ name, onClick, selected, id,videoRef,user,stream,isStreamOff }) => {
 
+  const setVideoRef = useCallback(
+    (node) => {
+      if (node) {
+        videoRef.current = node;
+        if (stream) {
+          videoRef.current.srcObject = stream;
+        }
+      }
+    },
+    [stream]
+  );
+
   useEffect(()=>{
     if(videoRef?.current){
       videoRef.current.srcObject = stream
@@ -93,7 +105,7 @@ export const UserBoxMini = ({ name, onClick, selected, id,videoRef,user,stream,i
         <video
           playsInline
           autoPlay
-          ref={videoRef}
+          ref={setVideoRef}
           style={{
             height: "100%",
             width: "100%",
