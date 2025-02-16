@@ -34,7 +34,8 @@ const ActionButtons = ({
   isOpen,
   isOpenConfirm,
   selectedClips,
-  setIsOpenReport
+  setIsOpenReport,
+  cutCall
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -86,7 +87,7 @@ const ActionButtons = ({
       </Tooltip>
 
       <Tooltip>
-        <div className="button end-call off">
+        <div className="button end-call off" onClick={cutCall}> 
           <Phone size={16} />
         </div>
       </Tooltip>

@@ -597,6 +597,7 @@ const VideoCallUI = ({
           setIsOpenConfirm={setIsOpenConfirm}
           selectedClips={selectedClips}
           setIsOpenReport={setIsOpenReport}
+          cutCall={cutCall}
         />
       )}
 
