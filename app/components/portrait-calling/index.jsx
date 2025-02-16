@@ -17,7 +17,31 @@ import Peer from "peerjs";
 import { toast } from "react-toastify";
 import { useAppSelector } from "../../store";
 import { bookingsState } from "../common/common.slice";
-
+import { pushProfilePhotoToS3 } from "../common/common.api";
+import { getReport, screenShotTake } from "../videoupload/videoupload.api";
+import html2canvas from "html2canvas";
+import ReportModal from "../video/reportModal";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Nav,
+  NavItem,
+  NavLink,
+  TabContent,
+  TabPane,
+} from "reactstrap";
+import { Utils } from "../../../utils/utils";
+import {
+  myClips,
+  traineeClips,
+} from "../../../containers/rightSidebar/fileSection.api";
+import { X } from "react-feather";
+import Notes from "../practiceLiveExperience/Notes";
+import CustomModal from "../../common/modal";
+import ScreenShotDetails from "../video/screenshotDetails";
 const VideoCallUI = ({
   id,
   isClose,
@@ -36,6 +60,8 @@ const VideoCallUI = ({
   const peerRef = useRef(null);
   const videoRef = useRef(null);
   const intervalRef = useRef(null); // useRef for interval
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenConfirm, setIsOpenConfirm] = useState(false);
   const { startMeeting } = useAppSelector(bookingsState);
   const [selectedClips, setSelectedClips] = useState([]);
   const [isTraineeJoined, setIsTraineeJoined] = useState(false);
@@ -51,11 +77,81 @@ const VideoCallUI = ({
   const [isMaximized, setIsMaximized] = useState(false);
   const [isRemoteVideoOff, setRemoteVideoOff] = useState(false);
   const [isOpenReport, setIsOpenReport] = useState(false);
+
   const remoteVideoRef = useRef(null);
   const [isLockMode, setIsLockMode] = useState(false);
-
+  const [clipSelectNote, setClipSelectNote] = useState(false);
   const [isLocalStreamOff, setIsLocalStreamOff] = useState(false);
   const [isRemoteStreamOff, setIsRemoteStreamOff] = useState(false);
+  const [selectClips, setSelectClips] = useState([]);
+  const [videoActiveTab, setAideoActiveTab] = useState("media");
+  const [clips, setClips] = useState([]);
+  const [traineeClip, setTraineeClips] = useState([]);
+  const [isScreenShotModelOpen, setIsScreenShotModelOpen] = useState(false);
+  const [screenShots, setScreenShots] = useState([]);
+  const [reportObj, setReportObj] = useState({ title: "", topic: "" });
+    const [isCallEnded, setIsCallEnded] = useState(false);
+  const netquixVideos = [
+    {
+      _id: "656acd81cd2d7329ed0d8e91",
+      title: "Dog Activity",
+      category: "Acting",
+      user_id: "6533881d1e8775aaa25b3b6e",
+      createdAt: "2023-12-02T06:24:01.995Z",
+      updatedAt: "2023-12-02T06:24:01.995Z",
+      file_name: "1717589251977.mp4",
+      __v: 0,
+    },
+    {
+      _id: "657053c4c440a4d0d775e639",
+      title: "Pupppy clip",
+      category: "Golf",
+      user_id: "64ad7aae6d668be38e53be1b",
+      createdAt: "2023-12-06T10:58:12.080Z",
+      updatedAt: "2023-12-06T10:58:12.080Z",
+      file_name: "1718140110745.quicktime",
+      __v: 0,
+    },
+  ];
+
+  useEffect(() => {
+    if (isOpen) {
+      getMyClips();
+    }
+  }, [isOpen]);
+
+  const getMyClips = async () => {
+    var res = await myClips({});
+    setClips(res?.data);
+    var res2 = await traineeClips({});
+    var arr = res2?.data || [];
+    for (let index = 0; index < arr?.length; index++) {
+      var el = arr[index]?.clips;
+      arr[index].clips = [
+        ...new Map(el.map((item) => [item.clips._id, item])).values(),
+      ];
+    }
+    setTraineeClips(arr);
+  };
+
+  socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos }) => {
+    setSelectedClips([...videos]);
+  });
+
+  //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
+  const emitVideoSelectEvent = (videos) => {
+    socket.emit(EVENTS.ON_VIDEO_SELECT, {
+      userInfo: { from_user: fromUser._id, to_user: toUser._id },
+
+      videos,
+    });
+  };
+
+  //NOTE - emit event after selecting the clips
+  useEffect(() => {
+    emitVideoSelectEvent(selectedClips);
+  }, [selectedClips?.length]);
+
   // selects trainee clips on load
 
   useEffect(() => {
@@ -69,6 +165,56 @@ const VideoCallUI = ({
   }, [accountType, startMeeting, isTraineeJoined]); // Dependencies to ensure it updates correctly
 
   console.log("selectedClips", selectedClips, accountType, startMeeting);
+
+  async function afterSucessUploadImageOnS3() {
+    var result = await getReport({
+      sessions: id,
+      trainer: fromUser?._id,
+      trainee: toUser?._id,
+    });
+    setScreenShots(result?.data?.reportData);
+  }
+
+  const takeScreenshot = () => {
+    setIsScreenShotModelOpen(false);
+    const targetElement = document.body;
+    html2canvas(targetElement, {
+      type: "png",
+      allowTaint: true,
+      useCORS: true,
+    }).then(async (canvas) => {
+      const dataUrl = canvas.toDataURL("image/png");
+      console.log("dataUrl", dataUrl);
+
+      var res = await screenShotTake({
+        sessions: id,
+        trainer: fromUser?._id,
+        trainee: toUser?._id,
+      });
+
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+
+      // Handling Error if SS is not generate image
+
+      if (!blob) {
+        return toast.error("Unable to take Screen Shot");
+      }
+      console.log("res?.data?.url", res?.data?.url);
+      if (res?.data?.url) {
+        setIsScreenShotModelOpen(true);
+        pushProfilePhotoToS3(res?.data?.url, blob, afterSucessUploadImageOnS3);
+      }
+
+      setTimeout(() => {
+        toast.success("The screenshot taken successfully.", {
+          type: "success",
+        });
+      }, 2000);
+    });
+  };
+
+  console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
 
   // Handle start call
   const handleStartCall = async () => {
@@ -123,8 +269,6 @@ const VideoCallUI = ({
       );
     }
   };
-
-
 
   const connectToPeer = (peer, peerId) => {
     if (!(videoRef && videoRef?.current)) return;
@@ -248,8 +392,424 @@ const VideoCallUI = ({
           toUser={toUser}
           isMuted={isMuted}
           setIsMuted={setIsMuted}
+          takeScreenshot={takeScreenshot}
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          isOpenConfirm={isOpenConfirm}
+          setIsOpenConfirm={setIsOpenConfirm}
+          selectedClips={selectedClips}
+          setIsOpenReport={setIsOpenReport}
         />
       )}
+
+      <Modal
+        isOpen={isOpenConfirm}
+        toggle={() => {
+          setIsOpenConfirm(false);
+        }}
+      >
+        <ModalHeader
+          toggle={() => {
+            setIsOpenConfirm(false);
+            setSelectedClips([]);
+          }}
+          close={() => <></>}
+        >
+          Confirm
+        </ModalHeader>
+        <ModalBody>Are you sure you want to exit clip analysis mode?</ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => {
+              setSelectedClips([]);
+              setIsOpenConfirm(false);
+            }}
+          >
+            Confirm
+          </Button>{" "}
+          <Button
+            color="secondary"
+            onClick={() => {
+              setIsOpenConfirm(false);
+            }}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      <CustomModal
+        isOpen={isOpen}
+        element={
+          <>
+            <div className="container media-gallery portfolio-section grid-portfolio">
+              <div className="theme-title  mb-5">
+                <div className="media-body media-body text-right">
+                  <div
+                    className="icon-btn btn-sm btn-outline-light close-apps pointer"
+                    onClick={() => {
+                      if (selectClips && selectClips?.length) {
+                        setSelectedClips(selectClips);
+                        setClipSelectNote(false);
+                      }
+                      setIsOpen(false);
+                    }}
+                  >
+                    <X />
+                  </div>
+                </div>
+                <div className="media d-flex flex-column  align-items-center">
+                  <div>
+                    <h2>Select 2 clips to share with {toUser?.fullname}</h2>
+                  </div>
+                </div>
+              </div>
+              <div className="theme-tab">
+                <Nav tabs className="justify-content-around">
+                  <NavItem className="ml-5px  mt-2">
+                    <NavLink
+                      className={`button-effect ${
+                        videoActiveTab === "media" ? "active" : ""
+                      } select-clip-width`}
+                      onClick={() => setAideoActiveTab("media")}
+                    >
+                      My Clips
+                    </NavLink>
+                  </NavItem>
+                  <NavItem className="ml-5px  mt-2">
+                    <NavLink
+                      className={`button-effect ${
+                        videoActiveTab === "trainee" ? "active" : ""
+                      } select-clip-width`}
+                      onClick={() => setAideoActiveTab("trainee")}
+                    >
+                      Trainee
+                    </NavLink>
+                  </NavItem>
+                  <NavItem className="ml-5px  mt-2">
+                    <NavLink
+                      className={`button-effect ${
+                        videoActiveTab === "docs" ? "active" : ""
+                      } select-clip-width`}
+                      onClick={() => setAideoActiveTab("docs")}
+                    >
+                      NetQwix
+                    </NavLink>
+                  </NavItem>
+                </Nav>
+              </div>
+              <div className="file-tab">
+                <TabContent
+                  activeTab={videoActiveTab}
+                  className="custom-scroll"
+                >
+                  <TabPane tabId="media">
+                    <div className="media-gallery portfolio-section grid-portfolio">
+                      {clips?.length ? (
+                        clips?.map((cl, ind) => (
+                          <div className={`collapse-block open`}>
+                            <h5
+                              className="block-title"
+                              onClick={() => {
+                                var temp = clips;
+                                temp = temp.map((vl) => {
+                                  return { ...vl, show: false };
+                                });
+                                temp[ind].show = true;
+                                setClips([...temp]);
+                              }}
+                            >
+                              {cl?._id}
+                              <label className="badge badge-primary sm ml-2">
+                                {cl?.clips?.length}
+                              </label>
+                            </h5>
+                            {/*  NORMAL  STRUCTURE END  */}
+                            <div className={`block-content`}>
+                              <div className="row" style={{ margin: 0 }}>
+                                {cl?.clips.map((clp, index) => {
+                                  var sld = selectClips.find(
+                                    (val) => val?._id === clp?._id
+                                  );
+                                  return (
+                                    <div
+                                      key={index}
+                                      className={`col-3 p-1`}
+                                      style={{ borderRadius: 5 }}
+                                      onClick={() => {
+                                        if (!sld && selectClips?.length < 2) {
+                                          selectClips.push(clp);
+                                          setSelectClips([...selectClips]);
+                                        } else {
+                                          var temp = JSON.parse(
+                                            JSON.stringify(selectClips)
+                                          );
+                                          temp = temp.filter(
+                                            (val) => val._id !== clp?._id
+                                          );
+                                          setSelectClips([...temp]);
+                                        }
+                                      }}
+                                    >
+                                      <video
+                                        poster={Utils?.generateThumbnailURL(
+                                          clp
+                                        )}
+                                        style={{
+                                          // border: `${sld ? "2px" : "0px"} solid green`,
+                                          // width: "98%",
+                                          // maxHeight: "150px",
+                                          // height: "100%",
+                                          marginBottom: "10px",
+                                          // height: "200px",
+                                          width: "100%",
+                                          border: sld
+                                            ? "4px solid green"
+                                            : "4px solid rgb(180, 187, 209)",
+                                          borderRadius: "5px",
+                                          objectFit: "cover",
+                                          aspectRatio: "1/1",
+                                        }}
+                                      >
+                                        <source
+                                          src={Utils?.generateVideoURL(clp)}
+                                          type="video/mp4"
+                                        />
+                                      </video>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              marginTop: "40px",
+                            }}
+                          >
+                            <h5 className="block-title"> No Data Found</h5>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </TabPane>
+                  <TabPane tabId="trainee">
+                    <div className="media-gallery portfolio-section grid-portfolio">
+                      {traineeClip?.length ? (
+                        traineeClip?.map((cl, ind) => (
+                          <div className={`collapse-block open`}>
+                            <h5
+                              className="block-title"
+                              onClick={() => {
+                                var temp = traineeClip;
+                                temp = temp.map((vl) => {
+                                  return { ...vl, show: false };
+                                });
+                                temp[ind].show = true;
+                                setTraineeClips([...temp]);
+                              }}
+                            >
+                              {cl?._id?.fullname}
+                              <label className="badge badge-primary sm ml-2">
+                                {cl?.clips?.length}
+                              </label>
+                            </h5>
+                            {/*  NORMAL  STRUCTURE END  */}
+                            <div className={`block-content `}>
+                              <div className="row" style={{ margin: 0 }}>
+                                {cl?.clips.map((clp, index) => {
+                                  var sld = selectClips.find(
+                                    (val) => val?._id === clp?.clips?._id
+                                  );
+                                  return (
+                                    <div
+                                      key={index}
+                                      className={`col-3 p-1`}
+                                      style={{ borderRadius: 5 }}
+                                      onClick={() => {
+                                        if (!sld && selectClips?.length < 2) {
+                                          selectClips.push(clp?.clips);
+                                          setSelectClips([...selectClips]);
+                                        } else {
+                                          var temp = JSON.parse(
+                                            JSON.stringify(selectClips)
+                                          );
+                                          temp = temp.filter(
+                                            (val) => val._id !== clp?.clips?._id
+                                          );
+                                          setSelectClips([...temp]);
+                                        }
+                                      }}
+                                    >
+                                      <video
+                                        poster={Utils?.generateThumbnailURL(
+                                          clp?.clips
+                                        )}
+                                        style={{
+                                          // border: `${sld ? "2px" : "0px"} solid green`,
+                                          // width: "98%",
+                                          // maxHeight: "150px",
+                                          // height: "100%",
+                                          marginBottom: "10px",
+
+                                          width: "100%",
+                                          border: sld
+                                            ? "4px solid green"
+                                            : "4px solid rgb(180, 187, 209)",
+                                          borderRadius: "5px",
+                                          objectFit: "cover",
+                                          aspectRatio: "1/1",
+                                        }}
+                                        preload="none"
+                                      >
+                                        <source
+                                          src={Utils?.generateVideoURL(
+                                            clp?.clips
+                                          )}
+                                          // src={Utils?.generateVideoURL(clp)}
+                                          type="video/mp4"
+                                        />
+                                      </video>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            marginTop: "40px",
+                          }}
+                        >
+                          <h5 className="block-title"> No Data Found</h5>
+                        </div>
+                      )}
+                    </div>
+                  </TabPane>
+                  <TabPane tabId="docs">
+                    <div className="media-gallery portfolio-section grid-portfolio">
+                      <div className={`collapse-block open`}>
+                        <div className={`block-content `}>
+                          <div className="row">
+                            {netquixVideos.map((clp, index) => {
+                              var sld = selectClips.find(
+                                (val) => val?._id === clp?._id
+                              );
+                              return clp?.file_name ? (
+                                <div
+                                  key={index}
+                                  className={`col-3 p-1`}
+                                  style={{ borderRadius: 5 }}
+                                  onClick={() => {
+                                    if (!sld && selectClips?.length < 2) {
+                                      selectClips.push(clp);
+                                      setSelectClips([...selectClips]);
+                                    } else {
+                                      var temp = JSON.parse(
+                                        JSON.stringify(selectClips)
+                                      );
+                                      temp = temp.filter(
+                                        (val) => val._id !== clp?._id
+                                      );
+                                      setSelectClips([...temp]);
+                                    }
+                                  }}
+                                >
+                                  <video
+                                    // style={{ border: `${sld ? "2px" : "0px"} solid green`, width: "98%", maxHeight: "150px", height: "100%", marginBottom: "10px", display: "flex", justifyContent: "center" }}
+                                    style={{
+                                      marginBottom: "10px",
+
+                                      width: "100%",
+                                      border: sld
+                                        ? "4px solid green"
+                                        : "4px solid rgb(180, 187, 209)",
+                                      borderRadius: "5px",
+                                      objectFit: "cover",
+                                      aspectRatio: "1/1",
+                                    }}
+                                  >
+                                    <source
+                                      src={Utils?.generateVideoURL(clp)}
+                                      type="video/mp4"
+                                    />
+                                  </video>
+                                </div>
+                              ) : null;
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabPane>
+                </TabContent>
+              </div>
+            </div>
+
+            {clipSelectNote && (
+              <Notes
+                isOpen={clipSelectNote}
+                onClose={setClipSelectNote}
+                title={"Select clips"}
+                desc={
+                  "Select clips to choose up to two clips, videos will load onto your board when you click the X (cross)."
+                }
+                style={{
+                  top: "10px",
+                  left: "10px",
+                }}
+                triangle={"clip-select"}
+                nextFunc={() => {
+                  setClipSelectNote(false);
+                }}
+              />
+            )}
+          </>
+        }
+      />
+
+      {isScreenShotModelOpen && (
+        <ScreenShotDetails
+          screenShotImages={screenShots}
+          setScreenShotImages={setScreenShots}
+          setIsOpenDetail={setIsScreenShotModelOpen}
+          isOpenDetail={isScreenShotModelOpen}
+          currentReportData={{
+            session: id,
+            trainer: fromUser?._id,
+            trainee: toUser?._id,
+          }}
+          reportObj={reportObj}
+        />
+      )}
+
+      <ReportModal
+        currentReportData={{
+          session: id,
+          trainer: fromUser?._id,
+          trainee: toUser?._id,
+        }}
+        isOpenReport={isOpenReport}
+        setIsOpenReport={setIsOpenReport}
+        screenShots={screenShots}
+        setScreenShots={setScreenShots}
+        // setScreenShots={setScreenShot}
+        reportObj={reportObj}
+        setReportObj={setReportObj}
+        isClose={isClose}
+        isTraineeJoined={isTraineeJoined}
+        isCallEnded={isCallEnded}
+      />
     </div>
   );
 };

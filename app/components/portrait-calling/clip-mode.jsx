@@ -16,6 +16,10 @@ import { useEffect } from "react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import { Utils } from "../../../utils/utils";
 import _debounce from "lodash/debounce";
+import { toast } from "react-toastify";
+import { pushProfilePhotoToS3 } from "../common/common.api";
+import { screenShotTake } from "../videoupload/videoupload.api";
+import html2canvas from "html2canvas";
 const SHAPES = {
   FREE_HAND: "hand",
   LINE: "line",
@@ -919,21 +923,8 @@ const ClipModeCall = ({
                     position: "relative",
                   }}
                 >
-                  {drawingMode && (
-                    <div
-                      className="button ml-1"
-                      onClick={() => {
-                        setShowDrawingTools(!showDrawingTools);
-                      }}
-                    >
-                      <ChevronDown
-                        size={18}
-                        color={drawingMode ? "blue" : "black"}
-                      />
-                    </div>
-                  )}
 
-                  {showDrawingTools && (
+                  {drawingMode && (
                     <div
                       style={{
                         position: "absolute",
@@ -1131,25 +1122,10 @@ const ClipModeCall = ({
                 >
                   {drawingMode && (
                     <div
-                      className="button ml-1"
-                      onClick={() => {
-                        setShowDrawingTools(!showDrawingTools);
-                      }}
-                    >
-                      <ChevronDown
-                        size={18}
-                        color={drawingMode ? "blue" : "black"}
-                      />
-                    </div>
-                  )}
-
-                  {showDrawingTools && (
-                    <div
                       style={{
                         position: "absolute",
                         zIndex: 99,
-                        top: 24,
-                        left: -10,
+                        top: -10,
                       }}
                     >
                       <CanvasMenuBar
@@ -1158,6 +1134,7 @@ const ClipModeCall = ({
                         setSketchPickerColor={(rgb) => {
                           setSketchPickerColor(rgb);
                         }}
+                        isFromPotrait={true}
                         undoDrawing={() => {
                           undoDrawing(
                             {

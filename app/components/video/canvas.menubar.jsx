@@ -44,6 +44,7 @@ export const CanvasMenuBar = ({
   clipSelectNote,
   setCountClipNoteOpen,
   resetInitialPinnedUser,
+  isFromPotrait
 }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
@@ -118,18 +119,15 @@ export const CanvasMenuBar = ({
   }
   console.log("isMobileScreen",isMobileScreen)
   return (
-    <div style={{ margin: "1rem", display: "flex", justifyContent: "center" }}>
+    <div style={{ margin: isFromPotrait?"0.5rem":"1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
         // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{height: !isMobileScreen ?(isIOS? "54vh" : "70vh"):"auto",overflow: 'auto'}}>
+        <div className="CreationBarCustomizable" style={{height: !isMobileScreen ?(isIOS? "54vh" : "70vh"):"auto",overflow: 'auto',display:isFromPotrait?"flex":"block"}}>
           <span></span>
           {/* free hand */}
-          <span>
-            {/* {displayColorPicker ?
-             */}
-            <Popover
+          <Popover
               className="color-picker-popover"
               isOpen={displayColorPicker}
               positions={["left", "right"]} // if you'd like, you can limit the positions
@@ -178,6 +176,10 @@ export const CanvasMenuBar = ({
                 />
               </div>
             </Popover>
+          <span>
+            {/* {displayColorPicker ?
+             */}
+          
             {/* : null} */}
             <div
               className={`icon-btn m-5 my-3  button-effect btn-sm ${

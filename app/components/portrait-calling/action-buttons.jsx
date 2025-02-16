@@ -27,7 +27,14 @@ const ActionButtons = ({
   fromUser,
   toUser,
   setIsMuted,
-  isMuted
+  isMuted,
+  takeScreenshot,
+  setIsOpenConfirm,
+  setIsOpen,
+  isOpen,
+  isOpenConfirm,
+  selectedClips,
+  setIsOpenReport
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -90,7 +97,13 @@ const ActionButtons = ({
             <div className="button external-link">
               <ExternalLink
                 size={16}
-                onClick={() => setIsShowVideos(!isShowVideos)}
+                onClick={() => {
+                  if (selectedClips?.length) {
+                    setIsOpenConfirm(true);
+                  } else {
+                    setIsOpen(true);
+                  }
+                }}
               />
             </div>
           </Tooltip>
@@ -105,13 +118,13 @@ const ActionButtons = ({
           </Tooltip>
 
           <Tooltip>
-            <div className="button aperture">
+            <div className="button aperture" onClick={takeScreenshot}>
               <Aperture size={16} />
             </div>
           </Tooltip>
 
           <Tooltip>
-            <div className="button file-add">
+            <div className="button file-add" onClick={()=>setIsOpenReport(true)}>
               <FilePlus size={16} />
             </div>
           </Tooltip>
