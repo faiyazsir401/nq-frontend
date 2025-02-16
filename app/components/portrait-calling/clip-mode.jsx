@@ -75,7 +75,7 @@ const VideoContainer = ({
   const videoContainerRef = useRef(null);
   const movingVideoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
+  const [currentTime, setCurrentTime] = useState(0)
   const [scale, setScale] = useState(1); // Zoom level (scale)
   const [lastTouch, setLastTouch] = useState(0);
   const [translate, setTranslate] = useState({
@@ -211,7 +211,7 @@ const VideoContainer = ({
     });
 
     socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
-      if (data?.videoId === clip?._id) {
+      if (data?.videoId === clip?._id && accountType === AccountType.TRAINEE) {
         video.currentTime = data.progress;
       }
     });
@@ -294,6 +294,7 @@ const VideoContainer = ({
       const progress = e.target.value;
 
       video.currentTime = progress;
+      setCurrentTime(progress)
       socket?.emit(EVENTS?.ON_VIDEO_TIME, {
         userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
         videoId: clip._id,
@@ -637,6 +638,7 @@ const VideoContainer = ({
             togglePlayPause={togglePlayPause}
             videoRef={videoRef}
             setIsPlaying={setIsPlaying}
+            setCurrentTime={setCurrentTime}
           />
         )}
       </div>
@@ -678,7 +680,7 @@ const ClipModeCall = ({
     b: 19,
     a: 1,
   });
-
+  const [currentTime,setCurrentTime] = useState(0) 
   const [isCanvasMenuNoteShow, setIsCanvasMenuNoteShow] = useState(false);
   const [micNote, setMicNote] = useState(false);
   const [clipSelectNote, setClipSelectNote] = useState(false);
@@ -687,8 +689,49 @@ const ClipModeCall = ({
   const [isPlayingBoth, setIsPlayingBoth] = useState(false); // Track video playback state
   const [isPlaying1, setIsPlaying1] = useState(false); // Track video playback state
   const [isPlaying2, setIsPlaying2] = useState(false); // Track video playback state
-
   const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen state
+
+
+  useEffect(() => {
+    const video1 = videoRef.current;
+    const video2 = videoRef2.current;
+
+
+    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+      if (data?.both && data?.isPlaying) {
+        // Only play if the video matches and the action is play
+        if (video1?.paused) {
+          video1.play();
+          video2.play();
+          setIsPlayingBoth(true);
+        }
+      }
+    });
+
+    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+      if (data?.both && !data?.isPlaying) {
+        if (video1?.play) {
+          video1.pause();
+          video2.pause();
+          setIsPlayingBoth(false);
+        }
+      }
+    });
+
+    socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
+      if (data?.both && accountType === AccountType.TRAINEE) {
+        video1.currentTime = data.progress;
+        video2.currentTime = data.progress;
+      }
+    });
+
+    // Clean up on unmount
+    return () => {
+      socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
+      socket?.off(EVENTS?.ON_VIDEO_TIME);
+      socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
+    };
+  }, [socket,  videoRef,videoRef2]);
 
   // Play/pause video
   const togglePlayPause = () => {
@@ -699,13 +742,25 @@ const ClipModeCall = ({
         video1.play();
         video2.play();
         setIsPlayingBoth(true);
+        socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
+          both: true,
+          userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+          isPlaying: true,
+        });
       } else {
         video1.pause();
         video2.pause();
         setIsPlayingBoth(false);
+        socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
+          both: true,
+          userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+          isPlaying: false,
+        });
       }
     }
   };
+
+
 
   // Handle seeking for both videos when locked
   const handleSeek = (e) => {
@@ -716,6 +771,12 @@ const ClipModeCall = ({
     if (video1 && video2) {
       video1.currentTime = progress;
       video2.currentTime = progress;
+      setCurrentTime(progress)
+      socket?.emit(EVENTS?.ON_VIDEO_TIME, {
+        both:true,
+        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+        progress,
+      });
     }
   };
 
@@ -1052,6 +1113,7 @@ const ClipModeCall = ({
                     videoRef={videoRef}
                     setIsPlaying={setIsPlayingBoth}
                     isFixed={isLock}
+                    setCurrentTime={setCurrentTime}
                   />
                 )}
               </>
@@ -1086,7 +1148,7 @@ const ClipModeCall = ({
         </div>
       ) : (
         <>
-          <div className="d-flex justify-content-between align-items-center pr-4 pl-4 mt-2 w-100">
+          <div className={`d-flex   px-4 ${accountType === AccountType.TRAINER ?"mt-2 justify-content-between": "m-2 justify-content-end"} w-100`}>
             {accountType === AccountType.TRAINER && (
               <div className="d-flex">
                 <div
@@ -1263,6 +1325,7 @@ const ClipModeCall = ({
                     videoRef={videoRef}
                     setIsPlaying={setIsPlayingBoth}
                     isFixed={isLock}
+                    setCurrentTime={setCurrentTime}
                   />
                 )}
               </>

@@ -4,6 +4,7 @@ import React, {
   useContext,
   useRef,
   useCallback,
+  useMemo,
 } from "react";
 import "./index.css";
 import { AccountType } from "../../common/constants";
@@ -42,6 +43,7 @@ import { X } from "react-feather";
 import Notes from "../practiceLiveExperience/Notes";
 import CustomModal from "../../common/modal";
 import ScreenShotDetails from "../video/screenshotDetails";
+import Timer from "../video/Timer";
 const VideoCallUI = ({
   id,
   isClose,
@@ -77,7 +79,6 @@ const VideoCallUI = ({
   const [isMaximized, setIsMaximized] = useState(false);
   const [isRemoteVideoOff, setRemoteVideoOff] = useState(false);
   const [isOpenReport, setIsOpenReport] = useState(false);
-
   const remoteVideoRef = useRef(null);
   const [isLockMode, setIsLockMode] = useState(false);
   const [clipSelectNote, setClipSelectNote] = useState(false);
@@ -90,7 +91,11 @@ const VideoCallUI = ({
   const [isScreenShotModelOpen, setIsScreenShotModelOpen] = useState(false);
   const [screenShots, setScreenShots] = useState([]);
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
-    const [isCallEnded, setIsCallEnded] = useState(false);
+  const [isCallEnded, setIsCallEnded] = useState(false);
+  const [screenStream, setScreenStream] = useState(null);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+
+  const [isModelOpen, setIsModelOpen] = useState(false);
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -270,6 +275,21 @@ const VideoCallUI = ({
     }
   };
 
+  useMemo(() => {
+    if (
+      remoteVideoRef.current &&
+      remoteStream &&
+      !remoteVideoRef.current.srcObject
+    ) {
+      remoteVideoRef.current.srcObject = remoteStream;
+      accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
+    }
+
+    return () => {
+      cutCall();
+    };
+  }, [remoteStream]);
+
   const connectToPeer = (peer, peerId) => {
     if (!(videoRef && videoRef?.current)) return;
     const call = peer.call(peerId, videoRef?.current?.srcObject);
@@ -282,7 +302,7 @@ const VideoCallUI = ({
         remoteVideoRef.current.srcObject = remoteStream;
       }
       setRemoteStream(remoteStream);
-      // accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
+      accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
     });
   };
   console.log("isTraineeJoined", isTraineeJoined);
@@ -313,13 +333,177 @@ const VideoCallUI = ({
     });
 
     socket.on(EVENTS.ON_CLEAR_CANVAS, () => {
-      clearCanvas();
+      // clearCanvas();
     });
 
     socket.on(EVENTS.VIDEO_CALL.STOP_FEED, ({ feedStatus }) => {
       setIsRemoteStreamOff(feedStatus);
     });
   }, [socket]);
+
+  const startRecording = async () => {
+    const data = {
+      sessions: id,
+      trainer: toUser?._id,
+      trainee: fromUser?._id,
+      user_id: fromUser?._id,
+      trainee_name: fromUser?.fullname,
+      trainer_name: toUser?.fullname,
+    };
+
+    socket.emit("videoUploadData", data);
+
+    const mixedAudioStream = await setupAudioMixing();
+
+    const screenStr = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      preferCurrentTab: true,
+    });
+    setScreenStream(screenStr);
+
+    const screenVideoTrack = screenStr.getVideoTracks()[0];
+
+    const combinedStream = new MediaStream([
+      screenVideoTrack,
+      ...mixedAudioStream.getAudioTracks(),
+    ]);
+
+    const mediaRecorder = new MediaRecorder(combinedStream);
+
+    let chunks = [];
+
+    mediaRecorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        chunks.push(event.data);
+      }
+    };
+    setInterval(function () {
+      if (mediaRecorder.state === "recording") {
+        mediaRecorder.requestData();
+
+        const chunkBuffers = chunks
+          .map((chunk) => {
+            if (chunk) {
+              // console.log("Chunk type:", typeof chunk);
+              return chunk;
+            } else {
+              return null; // or handle differently as needed
+            }
+          })
+          .filter(Boolean);
+        if (chunkBuffers.length > 0) {
+          const chunkData = { data: chunkBuffers };
+          socket.emit("chunk", chunkData);
+        }
+        chunks = [];
+      }
+    }, 1000);
+
+    mediaRecorder.onstop = () => {
+      socket.emit("chunksCompleted");
+    };
+
+    mediaRecorder.start();
+    setMediaRecorder(mediaRecorder);
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+    }
+    if (screenStream) {
+      screenStream.getTracks().forEach((track) => track.stop());
+      setScreenStream(null);
+    }
+  };
+
+  // NOTE - handle user offline
+  const handleOffline = () => {
+    stopRecording();
+    socket.emit("chunksCompleted");
+  };
+
+  function handlePeerDisconnect() {
+    stopRecording();
+    if (!(peerRef && peerRef.current)) return;
+    //NOTE -  manually close the peer connections
+    for (let conns in peerRef.current.connections) {
+      peerRef.current.connections[conns].forEach((conn, index, array) => {
+        // console.log(
+        //   `closing ${conn.connectionId} peerConnection (${index + 1}/${array.length
+        //   })`,
+        //   conn.peerConnection
+        // );
+        conn.peerConnection.close();
+
+        //NOTE - close it using peerjs methods
+        if (conn.close) conn.close();
+      });
+    }
+  }
+
+  const cleanupFunction = () => {
+    handlePeerDisconnect();
+    setIsCallEnded(true);
+
+    if (localStream) {
+      localStream.getAudioTracks().forEach(function (track) {
+        track.stop();
+      });
+      localStream.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+      setLocalStream(null);
+    }
+    if (screenStream) {
+      screenStream.getAudioTracks().forEach(function (track) {
+        track.stop();
+      });
+      screenStream.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+      setScreenStream(null);
+    }
+
+    if (remoteStream) {
+      remoteStream.getAudioTracks().forEach(function (track) {
+        track.stop();
+      });
+      setRemoteStream(null);
+    }
+    if (micStream) {
+      micStream.getAudioTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    let videorefSrc = videoRef.current || localVideoRef;
+    if (videoRef && videorefSrc && videorefSrc.srcObject) {
+      videorefSrc.srcObject.getTracks().forEach((t) => {
+        t.stop();
+      });
+
+      videorefSrc.srcObject.getVideoTracks().forEach((t) => {
+        t.stop();
+      });
+    }
+
+    let videorefSrcRemote = remoteVideoRef.current;
+    if (remoteVideoRef && videorefSrcRemote && videorefSrcRemote.srcObject) {
+      videorefSrcRemote.srcObject.getTracks().forEach((t) => {
+        t.stop();
+      });
+      videorefSrcRemote.srcObject.getVideoTracks().forEach((t) => {
+        t.stop();
+      });
+    }
+
+    if (peerRef.current) {
+      peerRef.current.destroy();
+      peerRef.current = null;
+    }
+
+    // clearCanvas();
+  };
 
   const cutCall = () => {
     stopRecording();
@@ -331,10 +515,24 @@ const VideoCallUI = ({
     }
   };
 
+  const handelTabClose = async () => {
+    mediaRecorder?.stop();
+    // setRecording(false);
+    socket.emit("chunksCompleted");
+  };
+
   useEffect(() => {
     if (fromUser && toUser) {
       handleStartCall();
     }
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("beforeunload", handelTabClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handelTabClose);
+      window.removeEventListener("offline", handleOffline);
+      cutCall();
+    };
   }, [fromUser, toUser]);
 
   console.log("refs", videoRef, remoteVideoRef, remoteStream);
@@ -347,7 +545,7 @@ const VideoCallUI = ({
       {displayMsg?.msg ? <div>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
-          timeRemaining={timeRemaining}
+          timeRemaining={session_end_time}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
           selectedClips={selectedClips}
@@ -364,7 +562,7 @@ const VideoCallUI = ({
         />
       ) : (
         <OneOnOneCall
-          timeRemaining={timeRemaining}
+          timeRemaining={session_end_time}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
           videoRef={videoRef}
@@ -810,6 +1008,35 @@ const VideoCallUI = ({
         isTraineeJoined={isTraineeJoined}
         isCallEnded={isCallEnded}
       />
+
+      <Modal isOpen={isModelOpen}>
+        <ModalHeader>
+          <h2>Recording</h2>
+        </ModalHeader>
+        <ModalBody>
+          <div className="row">
+            <Button
+              className="mx-3 mt-1"
+              color="primary"
+              onClick={() => {
+                startRecording();
+                setIsModelOpen(false);
+              }}
+            >
+              Start Recording
+            </Button>
+            <Button
+              className="mx-3 mt-1"
+              color="primary"
+              onClick={() => {
+                setIsModelOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   );
 };

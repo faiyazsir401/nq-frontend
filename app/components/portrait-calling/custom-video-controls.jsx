@@ -27,18 +27,25 @@ const CustomVideoControls = ({
   toggleFullscreen,
   setIsPlaying,
   isFixed,
+  currentTime,
+  setCurrentTime
 }) => {
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
   useEffect(() => {
     const handleEnded = () => setIsPlaying(false);
-    if (videoRef.current) {
+    const handleUpdate =()=> setCurrentTime(videoRef?.current?.currentTime)
+    if (videoRef?.current) {
       videoRef.current.addEventListener("ended", handleEnded);
+      videoRef.current.addEventListener("timeupdate", handleUpdate);
+
     }
     return () => {
       if (videoRef.current) {
         videoRef.current.removeEventListener("ended", handleEnded);
+      videoRef.current.addEventListener("timeupdate", handleUpdate);
+
       }
     };
   }, [videoRef]);
