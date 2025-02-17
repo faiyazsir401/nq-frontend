@@ -54,6 +54,9 @@ let canvasConfigs = {
 };
 let selectedShape = null;
 let storedLocalDrawPaths = { sender: [], receiver: [] };
+  let state = {
+    mousedown: false,
+  };
 
 const VideoContainer = ({
   drawingMode,
@@ -303,10 +306,7 @@ const VideoContainer = ({
     }
   };
 
-  // console.log("canvas12", canvasRef);
-  const state = {
-    mousedown: false,
-  };
+
 
   useEffect(() => {
     const video = videoRef.current;
@@ -663,9 +663,6 @@ const ClipModeCall = ({
   isLocalStreamOff,
 }) => {
   const socket = useContext(SocketContext);
-  const state = {
-    mousedown: false,
-  };
   const [drawingMode, setDrawingMode] = useState(false);
   const [showDrawingTools, setShowDrawingTools] = useState(false);
   const { accountType } = useAppSelector(authState);
@@ -818,20 +815,17 @@ const ClipModeCall = ({
   const sendDrawEvent = () => {
     try {
       const canvas = canvasRef?.current;
-
+      console.log("sendDrawEvent",canvas)
       if (!canvas) return;
       const { width, height } = canvas;
-
       canvas.toBlob((blob) => {
         const reader = new FileReader();
         reader.onload = (event) => {
           if (!(event && event.target)) return;
           const binaryData = event.target.result;
-          // console.log(`emit draw event---`);
+          
           socket.emit(EVENTS.DRAW, {
             userInfo: { from_user: fromUser._id, to_user: toUser._id },
-            // storedEvents,
-            // canvasConfigs,
             strikes: binaryData,
             canvasSize: { width, height },
           });

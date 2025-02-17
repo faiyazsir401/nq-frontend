@@ -1058,6 +1058,7 @@ useEffect(() => {
   };
 
   const sendDrawEvent = () => {
+    console.log("sendDrawEvent",canvasRef)
     const canvas = canvasRef.current;
     if (!canvas) return;
     const { width, height } = canvas;
