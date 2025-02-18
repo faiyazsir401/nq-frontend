@@ -45,6 +45,24 @@
   right: 10px;
   width: 100px;
   height: 150px;
+
+}
+
+.profile-box.mini-landscape {
+  position: absolute;
+  z-index: 9999;
+  bottom:120px;
+  right: 10px;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-box.mini-landscape img {
+ height: 120px;
 }
 
 .profile-box.mini1 .profile-img {

@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import {
+  Aperture,
   ChevronDown,
   Maximize,
   Minimize,
@@ -9,7 +10,7 @@ import {
 } from "react-feather";
 import { CanvasMenuBar } from "../video/canvas.menubar";
 // import VideoContainer from "./video-container";
-import { UserBoxMini } from "./user-box";
+import { UserBox, UserBoxMini, VideoMiniBox } from "./user-box";
 import TimeRemaining from "./time-remaining";
 import { useRef } from "react";
 import CustomVideoControls from "./custom-video-controls";
@@ -86,7 +87,7 @@ const VideoContainer = ({
     sender: [],
     receiver: [], // Sender and receiver for canvas1
   };
-  
+
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   const videoContainerRef = useRef(null);
@@ -139,6 +140,7 @@ const VideoContainer = ({
 
     // Decrease the scale by 0.5, with a minimum value of 1
     const newScale = Math.max(1, scale - 0.2);
+    console.log("newScale", newScale);
     setScale(newScale);
 
     socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
@@ -358,62 +360,61 @@ const VideoContainer = ({
     removeLastCoordinate = true
   ) => {
     try {
-      console.log("undo")
+      console.log("undo");
       const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (!context || !canvas) return;
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    if (removeLastCoordinate) storedLocalDrawPaths.sender.splice(-1, 1);
-    // draw all the paths in the paths array
-    await senderConfig.coordinates.forEach((path) => {
-      context.beginPath();
-      context.strokeStyle = senderConfig.theme.strokeStyle;
-      context.lineWidth = senderConfig.theme.lineWidth;
-      context.lineCap = "round";
-      if (path && Array.isArray(path)) {
-        // context.
-        context.moveTo(path[0][0], path[0][1]);
-        for (let i = 0; i < path.length; i++) {
-          context.lineTo(path[i][0], path[i][1]);
+      const context = canvas?.getContext("2d");
+      if (!context || !canvas) return;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      if (removeLastCoordinate) storedLocalDrawPaths.sender.splice(-1, 1);
+      // draw all the paths in the paths array
+      await senderConfig.coordinates.forEach((path) => {
+        context.beginPath();
+        context.strokeStyle = senderConfig.theme.strokeStyle;
+        context.lineWidth = senderConfig.theme.lineWidth;
+        context.lineCap = "round";
+        if (path && Array.isArray(path)) {
+          // context.
+          context.moveTo(path[0][0], path[0][1]);
+          for (let i = 0; i < path.length; i++) {
+            context.lineTo(path[i][0], path[i][1]);
+          }
+          context.stroke();
         }
-        context.stroke();
-      }
-    });
+      });
 
-    await extraCoordinateConfig.coordinates.forEach((path) => {
-      context.beginPath();
-      context.strokeStyle = extraCoordinateConfig.theme.strokeStyle;
-      context.lineWidth = extraCoordinateConfig.theme.lineWidth;
-      context.lineCap = "round";
+      await extraCoordinateConfig.coordinates.forEach((path) => {
+        context.beginPath();
+        context.strokeStyle = extraCoordinateConfig.theme.strokeStyle;
+        context.lineWidth = extraCoordinateConfig.theme.lineWidth;
+        context.lineCap = "round";
 
-      // context.beginPath();
-      if (path && Array.isArray(path)) {
-        // context.
-        context.moveTo(path[0][0], path[0][1]);
-        for (let i = 0; i < path.length; i++) {
-          context.lineTo(path[i][0], path[i][1]);
+        // context.beginPath();
+        if (path && Array.isArray(path)) {
+          // context.
+          context.moveTo(path[0][0], path[0][1]);
+          for (let i = 0; i < path.length; i++) {
+            context.lineTo(path[i][0], path[i][1]);
+          }
+          context.stroke();
         }
-        context.stroke();
+      });
+
+      if (strikes.length <= 0) return;
+      context.putImageData(strikes[strikes.length - 1], 0, 0);
+      strikes.pop();
+
+      // sending event to end user
+      if (removeLastCoordinate) {
+        // socket.emit(EVENTS.EMIT_UNDO, {
+        //     sender: storedLocalDrawPaths.sender,
+        //     receiver: extraCoordinateConfig.coordinates,
+        //     userInfo: { from_user: fromUser._id, to_user: toUser._id },
+        // });
+        sendEmitUndoEvent();
       }
-    });
-
-    if (strikes.length <= 0) return;
-    context.putImageData(strikes[strikes.length - 1], 0, 0);
-    strikes.pop();
-
-    // sending event to end user
-    if (removeLastCoordinate) {
-      // socket.emit(EVENTS.EMIT_UNDO, {
-      //     sender: storedLocalDrawPaths.sender,
-      //     receiver: extraCoordinateConfig.coordinates,
-      //     userInfo: { from_user: fromUser._id, to_user: toUser._id },
-      // });
-      sendEmitUndoEvent();
-    }
     } catch (error) {
-        console.log("error",error)
+      console.log("error", error);
     }
-    
   };
 
   useEffect(() => {
@@ -694,7 +695,7 @@ const VideoContainer = ({
               flexDirection: "column",
               right: "10px",
               top: "10px",
-              zIndex:10
+              zIndex: 10,
             }}
           >
             <div
@@ -770,7 +771,7 @@ const VideoContainer = ({
           className="canvas"
           style={{ display: drawingMode ? "block" : "none" }}
         />
-        {drawingMode && (
+        {drawingMode && accountType === AccountType.TRAINER && (
           <div
             className="absolute"
             style={{
@@ -780,7 +781,7 @@ const VideoContainer = ({
               flexDirection: "column",
               right: "10px",
               bottom: "10px",
-              zIndex:10
+              zIndex: 10,
             }}
           >
             <div className="button" onClick={zoomIn}>
@@ -824,6 +825,7 @@ const ClipModeCall = ({
   remoteStream,
   isRemoteStreamOff,
   isLocalStreamOff,
+  takeScreenshot,
 }) => {
   const socket = useContext(SocketContext);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -850,6 +852,28 @@ const ClipModeCall = ({
   const [isPlaying1, setIsPlaying1] = useState(false); // Track video playback state
   const [isPlaying2, setIsPlaying2] = useState(false); // Track video playback state
   const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen state
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  function handleUserClick(id) {
+    setSelectedUser(id);
+    emitVideoSelectEvent("swap", id);
+  }
+
+  socket.on(EVENTS.ON_VIDEO_SELECT, ({ id, type }) => {
+    if (type === "swap" && accountType === AccountType.TRAINEE) {
+      setSelectedUser(id);
+    }
+  });
+
+  //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
+  const emitVideoSelectEvent = (type, id) => {
+    socket.emit(EVENTS.ON_VIDEO_SELECT, {
+      userInfo: { from_user: fromUser._id, to_user: toUser._id },
+      type,
+      id,
+    });
+  };
+
 
   useEffect(() => {
     const video1 = videoRef.current;
@@ -902,7 +926,6 @@ const ClipModeCall = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
       socket?.off(EVENTS?.TOGGLE_DRAWING_MODE);
       socket?.off(EVENTS?.TOGGLE_FULL_SCREEN);
-
     };
   }, [socket, videoRef, videoRef2]);
 
@@ -1027,7 +1050,6 @@ const ClipModeCall = ({
     };
   });
 
-
   function resetInitialPinnedUser() {}
   const isSingle = selectedClips?.length === 1;
   return (
@@ -1036,7 +1058,7 @@ const ClipModeCall = ({
         <div className="">
           {accountType === AccountType.TRAINER && (
             <div
-              className="d-flex  justify-content-start top-0 absolute align-items-center pr-4 pl-4 mt-2 w-100"
+              className="d-flex  justify-content-start top-0 absolute align-items-center pr-4 pl-2 mt-2 w-100"
               style={{
                 zIndex: 99,
               }}
@@ -1045,8 +1067,7 @@ const ClipModeCall = ({
                 <div
                   className="button"
                   onClick={() => {
-                    
-                    setIsMaximized(!isMaximized)
+                    setIsMaximized(!isMaximized);
                     socket.emit(EVENTS.TOGGLE_FULL_SCREEN, {
                       userInfo: {
                         from_user: fromUser._id,
@@ -1062,13 +1083,16 @@ const ClipModeCall = ({
                     <Maximize size={18} />
                   )}
                 </div>
+                <div className="button aperture ml-2" onClick={takeScreenshot}>
+                  <Aperture size={16} />
+                </div>
                 <div
                   style={{
                     position: "relative",
                   }}
                 >
                   <div
-                    className="button ml-3"
+                    className="button ml-2"
                     onClick={() => {
                       setDrawingMode(!drawingMode);
                       socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
@@ -1095,7 +1119,7 @@ const ClipModeCall = ({
                       style={{
                         position: "absolute",
                         zIndex: 99,
-                        top: -10
+                        top: -10,
                       }}
                     >
                       <CanvasMenuBar
@@ -1165,7 +1189,6 @@ const ClipModeCall = ({
                   Peer={Peer}
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
-                  
                   sendDrawEvent={sendDrawEvent}
                 />
                 <VideoContainer
@@ -1191,7 +1214,6 @@ const ClipModeCall = ({
                   Peer={Peer}
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
-                  
                   sendDrawEvent={sendDrawEvent}
                 />
 
@@ -1233,7 +1255,6 @@ const ClipModeCall = ({
                 Peer={Peer}
                 canvasConfigs={canvasConfigs}
                 selectedShape={selectedShape}
-                
                 sendDrawEvent={sendDrawEvent}
               />
             )}
@@ -1242,7 +1263,7 @@ const ClipModeCall = ({
       ) : (
         <>
           <div
-            className={`d-flex   px-4 ${
+            className={`d-flex  pl-2 pr-4 ${
               accountType === AccountType.TRAINER
                 ? "mt-2 justify-content-between"
                 : "m-2 justify-content-end"
@@ -1253,8 +1274,7 @@ const ClipModeCall = ({
                 <div
                   className="button"
                   onClick={() => {
-                    
-                    setIsMaximized(!isMaximized)
+                    setIsMaximized(!isMaximized);
                     socket.emit(EVENTS.TOGGLE_FULL_SCREEN, {
                       userInfo: {
                         from_user: fromUser._id,
@@ -1349,33 +1369,135 @@ const ClipModeCall = ({
 
             <TimeRemaining timeRemaining={timeRemaining} />
           </div>
-          <UserBoxMini
-            id={toUser._id}
-            videoRef={remoteVideoRef}
-            stream={remoteStream}
-            user={toUser}
-            isStreamOff={isRemoteStreamOff}
-          />
-          <UserBoxMini
-            id={fromUser._id}
-            videoRef={localVideoRef}
-            stream={localStream}
-            user={fromUser}
-            isStreamOff={isLocalStreamOff}
-          />
+          {selectedUser ? (
+            <>
+              <UserBox
+                id={fromUser._id}
+                onClick={handleUserClick}
+                selectedUser={selectedUser}
+                selected={selectedUser === fromUser._id}
+                notSelected={selectedUser}
+                videoRef={remoteVideoRef}
+                user={toUser}
+                stream={remoteStream}
+                isStreamOff={isRemoteStreamOff}
+              />
 
-          <div>
-            {selectedClips.length > 1 ? (
-              <>
+              <UserBox
+                id={toUser._id}
+                onClick={handleUserClick}
+                selectedUser={selectedUser}
+                selected={selectedUser === toUser._id}
+                notSelected={selectedUser}
+                videoRef={localVideoRef}
+                user={fromUser}
+                stream={localStream}
+                isStreamOff={isLocalStreamOff}
+              />
+              {selectedUser === toUser._id ? (
+                <UserBoxMini
+                  id={fromUser._id}
+                  onClick={handleUserClick}
+                  selected={false}
+                  videoRef={remoteVideoRef}
+                  stream={remoteStream}
+                  user={toUser}
+                  isStreamOff={isRemoteStreamOff}
+                />
+              ) : (
+                <UserBoxMini
+                  id={toUser._id}
+                  onClick={handleUserClick}
+                  selected={false}
+                  videoRef={localVideoRef}
+                  stream={localStream}
+                  user={fromUser}
+                  isStreamOff={isLocalStreamOff}
+                />
+              )}
+
+              <VideoMiniBox
+                clips={selectedClips}
+                id={null}
+                onClick={handleUserClick}
+              />
+            </>
+          ) : (
+            <div>
+              {selectedClips.length > 1 ? (
+                <>
+                  <VideoContainer
+                    drawingMode={drawingMode}
+                    isLock={isLock}
+                    index={1}
+                    canvasRef={canvasRef}
+                    videoRef={videoRef}
+                    clip={selectedClips[0]}
+                    isPlaying={isLock ? isPlayingBoth : isPlaying1}
+                    setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying1}
+                    fromUser={fromUser}
+                    toUser={toUser}
+                    isDrawing={isDrawing}
+                    stopDrawing={stopDrawing}
+                    savedPos={savedPos}
+                    startPos={startPos}
+                    currPos={currPos}
+                    strikes={strikes}
+                    extraStream={extraStream}
+                    localVideoRef={localVideoRef}
+                    Peer={Peer}
+                    canvasConfigs={canvasConfigs}
+                    selectedShape={selectedShape}
+                    sendDrawEvent={sendDrawEvent}
+                  />
+                  <VideoContainer
+                    drawingMode={drawingMode}
+                    isLock={isLock}
+                    index={2}
+                    canvasRef={canvasRef2}
+                    videoRef={videoRef2}
+                    clip={selectedClips[1]}
+                    isPlaying={isLock ? isPlayingBoth : isPlaying2}
+                    setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying2}
+                    fromUser={fromUser}
+                    toUser={toUser}
+                    isDrawing={isDrawing}
+                    stopDrawing={stopDrawing}
+                    savedPos={savedPos}
+                    startPos={startPos}
+                    currPos={currPos}
+                    strikes={strikes}
+                    extraStream={extraStream}
+                    localVideoRef={localVideoRef}
+                    Peer={Peer}
+                    canvasConfigs={canvasConfigs}
+                    selectedShape={selectedShape}
+                    sendDrawEvent={sendDrawEvent}
+                  />
+
+                  {accountType === AccountType.TRAINER && isLock && (
+                    <CustomVideoControls
+                      handleSeek={handleSeek}
+                      isPlaying={isPlayingBoth}
+                      // toggleFullscreen={toggleFullscreen}
+                      // toggleMute={toggleMute}
+                      togglePlayPause={togglePlayPause}
+                      videoRef={videoRef}
+                      setIsPlaying={setIsPlayingBoth}
+                      isFixed={isLock}
+                      setCurrentTime={setCurrentTime}
+                    />
+                  )}
+                </>
+              ) : (
                 <VideoContainer
                   drawingMode={drawingMode}
-                  isLock={isLock}
-                  index={1}
                   canvasRef={canvasRef}
                   videoRef={videoRef}
                   clip={selectedClips[0]}
-                  isPlaying={isLock ? isPlayingBoth : isPlaying1}
-                  setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying1}
+                  isPlaying={isPlaying1}
+                  setIsPlaying={setIsPlaying1}
+                  isSingle={isSingle}
                   fromUser={fromUser}
                   toUser={toUser}
                   isDrawing={isDrawing}
@@ -1389,76 +1511,29 @@ const ClipModeCall = ({
                   Peer={Peer}
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
-                  
                   sendDrawEvent={sendDrawEvent}
                 />
-                <VideoContainer
-                  drawingMode={drawingMode}
-                  isLock={isLock}
-                  index={2}
-                  canvasRef={canvasRef2}
-                  videoRef={videoRef2}
-                  clip={selectedClips[1]}
-                  isPlaying={isLock ? isPlayingBoth : isPlaying2}
-                  setIsPlaying={isLock ? setIsPlayingBoth : setIsPlaying2}
-                  fromUser={fromUser}
-                  toUser={toUser}
-                  isDrawing={isDrawing}
-                  stopDrawing={stopDrawing}
-                  savedPos={savedPos}
-                  startPos={startPos}
-                  currPos={currPos}
-                  strikes={strikes}
-                  extraStream={extraStream}
-                  localVideoRef={localVideoRef}
-                  Peer={Peer}
-                  canvasConfigs={canvasConfigs}
-                  selectedShape={selectedShape}
-                  
-                  sendDrawEvent={sendDrawEvent}
-                />
-
-                {accountType === AccountType.TRAINER && isLock && (
-                  <CustomVideoControls
-                    handleSeek={handleSeek}
-                    isPlaying={isPlayingBoth}
-                    // toggleFullscreen={toggleFullscreen}
-                    // toggleMute={toggleMute}
-                    togglePlayPause={togglePlayPause}
-                    videoRef={videoRef}
-                    setIsPlaying={setIsPlayingBoth}
-                    isFixed={isLock}
-                    setCurrentTime={setCurrentTime}
-                  />
-                )}
-              </>
-            ) : (
-              <VideoContainer
-                drawingMode={drawingMode}
-                canvasRef={canvasRef}
-                videoRef={videoRef}
-                clip={selectedClips[0]}
-                isPlaying={isPlaying1}
-                setIsPlaying={setIsPlaying1}
-                isSingle={isSingle}
-                fromUser={fromUser}
-                toUser={toUser}
-                isDrawing={isDrawing}
-                stopDrawing={stopDrawing}
-                savedPos={savedPos}
-                startPos={startPos}
-                currPos={currPos}
-                strikes={strikes}
-                extraStream={extraStream}
-                localVideoRef={localVideoRef}
-                Peer={Peer}
-                canvasConfigs={canvasConfigs}
-                selectedShape={selectedShape}
-                
-                sendDrawEvent={sendDrawEvent}
+              )}
+              <UserBoxMini
+                id={fromUser._id}
+                onClick={handleUserClick}
+                selected={false}
+                videoRef={remoteVideoRef}
+                stream={remoteStream}
+                user={toUser}
+                isStreamOff={isRemoteStreamOff}
               />
-            )}
-          </div>
+              <UserBoxMini
+                id={toUser._id}
+                onClick={handleUserClick}
+                selected={false}
+                videoRef={localVideoRef}
+                stream={localStream}
+                user={fromUser}
+                isStreamOff={isLocalStreamOff}
+              />
+            </div>
+          )}
         </>
       )}
     </>

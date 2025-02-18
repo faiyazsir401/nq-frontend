@@ -139,22 +139,24 @@ const VideoCallUI = ({
     setTraineeClips(arr);
   };
 
-  socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos }) => {
-    setSelectedClips([...videos]);
+  socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos ,type}) => {
+    if(type ==="clips"){
+      setSelectedClips([...videos]);
+    }
   });
 
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
-  const emitVideoSelectEvent = (videos) => {
+  const emitVideoSelectEvent = (type,videos) => {
     socket.emit(EVENTS.ON_VIDEO_SELECT, {
       userInfo: { from_user: fromUser._id, to_user: toUser._id },
-
+      type,
       videos,
     });
   };
 
   //NOTE - emit event after selecting the clips
   useEffect(() => {
-    emitVideoSelectEvent(selectedClips);
+    emitVideoSelectEvent("clips",selectedClips);
   }, [selectedClips?.length]);
 
   // selects trainee clips on load
@@ -208,7 +210,7 @@ const VideoCallUI = ({
       console.log("res?.data?.url", res?.data?.url);
       if (res?.data?.url) {
         setIsScreenShotModelOpen(true);
-        pushProfilePhotoToS3(res?.data?.url, blob, afterSucessUploadImageOnS3);
+        pushProfilePhotoToS3(res?.data?.url, blob,null, afterSucessUploadImageOnS3);
       }
 
       setTimeout(() => {
@@ -483,6 +485,7 @@ const VideoCallUI = ({
           remoteStream={remoteStream}
           isRemoteStreamOff={isRemoteStreamOff}
           isLocalStreamOff={isLocalStreamOff}
+          takeScreenshot={takeScreenshot}
         />
       ) : (
         <OneOnOneCall

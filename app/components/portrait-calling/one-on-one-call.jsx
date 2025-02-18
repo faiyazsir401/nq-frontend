@@ -34,7 +34,7 @@ const OneOnOneCall = ({
 
       <div className="video-section">
         <UserBox
-          id={fromUser._id}
+          id={toUser._id}
           onClick={handleUserClick}
           selected={selectedUser === toUser._id}
           selectedUser={selectedUser}
@@ -45,7 +45,7 @@ const OneOnOneCall = ({
           isStreamOff={isLocalStreamOff}
         />
         <UserBox
-          id={toUser._id}
+          id={fromUser._id}
           onClick={handleUserClick}
           selectedUser={selectedUser}
           selected={selectedUser === fromUser._id}
@@ -58,7 +58,7 @@ const OneOnOneCall = ({
       </div>
       {selectedUser && (
         <UserBoxMini
-          id={selectedUser === toUser._id ? toUser._id : fromUser._id}
+          id={selectedUser === toUser._id ? fromUser._id : toUser._id}
           onClick={handleUserClick}
           selected={false}
           videoRef={selectedUser === toUser._id ? remoteVideoRef : videoRef}

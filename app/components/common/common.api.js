@@ -244,7 +244,7 @@ export async function pushProfilePhotoToS3(
       onUploadProgress: (progressEvent) => {
         const { loaded, total } = progressEvent;
         const percentCompleted = (loaded / total) * 100;
-        setProgress(
+        setProgress && setProgress(
           Math.trunc(percentCompleted === 100 ? 0 : percentCompleted)
         );
       },

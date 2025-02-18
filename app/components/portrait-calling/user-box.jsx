@@ -1,6 +1,6 @@
 import Draggable from "react-draggable";
-import { Utils } from "../../../utils/utils";
-import { useEffect } from "react";
+import { Point, Utils } from "../../../utils/utils";
+import React, { useEffect } from "react";
 import { useCallback } from "react";
 
 export const UserBox = ({
@@ -43,7 +43,7 @@ export const UserBox = ({
       style={{
         position:"relative"
       }}
-      onClick={() => onClick(id)}
+      onClick={() => !selected && onClick(id)}
     >
       {!isStreamOff ? (
         <video
@@ -76,6 +76,24 @@ export const UserBox = ({
   );
 };
 
+function useClickObserver(callback)
+{
+    const [dragStartPos, setDragStartPos] = React.useState(new Point())
+    const onStart = (_, data) =>
+    {
+        setDragStartPos(new Point(data.x, data.y))
+    }
+    const onStop = (_, data) =>
+    {
+        const dragStopPoint = new Point(data.x, data.y)
+        if(Point.dist(dragStartPos, dragStopPoint) < 5)
+        {
+            callback()
+        }
+    }
+    return {onStart, onStop}
+}
+
 export const UserBoxMini = ({ name, onClick, selected, id,videoRef,user,stream,isStreamOff }) => {
 
   const setVideoRef = useCallback(
@@ -95,11 +113,20 @@ export const UserBoxMini = ({ name, onClick, selected, id,videoRef,user,stream,i
       videoRef.current.srcObject = stream
     }
   },[videoRef,stream,isStreamOff])
+
+  const handleBoxClick = () => {
+    // event.stopPropagation();
+    if (onClick && id) {
+      console.log("i am clicked")
+      onClick(id)
+    }
+  };
   return (
-    <Draggable bounds="parent">
+    <Draggable bounds="parent" {...useClickObserver(handleBoxClick)}>
     
      
-      <div className={`profile-box mini`}>
+      <div className={`profile-box mini`} >
+
 
       {!isStreamOff ? (
         <video
@@ -131,6 +158,30 @@ export const UserBoxMini = ({ name, onClick, selected, id,videoRef,user,stream,i
         </>
       )}
      
+      </div>
+    </Draggable>
+  );
+};
+
+export const VideoMiniBox = ({ onClick, id,clips }) => {
+
+
+  const handleBoxClick = () => {
+    // event.stopPropagation();
+    if (onClick ) {
+      console.log("i am clicked")
+      onClick(id)
+    }
+  };
+  return (
+    <Draggable bounds="parent" {...useClickObserver(handleBoxClick)}>
+      <div className={`profile-box mini-landscape`}>
+        {clips.map((clip) => (
+          <img
+            src={Utils?.generateThumbnailURL(clip)}
+         
+          />
+        ))}
       </div>
     </Draggable>
   );
