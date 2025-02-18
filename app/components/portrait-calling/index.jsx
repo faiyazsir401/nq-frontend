@@ -341,90 +341,14 @@ const VideoCallUI = ({
     });
   }, [socket]);
 
-  const startRecording = async () => {
-    const data = {
-      sessions: id,
-      trainer: toUser?._id,
-      trainee: fromUser?._id,
-      user_id: fromUser?._id,
-      trainee_name: fromUser?.fullname,
-      trainer_name: toUser?.fullname,
-    };
-
-    socket.emit("videoUploadData", data);
-
-    const mixedAudioStream = await setupAudioMixing();
-
-    const screenStr = await navigator.mediaDevices.getDisplayMedia({
-      video: true,
-      preferCurrentTab: true,
-    });
-    setScreenStream(screenStr);
-
-    const screenVideoTrack = screenStr.getVideoTracks()[0];
-
-    const combinedStream = new MediaStream([
-      screenVideoTrack,
-      ...mixedAudioStream.getAudioTracks(),
-    ]);
-
-    const mediaRecorder = new MediaRecorder(combinedStream);
-
-    let chunks = [];
-
-    mediaRecorder.ondataavailable = (event) => {
-      if (event.data.size > 0) {
-        chunks.push(event.data);
-      }
-    };
-    setInterval(function () {
-      if (mediaRecorder.state === "recording") {
-        mediaRecorder.requestData();
-
-        const chunkBuffers = chunks
-          .map((chunk) => {
-            if (chunk) {
-              // console.log("Chunk type:", typeof chunk);
-              return chunk;
-            } else {
-              return null; // or handle differently as needed
-            }
-          })
-          .filter(Boolean);
-        if (chunkBuffers.length > 0) {
-          const chunkData = { data: chunkBuffers };
-          socket.emit("chunk", chunkData);
-        }
-        chunks = [];
-      }
-    }, 1000);
-
-    mediaRecorder.onstop = () => {
-      socket.emit("chunksCompleted");
-    };
-
-    mediaRecorder.start();
-    setMediaRecorder(mediaRecorder);
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-    }
-    if (screenStream) {
-      screenStream.getTracks().forEach((track) => track.stop());
-      setScreenStream(null);
-    }
-  };
-
   // NOTE - handle user offline
   const handleOffline = () => {
-    stopRecording();
+   
     socket.emit("chunksCompleted");
   };
 
   function handlePeerDisconnect() {
-    stopRecording();
+    
     if (!(peerRef && peerRef.current)) return;
     //NOTE -  manually close the peer connections
     for (let conns in peerRef.current.connections) {
@@ -506,7 +430,7 @@ const VideoCallUI = ({
   };
 
   const cutCall = () => {
-    stopRecording();
+
     cleanupFunction();
     if (isTraineeJoined && AccountType.TRAINER === accountType) {
       setIsOpenReport(true);
@@ -1009,35 +933,6 @@ const VideoCallUI = ({
         isTraineeJoined={isTraineeJoined}
         isCallEnded={isCallEnded}
       />
-
-      <Modal isOpen={isModelOpen}>
-        <ModalHeader>
-          <h2>Recording</h2>
-        </ModalHeader>
-        <ModalBody>
-          <div className="row">
-            <Button
-              className="mx-3 mt-1"
-              color="primary"
-              onClick={() => {
-                startRecording();
-                setIsModelOpen(false);
-              }}
-            >
-              Start Recording
-            </Button>
-            <Button
-              className="mx-3 mt-1"
-              color="primary"
-              onClick={() => {
-                setIsModelOpen(false);
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-        </ModalBody>
-      </Modal>
     </div>
   );
 };

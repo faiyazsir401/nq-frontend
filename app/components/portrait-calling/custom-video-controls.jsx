@@ -28,45 +28,44 @@ const CustomVideoControls = ({
   setIsPlaying,
   isFixed,
   currentTime,
-  setCurrentTime
+  setCurrentTime,
 }) => {
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
   useEffect(() => {
     const handleEnded = () => setIsPlaying(false);
-    const handleUpdate =()=> setCurrentTime(videoRef?.current?.currentTime)
+    const handleUpdate = () => setCurrentTime(videoRef?.current?.currentTime);
     if (videoRef?.current) {
       videoRef.current.addEventListener("ended", handleEnded);
       videoRef.current.addEventListener("timeupdate", handleUpdate);
-
     }
     return () => {
       if (videoRef.current) {
         videoRef.current.removeEventListener("ended", handleEnded);
-      videoRef.current.addEventListener("timeupdate", handleUpdate);
-
+        videoRef.current.addEventListener("timeupdate", handleUpdate);
       }
     };
   }, [videoRef]);
 
-//   const GetVolumeIcon = () => {
-//     if (volume === 0) return <FaVolumeMute />;
-//     if (volume < 0.6) return <FaVolumeDown />;
-//     return <FaVolumeUp />;
-//   };
+  //   const GetVolumeIcon = () => {
+  //     if (volume === 0) return <FaVolumeMute />;
+  //     if (volume < 0.6) return <FaVolumeDown />;
+  //     return <FaVolumeUp />;
+  //   };
 
   return (
     <div
       style={{
-        position: isFixed?"relative":'absolute',
-        bottom: isFixed?"0px":"10px",
+        position: isFixed ? "relative" : "absolute",
+        bottom: isFixed ? "0px" : "10px",
         left: "50%",
         transform: "translateX(-50%)",
         display: "flex",
         alignItems: "Center",
         justifyContent: "center",
         gap: "5px",
+        width: "100%",
       }}
     >
       {/* Toggle Controls Button */}
@@ -83,9 +82,8 @@ const CustomVideoControls = ({
               display: "flex",
               alignItems: "center",
               backgroundColor: "rgba(0, 0, 0, 0.7)",
-              padding: "10px 15px",
-              borderRadius: "12px",
-
+              padding: "5px 15px",
+              width: "100%",
               gap: "12px",
             }}
           >
@@ -96,7 +94,7 @@ const CustomVideoControls = ({
                 background: "none",
                 border: "none",
                 color: "white",
-                fontSize: "22px",
+                fontSize: "16px",
                 cursor: "pointer",
               }}
             >
@@ -139,7 +137,6 @@ const CustomVideoControls = ({
               value={videoRef.current?.currentTime || 0}
               max={videoRef.current?.duration || 100}
               onChange={handleSeek}
-
               style={{
                 flex: 1,
                 cursor: "pointer",
@@ -155,21 +152,6 @@ const CustomVideoControls = ({
                 transition: "background 0.3s ease",
               }}
             />
-
-            {/* Fullscreen Button */}
-            {isFullscreen !== undefined &&
-            <button
-              onClick={()=>toggleFullscreen&& toggleFullscreen()}
-              style={{
-                background: "none",
-                border: "none",
-                color: "white",
-                fontSize: "22px",
-                cursor: "pointer",
-              }}
-            >
-              {isFullscreen ? <FaCompress /> : <FaExpand />}
-            </button>}
           </motion.div>
         )}
       </AnimatePresence>

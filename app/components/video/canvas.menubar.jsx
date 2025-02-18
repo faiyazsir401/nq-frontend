@@ -349,6 +349,7 @@ export const CanvasMenuBar = ({
             </div>
           </span>
           </>}
+         { undoDrawing &&
           <span>
             <div
               className={`icon-btn m-5  button-effect btn-sm my-3`}
@@ -361,7 +362,7 @@ export const CanvasMenuBar = ({
             >
               <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"none"}}/>
             </div>
-          </span>
+          </span>}
           <span>
             <div
               className={`icon-btn m-5  button-effect btn-sm my-3`}

@@ -76,7 +76,8 @@
 .profile-name {
   color: white;
   font-weight: bold;
-  margin-top: 5px;
+  margin: 5px;
+  text-align: center;
 }
 
 .controls {

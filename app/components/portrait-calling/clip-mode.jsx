@@ -1,5 +1,12 @@
 import { useCallback, useState } from "react";
-import { ChevronDown, Maximize, Minimize, PenTool } from "react-feather";
+import {
+  ChevronDown,
+  Maximize,
+  Minimize,
+  MinusCircle,
+  PenTool,
+  PlusCircle,
+} from "react-feather";
 import { CanvasMenuBar } from "../video/canvas.menubar";
 // import VideoContainer from "./video-container";
 import { UserBoxMini } from "./user-box";
@@ -20,6 +27,7 @@ import { toast } from "react-toastify";
 import { pushProfilePhotoToS3 } from "../common/common.api";
 import { screenShotTake } from "../videoupload/videoupload.api";
 import html2canvas from "html2canvas";
+import { FaUndo } from "react-icons/fa";
 const SHAPES = {
   FREE_HAND: "hand",
   LINE: "line",
@@ -53,10 +61,10 @@ let canvasConfigs = {
   },
 };
 let selectedShape = null;
-let storedLocalDrawPaths = { sender: [], receiver: [] };
-  let state = {
-    mousedown: false,
-  };
+
+let state = {
+  mousedown: false,
+};
 
 const VideoContainer = ({
   drawingMode,
@@ -72,13 +80,19 @@ const VideoContainer = ({
   fromUser,
   toUser,
   stopDrawing,
+  sendDrawEvent,
 }) => {
+  let storedLocalDrawPaths = {
+    sender: [],
+    receiver: [], // Sender and receiver for canvas1
+  };
+  
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   const videoContainerRef = useRef(null);
   const movingVideoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0);
   const [scale, setScale] = useState(1); // Zoom level (scale)
   const [lastTouch, setLastTouch] = useState(0);
   const [translate, setTranslate] = useState({
@@ -95,6 +109,36 @@ const VideoContainer = ({
     const zoomFactor = delta < 0 ? 1.1 : 0.9;
     const newScale = Math.max(1, Math.min(5, scale * zoomFactor));
 
+    setScale(newScale);
+
+    socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
+      videoId: clip._id,
+      zoom: newScale,
+      pan: translate,
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+    });
+  };
+
+  const zoomIn = () => {
+    if (accountType === AccountType.TRAINEE) return;
+
+    // Increase the scale by 0.5, with a maximum value of 5
+    const newScale = Math.min(5, scale + 0.2);
+    setScale(newScale);
+
+    socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
+      videoId: clip._id,
+      zoom: newScale,
+      pan: translate,
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+    });
+  };
+
+  const zoomOut = () => {
+    if (accountType === AccountType.TRAINEE) return;
+
+    // Decrease the scale by 0.5, with a minimum value of 1
+    const newScale = Math.max(1, scale - 0.2);
     setScale(newScale);
 
     socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
@@ -130,7 +174,7 @@ const VideoContainer = ({
       const deltaY = touch.pageY - dragStart.y;
 
       let newX = translate.x + deltaX;
-      let newY =  translate.y + deltaY;
+      let newY = translate.y + deltaY;
 
       setTranslate({ x: newX, y: newY });
       setDragStart({ x: touch.pageX, y: touch.pageY });
@@ -297,7 +341,7 @@ const VideoContainer = ({
       const progress = e.target.value;
 
       video.currentTime = progress;
-      setCurrentTime(progress)
+      setCurrentTime(progress);
       socket?.emit(EVENTS?.ON_VIDEO_TIME, {
         userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
         videoId: clip._id,
@@ -306,12 +350,77 @@ const VideoContainer = ({
     }
   };
 
+  const sendEmitUndoEvent = useCallback(_debounce(sendDrawEvent, 500), []);
 
+  const undoDrawing = async (
+    senderConfig,
+    extraCoordinateConfig,
+    removeLastCoordinate = true
+  ) => {
+    try {
+      console.log("undo")
+      const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (!context || !canvas) return;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (removeLastCoordinate) storedLocalDrawPaths.sender.splice(-1, 1);
+    // draw all the paths in the paths array
+    await senderConfig.coordinates.forEach((path) => {
+      context.beginPath();
+      context.strokeStyle = senderConfig.theme.strokeStyle;
+      context.lineWidth = senderConfig.theme.lineWidth;
+      context.lineCap = "round";
+      if (path && Array.isArray(path)) {
+        // context.
+        context.moveTo(path[0][0], path[0][1]);
+        for (let i = 0; i < path.length; i++) {
+          context.lineTo(path[i][0], path[i][1]);
+        }
+        context.stroke();
+      }
+    });
+
+    await extraCoordinateConfig.coordinates.forEach((path) => {
+      context.beginPath();
+      context.strokeStyle = extraCoordinateConfig.theme.strokeStyle;
+      context.lineWidth = extraCoordinateConfig.theme.lineWidth;
+      context.lineCap = "round";
+
+      // context.beginPath();
+      if (path && Array.isArray(path)) {
+        // context.
+        context.moveTo(path[0][0], path[0][1]);
+        for (let i = 0; i < path.length; i++) {
+          context.lineTo(path[i][0], path[i][1]);
+        }
+        context.stroke();
+      }
+    });
+
+    if (strikes.length <= 0) return;
+    context.putImageData(strikes[strikes.length - 1], 0, 0);
+    strikes.pop();
+
+    // sending event to end user
+    if (removeLastCoordinate) {
+      // socket.emit(EVENTS.EMIT_UNDO, {
+      //     sender: storedLocalDrawPaths.sender,
+      //     receiver: extraCoordinateConfig.coordinates,
+      //     userInfo: { from_user: fromUser._id, to_user: toUser._id },
+      // });
+      sendEmitUndoEvent();
+    }
+    } catch (error) {
+        console.log("error",error)
+    }
+    
+  };
 
   useEffect(() => {
     const video = videoRef.current;
     const videoContainer = videoContainerRef.current;
     const canvas = canvasRef?.current;
+
     if (canvas && videoContainer) {
       canvas.width = video.clientWidth;
       canvas.height = video.clientHeight;
@@ -554,9 +663,7 @@ const VideoContainer = ({
       <div
         id="video-container"
         ref={videoContainerRef}
-        className={`relative border rounded-lg overflow-hidden ${
-          isMaximized ? "" : "mb-3"
-        }`}
+        className={`relative border rounded-lg overflow-hidden `}
         style={{
           height: isSingle
             ? isMaximized
@@ -565,9 +672,9 @@ const VideoContainer = ({
             : isMaximized
             ? isLock
               ? "47dvh"
-              : "50dvh" // If isMaximized is true and isSingle is false
+              : "46dvh" // If isMaximized is true and isSingle is false
             : isLock
-            ? "38dvh"
+            ? "42dvh"
             : "40dvh", // If isMaximized is false and isSingle is false
           width: "100vw",
           display: "flex",
@@ -577,6 +684,41 @@ const VideoContainer = ({
           position: "relative",
         }}
       >
+        {drawingMode && (
+          <div
+            className="absolute"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "5px",
+              flexDirection: "column",
+              right: "10px",
+              top: "10px",
+              zIndex:10
+            }}
+          >
+            <div
+              className="button"
+              onClick={() =>
+                undoDrawing(
+                  {
+                    coordinates: storedLocalDrawPaths.sender,
+                    theme: canvasConfigs.sender,
+                  },
+                  {
+                    coordinates: storedLocalDrawPaths.receiver,
+                    theme: {
+                      lineWidth: canvasConfigs.receiver.lineWidth,
+                      strokeStyle: canvasConfigs.receiver.strokeStyle,
+                    },
+                  }
+                )
+              }
+            >
+              <FaUndo />
+            </div>
+          </div>
+        )}
         <div
           onWheel={onWheel}
           onTouchStart={handleTouchStart}
@@ -628,20 +770,41 @@ const VideoContainer = ({
           className="canvas"
           style={{ display: drawingMode ? "block" : "none" }}
         />
-
-        {accountType === AccountType.TRAINER && !isLock && (
-          <CustomVideoControls
-            handleSeek={handleSeek}
-            isFullscreen={isFullscreen}
-            isPlaying={isPlaying}
-            toggleFullscreen={toggleFullscreen}
-            togglePlayPause={togglePlayPause}
-            videoRef={videoRef}
-            setIsPlaying={setIsPlaying}
-            setCurrentTime={setCurrentTime}
-          />
+        {drawingMode && (
+          <div
+            className="absolute"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "5px",
+              flexDirection: "column",
+              right: "10px",
+              bottom: "10px",
+              zIndex:10
+            }}
+          >
+            <div className="button" onClick={zoomIn}>
+              <PlusCircle />
+            </div>
+            <div className="button" onClick={zoomOut}>
+              <MinusCircle />
+            </div>
+          </div>
         )}
       </div>
+      {accountType === AccountType.TRAINER && !isLock && (
+        <CustomVideoControls
+          handleSeek={handleSeek}
+          isFullscreen={isFullscreen}
+          isPlaying={isPlaying}
+          toggleFullscreen={toggleFullscreen}
+          togglePlayPause={togglePlayPause}
+          videoRef={videoRef}
+          setIsPlaying={setIsPlaying}
+          setCurrentTime={setCurrentTime}
+          isFixed={true}
+        />
+      )}
     </>
   );
 };
@@ -677,7 +840,7 @@ const ClipModeCall = ({
     b: 19,
     a: 1,
   });
-  const [currentTime,setCurrentTime] = useState(0) 
+  const [currentTime, setCurrentTime] = useState(0);
   const [isCanvasMenuNoteShow, setIsCanvasMenuNoteShow] = useState(false);
   const [micNote, setMicNote] = useState(false);
   const [clipSelectNote, setClipSelectNote] = useState(false);
@@ -688,11 +851,9 @@ const ClipModeCall = ({
   const [isPlaying2, setIsPlaying2] = useState(false); // Track video playback state
   const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen state
 
-
   useEffect(() => {
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
-
 
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
       if (data?.both && data?.isPlaying) {
@@ -722,13 +883,28 @@ const ClipModeCall = ({
       }
     });
 
+    socket?.on(EVENTS.TOGGLE_DRAWING_MODE, (data) => {
+      if (accountType === AccountType.TRAINEE) {
+        setDrawingMode(data.drawingMode);
+      }
+    });
+
+    socket?.on(EVENTS.TOGGLE_FULL_SCREEN, (data) => {
+      if (accountType === AccountType.TRAINEE) {
+        setIsMaximized(data.isMaximized);
+      }
+    });
+
     // Clean up on unmount
     return () => {
       socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
       socket?.off(EVENTS?.ON_VIDEO_TIME);
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
+      socket?.off(EVENTS?.TOGGLE_DRAWING_MODE);
+      socket?.off(EVENTS?.TOGGLE_FULL_SCREEN);
+
     };
-  }, [socket,  videoRef,videoRef2]);
+  }, [socket, videoRef, videoRef2]);
 
   // Play/pause video
   const togglePlayPause = () => {
@@ -757,8 +933,6 @@ const ClipModeCall = ({
     }
   };
 
-
-
   // Handle seeking for both videos when locked
   const handleSeek = (e) => {
     const progress = e.target.value;
@@ -768,9 +942,9 @@ const ClipModeCall = ({
     if (video1 && video2) {
       video1.currentTime = progress;
       video2.currentTime = progress;
-      setCurrentTime(progress)
+      setCurrentTime(progress);
       socket?.emit(EVENTS?.ON_VIDEO_TIME, {
-        both:true,
+        both: true,
         userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
         progress,
       });
@@ -815,7 +989,7 @@ const ClipModeCall = ({
   const sendDrawEvent = () => {
     try {
       const canvas = canvasRef?.current;
-      console.log("sendDrawEvent",canvas)
+      console.log("sendDrawEvent", canvas);
       if (!canvas) return;
       const { width, height } = canvas;
       canvas.toBlob((blob) => {
@@ -823,7 +997,7 @@ const ClipModeCall = ({
         reader.onload = (event) => {
           if (!(event && event.target)) return;
           const binaryData = event.target.result;
-          
+
           socket.emit(EVENTS.DRAW, {
             userInfo: { from_user: fromUser._id, to_user: toUser._id },
             strikes: binaryData,
@@ -853,85 +1027,6 @@ const ClipModeCall = ({
     };
   });
 
-  const sendEmitUndoEvent = useCallback(_debounce(sendDrawEvent, 500), []);
-
-  const undoDrawing = async (
-    senderConfig,
-    extraCoordinateConfig,
-    removeLastCoordinate = true
-  ) => {
-    const canvas1 = canvasRef?.current || null;
-    const canvas2 = canvasRef2?.current || null;
-
-    const context1 = canvas1 ? canvas1.getContext("2d") : null;
-    const context2 = canvas2 ? canvas2.getContext("2d") : null;
-
-    if (!context1 && !context2) return; // Exit if both canvases are missing.
-
-    // Function to clear canvas safely
-    const clearCanvas = (ctx, canvas) => {
-      if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    };
-
-    // Clear only the available canvases
-    clearCanvas(context1, canvas1);
-    clearCanvas(context2, canvas2);
-
-    if (removeLastCoordinate) {
-      storedLocalDrawPaths.sender.splice(-1, 1);
-    }
-
-    // Function to redraw paths for a specific canvas
-    const redrawPaths = (ctx, coordinates, theme) => {
-      if (!ctx || !coordinates) return;
-
-      ctx.strokeStyle = theme.strokeStyle;
-      ctx.lineWidth = theme.lineWidth;
-      ctx.lineCap = "round";
-
-      for (const path of coordinates) {
-        if (path && Array.isArray(path)) {
-          ctx.beginPath();
-          ctx.moveTo(path[0][0], path[0][1]);
-          for (let i = 1; i < path.length; i++) {
-            ctx.lineTo(path[i][0], path[i][1]);
-          }
-          ctx.stroke();
-        }
-      }
-    };
-
-    // **Redraw paths separately for each canvas**
-    if (context1) {
-      redrawPaths(context1, senderConfig.coordinates, senderConfig.theme);
-      redrawPaths(
-        context1,
-        extraCoordinateConfig.coordinates,
-        extraCoordinateConfig.theme
-      );
-    }
-
-    if (context2) {
-      redrawPaths(context2, senderConfig.coordinates, senderConfig.theme);
-      redrawPaths(
-        context2,
-        extraCoordinateConfig.coordinates,
-        extraCoordinateConfig.theme
-      );
-    }
-
-    // **Restore previous stroke only if available**
-    if (strikes.length > 0) {
-      const lastStrike = strikes.pop();
-      if (context1) context1.putImageData(lastStrike, 0, 0);
-      if (context2) context2.putImageData(lastStrike, 0, 0);
-    }
-
-    // **Emit undo event (if required)**
-    if (removeLastCoordinate) {
-      sendEmitUndoEvent();
-    }
-  };
 
   function resetInitialPinnedUser() {}
   const isSingle = selectedClips?.length === 1;
@@ -949,7 +1044,17 @@ const ClipModeCall = ({
               <div className="d-flex">
                 <div
                   className="button"
-                  onClick={() => setIsMaximized(!isMaximized)}
+                  onClick={() => {
+                    
+                    setIsMaximized(!isMaximized)
+                    socket.emit(EVENTS.TOGGLE_FULL_SCREEN, {
+                      userInfo: {
+                        from_user: fromUser._id,
+                        to_user: toUser._id,
+                      },
+                      isMaximized: !isMaximized,
+                    });
+                  }}
                 >
                   {isMaximized ? (
                     <Minimize size={18} />
@@ -966,6 +1071,13 @@ const ClipModeCall = ({
                     className="button ml-3"
                     onClick={() => {
                       setDrawingMode(!drawingMode);
+                      socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
+                        userInfo: {
+                          from_user: fromUser._id,
+                          to_user: toUser._id,
+                        },
+                        drawingMode: !drawingMode,
+                      });
                       setShowDrawingTools(false);
                     }}
                   >
@@ -978,36 +1090,20 @@ const ClipModeCall = ({
                     position: "relative",
                   }}
                 >
-
                   {drawingMode && (
                     <div
                       style={{
                         position: "absolute",
                         zIndex: 99,
-                        top: 24,
-                        left: -10,
+                        top: -10
                       }}
                     >
                       <CanvasMenuBar
                         isOpen={isOpen}
+                        isFromPotrait={true}
                         setIsOpen={setIsOpen}
                         setSketchPickerColor={(rgb) => {
                           setSketchPickerColor(rgb);
-                        }}
-                        undoDrawing={() => {
-                          undoDrawing(
-                            {
-                              coordinates: storedLocalDrawPaths.sender,
-                              theme: canvasConfigs.sender,
-                            },
-                            {
-                              coordinates: storedLocalDrawPaths.receiver,
-                              theme: {
-                                lineWidth: canvasConfigs.receiver.lineWidth,
-                                strokeStyle: canvasConfigs.receiver.strokeStyle,
-                              },
-                            }
-                          );
                         }}
                         sketchPickerColor={sketchPickerColor}
                         canvasConfigs={canvasConfigs}
@@ -1019,8 +1115,8 @@ const ClipModeCall = ({
                         }}
                         refreshDrawing={() => {
                           // deleting the canvas drawing
-                          storedLocalDrawPaths.sender = [];
-                          storedLocalDrawPaths.receiver = [];
+                          // storedLocalDrawPaths.sender = [];
+                          // storedLocalDrawPaths.receiver = [];
                           clearCanvas();
                           // sendClearCanvasEvent();
                         }}
@@ -1069,7 +1165,8 @@ const ClipModeCall = ({
                   Peer={Peer}
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
-                  storedLocalDrawPaths={storedLocalDrawPaths}
+                  
+                  sendDrawEvent={sendDrawEvent}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
@@ -1094,7 +1191,8 @@ const ClipModeCall = ({
                   Peer={Peer}
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
-                  storedLocalDrawPaths={storedLocalDrawPaths}
+                  
+                  sendDrawEvent={sendDrawEvent}
                 />
 
                 {isLock && (
@@ -1135,19 +1233,36 @@ const ClipModeCall = ({
                 Peer={Peer}
                 canvasConfigs={canvasConfigs}
                 selectedShape={selectedShape}
-                storedLocalDrawPaths={storedLocalDrawPaths}
+                
+                sendDrawEvent={sendDrawEvent}
               />
             )}
           </div>
         </div>
       ) : (
         <>
-          <div className={`d-flex   px-4 ${accountType === AccountType.TRAINER ?"mt-2 justify-content-between": "m-2 justify-content-end"} w-100`}>
+          <div
+            className={`d-flex   px-4 ${
+              accountType === AccountType.TRAINER
+                ? "mt-2 justify-content-between"
+                : "m-2 justify-content-end"
+            } w-100`}
+          >
             {accountType === AccountType.TRAINER && (
               <div className="d-flex">
                 <div
                   className="button"
-                  onClick={() => setIsMaximized(!isMaximized)}
+                  onClick={() => {
+                    
+                    setIsMaximized(!isMaximized)
+                    socket.emit(EVENTS.TOGGLE_FULL_SCREEN, {
+                      userInfo: {
+                        from_user: fromUser._id,
+                        to_user: toUser._id,
+                      },
+                      isMaximized: !isMaximized,
+                    });
+                  }}
                 >
                   {isMaximized ? (
                     <Minimize size={18} />
@@ -1164,6 +1279,13 @@ const ClipModeCall = ({
                     className="button ml-3"
                     onClick={() => {
                       setDrawingMode(!drawingMode);
+                      socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
+                        userInfo: {
+                          from_user: fromUser._id,
+                          to_user: toUser._id,
+                        },
+                        drawingMode: !drawingMode,
+                      });
                       setShowDrawingTools(false);
                     }}
                   >
@@ -1191,21 +1313,6 @@ const ClipModeCall = ({
                           setSketchPickerColor(rgb);
                         }}
                         isFromPotrait={true}
-                        undoDrawing={() => {
-                          undoDrawing(
-                            {
-                              coordinates: storedLocalDrawPaths.sender,
-                              theme: canvasConfigs.sender,
-                            },
-                            {
-                              coordinates: storedLocalDrawPaths.receiver,
-                              theme: {
-                                lineWidth: canvasConfigs.receiver.lineWidth,
-                                strokeStyle: canvasConfigs.receiver.strokeStyle,
-                              },
-                            }
-                          );
-                        }}
                         sketchPickerColor={sketchPickerColor}
                         canvasConfigs={canvasConfigs}
                         setCanvasConfigs={(config) => {
@@ -1216,8 +1323,8 @@ const ClipModeCall = ({
                         }}
                         refreshDrawing={() => {
                           // deleting the canvas drawing
-                          storedLocalDrawPaths.sender = [];
-                          storedLocalDrawPaths.receiver = [];
+                          // storedLocalDrawPaths.sender = [];
+                          // storedLocalDrawPaths.receiver = [];
                           clearCanvas();
                           // sendClearCanvasEvent();
                         }}
@@ -1282,7 +1389,8 @@ const ClipModeCall = ({
                   Peer={Peer}
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
-                  storedLocalDrawPaths={storedLocalDrawPaths}
+                  
+                  sendDrawEvent={sendDrawEvent}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
@@ -1306,7 +1414,8 @@ const ClipModeCall = ({
                   Peer={Peer}
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
-                  storedLocalDrawPaths={storedLocalDrawPaths}
+                  
+                  sendDrawEvent={sendDrawEvent}
                 />
 
                 {accountType === AccountType.TRAINER && isLock && (
@@ -1345,7 +1454,8 @@ const ClipModeCall = ({
                 Peer={Peer}
                 canvasConfigs={canvasConfigs}
                 selectedShape={selectedShape}
-                storedLocalDrawPaths={storedLocalDrawPaths}
+                
+                sendDrawEvent={sendDrawEvent}
               />
             )}
           </div>
