@@ -486,6 +486,7 @@ const VideoCallUI = ({
           isRemoteStreamOff={isRemoteStreamOff}
           isLocalStreamOff={isLocalStreamOff}
           takeScreenshot={takeScreenshot}
+          setIsLock={setIsLockMode}
         />
       ) : (
         <OneOnOneCall

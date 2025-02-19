@@ -112,7 +112,12 @@ const ActionButtons = ({
           <Tooltip>
             <div
               className="button video-lock"
-              onClick={() => setIsLockMode(!isLockMode)}
+              onClick={() => {
+                socket.emit(EVENTS.TOGGLE_LOCK_MODE, {
+                  userInfo: { from_user: fromUser._id, to_user: toUser._id },
+                  isLockMode: !isLockMode,
+                });
+                setIsLockMode(!isLockMode)}}
             >
               {isLockMode ? <FaLock size={16} /> : <FaUnlock size={16} />}
             </div>

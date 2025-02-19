@@ -30,6 +30,7 @@ export const EVENTS = {
         MUTE_ME: "MUTE_ME",
         STOP_FEED: "STOP_FEED"
     },
+    TOGGLE_LOCK_MODE:"TOGGLE_LOCK_MODE",
     PUSH_NOTIFICATIONS : {
         ON_SEND : 'send',
         ON_RECEIVE : 'receive'
