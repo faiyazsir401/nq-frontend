@@ -42,13 +42,11 @@ const SHAPES = {
 };
 
 let isDrawing = false;
-let savedPos;
-let startPos;
-let currPos;
-let strikes = [];
-let extraStream;
-let localVideoRef;
-let Peer;
+let savedPos = { canvas1: null, canvas2: null };
+let startPos = { canvas1: null, canvas2: null };
+let currPos = { canvas1: null, canvas2: null };
+let strikes = { canvas1: [], canvas2: [] };
+
 let canvasConfigs = {
   sender: {
     strokeStyle: "red",
@@ -61,11 +59,21 @@ let canvasConfigs = {
     lineCap: "round",
   },
 };
+
 let selectedShape = null;
 
 let state = {
-  mousedown: false,
+  mousedown: { canvas1: false, canvas2: false },
 };
+
+let storedLocalDrawPaths = {
+  canvas1: { sender: [], receiver: [] },
+  canvas2: { sender: [], receiver: [] }, // Separate history for each canvas
+};
+
+let extraStream;
+let localVideoRef;
+let Peer;
 
 const VideoContainer = ({
   drawingMode,
@@ -82,12 +90,8 @@ const VideoContainer = ({
   toUser,
   stopDrawing,
   sendDrawEvent,
+  undoDrawing,
 }) => {
-  let storedLocalDrawPaths = {
-    sender: [],
-    receiver: [], // Sender and receiver for canvas1
-  };
-
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   const videoContainerRef = useRef(null);
@@ -352,313 +356,6 @@ const VideoContainer = ({
     }
   };
 
-  const sendEmitUndoEvent = useCallback(_debounce(sendDrawEvent, 500), []);
-
-  const undoDrawing = async (
-    senderConfig,
-    extraCoordinateConfig,
-    removeLastCoordinate = true
-  ) => {
-    try {
-      console.log("undo");
-      const canvas = canvasRef.current;
-      const context = canvas?.getContext("2d");
-      if (!context || !canvas) return;
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      if (removeLastCoordinate) storedLocalDrawPaths.sender.splice(-1, 1);
-      // draw all the paths in the paths array
-      await senderConfig.coordinates.forEach((path) => {
-        context.beginPath();
-        context.strokeStyle = senderConfig.theme.strokeStyle;
-        context.lineWidth = senderConfig.theme.lineWidth;
-        context.lineCap = "round";
-        if (path && Array.isArray(path)) {
-          // context.
-          context.moveTo(path[0][0], path[0][1]);
-          for (let i = 0; i < path.length; i++) {
-            context.lineTo(path[i][0], path[i][1]);
-          }
-          context.stroke();
-        }
-      });
-
-      await extraCoordinateConfig.coordinates.forEach((path) => {
-        context.beginPath();
-        context.strokeStyle = extraCoordinateConfig.theme.strokeStyle;
-        context.lineWidth = extraCoordinateConfig.theme.lineWidth;
-        context.lineCap = "round";
-
-        // context.beginPath();
-        if (path && Array.isArray(path)) {
-          // context.
-          context.moveTo(path[0][0], path[0][1]);
-          for (let i = 0; i < path.length; i++) {
-            context.lineTo(path[i][0], path[i][1]);
-          }
-          context.stroke();
-        }
-      });
-
-      if (strikes.length <= 0) return;
-      context.putImageData(strikes[strikes.length - 1], 0, 0);
-      strikes.pop();
-
-      // sending event to end user
-      if (removeLastCoordinate) {
-        // socket.emit(EVENTS.EMIT_UNDO, {
-        //     sender: storedLocalDrawPaths.sender,
-        //     receiver: extraCoordinateConfig.coordinates,
-        //     userInfo: { from_user: fromUser._id, to_user: toUser._id },
-        // });
-        sendEmitUndoEvent();
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
-
-  useEffect(() => {
-    const video = videoRef.current;
-    const videoContainer = videoContainerRef.current;
-    const canvas = canvasRef?.current;
-
-    if (canvas && videoContainer) {
-      canvas.width = video.clientWidth;
-      canvas.height = video.clientHeight;
-    }
-    console.log("canvas", canvas); // This should now log the canvas element correctly.
-    const context = canvas?.getContext("2d");
-    if (!context) return;
-
-    const drawFrame = () => {
-      if (canvas && context && video) {
-        context.fillStyle = "rgba(255, 255, 255, 0.5)";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-      }
-      requestAnimationFrame(drawFrame);
-    };
-
-    const startDrawing = (event) => {
-      console.log(
-        "clientWidth",
-        document.getElementById("video-container")?.clientWidth
-      );
-      console.log(
-        "clientHeight",
-        document.getElementById("video-container")?.clientHeight
-      );
-      event.preventDefault();
-      isDrawing = true;
-      if (!context) return;
-      savedPos = context?.getImageData(
-        0,
-        0,
-        document.getElementById("video-container")?.clientWidth,
-        document.getElementById("video-container")?.clientHeight
-      );
-      if (strikes.length >= 10) strikes.shift(); // removing first position if strikes > 10;
-      strikes.push(savedPos);
-      const mousePos = event.type.includes("touchstart")
-        ? getTouchPos(event)
-        : getMousePositionOnCanvas(event);
-      context.strokeStyle = canvasConfigs.sender.strokeStyle;
-      context.lineWidth = canvasConfigs.sender.lineWidth;
-      context.lineCap = "round";
-      context.beginPath();
-      context.moveTo(mousePos.x, mousePos.y);
-      context.fill();
-      state.mousedown = true;
-      startPos = { x: mousePos.x, y: mousePos.y };
-    };
-
-    const findDistance = () => {
-      let dis = Math.sqrt(
-        Math.pow(currPos.x - startPos.x, 2) +
-          Math.pow(currPos.y - startPos.y, 2)
-      );
-      return dis;
-    };
-
-    const drawShapes = () => {
-      switch (selectedShape) {
-        case SHAPES.LINE: {
-          context.moveTo(startPos.x, startPos.y);
-          context.lineTo(currPos.x, currPos.y);
-          break;
-        }
-        case SHAPES.CIRCLE: {
-          let distance = findDistance(startPos, currPos);
-          context.arc(startPos.x, startPos.y, distance, 0, 2 * Math.PI, false);
-          break;
-        }
-        case SHAPES.SQUARE: {
-          let w = currPos.x - startPos.x;
-          let h = currPos.y - startPos.y;
-          context.rect(startPos.x, startPos.y, w, h);
-          break;
-        }
-        case SHAPES.RECTANGLE: {
-          let w = currPos.x - startPos.x;
-          let h = currPos.y - startPos.y;
-          context.rect(startPos.x, startPos.y, w, h);
-          break;
-        }
-        case SHAPES.OVAL: {
-          const transform = context.getTransform();
-          let w = currPos.x - startPos.x;
-          let h = currPos.y - startPos.y;
-          context.fillStyle = "#FFFFFF";
-          context.fillStyle = "rgba(0, 0, 0, 0)";
-          const radiusX = w * transform.a;
-          const radiusY = h * transform.d;
-          if (radiusX > 0 && radiusY > 0) {
-            context.ellipse(
-              currPos.x,
-              currPos.y,
-              radiusX,
-              radiusY,
-              0,
-              0,
-              2 * Math.PI
-            );
-            context.fill();
-          }
-          break;
-        }
-        case SHAPES.TRIANGLE: {
-          context.moveTo(startPos.x + (currPos.x - startPos.x) / 2, startPos.y);
-          context.lineTo(startPos.x, currPos.y);
-          context.lineTo(currPos.x, currPos.y);
-          context.closePath();
-          break;
-        }
-        case SHAPES.ARROW_RIGHT: {
-          const arrowSize = 10;
-          const direction = Math.atan2(
-            currPos.y - startPos.y,
-            currPos.x - startPos.x
-          );
-          // Calculate the coordinates of the arrowhead
-          const arrowheadX = currPos.x + length * Math.cos(direction);
-          const arrowheadY = currPos.y + length * Math.sin(direction);
-          // Draw the line of the arrow
-          context.moveTo(startPos.x, startPos.y);
-          context.lineTo(currPos.x, currPos.y);
-          // Draw the arrowhead
-          context.moveTo(arrowheadX, arrowheadY);
-          context.lineTo(
-            currPos.x - arrowSize * Math.cos(direction - Math.PI / 6),
-            currPos.y - arrowSize * Math.sin(direction - Math.PI / 6)
-          );
-          context.moveTo(currPos.x, currPos.y);
-          context.lineTo(
-            currPos.x - arrowSize * Math.cos(direction + Math.PI / 6),
-            currPos.y - arrowSize * Math.sin(direction + Math.PI / 6)
-          );
-          context.stroke();
-          break;
-        }
-        case SHAPES.TWO_SIDE_ARROW: {
-          const x1 = startPos.x;
-          const y1 = startPos.y;
-          const x2 = currPos.x;
-          const y2 = currPos.y;
-          const size = 10;
-          const angle = Math.atan2(y2 - y1, x2 - x1);
-          const arrowPoints = [
-            {
-              x: x2 - size * Math.cos(angle - Math.PI / 6),
-              y: y2 - size * Math.sin(angle - Math.PI / 6),
-            },
-            {
-              x: x2 - size * Math.cos(angle + Math.PI / 6),
-              y: y2 - size * Math.sin(angle + Math.PI / 6),
-            },
-            {
-              x: x1 + size * Math.cos(angle - Math.PI / 6),
-              y: y1 + size * Math.sin(angle - Math.PI / 6),
-            },
-            {
-              x: x1 + size * Math.cos(angle + Math.PI / 6),
-              y: y1 + size * Math.sin(angle + Math.PI / 6),
-            },
-          ];
-          context.moveTo(x1, y1);
-          context.lineTo(x2, y2);
-          context.moveTo(arrowPoints[0].x, arrowPoints[0].y);
-          context.lineTo(x2, y2);
-          context.lineTo(arrowPoints[1].x, arrowPoints[1].y);
-          context.moveTo(arrowPoints[2].x, arrowPoints[2].y);
-          context.lineTo(x1, y1);
-          context.lineTo(arrowPoints[3].x, arrowPoints[3].y);
-
-          context.stroke();
-          break;
-        }
-      }
-    };
-
-    const draw = (event) => {
-      event.preventDefault();
-      if (!isDrawing || !context || !state.mousedown) return;
-      const mousePos = event.type.includes("touchmove")
-        ? getTouchPos(event)
-        : getMousePositionOnCanvas(event);
-      currPos = { x: mousePos?.x, y: mousePos.y };
-
-      if (selectedShape !== SHAPES.FREE_HAND) {
-        context.putImageData(savedPos, 0, 0);
-        context.beginPath();
-        drawShapes();
-        context.stroke();
-      } else {
-        context.lineTo(mousePos.x, mousePos.y);
-        context.stroke();
-      }
-    };
-
-    if (canvas) {
-      canvas.addEventListener("touchstart", startDrawing, { passive: false });
-      canvas.addEventListener("touchmove", draw, { passive: false });
-      canvas.addEventListener("touchend", stopDrawing, { passive: false });
-
-      canvas.addEventListener("mousedown", startDrawing);
-      canvas.addEventListener("mousemove", draw);
-      canvas.addEventListener("mouseup", stopDrawing);
-    }
-
-    return () => {
-      video?.removeEventListener("play", drawFrame);
-    };
-  }, [canvasRef]);
-
-  const getMousePositionOnCanvas = (event) => {
-    const canvas = canvasRef?.current;
-    if (!canvas) return { x: 0, y: 0 };
-
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width; // Scale factor for width
-    const scaleY = canvas.height / rect.height; // Scale factor for height
-
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
-
-    return { x, y };
-  };
-
-  const getTouchPos = (touchEvent) => {
-    const canvas = canvasRef?.current;
-    if (!canvas) return { x: 0, y: 0 };
-
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-
-    const x = (touchEvent.changedTouches[0].clientX - rect.left) * scaleX;
-    const y = (touchEvent.changedTouches[0].clientY - rect.top) * scaleY;
-
-    return { x, y };
-  };
   return (
     <>
       <div
@@ -668,7 +365,7 @@ const VideoContainer = ({
         style={{
           height: isSingle
             ? isMaximized
-              ? "100dvh"
+              ? "96dvh"
               : "85dvh" // If isSingle is true
             : isMaximized
             ? isLock
@@ -685,7 +382,7 @@ const VideoContainer = ({
           position: "relative",
         }}
       >
-        {drawingMode && (
+        {drawingMode && accountType === AccountType.TRAINER && (
           <div
             className="absolute"
             style={{
@@ -703,16 +400,19 @@ const VideoContainer = ({
               onClick={() =>
                 undoDrawing(
                   {
-                    coordinates: storedLocalDrawPaths.sender,
+                    coordinates: storedLocalDrawPaths[`canvas${index}`].sender,
                     theme: canvasConfigs.sender,
                   },
                   {
-                    coordinates: storedLocalDrawPaths.receiver,
+                    coordinates:
+                      storedLocalDrawPaths[`canvas${index}`].receiver,
                     theme: {
                       lineWidth: canvasConfigs.receiver.lineWidth,
                       strokeStyle: canvasConfigs.receiver.strokeStyle,
                     },
-                  }
+                  },
+                  true,
+                  index
                 )
               }
             >
@@ -874,7 +574,6 @@ const ClipModeCall = ({
     });
   };
 
-
   useEffect(() => {
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
@@ -916,7 +615,12 @@ const ClipModeCall = ({
     socket?.on(EVENTS.TOGGLE_FULL_SCREEN, (data) => {
       if (accountType === AccountType.TRAINEE) {
         setIsMaximized(data.isMaximized);
+        setDrawingMode(false)
       }
+    });
+
+    socket.on(EVENTS.ON_CLEAR_CANVAS, () => {
+      clearCanvas();
     });
 
     // Clean up on unmount
@@ -926,6 +630,7 @@ const ClipModeCall = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
       socket?.off(EVENTS?.TOGGLE_DRAWING_MODE);
       socket?.off(EVENTS?.TOGGLE_FULL_SCREEN);
+      socket?.off(EVENTS?.ON_CLEAR_CANVAS);
     };
   }, [socket, videoRef, videoRef2]);
 
@@ -974,45 +679,56 @@ const ClipModeCall = ({
     }
   };
 
-  const clearCanvas = () => {
-    const canvas1 = canvasRef?.current;
-    const canvas2 = canvasRef2?.current;
-
-    const context1 = canvas1?.getContext("2d");
-    const context2 = canvas2?.getContext("2d");
-
-    if (context1 && canvas1) {
-      context1.clearRect(0, 0, canvas1.width, canvas1.height);
-    }
-
-    if (context2 && canvas2) {
-      context2.clearRect(0, 0, canvas2.width, canvas2.height);
-    }
-  };
-
-  const sendStopDrawingEvent = () => {
+  const sendClearCanvasEvent = () => {
     if (remoteVideoRef && remoteVideoRef.current) {
-      socket.emit(EVENTS.STOP_DRAWING, {
+      socket.emit(EVENTS.EMIT_CLEAR_CANVAS, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
       });
     }
   };
 
-  const stopDrawing = (event) => {
-    event.preventDefault();
-    if (state.mousedown) {
-      // console.log(`--- stop drawing ---- `);
-      sendStopDrawingEvent();
-      isDrawing = false;
-      state.mousedown = false;
-      sendDrawEvent();
+  const clearCanvas = () => {
+    const canvas1 = canvasRef?.current;
+    const canvas2 = canvasRef2?.current;
+
+    // Clear canvas1
+    const context1 = canvas1?.getContext("2d");
+    if (context1 && canvas1) {
+      context1.clearRect(0, 0, canvas1.width, canvas1.height);
+    }
+
+    // Clear canvas2
+    const context2 = canvas2?.getContext("2d");
+    if (context2 && canvas2) {
+      context2.clearRect(0, 0, canvas2.width, canvas2.height);
     }
   };
 
-  const sendDrawEvent = () => {
+  const sendStopDrawingEvent = (canvasIndex = 1) => {
+    console.log("canvassendStopDrawingEvent", canvasIndex);
+    if (remoteVideoRef && remoteVideoRef.current) {
+      socket.emit(EVENTS.STOP_DRAWING, {
+        userInfo: { from_user: fromUser._id, to_user: toUser._id },
+        canvasIndex,
+      });
+    }
+  };
+
+  const stopDrawing = (event, canvasIndex = 1) => {
+    event.preventDefault();
+    if (state.mousedown[`canvas${canvasIndex}`]) {
+      sendDrawEvent(canvasIndex);
+      sendStopDrawingEvent(canvasIndex);
+      isDrawing = false;
+      state.mousedown[canvasIndex] = false;
+    }
+  };
+
+  const sendDrawEvent = (canvasIndex = 1) => {
+    console.log("canvassendDrawEvent", canvasIndex);
     try {
-      const canvas = canvasRef?.current;
-      console.log("sendDrawEvent", canvas);
+      const canvas =
+        canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
       if (!canvas) return;
       const { width, height } = canvas;
       canvas.toBlob((blob) => {
@@ -1025,6 +741,7 @@ const ClipModeCall = ({
             userInfo: { from_user: fromUser._id, to_user: toUser._id },
             strikes: binaryData,
             canvasSize: { width, height },
+            canvasIndex,
           });
         };
         reader.readAsArrayBuffer(blob);
@@ -1034,21 +751,440 @@ const ClipModeCall = ({
     }
   };
 
-  socket.on(EVENTS.EMIT_DRAWING_CORDS, ({ strikes, canvasSize }) => {
-    const canvas = canvasRef.current;
-    const context = canvas?.getContext("2d");
-    if (!context || !canvas) return;
-    const blob = new Blob([strikes]);
-    const image = new Image();
-    image.src = URL.createObjectURL(blob);
-    image.onload = () => {
-      const { width, height } = canvasSize;
-      const scaleX = canvas.width / width;
-      const scaleY = canvas.height / height;
+  socket.on(
+    EVENTS.EMIT_DRAWING_CORDS,
+    ({ strikes, canvasSize, canvasIndex }) => {
+      console.log("is sending data");
+      const canvas =
+        canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
+      const context = canvas?.getContext("2d");
+      if (!context || !canvas) return;
+      const blob = new Blob([strikes]);
+      const image = new Image();
+      image.src = URL.createObjectURL(blob);
+      image.onload = () => {
+        const { width, height } = canvasSize;
+        const scaleX = canvas.width / width;
+        const scaleY = canvas.height / height;
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(image, 0, 0, width * scaleX, height * scaleY);
+      };
+    }
+  );
+
+  const sendEmitUndoEvent = useCallback((canvasIndex) => {
+    _debounce(() => sendDrawEvent(canvasIndex), 500)();
+  }, []);
+
+  const undoDrawing = async (
+    senderConfig,
+    extraCoordinateConfig,
+    removeLastCoordinate = true,
+    canvasIndex = 1
+  ) => {
+    console.log("canvasundoDrawing", canvasIndex);
+    try {
+      const canvas =
+        canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
+      const context = canvas?.getContext("2d");
+      if (!context || !canvas) return;
       context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(image, 0, 0, width * scaleX, height * scaleY);
+
+      if (removeLastCoordinate)
+        storedLocalDrawPaths[`canvas${canvasIndex}`].sender.splice(-1, 1);
+
+      // Draw all the paths in the paths array
+      await senderConfig.coordinates.forEach((path) => {
+        context.beginPath();
+        context.strokeStyle = senderConfig.theme.strokeStyle;
+        context.lineWidth = senderConfig.theme.lineWidth;
+        context.lineCap = "round";
+        if (path && Array.isArray(path)) {
+          context.moveTo(path[0][0], path[0][1]);
+          for (let i = 0; i < path.length; i++) {
+            context.lineTo(path[i][0], path[i][1]);
+          }
+          context.stroke();
+        }
+      });
+
+      await extraCoordinateConfig.coordinates.forEach((path) => {
+        context.beginPath();
+        context.strokeStyle = extraCoordinateConfig.theme.strokeStyle;
+        context.lineWidth = extraCoordinateConfig.theme.lineWidth;
+        context.lineCap = "round";
+
+        if (path && Array.isArray(path)) {
+          context.moveTo(path[0][0], path[0][1]);
+          for (let i = 0; i < path.length; i++) {
+            context.lineTo(path[i][0], path[i][1]);
+          }
+          context.stroke();
+        }
+      });
+
+      if (strikes[`canvas${canvasIndex}`].length <= 0) return;
+      context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
+
+      // Send event to the other user (if needed)
+      if (removeLastCoordinate) {
+        sendEmitUndoEvent(canvasIndex);
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    const video1 = videoRef.current;
+    const video2 = videoRef2.current;
+
+    const canvas1 = canvasRef?.current;
+    const canvas2 = canvasRef2?.current;
+
+    if (canvas1) {
+      canvas1.width = video1.clientWidth;
+      canvas1.height = video1.clientHeight;
+    }
+    if (canvas2) {
+      canvas2.width = video2.clientWidth;
+      canvas2.height = video2.clientHeight;
+    }
+
+    const context1 = canvas1?.getContext("2d");
+    const context2 = canvas2?.getContext("2d");
+
+    const drawFrame = () => {
+      if (canvas1 && context1 && video) {
+        context1.fillStyle = "rgba(255, 255, 255, 0.5)";
+        context1.fillRect(0, 0, canvas1.width, canvas1.height);
+      }
+      if (canvas2 && context2 && video) {
+        context2.fillStyle = "rgba(255, 255, 255, 0.5)";
+        context2.fillRect(0, 0, canvas2.width, canvas2.height);
+      }
+      requestAnimationFrame(drawFrame);
     };
-  });
+
+    // Drawing Logic for Canvas 1 and Canvas 2
+    const startDrawing = (event, canvasIndex = 1) => {
+      try {
+        console.log("canvas", canvasIndex);
+        event.preventDefault();
+        isDrawing = true;
+        const canvas =
+          canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
+        const context = canvas?.getContext("2d");
+        if (!context) return;
+
+        savedPos[`canvas${canvasIndex}`] = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+        if (strikes[`canvas${canvasIndex}`].length >= 10)
+          strikes[`canvas${canvasIndex}`].shift();
+        strikes[`canvas${canvasIndex}`].push(savedPos[`canvas${canvasIndex}`]);
+
+        const mousePos = event.type.includes("touchstart")
+          ? getTouchPos(event, canvas)
+          : getMousePositionOnCanvas(event, canvas);
+
+        context.strokeStyle = canvasConfigs.sender.strokeStyle;
+        context.lineWidth = canvasConfigs.sender.lineWidth;
+        context.lineCap = "round";
+        context.beginPath();
+        context.moveTo(mousePos.x, mousePos.y);
+        state.mousedown[`canvas${canvasIndex}`] = true;
+        startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    const findDistance = (startPos, currPos) => {
+      let dis = Math.sqrt(
+        Math.pow(currPos.x - startPos.x, 2) +
+          Math.pow(currPos.y - startPos.y, 2)
+      );
+      return dis;
+    };
+
+    const drawShapes = (context, canvasIndex) => {
+      switch (selectedShape) {
+        case SHAPES.LINE: {
+          context.moveTo(
+            startPos[`canvas${canvasIndex}`].x,
+            startPos[`canvas${canvasIndex}`].y
+          );
+          context.lineTo(
+            currPos[`canvas${canvasIndex}`].x,
+            currPos[`canvas${canvasIndex}`].y
+          );
+          break;
+        }
+        case SHAPES.CIRCLE: {
+          let distance = findDistance(
+            startPos[`canvas${canvasIndex}`],
+            currPos[`canvas${canvasIndex}`]
+          );
+          context.arc(
+            startPos[`canvas${canvasIndex}`].x,
+            startPos[`canvas${canvasIndex}`].y,
+            distance,
+            0,
+            2 * Math.PI,
+            false
+          );
+          break;
+        }
+        case SHAPES.SQUARE: {
+          let w =
+            currPos[`canvas${canvasIndex}`].x -
+            startPos[`canvas${canvasIndex}`].x;
+          let h =
+            currPos[`canvas${canvasIndex}`].y -
+            startPos[`canvas${canvasIndex}`].y;
+          context.rect(
+            startPos[`canvas${canvasIndex}`].x,
+            startPos[`canvas${canvasIndex}`].y,
+            w,
+            h
+          );
+          break;
+        }
+        case SHAPES.RECTANGLE: {
+          let w =
+            currPos[`canvas${canvasIndex}`].x -
+            startPos[`canvas${canvasIndex}`].x;
+          let h =
+            currPos[`canvas${canvasIndex}`].y -
+            startPos[`canvas${canvasIndex}`].y;
+          context.rect(
+            startPos[`canvas${canvasIndex}`].x,
+            startPos[`canvas${canvasIndex}`].y,
+            w,
+            h
+          );
+          break;
+        }
+        case SHAPES.OVAL: {
+          const transform = context.getTransform();
+          let w =
+            currPos[`canvas${canvasIndex}`].x -
+            startPos[`canvas${canvasIndex}`].x;
+          let h =
+            currPos[`canvas${canvasIndex}`].y -
+            startPos[`canvas${canvasIndex}`].y;
+          context.fillStyle = "#FFFFFF";
+          context.fillStyle = "rgba(0, 0, 0, 0)";
+          const radiusX = w * transform.a;
+          const radiusY = h * transform.d;
+          if (radiusX > 0 && radiusY > 0) {
+            context.ellipse(
+              currPos[`canvas${canvasIndex}`].x,
+              currPos[`canvas${canvasIndex}`].y,
+              radiusX,
+              radiusY,
+              0,
+              0,
+              2 * Math.PI
+            );
+            context.fill();
+          }
+          break;
+        }
+        case SHAPES.TRIANGLE: {
+          context.moveTo(
+            startPos[`canvas${canvasIndex}`].x +
+              (currPos[`canvas${canvasIndex}`].x -
+                startPos[`canvas${canvasIndex}`].x) /
+                2,
+            startPos[`canvas${canvasIndex}`].y
+          );
+          context.lineTo(
+            startPos[`canvas${canvasIndex}`].x,
+            currPos[`canvas${canvasIndex}`].y
+          );
+          context.lineTo(
+            currPos[`canvas${canvasIndex}`].x,
+            currPos[`canvas${canvasIndex}`].y
+          );
+          context.closePath();
+          break;
+        }
+        case SHAPES.ARROW_RIGHT: {
+          const arrowSize = 10;
+          const direction = Math.atan2(
+            currPos[`canvas${canvasIndex}`].y -
+              startPos[`canvas${canvasIndex}`].y,
+            currPos[`canvas${canvasIndex}`].x -
+              startPos[`canvas${canvasIndex}`].x
+          );
+          const arrowheadX =
+            currPos[`canvas${canvasIndex}`].x + length * Math.cos(direction);
+          const arrowheadY =
+            currPos[`canvas${canvasIndex}`].y + length * Math.sin(direction);
+          context.moveTo(
+            startPos[`canvas${canvasIndex}`].x,
+            startPos[`canvas${canvasIndex}`].y
+          );
+          context.lineTo(
+            currPos[`canvas${canvasIndex}`].x,
+            currPos[`canvas${canvasIndex}`].y
+          );
+          context.moveTo(arrowheadX, arrowheadY);
+          context.lineTo(
+            currPos[`canvas${canvasIndex}`].x -
+              arrowSize * Math.cos(direction - Math.PI / 6),
+            currPos[`canvas${canvasIndex}`].y -
+              arrowSize * Math.sin(direction - Math.PI / 6)
+          );
+          context.moveTo(
+            currPos[`canvas${canvasIndex}`].x,
+            currPos[`canvas${canvasIndex}`].y
+          );
+          context.lineTo(
+            currPos[`canvas${canvasIndex}`].x -
+              arrowSize * Math.cos(direction + Math.PI / 6),
+            currPos[`canvas${canvasIndex}`].y -
+              arrowSize * Math.sin(direction + Math.PI / 6)
+          );
+          context.stroke();
+          break;
+        }
+        case SHAPES.TWO_SIDE_ARROW: {
+          const x1 = startPos[`canvas${canvasIndex}`].x;
+          const y1 = startPos[`canvas${canvasIndex}`].y;
+          const x2 = currPos[`canvas${canvasIndex}`].x;
+          const y2 = currPos[`canvas${canvasIndex}`].y;
+          const size = 10;
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          const arrowPoints = [
+            {
+              x: x2 - size * Math.cos(angle - Math.PI / 6),
+              y: y2 - size * Math.sin(angle - Math.PI / 6),
+            },
+            {
+              x: x2 - size * Math.cos(angle + Math.PI / 6),
+              y: y2 - size * Math.sin(angle + Math.PI / 6),
+            },
+            {
+              x: x1 + size * Math.cos(angle - Math.PI / 6),
+              y: y1 + size * Math.sin(angle - Math.PI / 6),
+            },
+            {
+              x: x1 + size * Math.cos(angle + Math.PI / 6),
+              y: y1 + size * Math.sin(angle + Math.PI / 6),
+            },
+          ];
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          context.moveTo(arrowPoints[0].x, arrowPoints[0].y);
+          context.lineTo(x2, y2);
+          context.lineTo(arrowPoints[1].x, arrowPoints[1].y);
+          context.moveTo(arrowPoints[2].x, arrowPoints[2].y);
+          context.lineTo(x1, y1);
+          context.lineTo(arrowPoints[3].x, arrowPoints[3].y);
+          context.stroke();
+          break;
+        }
+      }
+    };
+
+    const draw = (event, canvasIndex = 1) => {
+      console.log("canvasDraw", canvasIndex);
+      event.preventDefault();
+      const canvas =
+        canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
+      const context = canvas?.getContext("2d");
+      if (!isDrawing || !context || !state.mousedown[`canvas${canvasIndex}`])
+        return;
+
+      const mousePos = event.type.includes("touchmove")
+        ? getTouchPos(event, canvas)
+        : getMousePositionOnCanvas(event, canvas);
+      currPos[`canvas${canvasIndex}`] = { x: mousePos?.x, y: mousePos.y };
+      console.log("selectedShape1", selectedShape);
+      if (selectedShape !== SHAPES.FREE_HAND) {
+        context.putImageData(savedPos[`canvas${canvasIndex}`], 0, 0);
+        context.beginPath();
+        drawShapes(context, canvasIndex);
+        context.stroke();
+      } else {
+        // console.log(`--- drawing ---- `);
+        context.strokeStyle = canvasConfigs.sender.strokeStyle;
+        context.lineWidth = canvasConfigs.sender.lineWidth;
+        context.lineCap = "round";
+        context.lineTo(mousePos.x, mousePos.y);
+        context.stroke();
+      }
+    };
+
+    if (canvas1) {
+      canvas1.addEventListener("touchstart", (e) => startDrawing(e, 1), {
+        passive: false,
+      });
+      canvas1.addEventListener("touchmove", (e) => draw(e, 1), {
+        passive: false,
+      });
+      canvas1.addEventListener("touchend", (e) => stopDrawing(e, 1), {
+        passive: false,
+      });
+
+      canvas1.addEventListener("mousedown", (e) => startDrawing(e, 1));
+      canvas1.addEventListener("mousemove", (e) => draw(e, 1));
+      canvas1.addEventListener("mouseup", (e) => stopDrawing(e, 1));
+    }
+
+    if (canvas2) {
+      canvas2.addEventListener("touchstart", (e) => startDrawing(e, 2), {
+        passive: false,
+      });
+      canvas2.addEventListener("touchmove", (e) => draw(e, 2), {
+        passive: false,
+      });
+      canvas2.addEventListener("touchend", (e) => stopDrawing(e, 2), {
+        passive: false,
+      });
+
+      canvas2.addEventListener("mousedown", (e) => startDrawing(e, 2));
+      canvas2.addEventListener("mousemove", (e) => draw(e, 2));
+      canvas2.addEventListener("mouseup", (e) => stopDrawing(e, 2));
+    }
+
+    return () => {
+      video1?.removeEventListener("play", drawFrame);
+      video2?.removeEventListener("play", drawFrame);
+    };
+  }, [canvasRef, canvasRef2]);
+
+  const getMousePositionOnCanvas = (event, canvas) => {
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width; // Scale factor for width
+    const scaleY = canvas.height / rect.height; // Scale factor for height
+
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
+    return { x, y };
+  };
+
+  const getTouchPos = (touchEvent, canvas) => {
+    if (!canvas) return { x: 0, y: 0 };
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    const x = (touchEvent.changedTouches[0].clientX - rect.left) * scaleX;
+    const y = (touchEvent.changedTouches[0].clientY - rect.top) * scaleY;
+
+    return { x, y };
+  };
 
   function resetInitialPinnedUser() {}
   const isSingle = selectedClips?.length === 1;
@@ -1064,10 +1200,11 @@ const ClipModeCall = ({
               }}
             >
               <div className="d-flex">
-                <div
+                {/* <div
                   className="button"
                   onClick={() => {
                     setIsMaximized(!isMaximized);
+                    setDrawingMode(false)
                     socket.emit(EVENTS.TOGGLE_FULL_SCREEN, {
                       userInfo: {
                         from_user: fromUser._id,
@@ -1082,7 +1219,7 @@ const ClipModeCall = ({
                   ) : (
                     <Maximize size={18} />
                   )}
-                </div>
+                </div> */}
                 <div className="button aperture ml-2" onClick={takeScreenshot}>
                   <Aperture size={16} />
                 </div>
@@ -1135,14 +1272,17 @@ const ClipModeCall = ({
                           canvasConfigs = config;
                         }}
                         drawShapes={(shapeType) => {
+                          console.log("shapeType", shapeType);
                           selectedShape = shapeType;
                         }}
                         refreshDrawing={() => {
                           // deleting the canvas drawing
-                          // storedLocalDrawPaths.sender = [];
-                          // storedLocalDrawPaths.receiver = [];
+                          storedLocalDrawPaths = {
+                            canvas1: { sender: [], receiver: [] },
+                            canvas2: { sender: [], receiver: [] }, // Separate history for each canvas
+                          };
                           clearCanvas();
-                          // sendClearCanvasEvent();
+                          sendClearCanvasEvent();
                         }}
                         selectedClips={selectedClips}
                         setSelectedClips={setSelectedClips}
@@ -1190,6 +1330,7 @@ const ClipModeCall = ({
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
                   sendDrawEvent={sendDrawEvent}
+                  undoDrawing={undoDrawing}
                 />
                 <VideoContainer
                   drawingMode={drawingMode}
@@ -1215,6 +1356,7 @@ const ClipModeCall = ({
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
                   sendDrawEvent={sendDrawEvent}
+                  undoDrawing={undoDrawing}
                 />
 
                 {isLock && (
@@ -1256,6 +1398,7 @@ const ClipModeCall = ({
                 canvasConfigs={canvasConfigs}
                 selectedShape={selectedShape}
                 sendDrawEvent={sendDrawEvent}
+                undoDrawing={undoDrawing}
               />
             )}
           </div>
@@ -1271,10 +1414,11 @@ const ClipModeCall = ({
           >
             {accountType === AccountType.TRAINER && (
               <div className="d-flex">
-                <div
+                {/* <div
                   className="button"
                   onClick={() => {
                     setIsMaximized(!isMaximized);
+                    setDrawingMode(false)
                     socket.emit(EVENTS.TOGGLE_FULL_SCREEN, {
                       userInfo: {
                         from_user: fromUser._id,
@@ -1289,14 +1433,14 @@ const ClipModeCall = ({
                   ) : (
                     <Maximize size={18} />
                   )}
-                </div>
+                </div> */}
                 <div
                   style={{
                     position: "relative",
                   }}
                 >
                   <div
-                    className="button ml-3"
+                    className="button "
                     onClick={() => {
                       setDrawingMode(!drawingMode);
                       socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
@@ -1339,14 +1483,17 @@ const ClipModeCall = ({
                           canvasConfigs = config;
                         }}
                         drawShapes={(shapeType) => {
+                          console.log("shapeType", shapeType);
                           selectedShape = shapeType;
                         }}
                         refreshDrawing={() => {
                           // deleting the canvas drawing
-                          // storedLocalDrawPaths.sender = [];
-                          // storedLocalDrawPaths.receiver = [];
+                          storedLocalDrawPaths = {
+                            canvas1: { sender: [], receiver: [] },
+                            canvas2: { sender: [], receiver: [] }, // Separate history for each canvas
+                          };
                           clearCanvas();
-                          // sendClearCanvasEvent();
+                          sendClearCanvasEvent();
                         }}
                         selectedClips={selectedClips}
                         setSelectedClips={setSelectedClips}
@@ -1449,6 +1596,7 @@ const ClipModeCall = ({
                     canvasConfigs={canvasConfigs}
                     selectedShape={selectedShape}
                     sendDrawEvent={sendDrawEvent}
+                    undoDrawing={undoDrawing}
                   />
                   <VideoContainer
                     drawingMode={drawingMode}
@@ -1473,6 +1621,7 @@ const ClipModeCall = ({
                     canvasConfigs={canvasConfigs}
                     selectedShape={selectedShape}
                     sendDrawEvent={sendDrawEvent}
+                    undoDrawing={undoDrawing}
                   />
 
                   {accountType === AccountType.TRAINER && isLock && (
@@ -1491,6 +1640,7 @@ const ClipModeCall = ({
                 </>
               ) : (
                 <VideoContainer
+                  index={1}
                   drawingMode={drawingMode}
                   canvasRef={canvasRef}
                   videoRef={videoRef}
@@ -1512,6 +1662,7 @@ const ClipModeCall = ({
                   canvasConfigs={canvasConfigs}
                   selectedShape={selectedShape}
                   sendDrawEvent={sendDrawEvent}
+                  undoDrawing={undoDrawing}
                 />
               )}
               <UserBoxMini
