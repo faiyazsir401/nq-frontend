@@ -68,7 +68,6 @@ export const traineeClips = async (payload) => {
   }
 };
 
-
 export const reports = async (payload) => {
   try {
     const response = await axiosInstance({

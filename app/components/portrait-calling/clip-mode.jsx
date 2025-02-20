@@ -28,7 +28,8 @@ import { toast } from "react-toastify";
 import { pushProfilePhotoToS3 } from "../common/common.api";
 import { screenShotTake } from "../videoupload/videoupload.api";
 import html2canvas from "html2canvas";
-import { FaUndo } from "react-icons/fa";
+import { FaLock, FaUndo, FaUnlock } from "react-icons/fa";
+import Image from "next/image";
 const SHAPES = {
   FREE_HAND: "hand",
   LINE: "line",
@@ -361,7 +362,7 @@ const VideoContainer = ({
       <div
         id="video-container"
         ref={videoContainerRef}
-        className={`relative border rounded-lg overflow-hidden `}
+        className={`relative overflow-hidden `}
         style={{
           height: isSingle
             ? isMaximized
@@ -556,8 +557,10 @@ const ClipModeCall = ({
   const [selectedUser, setSelectedUser] = useState(null);
 
   function handleUserClick(id) {
-    setSelectedUser(id);
-    emitVideoSelectEvent("swap", id);
+    if (accountType === AccountType.TRAINER) {
+      setSelectedUser(id);
+      emitVideoSelectEvent("swap", id);
+    }
   }
 
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ id, type }) => {
@@ -566,7 +569,7 @@ const ClipModeCall = ({
     }
   });
 
-  //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
+
   const emitVideoSelectEvent = (type, id) => {
     socket.emit(EVENTS.ON_VIDEO_SELECT, {
       userInfo: { from_user: fromUser._id, to_user: toUser._id },
@@ -1228,13 +1231,28 @@ const ClipModeCall = ({
               </div>
             )}
 
+            {isMaximized && (
+              <div
+                className="button video-lock  ml-2"
+                onClick={() => {
+                  socket.emit(EVENTS.TOGGLE_LOCK_MODE, {
+                    userInfo: { from_user: fromUser._id, to_user: toUser._id },
+                    isLockMode: !isLock,
+                  });
+                  setIsLock(!isLock);
+                }}
+              >
+                {isLock ? <FaLock size={16} /> : <FaUnlock size={16} />}
+              </div>
+            )}
+
             <div
               style={{
                 position: "relative",
               }}
             >
               <div
-                className="button ml-3"
+                className="button ml-2"
                 onClick={() => {
                   setDrawingMode(!drawingMode);
                   socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
@@ -1308,7 +1326,7 @@ const ClipModeCall = ({
           </div>
         )}
 
-        <TimeRemaining timeRemaining={timeRemaining} />
+        {!drawingMode && <TimeRemaining timeRemaining={timeRemaining} />}
       </div>
       <div
         style={{
@@ -1369,8 +1387,33 @@ const ClipModeCall = ({
       <div
         style={{
           display: selectedUser ? "none" : "block",
+          position: "relative",
         }}
       >
+        <Image
+          src="/assets/images/netquix_logo_beta.png"
+          width={100}
+          height={40}
+          style={{
+            objectFit: "contain",
+            position: "absolute",
+            zIndex: 10,
+            top: 0,
+            left: 5,
+          }}
+        />
+        <h4
+          style={{
+            objectFit: "contain",
+            position: "absolute",
+            zIndex: 10,
+            bottom: accountType === AccountType.TRAINEE?10:40,
+            right: 5,
+            color: "white",
+          }}
+        >
+          &copy; Netqwix.com
+        </h4>
         {selectedClips.length > 1 ? (
           <>
             <VideoContainer
@@ -1472,6 +1515,7 @@ const ClipModeCall = ({
           <>
             <UserBoxMini
               id={fromUser._id}
+              zIndex={20}
               onClick={handleUserClick}
               selected={false}
               videoRef={remoteVideoRef}
@@ -1481,6 +1525,7 @@ const ClipModeCall = ({
             />
             <UserBoxMini
               id={toUser._id}
+              zIndex={10}
               onClick={handleUserClick}
               selected={false}
               videoRef={localVideoRef}

@@ -1,8 +1,11 @@
+import { useContext } from "react";
+import { EVENTS } from "../../../helpers/events";
 import { AccountType } from "../../common/constants";
 import { useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";
 import TimeRemaining from "./time-remaining";
 import { UserBox, UserBoxMini } from "./user-box";
+import { SocketContext } from "../socket";
 
 const OneOnOneCall = ({
   timeRemaining,
@@ -18,13 +21,34 @@ const OneOnOneCall = ({
   setIsLocalStreamOff,
   isRemoteStreamOff,
 }) => {
-  const handleUserClick = (id) => {
-    setSelectedUser(id);
-  };
+
+  const socket = useContext(SocketContext);
   const { accountType } = useAppSelector(authState);
   console.log("selectedUser", selectedUser);
   console.log("toUser", toUser._id);
   console.log("fromUser", fromUser._id);
+
+
+  const handleUserClick = (id) => {
+    if(accountType === AccountType.TRAINER){
+      setSelectedUser(id);
+      emitVideoSelectEvent("swap",id)
+    }
+  };
+
+  socket.on(EVENTS.ON_VIDEO_SELECT, ({ id, type }) => {
+    if (type === "swap" && accountType === AccountType.TRAINEE) {
+      setSelectedUser(id);
+    }
+  });
+
+  const emitVideoSelectEvent = (type, id) => {
+    socket.emit(EVENTS.ON_VIDEO_SELECT, {
+      userInfo: { from_user: fromUser._id, to_user: toUser._id },
+      type,
+      id,
+    });
+  };
 
   return (
     <>

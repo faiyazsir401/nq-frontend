@@ -35,7 +35,7 @@ const ActionButtons = ({
   isOpenConfirm,
   selectedClips,
   setIsOpenReport,
-  cutCall
+  cutCall,
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -43,9 +43,8 @@ const ActionButtons = ({
     <div className="action-buttons">
       <Tooltip>
         <div
-          className={`button mic-toggle ${isMuted?"off":""}`}
+          className={`button mic-toggle ${isMuted ? "off" : ""}`}
           onClick={() => {
-
             if (stream) {
               const audioTracks = stream.getAudioTracks();
               if (audioTracks.length > 0) {
@@ -87,7 +86,7 @@ const ActionButtons = ({
       </Tooltip>
 
       <Tooltip>
-        <div className="button end-call off" onClick={cutCall}> 
+        <div className="button end-call off" onClick={cutCall}>
           <Phone size={16} />
         </div>
       </Tooltip>
@@ -109,19 +108,22 @@ const ActionButtons = ({
             </div>
           </Tooltip>
 
-          <Tooltip>
-            <div
-              className="button video-lock"
-              onClick={() => {
-                socket.emit(EVENTS.TOGGLE_LOCK_MODE, {
-                  userInfo: { from_user: fromUser._id, to_user: toUser._id },
-                  isLockMode: !isLockMode,
-                });
-                setIsLockMode(!isLockMode)}}
-            >
-              {isLockMode ? <FaLock size={16} /> : <FaUnlock size={16} />}
-            </div>
-          </Tooltip>
+          {selectedClips && selectedClips?.length >=1 && (
+            <Tooltip>
+              <div
+                className="button video-lock"
+                onClick={() => {
+                  socket.emit(EVENTS.TOGGLE_LOCK_MODE, {
+                    userInfo: { from_user: fromUser._id, to_user: toUser._id },
+                    isLockMode: !isLockMode,
+                  });
+                  setIsLockMode(!isLockMode);
+                }}
+              >
+                {isLockMode ? <FaLock size={16} /> : <FaUnlock size={16} />}
+              </div>
+            </Tooltip>
+          )}
 
           <Tooltip>
             <div className="button aperture" onClick={takeScreenshot}>
@@ -130,7 +132,10 @@ const ActionButtons = ({
           </Tooltip>
 
           <Tooltip>
-            <div className="button file-add" onClick={()=>setIsOpenReport(true)}>
+            <div
+              className="button file-add"
+              onClick={() => setIsOpenReport(true)}
+            >
               <FilePlus size={16} />
             </div>
           </Tooltip>

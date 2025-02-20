@@ -128,16 +128,32 @@ const VideoCallUI = ({
   const getMyClips = async () => {
     var res = await myClips({});
     setClips(res?.data);
+  
     var res2 = await traineeClips({});
     var arr = res2?.data || [];
+  
+    let selectedTraineeClips = [];
+    console.log("traineeInfo._id",traineeInfo._id,id)
     for (let index = 0; index < arr?.length; index++) {
-      var el = arr[index]?.clips;
-      arr[index].clips = [
-        ...new Map(el.map((item) => [item.clips._id, item])).values(),
-      ];
+      console.log("UserId",arr[index]._id._id,traineeInfo._id)
+      if (arr[index]._id._id === traineeInfo._id) {
+        let filteredClips = arr[index].clips.filter(clip =>{
+          console.log("clip.clips._id === id",clip._id,id) 
+          return clip._id === id
+          });
+        
+        if (filteredClips.length > 0) {
+          selectedTraineeClips.push({
+            ...arr[index], 
+            clips: filteredClips
+          });
+        }
+      }
     }
-    setTraineeClips(arr);
+    console.log("selectedTraineeClips",selectedTraineeClips)
+    setTraineeClips(selectedTraineeClips);
   };
+  
 
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos ,type}) => {
     if(type ==="clips"){
