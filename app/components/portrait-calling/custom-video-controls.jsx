@@ -13,6 +13,9 @@ import {
   FaChevronRight,
   FaChevronLeft,
 } from "react-icons/fa";
+import { useAppSelector } from "../../store";
+import { authState } from "../auth/auth.slice";
+import { AccountType } from "../../common/constants";
 
 const CustomVideoControls = ({
   isPlaying,
@@ -30,6 +33,7 @@ const CustomVideoControls = ({
   currentTime,
   setCurrentTime,
 }) => {
+    const { accountType } = useAppSelector(authState);
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
@@ -66,6 +70,7 @@ const CustomVideoControls = ({
         justifyContent: "center",
         gap: "5px",
         width: "100%",
+        visibility:accountType === AccountType.TRAINEE?"hidden":"visible"
       }}
     >
       {/* Toggle Controls Button */}

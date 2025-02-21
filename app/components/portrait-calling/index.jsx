@@ -128,41 +128,40 @@ const VideoCallUI = ({
   const getMyClips = async () => {
     var res = await myClips({});
     setClips(res?.data);
-  
+
     var res2 = await traineeClips({});
     var arr = res2?.data || [];
-  
+
     let selectedTraineeClips = [];
-    console.log("traineeInfo._id",traineeInfo._id,id)
+    console.log("traineeInfo._id", traineeInfo._id, id);
     for (let index = 0; index < arr?.length; index++) {
-      console.log("UserId",arr[index]._id._id,traineeInfo._id)
+      console.log("UserId", arr[index]._id._id, traineeInfo._id);
       if (arr[index]._id._id === traineeInfo._id) {
-        let filteredClips = arr[index].clips.filter(clip =>{
-          console.log("clip.clips._id === id",clip._id,id) 
-          return clip._id === id
-          });
-        
+        let filteredClips = arr[index].clips.filter((clip) => {
+          console.log("clip.clips._id === id", clip._id, id);
+          return clip._id === id;
+        });
+
         if (filteredClips.length > 0) {
           selectedTraineeClips.push({
-            ...arr[index], 
-            clips: filteredClips
+            ...arr[index],
+            clips: filteredClips,
           });
         }
       }
     }
-    console.log("selectedTraineeClips",selectedTraineeClips)
+    console.log("selectedTraineeClips", selectedTraineeClips);
     setTraineeClips(selectedTraineeClips);
   };
-  
 
-  socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos ,type}) => {
-    if(type ==="clips"){
+  socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos, type }) => {
+    if (type === "clips") {
       setSelectedClips([...videos]);
     }
   });
 
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
-  const emitVideoSelectEvent = (type,videos) => {
+  const emitVideoSelectEvent = (type, videos) => {
     socket.emit(EVENTS.ON_VIDEO_SELECT, {
       userInfo: { from_user: fromUser._id, to_user: toUser._id },
       type,
@@ -172,7 +171,7 @@ const VideoCallUI = ({
 
   //NOTE - emit event after selecting the clips
   useEffect(() => {
-    emitVideoSelectEvent("clips",selectedClips);
+    emitVideoSelectEvent("clips", selectedClips);
   }, [selectedClips?.length]);
 
   // selects trainee clips on load
@@ -226,7 +225,12 @@ const VideoCallUI = ({
       console.log("res?.data?.url", res?.data?.url);
       if (res?.data?.url) {
         setIsScreenShotModelOpen(true);
-        pushProfilePhotoToS3(res?.data?.url, blob,null, afterSucessUploadImageOnS3);
+        pushProfilePhotoToS3(
+          res?.data?.url,
+          blob,
+          null,
+          afterSucessUploadImageOnS3
+        );
       }
 
       setTimeout(() => {
@@ -361,12 +365,10 @@ const VideoCallUI = ({
 
   // NOTE - handle user offline
   const handleOffline = () => {
-   
     socket.emit("chunksCompleted");
   };
 
   function handlePeerDisconnect() {
-    
     if (!(peerRef && peerRef.current)) return;
     //NOTE -  manually close the peer connections
     for (let conns in peerRef.current.connections) {
@@ -448,7 +450,6 @@ const VideoCallUI = ({
   };
 
   const cutCall = () => {
-
     cleanupFunction();
     if (isTraineeJoined && AccountType.TRAINER === accountType) {
       setIsOpenReport(true);
@@ -592,10 +593,6 @@ const VideoCallUI = ({
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => {
-                      if (selectClips && selectClips?.length) {
-                        setSelectedClips(selectClips);
-                        setClipSelectNote(false);
-                      }
                       setIsOpen(false);
                     }}
                   >
@@ -604,23 +601,26 @@ const VideoCallUI = ({
                 </div>
                 <div className="media d-flex flex-column  align-items-center">
                   <div>
-                    <h2>Select 2 clips to share with {toUser?.fullname}</h2>
+                    <h2>
+                      Select one video to do a full-screen analysis or select
+                      two videos to do a comparison.
+                    </h2>
                   </div>
                 </div>
               </div>
               <div className="theme-tab">
                 <Nav tabs className="justify-content-around">
-                  <NavItem className="ml-5px  mt-2">
+                  <NavItem className="mb-2" style={{ width: "100%" }}>
                     <NavLink
                       className={`button-effect ${
                         videoActiveTab === "media" ? "active" : ""
                       } select-clip-width`}
                       onClick={() => setAideoActiveTab("media")}
                     >
-                      My Clips
+                      My Videos
                     </NavLink>
                   </NavItem>
-                  <NavItem className="ml-5px  mt-2">
+                  <NavItem className="mb-2" style={{ width: "100%" }}>
                     <NavLink
                       className={`button-effect ${
                         videoActiveTab === "trainee" ? "active" : ""
@@ -630,7 +630,7 @@ const VideoCallUI = ({
                       Trainee
                     </NavLink>
                   </NavItem>
-                  <NavItem className="ml-5px  mt-2">
+                  <NavItem className="mb-2" style={{ width: "100%" }}>
                     <NavLink
                       className={`button-effect ${
                         videoActiveTab === "docs" ? "active" : ""
@@ -648,7 +648,7 @@ const VideoCallUI = ({
                   className="custom-scroll"
                 >
                   <TabPane tabId="media">
-                    <div className="media-gallery portfolio-section grid-portfolio">
+                    <div className="media-gallery portfolio-section grid-portfolio" style={{ overflowY: "auto", height: "55dvh" }}>
                       {clips?.length ? (
                         clips?.map((cl, ind) => (
                           <div className={`collapse-block open`}>
@@ -741,9 +741,25 @@ const VideoCallUI = ({
                         </>
                       )}
                     </div>
+                    {clips.length && (
+                      <div className="d-flex justify-content-around w-100 p-3">
+                        <Button
+                          color="success"
+                          onClick={() => {
+                            if (selectClips && selectClips?.length) {
+                              setSelectedClips(selectClips);
+                              setClipSelectNote(false);
+                            }
+                            setIsOpen(false);
+                          }}
+                        >
+                          Select
+                        </Button>
+                      </div>
+                    )}
                   </TabPane>
                   <TabPane tabId="trainee">
-                    <div className="media-gallery portfolio-section grid-portfolio">
+                    <div className="media-gallery portfolio-section grid-portfolio" style={{ overflowY: "auto", height: "55dvh" }}>
                       {traineeClip?.length ? (
                         traineeClip?.map((cl, ind) => (
                           <div className={`collapse-block open`}>
@@ -838,9 +854,26 @@ const VideoCallUI = ({
                         </div>
                       )}
                     </div>
+
+                    {traineeClip.length && (
+                      <div className="d-flex justify-content-around w-100 p-3">
+                        <Button
+                          color="success"
+                          onClick={() => {
+                            if (selectClips && selectClips?.length) {
+                              setSelectedClips(selectClips);
+                              setClipSelectNote(false);
+                            }
+                            setIsOpen(false);
+                          }}
+                        >
+                          Select
+                        </Button>
+                      </div>
+                    )}
                   </TabPane>
                   <TabPane tabId="docs">
-                    <div className="media-gallery portfolio-section grid-portfolio">
+                    <div className="media-gallery portfolio-section grid-portfolio" style={{ overflowY: "auto", height: "55dvh" }}>
                       <div className={`collapse-block open`}>
                         <div className={`block-content `}>
                           <div className="row">
@@ -894,6 +927,23 @@ const VideoCallUI = ({
                         </div>
                       </div>
                     </div>
+
+                    {netquixVideos.length && (
+                      <div className="d-flex justify-content-around w-100 p-3">
+                        <Button
+                          color="success"
+                          onClick={() => {
+                            if (selectClips && selectClips?.length) {
+                              setSelectedClips(selectClips);
+                              setClipSelectNote(false);
+                            }
+                            setIsOpen(false);
+                          }}
+                        >
+                          Select
+                        </Button>
+                      </div>
+                    )}
                   </TabPane>
                 </TabContent>
               </div>

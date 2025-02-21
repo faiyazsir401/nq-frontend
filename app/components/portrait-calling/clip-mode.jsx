@@ -29,7 +29,7 @@ import { pushProfilePhotoToS3 } from "../common/common.api";
 import { screenShotTake } from "../videoupload/videoupload.api";
 import html2canvas from "html2canvas";
 import { FaLock, FaUndo, FaUnlock } from "react-icons/fa";
-import Image from "next/image";
+import NextImage from "next/image";
 const SHAPES = {
   FREE_HAND: "hand",
   LINE: "line",
@@ -370,7 +370,7 @@ const VideoContainer = ({
               : "80dvh" // If isSingle is true
             : isMaximized
             ? isLock
-              ? "44dvh"
+              ? "44.5dvh"
               : "42dvh" // If isMaximized is true and isSingle is false
             : isLock
             ? "40dvh"
@@ -472,11 +472,13 @@ const VideoContainer = ({
           className="canvas"
           style={{ display: drawingMode ? "block" : "none" }}
         />
-        {drawingMode && accountType === AccountType.TRAINER && (
+        {drawingMode && (
           <div
             className="absolute"
             style={{
               display: "flex",
+              visibility:
+                accountType === AccountType.TRAINER ? "hidden" : "visible",
               justifyContent: "center",
               gap: "5px",
               flexDirection: "column",
@@ -494,7 +496,7 @@ const VideoContainer = ({
           </div>
         )}
       </div>
-      {accountType === AccountType.TRAINER && !isLock && (
+      {!isLock && (
         <CustomVideoControls
           handleSeek={handleSeek}
           isFullscreen={isFullscreen}
@@ -568,7 +570,6 @@ const ClipModeCall = ({
       setSelectedUser(id);
     }
   });
-
 
   const emitVideoSelectEvent = (type, id) => {
     socket.emit(EVENTS.ON_VIDEO_SELECT, {
@@ -1201,7 +1202,7 @@ const ClipModeCall = ({
   return (
     <>
       <div
-        className={`d-flex  pl-2 pr-4 ${
+        className={`d-flex  pl-1 pr-1 ${
           accountType === AccountType.TRAINER && !selectedUser
             ? "mt-2 justify-content-between"
             : "m-2 justify-content-end"
@@ -1226,14 +1227,14 @@ const ClipModeCall = ({
             </div>
 
             {isMaximized && (
-              <div className="button aperture ml-2" onClick={takeScreenshot}>
+              <div className="button aperture ml-1" onClick={takeScreenshot}>
                 <Aperture size={16} />
               </div>
             )}
 
             {isMaximized && (
               <div
-                className="button video-lock  ml-2"
+                className="button video-lock  ml-1"
                 onClick={() => {
                   socket.emit(EVENTS.TOGGLE_LOCK_MODE, {
                     userInfo: { from_user: fromUser._id, to_user: toUser._id },
@@ -1252,7 +1253,7 @@ const ClipModeCall = ({
               }}
             >
               <div
-                className="button ml-2"
+                className="button ml-1"
                 onClick={() => {
                   setDrawingMode(!drawingMode);
                   socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
@@ -1390,7 +1391,7 @@ const ClipModeCall = ({
           position: "relative",
         }}
       >
-        <Image
+        <NextImage
           src="/assets/images/netquix_logo_beta.png"
           width={100}
           height={40}
@@ -1407,7 +1408,7 @@ const ClipModeCall = ({
             objectFit: "contain",
             position: "absolute",
             zIndex: 10,
-            bottom: accountType === AccountType.TRAINEE?10:40,
+            bottom: 40,
             right: 5,
             color: "white",
           }}
@@ -1469,7 +1470,7 @@ const ClipModeCall = ({
               undoDrawing={undoDrawing}
             />
 
-            {accountType === AccountType.TRAINER && isLock && (
+            {isLock && (
               <CustomVideoControls
                 handleSeek={handleSeek}
                 isPlaying={isPlayingBoth}

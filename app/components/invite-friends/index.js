@@ -66,7 +66,7 @@ const InviteFriendsCard = () => {
             <div className='invite-body'>
                 <textarea
                     className='form-control mb-2'
-                    placeholder="Enter friends' emails, separated by commas"
+                    placeholder="Enter friend's emails separated by commas"
                     value={userEmails}
                     onChange={(e) => setUserEmails(e.target.value)}
                 />
