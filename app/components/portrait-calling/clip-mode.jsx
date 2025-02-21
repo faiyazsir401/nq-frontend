@@ -366,15 +366,15 @@ const VideoContainer = ({
         style={{
           height: isSingle
             ? isMaximized
-              ? "91dvh"
-              : "85dvh" // If isSingle is true
+              ? "88dvh"
+              : "80dvh" // If isSingle is true
             : isMaximized
             ? isLock
-              ? "45dvh"
-              : "43dvh" // If isMaximized is true and isSingle is false
+              ? "44dvh"
+              : "42dvh" // If isMaximized is true and isSingle is false
             : isLock
-            ? "42dvh"
-            : "40dvh", // If isMaximized is false and isSingle is false
+            ? "40dvh"
+            : "37dvh", // If isMaximized is false and isSingle is false
           width: "100vw",
           display: "flex",
           justifyContent: "center",
