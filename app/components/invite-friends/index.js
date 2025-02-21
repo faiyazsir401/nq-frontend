@@ -3,30 +3,81 @@ import { toast } from 'react-toastify';
 import { inviteFriend } from '../NavHomePage/navHomePage.api';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const InviteFriendsCard = () => {
-    const [err, setErr] = useState({ email: false, video: false });
-    const [userEmail, setUserEmail] = useState("");
-    const sendInvitiation = async () => {
-        if (!emailRegex.test(userEmail)) setErr({ email: true, video: false })
-        else {
-            var res = await inviteFriend({ user_email: userEmail })
-            toast?.success("Email sent successfully.", { type: "success" })
-            setErr({ email: false, video: false })
-            setUserEmail("")
+    const [err, setErr] = useState("");
+    const [userEmails, setUserEmails] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const handleFileUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                const emails = text.split(/\r?\n|,/).map(email => email.trim()).filter(email => emailRegex.test(email));
+                setUserEmails(prev => prev ? `${prev}, ${emails.join(', ')}` : emails.join(', '));
+            };
+            reader.readAsText(file);
         }
-    }
+    };
+
+    const sendInvitation = async () => {
+        setLoading(true);
+        setErr("");
+        let emailList = userEmails.split(',').map(email => email.trim()).filter(email => emailRegex.test(email));
+        
+        if (emailList.length === 0) {
+            setErr("Invalid email(s) found.");
+            setLoading(false);
+            return;
+        }
+
+        if (emailList.length > 10) {
+            setErr("You can invite a maximum of 10 friends at a time.");
+            setLoading(false);
+            return;
+        }
+
+        let failedEmails = [];
+        await Promise.all(emailList.map(async (email) => {
+            try {
+                await inviteFriend({ user_email: email });
+            } catch (error) {
+                failedEmails.push(email);
+            }
+        }));
+        
+        if (failedEmails.length) {
+            toast.error(`Failed to send invitations to: ${failedEmails.join(', ')}`);
+            setErr(`Failed to send invitations to: ${failedEmails.join(', ')}`);
+        } else {
+            toast.success("Emails sent successfully.");
+            setUserEmails("");
+        }
+        setLoading(false);
+    };
+
     return (
-        <div>
-            <div className='Inv-freind'>
-                <h3>Invite a Friend</h3>
+        <div className="invite-card-container">
+            <div className='invite-header mb-2 text-center'>
+                <h3>Invite Friends</h3>
             </div>
-            <div className='Invite-freind'>
-                {/* Placeholder */}
-                <input className='form-control' type="text" placeholder="Enter friend's email" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} />
-                {err?.email && <p style={{ color: "red", marginTop: "5px", textAlign: "left", width: "100%" }}>Invalid Email.</p>}
-                {/* Buttons */}
-                <div className='Button-up'>
-                    <button className='btn btn-primary btn-sm btn_css' type="button" onClick={sendInvitiation}>Invite Friend</button>
+            <div className='invite-body'>
+                <textarea
+                    className='form-control mb-2'
+                    placeholder="Enter friends' emails, separated by commas"
+                    value={userEmails}
+                    onChange={(e) => setUserEmails(e.target.value)}
+                />
+                {err && <p className='error-message'>{err}</p>}
+                
+                <input type="file" accept=".csv" className='file-upload mb-2 ' onChange={handleFileUpload} />
+                
+                <div className='button-container text-center'>
+                    <button className='btn btn-primary' type="button" onClick={sendInvitation} disabled={loading}>
+                        {loading ? "Sending..." : "Invite Friends"}
+                    </button>
                 </div>
             </div>
         </div>
