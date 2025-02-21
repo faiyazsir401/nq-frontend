@@ -12,7 +12,7 @@ import {
 
 const EmailsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [emails, setEmails] = useState([]);
+
   const [email, setEmail] = useState('');
 
   // Toggle the popup
@@ -20,13 +20,8 @@ const EmailsPopup = ({ props }) => {
 
   // Add a new email to the list
   const addEmail = (newEmail) => {
-    if (emails.includes(newEmail)) {
-      alert("Email Already Entered.");
-      return;
-    }
     if (isValidEmail(newEmail)) {
-      setEmails([...emails, newEmail]);
-      setEmail(''); // Clear the input after adding
+      setEmail(newEmail); // Clear the input after adding
     } else {
       alert("Please enter a valid email.");
     }
@@ -52,25 +47,13 @@ const EmailsPopup = ({ props }) => {
       if (trimmedEmail) {
         addEmail(trimmedEmail); // Add the email if not empty
       }
-    } else if (e.key === 'Backspace' && !email && emails.length > 0) {
-      // Re-enter the last email into the input field
-      const lastEmail = emails[emails.length - 1];
-      setEmail(lastEmail);
-      setEmails(emails.slice(0, -1)); // Remove last email from the list
     }
-  };
-
-  // Remove an email from the list
-  const removeEmail = (index) => {
-    const updatedEmails = emails.filter((_, idx) => idx !== index);
-    setEmails(updatedEmails);
   };
 
   // Confirm selection of emails
   const confirmEmails = () => {
-    console.log("Submitted Emails:", emails);
     toggle(); // Close the modal
-    props.setSelectedEmails(emails); // Pass emails to the parent component if needed
+    props.setSelectedEmails([email]); // Pass emails to the parent component if needed
   };
 
   // Validate email format (basic validation)
@@ -90,23 +73,15 @@ const EmailsPopup = ({ props }) => {
       </button>
 
       <Modal isOpen={isOpen} toggle={toggle} centered={true}>
-        <ModalHeader>Add Multiple Emails</ModalHeader>
+        <ModalHeader>Add Email</ModalHeader>
         <ModalBody>
           <Form onSubmit={(e) => e.preventDefault()}>
             <InputGroup className="mb-3 d-flex">
               <div className="d-flex flex-wrap align-items-center w-100" style={{ gap: '5px', padding: '8px', border: '1px solid #ccc', borderRadius: '5px', minHeight: '40px' }}>
-                {emails.map((email, index) => (
-                  <div key={index} style={{ background: '#e0e0e0', padding: '5px 10px', borderRadius: '15px', display: 'flex', alignItems: 'center' }}>
-                    {email}
-                    <button className="bg-danger ml-2 px-2 rounded border-0 text-white" onClick={() => removeEmail(index)} style={{ marginLeft: '5px', cursor: 'pointer' }}>
-                      &times;
-                    </button>
-                  </div>
-                ))}
                 <Input
                   type="text"
                   value={email}
-                  placeholder="Enter emails separated by space"
+                  placeholder="Enter email"
                   onChange={handleEmailChange}
                   onKeyDown={handleKeyDown}
                   style={{ border: 'none', outline: 'none', minWidth: '100px' }}
@@ -117,7 +92,7 @@ const EmailsPopup = ({ props }) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={confirmEmails}>
-            Confirm Emails
+            Confirm Email
           </Button>
           <Button color="secondary" onClick={toggle}>
             Close
