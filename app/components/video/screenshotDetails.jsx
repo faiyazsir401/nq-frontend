@@ -92,7 +92,7 @@ function ScreenShotDetails({
           >
             <div
               style={{
-                width: "80%",
+                width: "70%",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
@@ -112,7 +112,7 @@ function ScreenShotDetails({
             <div
               style={{
                 width: '70%',
-                marginLeft: '5px'
+              
               }}>
               
               <div
