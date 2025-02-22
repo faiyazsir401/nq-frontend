@@ -130,7 +130,7 @@ export const UserBoxMini = ({
 
   return (
     <Draggable bounds="parent" {...useClickObserver(handleBoxClick)}>
-      <div className={`profile-box mini`} style={{
+      <div className={`profile-box mini hide-in-screenshot`} style={{
         zIndex: zIndex ?? 100
       }}>
         {!isStreamOff ? (
@@ -181,7 +181,7 @@ export const VideoMiniBox = ({ onClick, id, clips }) => {
   return (
     <Draggable bounds="parent" {...useClickObserver(handleBoxClick)}>
       <div
-        className={`profile-box mini-landscape`}
+        className={`profile-box mini-landscape hide-in-screenshot`}
         style={{
           zIndex: 5,
         }}

@@ -72,6 +72,7 @@ const CustomVideoControls = ({
         width: "100%",
         visibility:accountType === AccountType.TRAINEE?"hidden":"visible"
       }}
+      className="hide-in-screenshot"
     >
       {/* Toggle Controls Button */}
 

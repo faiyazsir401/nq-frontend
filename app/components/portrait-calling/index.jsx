@@ -199,12 +199,25 @@ const VideoCallUI = ({
 
   const takeScreenshot = () => {
     setIsScreenShotModelOpen(false);
-    const targetElement = document.body;
+    let targetElement = document.getElementById("clip-container");
+    if (!targetElement) {
+      targetElement = document.body;
+    }
+
+    // Select only elements with the class "hide-in-screenshot"
+    const elementsToHide = Array.from(
+      targetElement.getElementsByClassName("hide-in-screenshot")
+    );
+
+    // Hide selected elements
+    elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
     html2canvas(targetElement, {
       type: "png",
       allowTaint: true,
       useCORS: true,
     }).then(async (canvas) => {
+      // Restore visibility after the screenshot is taken
+      elementsToHide.forEach((el) => (el.style.visibility = "visible"));
       const dataUrl = canvas.toDataURL("image/png");
       console.log("dataUrl", dataUrl);
 
@@ -648,7 +661,10 @@ const VideoCallUI = ({
                   className="custom-scroll"
                 >
                   <TabPane tabId="media">
-                    <div className="media-gallery portfolio-section grid-portfolio" style={{ overflowY: "auto", height: "55dvh" }}>
+                    <div
+                      className="media-gallery portfolio-section grid-portfolio"
+                      style={{ overflowY: "auto", height: "55dvh" }}
+                    >
                       {clips?.length ? (
                         clips?.map((cl, ind) => (
                           <div className={`collapse-block open`}>
@@ -759,7 +775,10 @@ const VideoCallUI = ({
                     )}
                   </TabPane>
                   <TabPane tabId="trainee">
-                    <div className="media-gallery portfolio-section grid-portfolio" style={{ overflowY: "auto", height: "55dvh" }}>
+                    <div
+                      className="media-gallery portfolio-section grid-portfolio"
+                      style={{ overflowY: "auto", height: "55dvh" }}
+                    >
                       {traineeClip?.length ? (
                         traineeClip?.map((cl, ind) => (
                           <div className={`collapse-block open`}>
@@ -873,7 +892,10 @@ const VideoCallUI = ({
                     )}
                   </TabPane>
                   <TabPane tabId="docs">
-                    <div className="media-gallery portfolio-section grid-portfolio" style={{ overflowY: "auto", height: "55dvh" }}>
+                    <div
+                      className="media-gallery portfolio-section grid-portfolio"
+                      style={{ overflowY: "auto", height: "55dvh" }}
+                    >
                       <div className={`collapse-block open`}>
                         <div className={`block-content `}>
                           <div className="row">

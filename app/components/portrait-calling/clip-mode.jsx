@@ -385,7 +385,7 @@ const VideoContainer = ({
       >
         {drawingMode && accountType === AccountType.TRAINER && (
           <div
-            className="absolute"
+            className="absolute hide-in-screenshot"
             style={{
               display: "flex",
               justifyContent: "center",
@@ -472,13 +472,11 @@ const VideoContainer = ({
           className="canvas"
           style={{ display: drawingMode ? "block" : "none" }}
         />
-        {drawingMode && (
+        {drawingMode && accountType === AccountType.TRAINER && (
           <div
-            className="absolute"
+            className="absolute hide-in-screenshot"
             style={{
               display: "flex",
-              visibility:
-                accountType === AccountType.TRAINER ? "hidden" : "visible",
               justifyContent: "center",
               gap: "5px",
               flexDirection: "column",
@@ -1390,6 +1388,7 @@ const ClipModeCall = ({
           display: selectedUser ? "none" : "block",
           position: "relative",
         }}
+        id="clip-container"
       >
         <NextImage
           src="/assets/images/netquix_logo_beta.png"

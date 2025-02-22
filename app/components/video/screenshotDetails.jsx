@@ -92,8 +92,7 @@ function ScreenShotDetails({
           >
             <div
               style={{
-                width: "30%",
-                height: "80px",
+                width: "80%",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
