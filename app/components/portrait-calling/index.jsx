@@ -52,7 +52,7 @@ const VideoCallUI = ({
   trainerInfo,
   session_end_time,
   bIndex,
-  isLandscape
+  isLandscape,
 }) => {
   const fromUser =
     accountType === AccountType.TRAINEE ? traineeInfo : trainerInfo;
@@ -129,30 +129,29 @@ const VideoCallUI = ({
   const getMyClips = async () => {
     var res = await myClips({});
     setClips(res?.data);
-
     var res2 = await traineeClips({});
+    let selectedClips = [];
     var arr = res2?.data || [];
-
-    let selectedTraineeClips = [];
-    console.log("traineeInfo._id", traineeInfo._id, id);
     for (let index = 0; index < arr?.length; index++) {
-      console.log("UserId", arr[index]._id._id, traineeInfo._id);
       if (arr[index]._id._id === traineeInfo._id) {
-        let filteredClips = arr[index].clips.filter((clip) => {
-          console.log("clip.clips._id === id", clip._id, id);
-          return clip._id === id;
-        });
+        var el = arr[index]?.clips;
 
-        if (filteredClips.length > 0) {
-          selectedTraineeClips.push({
-            ...arr[index],
-            clips: filteredClips,
-          });
-        }
+        arr[index].clips = arr[index].clips.map((clip) => {
+          // Check if the current clip's _id matches the given id
+          if (clip._id === id) {
+            // Add the extra field 'duringSession' to the clip
+            clip.duringSession = true;
+          }
+          return clip; // Return the modified or unmodified clip
+        });
+        arr[index].clips = [
+          ...new Map(el.map((item) => [item.clips._id, item])).values(),
+        ];
+        selectedClips = [arr[index]];
       }
     }
-    console.log("selectedTraineeClips", selectedTraineeClips);
-    setTraineeClips(selectedTraineeClips);
+    console.log("selectedClips", selectedClips);
+    setTraineeClips(selectedClips);
   };
 
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos, type }) => {
@@ -497,7 +496,11 @@ const VideoCallUI = ({
   return (
     <div
       className="video-call-container"
-      style={{ alignItems: isMaximized ? "normal" : "center",margin:isLandscape?"auto":"none",width:isLandscape?"50%":"100%" }}
+      style={{
+        alignItems: isMaximized ? "normal" : "center",
+        margin: isLandscape ? "auto" : "none",
+        width: isLandscape ? "50%" : "100%",
+      }}
     >
       {displayMsg?.msg ? <div>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
@@ -842,7 +845,10 @@ const VideoCallUI = ({
                                           width: "100%",
                                           border: sld
                                             ? "4px solid green"
+                                            : clp.duringSession
+                                            ? "4px solid red"
                                             : "4px solid rgb(180, 187, 209)",
+
                                           borderRadius: "5px",
                                           objectFit: "cover",
                                           aspectRatio: "1/1",
