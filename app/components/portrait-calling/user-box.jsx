@@ -14,6 +14,7 @@ export const UserBox = ({
   stream,
   isStreamOff,
   selectedUser,
+  isLandscape
 }) => {
   console.log("user", id);
 
@@ -42,6 +43,7 @@ export const UserBox = ({
       }`}
       style={{
         position: "relative",
+        width: isLandscape?"50vw":"95vw"
       }}
       onClick={() => !selected && onClick(id)}
     >

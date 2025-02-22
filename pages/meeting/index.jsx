@@ -48,7 +48,7 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
 
   console.log("meetingDetails", meetingDetails, accountType);
   return (
-    height > width && !isRotatedInitally ?
+    // height > width && !isRotatedInitally ?
     <VideoCallUI
     id={meetingDetails._id}
       accountType={accountType}
@@ -65,25 +65,27 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
         dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
         router.push("/dashboard")
       }}
+      isLandscape={!(height > width && !isRotatedInitally)}
+
     />
-    :
-    <StartMeeting
-      id={meetingDetails._id}
-      accountType={accountType}
-      traineeInfo={meetingDetails.trainee_info}
-      trainerInfo={meetingDetails.trainer_info}
-      session_end_time={meetingDetails.session_end_time}
-      isClose={() => {
-        MeetingSetter({
-          id: null,
-          isOpenModal: false,
-          traineeInfo: null,
-          trainerInfo: null,
-        });
-        dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
-        router.push("/dashboard")
-      }}
-    />
+    // :
+    // <StartMeeting
+    //   id={meetingDetails._id}
+    //   accountType={accountType}
+    //   traineeInfo={meetingDetails.trainee_info}
+    //   trainerInfo={meetingDetails.trainer_info}
+    //   session_end_time={meetingDetails.session_end_time}
+    //   isClose={() => {
+    //     MeetingSetter({
+    //       id: null,
+    //       isOpenModal: false,
+    //       traineeInfo: null,
+    //       trainerInfo: null,
+    //     });
+    //     dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
+    //     router.push("/dashboard")
+    //   }}
+    // />
   );
 };
 

@@ -52,6 +52,7 @@ const VideoCallUI = ({
   trainerInfo,
   session_end_time,
   bIndex,
+  isLandscape
 }) => {
   const fromUser =
     accountType === AccountType.TRAINEE ? traineeInfo : trainerInfo;
@@ -496,7 +497,7 @@ const VideoCallUI = ({
   return (
     <div
       className="video-call-container"
-      style={{ alignItems: isMaximized ? "normal" : "center" }}
+      style={{ alignItems: isMaximized ? "normal" : "center",margin:isLandscape?"auto":"none",width:isLandscape?"50%":"100%" }}
     >
       {displayMsg?.msg ? <div>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
@@ -517,6 +518,7 @@ const VideoCallUI = ({
           isLocalStreamOff={isLocalStreamOff}
           takeScreenshot={takeScreenshot}
           setIsLock={setIsLockMode}
+          isLandscape={isLandscape}
         />
       ) : (
         <OneOnOneCall
@@ -533,6 +535,7 @@ const VideoCallUI = ({
           setIsLocalStreamOff={setIsLocalStreamOff}
           isRemoteStreamOff={isRemoteStreamOff}
           setIsRemoteStreamOff={setIsRemoteStreamOff}
+          isLandscape={isLandscape}
         />
       )}
       {!isMaximized && (

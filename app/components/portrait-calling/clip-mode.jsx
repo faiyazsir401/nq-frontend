@@ -92,6 +92,7 @@ const VideoContainer = ({
   stopDrawing,
   sendDrawEvent,
   undoDrawing,
+  isLandscape
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -375,7 +376,7 @@ const VideoContainer = ({
             : isLock
             ? "40dvh"
             : "37dvh", // If isMaximized is false and isSingle is false
-          width: "100vw",
+          width: isLandscape?"50vw":"100vw",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -528,6 +529,7 @@ const ClipModeCall = ({
   isRemoteStreamOff,
   isLocalStreamOff,
   takeScreenshot,
+  isLandscape
 }) => {
   const socket = useContext(SocketContext);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -1330,6 +1332,7 @@ const ClipModeCall = ({
       <div
         style={{
           display: selectedUser ? "block" : "none",
+          position:"relative"
         }}
       >
         <UserBox
@@ -1342,6 +1345,7 @@ const ClipModeCall = ({
           user={toUser}
           stream={remoteStream}
           isStreamOff={isRemoteStreamOff}
+          isLandscape={isLandscape}
         />
 
         <UserBox
@@ -1354,6 +1358,7 @@ const ClipModeCall = ({
           user={fromUser}
           stream={localStream}
           isStreamOff={isLocalStreamOff}
+          isLandscape={isLandscape}
         />
         {selectedUser === toUser._id ? (
           <UserBoxMini
@@ -1441,6 +1446,7 @@ const ClipModeCall = ({
               selectedShape={selectedShape}
               sendDrawEvent={sendDrawEvent}
               undoDrawing={undoDrawing}
+              isLandscape={isLandscape}
             />
             <VideoContainer
               drawingMode={drawingMode}
@@ -1467,6 +1473,7 @@ const ClipModeCall = ({
               selectedShape={selectedShape}
               sendDrawEvent={sendDrawEvent}
               undoDrawing={undoDrawing}
+              isLandscape={isLandscape}
             />
 
             {isLock && (
@@ -1509,6 +1516,7 @@ const ClipModeCall = ({
             selectedShape={selectedShape}
             sendDrawEvent={sendDrawEvent}
             undoDrawing={undoDrawing}
+            isLandscape={isLandscape}
           />
         )}
         {!isMaximized && (

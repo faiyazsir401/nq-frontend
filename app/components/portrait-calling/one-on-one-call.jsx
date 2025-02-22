@@ -20,19 +20,18 @@ const OneOnOneCall = ({
   isLocalStreamOff,
   setIsLocalStreamOff,
   isRemoteStreamOff,
+  isLandscape,
 }) => {
-
   const socket = useContext(SocketContext);
   const { accountType } = useAppSelector(authState);
   console.log("selectedUser", selectedUser);
   console.log("toUser", toUser._id);
   console.log("fromUser", fromUser._id);
 
-
   const handleUserClick = (id) => {
-    if(accountType === AccountType.TRAINER){
+    if (accountType === AccountType.TRAINER) {
       setSelectedUser(id);
-      emitVideoSelectEvent("swap",id)
+      emitVideoSelectEvent("swap", id);
     }
   };
 
@@ -67,6 +66,7 @@ const OneOnOneCall = ({
           user={fromUser}
           stream={localStream}
           isStreamOff={isLocalStreamOff}
+          isLandscape={isLandscape}
         />
         <UserBox
           id={fromUser._id}
@@ -78,21 +78,23 @@ const OneOnOneCall = ({
           user={toUser}
           stream={remoteStream}
           isStreamOff={isRemoteStreamOff}
+          isLandscape={isLandscape}
         />
+
+        {selectedUser && (
+          <UserBoxMini
+            id={selectedUser === toUser._id ? fromUser._id : toUser._id}
+            onClick={handleUserClick}
+            selected={false}
+            videoRef={selectedUser === toUser._id ? remoteVideoRef : videoRef}
+            stream={selectedUser === toUser._id ? remoteStream : localStream}
+            user={selectedUser === toUser._id ? toUser : fromUser}
+            isStreamOff={
+              selectedUser === toUser._id ? isRemoteStreamOff : isLocalStreamOff
+            }
+          />
+        )}
       </div>
-      {selectedUser && (
-        <UserBoxMini
-          id={selectedUser === toUser._id ? fromUser._id : toUser._id}
-          onClick={handleUserClick}
-          selected={false}
-          videoRef={selectedUser === toUser._id ? remoteVideoRef : videoRef}
-          stream={selectedUser === toUser._id ? remoteStream : localStream}
-          user={selectedUser === toUser._id ? toUser : fromUser}
-          isStreamOff={
-            selectedUser === toUser._id ? isRemoteStreamOff : isLocalStreamOff
-          }
-        />
-      )}
     </>
   );
 };

@@ -17,6 +17,7 @@
 
 .video-section {
   display: flex;
+  position: relative;
   flex-direction: column;
   gap: 20px;
   align-items: center;
@@ -33,7 +34,7 @@
   padding: 20px;
   height: 40dvh;
   /* margin: 10px 0px; */
-  width: 95vw;
+
   border-radius: 20px;
   border: 2px solid white;
 }
