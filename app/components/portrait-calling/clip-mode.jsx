@@ -1325,7 +1325,7 @@ const ClipModeCall = ({
           </div>
         )}
 
-        {!drawingMode && <TimeRemaining timeRemaining={timeRemaining} />}
+        {drawingMode && accountType === AccountType.TRAINER ?<></>: <TimeRemaining timeRemaining={timeRemaining} />}
       </div>
       <div
         style={{
