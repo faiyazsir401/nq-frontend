@@ -215,6 +215,7 @@ const VideoCallUI = ({
       type: "png",
       allowTaint: true,
       useCORS: true,
+      scale: window.devicePixelRatio
     }).then(async (canvas) => {
       // Restore visibility after the screenshot is taken
       elementsToHide.forEach((el) => (el.style.visibility = "visible"));
@@ -628,32 +629,52 @@ const VideoCallUI = ({
                 </div>
               </div>
               <div className="theme-tab">
-                <Nav tabs className="justify-content-around">
-                  <NavItem className="mb-2" style={{ width: "100%" }}>
+                <Nav tabs className="" style={{
+                  justifyContent:'center',
+                  flexWrap:"nowrap",
+                  gap:"5px",
+                }}>
+                  <NavItem className="mb-2" style={{
+                    width:"100%"
+                  }}>
                     <NavLink
                       className={`button-effect ${
                         videoActiveTab === "media" ? "active" : ""
                       } select-clip-width`}
+                      style={{
+                        minWidth:"auto",
+                      }}
                       onClick={() => setAideoActiveTab("media")}
                     >
                       My Videos
                     </NavLink>
                   </NavItem>
-                  <NavItem className="mb-2" style={{ width: "100%" }}>
+                  <NavItem className="mb-2" style={{
+                    width:"100%"
+                  }}>
                     <NavLink
                       className={`button-effect ${
                         videoActiveTab === "trainee" ? "active" : ""
-                      } select-clip-width`}
+                      } select-clip-width` }
+
+                      style={{
+                        minWidth:"auto",
+                      }}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
                       Trainee
                     </NavLink>
                   </NavItem>
-                  <NavItem className="mb-2" style={{ width: "100%" }}>
+                  <NavItem className="mb-2" style={{
+                    width:"100%"
+                  }}>
                     <NavLink
                       className={`button-effect ${
                         videoActiveTab === "docs" ? "active" : ""
                       } select-clip-width`}
+                      style={{
+                        minWidth:"auto",
+                      }}
                       onClick={() => setAideoActiveTab("docs")}
                     >
                       NetQwix

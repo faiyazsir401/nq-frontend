@@ -92,7 +92,7 @@ const VideoContainer = ({
   stopDrawing,
   sendDrawEvent,
   undoDrawing,
-  isLandscape
+  isLandscape,
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -358,6 +358,18 @@ const VideoContainer = ({
     }
   };
 
+  const [aspectRatio, setAspectRatio] = useState("16 / 9");
+
+useEffect(() => {
+  if (videoRef.current) {
+    const video = videoRef.current;
+    video.onloadedmetadata = () => {
+      const ratio = video.videoWidth / video.videoHeight;
+      setAspectRatio(`${video.videoWidth} / ${video.videoHeight}`);
+    };
+  }
+}, [videoRef]);
+  console.log("videoRef",aspectRatio)
   return (
     <>
       <div
@@ -376,7 +388,7 @@ const VideoContainer = ({
             : isLock
             ? "40dvh"
             : "37dvh", // If isMaximized is false and isSingle is false
-          width: isLandscape?"50vw":"100vw",
+          width: isLandscape ? "50vw" : "100vw",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -443,18 +455,20 @@ const VideoContainer = ({
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+               overflow: "hidden"
             }}
           >
             <video
-              controls={false} // Hide built-in controls
+              controls={false}
               ref={videoRef}
               playsInline
               webkit-playsinline="true"
               style={{
                 touchAction: "manipulation",
-                width: "fit-content",
+                width: "100%", // Ensure it fills the parent container
                 height: "100%",
-                aspectRatio: "auto",
+                aspectRatio: aspectRatio, // Force a correct aspect ratio
+                objectFit: "contain", // Prevent stretching
               }}
               id={clip?.id}
               muted={true}
@@ -529,7 +543,7 @@ const ClipModeCall = ({
   isRemoteStreamOff,
   isLocalStreamOff,
   takeScreenshot,
-  isLandscape
+  isLandscape,
 }) => {
   const socket = useContext(SocketContext);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -1204,9 +1218,9 @@ const ClipModeCall = ({
       <div
         className={`d-flex  pl-1 pr-1 ${
           accountType === AccountType.TRAINER && !selectedUser
-            ? "mt-2 justify-content-between"
-            : "m-2 justify-content-end"
-        } w-100`}
+            ? "mt-1 mb-1 justify-content-between"
+            : "mt-2 mb-2  justify-content-end"
+        } ${isMaximized?"":"w-100"}`}
       >
         {accountType === AccountType.TRAINER && !selectedUser && (
           <div className="d-flex">
@@ -1327,12 +1341,16 @@ const ClipModeCall = ({
           </div>
         )}
 
-        {drawingMode && accountType === AccountType.TRAINER ?<></>: <TimeRemaining timeRemaining={timeRemaining} />}
+        {drawingMode && accountType === AccountType.TRAINER ? (
+          <></>
+        ) : (
+          <TimeRemaining timeRemaining={timeRemaining} />
+        )}
       </div>
       <div
         style={{
           display: selectedUser ? "block" : "none",
-          position:"relative"
+          position: "relative",
         }}
       >
         <UserBox
@@ -1406,6 +1424,7 @@ const ClipModeCall = ({
             top: 0,
             left: 5,
           }}
+          unoptimized={true}
         />
         <h4
           style={{
