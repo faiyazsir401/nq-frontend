@@ -465,7 +465,8 @@ useEffect(() => {
               webkit-playsinline="true"
               style={{
                 touchAction: "manipulation",
-                width: "100%", // Ensure it fills the parent container
+                maxWidth: "100%",
+                 width:"auto",
                 height: "100%",
                 aspectRatio: aspectRatio, // Force a correct aspect ratio
                 objectFit: "contain", // Prevent stretching
