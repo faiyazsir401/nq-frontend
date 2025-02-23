@@ -669,7 +669,7 @@ const VideoCallUI = ({
                   <TabPane tabId="media">
                     <div
                       className="media-gallery portfolio-section grid-portfolio"
-                      style={{ overflowY: "auto", height: "55dvh" }}
+                      style={{ overflowY: "auto", height: "40dvh" }}
                     >
                       {clips?.length ? (
                         clips?.map((cl, ind) => (
@@ -783,7 +783,7 @@ const VideoCallUI = ({
                   <TabPane tabId="trainee">
                     <div
                       className="media-gallery portfolio-section grid-portfolio"
-                      style={{ overflowY: "auto", height: "55dvh" }}
+                      style={{ overflowY: "auto", height: "40dvh" }}
                     >
                       {traineeClip?.length ? (
                         traineeClip?.map((cl, ind) => (
@@ -903,7 +903,7 @@ const VideoCallUI = ({
                   <TabPane tabId="docs">
                     <div
                       className="media-gallery portfolio-section grid-portfolio"
-                      style={{ overflowY: "auto", height: "55dvh" }}
+                      style={{ overflowY: "auto", height: "40dvh" }}
                     >
                       <div className={`collapse-block open`}>
                         <div className={`block-content `}>
