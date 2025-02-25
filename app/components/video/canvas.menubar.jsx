@@ -158,14 +158,16 @@ export const CanvasMenuBar = ({
               )}
             >
               <div
-                className="icon-btn m-5  button-effect btn-sm"
+                className="icon-btn  button-effect btn-sm"
                 onClick={() => {
                   setDisplayColorPicker(true);
                 }}
                 style={{
                   height:"24px",
                   width:"24px",
-                  padding:"5px"
+                  padding:"5px",
+                  margin:"5px",
+                  marginLeft:"2px",
                 }}
               >
                 <Image
@@ -182,7 +184,7 @@ export const CanvasMenuBar = ({
           
             {/* : null} */}
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 SHAPES.FREE_HAND === activeTab
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -190,7 +192,10 @@ export const CanvasMenuBar = ({
               style={{
                 height:"24px",
                 width:"24px",
-                padding:"5px"
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.FREE_HAND)
@@ -202,7 +207,7 @@ export const CanvasMenuBar = ({
           {/* line */}
         
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.LINE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -210,7 +215,10 @@ export const CanvasMenuBar = ({
               style={{
                 height:"24px",
                 width:"24px",
-                padding:"5px"
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.LINE)
@@ -223,7 +231,7 @@ export const CanvasMenuBar = ({
           {/* circle */}
       
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.CIRCLE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -231,7 +239,10 @@ export const CanvasMenuBar = ({
               style={{
                 height:"24px",
                 width:"24px",
-                padding:"5px"
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.CIRCLE)
@@ -243,7 +254,7 @@ export const CanvasMenuBar = ({
           {/* square */}
          
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.SQUARE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -251,7 +262,10 @@ export const CanvasMenuBar = ({
               style={{
                 height:"24px",
                 width:"24px",
-                padding:"5px"
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.SQUARE)
@@ -264,9 +278,11 @@ export const CanvasMenuBar = ({
              style={{
               height:"24px",
               width:"24px",
-              padding:"5px"
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
             }}
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.ARROW_RIGHT
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -283,7 +299,7 @@ export const CanvasMenuBar = ({
           {/* rectangle */}
               
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.RECTANGLE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -294,7 +310,10 @@ export const CanvasMenuBar = ({
               style={{
                 height:"24px",
                 width:"24px",
-                padding:"5px"
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
             >
               <Image
@@ -311,9 +330,11 @@ export const CanvasMenuBar = ({
              style={{
               height:"24px",
               width:"24px",
-              padding:"5px"
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
             }}
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.OVAL
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -332,9 +353,11 @@ export const CanvasMenuBar = ({
              style={{
               height:"24px",
               width:"24px",
-              padding:"5px"
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
             }}
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.TRIANGLE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -361,9 +384,11 @@ export const CanvasMenuBar = ({
              style={{
               height:"24px",
               width:"24px",
-              padding:"5px"
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
             }}
-              className={`icon-btn m-5  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.TWO_SIDE_ARROW
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -379,12 +404,15 @@ export const CanvasMenuBar = ({
          { undoDrawing &&
          
             <div
-              className={`icon-btn m-5  button-effect btn-sm my-3`}
+              className={`icon-btn  button-effect btn-sm`}
               onClick={undoDrawing}
               style={{
                 height:"24px",
                 width:"24px",
-                padding:"5px"
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
             >
               <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"none"}}/>
@@ -392,12 +420,15 @@ export const CanvasMenuBar = ({
          }
         
             <div
-              className={`icon-btn m-5  button-effect btn-sm my-3`}
+              className={`icon-btn  button-effect btn-sm`}
               onClick={refreshDrawing}
               style={{
                 height:"24px",
                 width:"24px",
-                padding:"5px"
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
             >
               <RefreshCw />
@@ -405,7 +436,7 @@ export const CanvasMenuBar = ({
       
           {/* <span>
             <div
-              className={`icon-btn m-5  button-effect btn-sm my-3`}
+              className={`icon-btn  button-effect btn-sm`}
               onClick={() => { setIsOpen(true) }}
             >
               <i className="fa fa-film" />
