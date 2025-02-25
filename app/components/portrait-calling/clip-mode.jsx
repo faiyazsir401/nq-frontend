@@ -468,7 +468,7 @@ useEffect(() => {
                 touchAction: "manipulation",
                 maxWidth: "100%",
                  width:"auto",
-                height: `${100*(scale*window.devicePixelRatio)}%`,
+                height: `${100*scale}%`,
                 // maxHeight:"100%",
                 aspectRatio: aspectRatio, // Force a correct aspect ratio
                 objectFit: "contain", // Prevent stretching
