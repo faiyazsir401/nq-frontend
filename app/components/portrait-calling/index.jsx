@@ -91,6 +91,7 @@ const VideoCallUI = ({
   const [traineeClip, setTraineeClips] = useState([]);
   const [isScreenShotModelOpen, setIsScreenShotModelOpen] = useState(false);
   const [screenShots, setScreenShots] = useState([]);
+  const [currentScreenShot,setCurrentScreenshot] = useState("")
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
   const [isCallEnded, setIsCallEnded] = useState(false);
   const [screenStream, setScreenStream] = useState(null);
@@ -195,64 +196,89 @@ const VideoCallUI = ({
       trainee: toUser?._id,
     });
     setScreenShots(result?.data?.reportData);
+    setCurrentScreenshot(result?.data?.reportData[result?.data?.reportData?.length - 1]?.imageUrl)
   }
+  const [isLoading, setIsLoading] = useState(false)
 
-  const takeScreenshot = () => {
-    setIsScreenShotModelOpen(false);
-    let targetElement = document.getElementById("clip-container");
-    if (!targetElement) {
-      targetElement = document.body;
-    }
+  const takeScreenshot = async () => {
 
-    // Select only elements with the class "hide-in-screenshot"
-    const elementsToHide = Array.from(
-      targetElement.getElementsByClassName("hide-in-screenshot")
-    );
+    try {
+      setIsLoading(true)
+      setCurrentScreenshot("")
+      setIsScreenShotModelOpen(false);
 
-    // Hide selected elements
-    elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
-    html2canvas(targetElement, {
-      type: "png",
-      allowTaint: true,
-      useCORS: true,
-      scale: window.devicePixelRatio
-    }).then(async (canvas) => {
-      // Restore visibility after the screenshot is taken
-      elementsToHide.forEach((el) => (el.style.visibility = "visible"));
-      const dataUrl = canvas.toDataURL("image/png");
-      console.log("dataUrl", dataUrl);
-
-      var res = await screenShotTake({
-        sessions: id,
-        trainer: fromUser?._id,
-        trainee: toUser?._id,
+      // Ensure video posters are shown before taking the screenshot
+      const videos = document.querySelectorAll("video");
+      videos.forEach(video => {
+        // Ensure each video is briefly played to trigger poster image rendering
+        if (!video.paused) return;  // Skip if video is already playing
+        video.play();
+        video.pause();
       });
 
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-
-      // Handling Error if SS is not generate image
-
-      if (!blob) {
-        return toast.error("Unable to take Screen Shot");
-      }
-      console.log("res?.data?.url", res?.data?.url);
-      if (res?.data?.url) {
-        setIsScreenShotModelOpen(true);
-        pushProfilePhotoToS3(
-          res?.data?.url,
-          blob,
-          null,
-          afterSucessUploadImageOnS3
-        );
-      }
-
       setTimeout(() => {
-        toast.success("The screenshot taken successfully.", {
-          type: "success",
+
+
+        let targetElement = document.getElementById("clip-container");
+        if (!targetElement) {
+          targetElement = document.body;
+        }
+
+        // Select only elements with the class "hide-in-screenshot"
+        const elementsToHide = Array.from(
+          targetElement.getElementsByClassName("hide-in-screenshot")
+        );
+
+        // Hide selected elements
+        elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
+        html2canvas(targetElement, {
+          type: "png",
+          allowTaint: true,
+          useCORS: true,
+          scale: window.devicePixelRatio
+        }).then(async (canvas) => {
+          // Restore visibility after the screenshot is taken
+          elementsToHide.forEach((el) => (el.style.visibility = "visible"));
+          const dataUrl = canvas.toDataURL("image/png");
+          console.log("dataUrl", dataUrl);
+
+          var res = await screenShotTake({
+            sessions: id,
+            trainer: fromUser?._id,
+            trainee: toUser?._id,
+          });
+
+          const response = await fetch(dataUrl);
+          const blob = await response.blob();
+
+          // Handling Error if SS is not generate image
+
+          if (!blob) {
+            return toast.error("Unable to take Screen Shot");
+          }
+          console.log("res?.data?.url", res?.data?.url);
+          if (res?.data?.url) {
+            setIsScreenShotModelOpen(true);
+            await pushProfilePhotoToS3(
+              res?.data?.url,
+              blob,
+              null,
+              afterSucessUploadImageOnS3
+            );
+            toast.success("The screenshot taken successfully.", {
+              type: "success",
+            });
+          }
         });
-      }, 2000);
-    });
+      }, 1000)
+
+
+    } catch (error) {
+      console.log("error: Take Screenshot: ", error)
+    } finally {
+      setIsLoading(false)
+    }
+
   };
 
   console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
@@ -630,19 +656,18 @@ const VideoCallUI = ({
               </div>
               <div className="theme-tab">
                 <Nav tabs className="" style={{
-                  justifyContent:'center',
-                  flexWrap:"nowrap",
-                  gap:"5px",
+                  justifyContent: 'center',
+                  flexWrap: "nowrap",
+                  gap: "5px",
                 }}>
                   <NavItem className="mb-2" style={{
-                    width:"100%"
+                    width: "100%"
                   }}>
                     <NavLink
-                      className={`button-effect ${
-                        videoActiveTab === "media" ? "active" : ""
-                      } select-clip-width`}
+                      className={`button-effect ${videoActiveTab === "media" ? "active" : ""
+                        } select-clip-width`}
                       style={{
-                        minWidth:"auto",
+                        minWidth: "auto",
                       }}
                       onClick={() => setAideoActiveTab("media")}
                     >
@@ -650,15 +675,14 @@ const VideoCallUI = ({
                     </NavLink>
                   </NavItem>
                   <NavItem className="mb-2" style={{
-                    width:"100%"
+                    width: "100%"
                   }}>
                     <NavLink
-                      className={`button-effect ${
-                        videoActiveTab === "trainee" ? "active" : ""
-                      } select-clip-width` }
+                      className={`button-effect ${videoActiveTab === "trainee" ? "active" : ""
+                        } select-clip-width`}
 
                       style={{
-                        minWidth:"auto",
+                        minWidth: "auto",
                       }}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
@@ -666,14 +690,13 @@ const VideoCallUI = ({
                     </NavLink>
                   </NavItem>
                   <NavItem className="mb-2" style={{
-                    width:"100%"
+                    width: "100%"
                   }}>
                     <NavLink
-                      className={`button-effect ${
-                        videoActiveTab === "docs" ? "active" : ""
-                      } select-clip-width`}
+                      className={`button-effect ${videoActiveTab === "docs" ? "active" : ""
+                        } select-clip-width`}
                       style={{
-                        minWidth:"auto",
+                        minWidth: "auto",
                       }}
                       onClick={() => setAideoActiveTab("docs")}
                     >
@@ -867,8 +890,8 @@ const VideoCallUI = ({
                                           border: sld
                                             ? "4px solid green"
                                             : clp.duringSession
-                                            ? "4px solid red"
-                                            : "4px solid rgb(180, 187, 209)",
+                                              ? "4px solid red"
+                                              : "4px solid rgb(180, 187, 209)",
 
                                           borderRadius: "5px",
                                           objectFit: "cover",
@@ -1027,6 +1050,7 @@ const VideoCallUI = ({
         <ScreenShotDetails
           screenShotImages={screenShots}
           setScreenShotImages={setScreenShots}
+          currentScreenShot={currentScreenShot}
           setIsOpenDetail={setIsScreenShotModelOpen}
           isOpenDetail={isScreenShotModelOpen}
           currentReportData={{
@@ -1034,6 +1058,7 @@ const VideoCallUI = ({
             trainer: fromUser?._id,
             trainee: toUser?._id,
           }}
+          isLoading={isLoading}
           reportObj={reportObj}
         />
       )}
