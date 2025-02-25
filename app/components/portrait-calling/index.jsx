@@ -235,6 +235,7 @@ const VideoCallUI = ({
           type: "png",
           allowTaint: true,
           useCORS: true,
+          scale: window.devicePixelRatio
         }).then(async (canvas) => {
           // Restore visibility after the screenshot is taken
           elementsToHide.forEach((el) => (el.style.visibility = "visible"));
