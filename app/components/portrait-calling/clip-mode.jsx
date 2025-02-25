@@ -370,6 +370,7 @@ useEffect(() => {
   }
 }, [videoRef]);
   console.log("videoRef",aspectRatio)
+
   return (
     <>
       <div
@@ -467,7 +468,7 @@ useEffect(() => {
                 touchAction: "manipulation",
                 maxWidth: "100%",
                  width:"auto",
-                height: `${100*scale}%`,
+                height: `${100*(scale*window.devicePixelRatio)}%`,
                 // maxHeight:"100%",
                 aspectRatio: aspectRatio, // Force a correct aspect ratio
                 objectFit: "contain", // Prevent stretching
