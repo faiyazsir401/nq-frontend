@@ -259,6 +259,24 @@ export const CanvasMenuBar = ({
             >
               <i className="fa fa-square-o" />
             </div>
+
+            <div
+             style={{
+              height:"24px",
+              width:"24px",
+              padding:"5px"
+            }}
+              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+                activeTab === SHAPES.ARROW_RIGHT
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+              }`}
+              onClick={() => {
+                menuSelector(SHAPES.ARROW_RIGHT)
+              }}
+            >
+              <i className="fa fa-long-arrow-right" />
+            </div>
           
           {!isMobileScreen &&
           <>
@@ -336,23 +354,7 @@ export const CanvasMenuBar = ({
           {/* arrows */}
           
     
-            <div
-             style={{
-              height:"24px",
-              width:"24px",
-              padding:"5px"
-            }}
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
-                activeTab === SHAPES.ARROW_RIGHT
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              onClick={() => {
-                menuSelector(SHAPES.ARROW_RIGHT)
-              }}
-            >
-              <i className="fa fa-long-arrow-right" />
-            </div>
+            
        
        
             <div

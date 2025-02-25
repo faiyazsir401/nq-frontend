@@ -70,7 +70,6 @@ const CustomVideoControls = ({
         justifyContent: "center",
         gap: "5px",
         width: "100%",
-        visibility:accountType === AccountType.TRAINEE?"hidden":"visible"
       }}
       className="hide-in-screenshot"
     >
@@ -103,6 +102,7 @@ const CustomVideoControls = ({
                 fontSize: "16px",
                 cursor: "pointer",
               }}
+              disabled={accountType === AccountType.TRAINEE}
             >
               {isPlaying ? <FaPause /> : <FaPlay />}
             </button>
@@ -140,6 +140,7 @@ const CustomVideoControls = ({
               type="range"
               min="0"
               step="0.01"
+              disabled={accountType === AccountType.TRAINEE}
               value={videoRef.current?.currentTime || 0}
               max={videoRef.current?.duration || 100}
               onChange={handleSeek}

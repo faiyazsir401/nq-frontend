@@ -807,7 +807,7 @@ const VideoCallUI = ({
                         </>
                       )}
                     </div>
-                    {clips.length && (
+                    {clips && clips.length !==0 && (
                       <div className="d-flex justify-content-around w-100 p-3">
                         <Button
                           color="success"
@@ -927,7 +927,7 @@ const VideoCallUI = ({
                       )}
                     </div>
 
-                    {traineeClip.length && (
+                    {traineeClip && traineeClip.length !==0 && (
                       <div className="d-flex justify-content-around w-100 p-3">
                         <Button
                           color="success"
@@ -1003,7 +1003,7 @@ const VideoCallUI = ({
                       </div>
                     </div>
 
-                    {netquixVideos.length && (
+                    {netquixVideos && netquixVideos?.length !== 0 && (
                       <div className="d-flex justify-content-around w-100 p-3">
                         <Button
                           color="success"

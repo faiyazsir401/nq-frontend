@@ -384,7 +384,7 @@ useEffect(() => {
             : isMaximized
             ? isLock
               ? "44.5dvh"
-              : "42dvh" // If isMaximized is true and isSingle is false
+              : "43dvh" // If isMaximized is true and isSingle is false
             : isLock
             ? "40dvh"
             : "37dvh", // If isMaximized is false and isSingle is false
@@ -1437,7 +1437,7 @@ const ClipModeCall = ({
             color: "white",
           }}
         >
-          &copy; Netqwix.com
+          &copy; NetQwix.com
         </h4>
         {selectedClips.length > 1 ? (
           <>
