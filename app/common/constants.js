@@ -1022,3 +1022,17 @@ export const TimeZone = [
 
 export const MINIMUM_RATE = 10;
 export const MAXIMUM_RATE = 999;
+
+
+export const CANVAS_CONFIG = {
+  sender: {
+    strokeStyle: "red",
+    lineWidth: 3,
+    lineCap: "round",
+  },
+  receiver: {
+    strokeStyle: "green",
+    lineWidth: 3,
+    lineCap: "round",
+  },
+};

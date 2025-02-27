@@ -30,7 +30,6 @@ const Timer = (session_end_time) => {
         const paddedMinutes = pad(minutes);
         const paddedSeconds = pad(seconds);
 
-        console.log("hours", hours)
 
         let formattedTimeDifference = `${isBeforeEndTime ? "" : "-"}${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
         if (hours === 0) {
@@ -38,7 +37,6 @@ const Timer = (session_end_time) => {
         }
 
 
-        console.log("formattedTimeDifference", formattedTimeDifference)
         setTimeDifference(formattedTimeDifference);
         // setIsOverTime(!isBeforeEndTime); // Uncomment if you need to set an over-time flag
       };

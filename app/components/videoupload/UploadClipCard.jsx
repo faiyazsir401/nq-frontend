@@ -271,8 +271,9 @@ const UploadClipCard = (props) => {
       } else {
         generateThumbnailMacAndiOS()
       }
-      setLoading(false)
+      
     }, 3000);
+    setLoading(false)
   }
 
 
@@ -363,45 +364,6 @@ const UploadClipCard = (props) => {
         if (file) {
           setVideo(file);
         }
-
-
-        // const formData = new FormData();
-        // formData.append('video', file);
-  
-        // try {
-        //   // const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/common/generate-thumbnail`, {
-        //   const response = await fetch(`https://6d3e-59-99-53-84.ngrok-free.app/common/generate-thumbnail`, {
-        //     method: 'POST',
-        //     headers: {
-        //       // "Content-Type": "application/json",
-        //       // "Access-Control-Allow-Origin": "*",
-        //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-        //     },
-        //     body: formData,
-        //     // credentials: 'include' 
-        //   });
-        //   // const response = await generateThumbnailURL(formData);
-
-        //   if (!response.ok) {
-        //     throw new Error('Failed to generate thumbnail');
-        //   }
-  
-        //   const blob = await response.blob();
-        //   const thumbnailUrl = URL.createObjectURL(blob);
-  
-        //   setThumbnail({
-        //     thumbnailFile: blob,
-        //     dataUrl: thumbnailUrl,
-        //     fileType: blob.type
-        //   });
-  
-        //   // console.log("=============>", {thumbnailUrl,blob })
-        //   setThumbnail(thumbnailUrl);
-        // } catch (error) {
-        //   console.error('Error generating thumbnail:', error);
-        //   alert('Error generating thumbnail');
-        // } finally {
-        // }
 
         setLoading(false)
 
@@ -615,7 +577,7 @@ const UploadClipCard = (props) => {
           {
             shareWith === shareWithConstants.newUsers && 
             <div className="d-flex flex-column align-items-center">
-            <EmailsPopup props={{buttonLabel:"Add New Users" , setSelectedEmails}}/>
+            <EmailsPopup props={{buttonLabel:"Add New User" , setSelectedEmails}}/>
             <div>Total Emails Selected {selectedEmails.length}</div>
             </div>
           }
@@ -631,7 +593,7 @@ const UploadClipCard = (props) => {
             id="fileUpload"
             onChange={handleFileChange}
             style={{ width: "67%" }}
-            accept="video/*,video/mp4,video/webm,"
+            accept="video/*,video/mp4,video/webm,video/quicktime"
           />
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
 import { authState } from "../auth/auth.slice";
 import { BookedSession, bookingButton } from "../../common/constants";
 import { getScheduledMeetingDetails } from "../common/common.api";
+import { navigateToMeeting } from "../../../utils/utils";
 
 const initialModelValue = {
   title: "",
@@ -113,7 +114,8 @@ const NotificationPopup = () => {
                 };
 
                 tempObj.cta.call = () => {
-                  dispatch(bookingsAction.setStartMeeting(MeetingPayload));
+                  console.log("newBooking",newBooking)
+                  navigateToMeeting(newBooking?._id)
                       sendNotifications({
                       title: notificiationTitles.sessionStrated,
                       description: `Trainer has Confirmed and started the session. Join the session via the upcoming sessions tab in My Locker.`,
@@ -160,7 +162,8 @@ const NotificationPopup = () => {
       };
 
       tempObj.cta.call = () => {
-        dispatch(bookingsAction.setStartMeeting(MeetingPayload));
+        console.log("notification?.bookingInfo",notification?.bookingInfo)
+        navigateToMeeting(notification?.bookingInfo?._id)
         toggle();
       };
     }

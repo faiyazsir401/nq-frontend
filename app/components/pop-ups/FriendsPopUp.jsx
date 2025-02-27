@@ -127,8 +127,8 @@ const FriendsPopup = ({ props }) => {
           </div>
         </ModalBody>
         <ModalFooter className="d-flex">
-          <Button className="m-auto" color="danger" onClick={toggle}>
-            Close
+          <Button className="m-auto" color="white" onClick={toggle} style={{backgroundColor:'rgb(83 233 89)'}}>
+            Select
           </Button>
         </ModalFooter>
       </Modal>

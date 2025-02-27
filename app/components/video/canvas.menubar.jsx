@@ -44,6 +44,7 @@ export const CanvasMenuBar = ({
   clipSelectNote,
   setCountClipNoteOpen,
   resetInitialPinnedUser,
+  isFromPotrait
 }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
@@ -118,18 +119,15 @@ export const CanvasMenuBar = ({
   }
   console.log("isMobileScreen",isMobileScreen)
   return (
-    <div style={{ margin: "1rem", display: "flex", justifyContent: "center" }}>
+    <div style={{ margin: isFromPotrait?"0.5rem":"1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
         // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{height: !isMobileScreen ?(isIOS? "54vh" : "70vh"):"auto",overflow: 'auto'}}>
-          <span></span>
+        <div className="CreationBarCustomizable" style={{overflow: 'auto',display:isFromPotrait?"flex":"block"}}>
+         
           {/* free hand */}
-          <span>
-            {/* {displayColorPicker ?
-             */}
-            <Popover
+          <Popover
               className="color-picker-popover"
               isOpen={displayColorPicker}
               positions={["left", "right"]} // if you'd like, you can limit the positions
@@ -160,14 +158,16 @@ export const CanvasMenuBar = ({
               )}
             >
               <div
-                className="icon-btn m-5  button-effect btn-sm"
+                className="icon-btn  button-effect btn-sm"
                 onClick={() => {
                   setDisplayColorPicker(true);
                 }}
                 style={{
-                  height:isMobileScreen?"24px":"none",
-                  width:isMobileScreen?"24px":"none",
-                  padding:isMobileScreen?"5px":"auto"
+                  height:"24px",
+                  width:"24px",
+                  padding:"5px",
+                  margin:"5px",
+                  marginLeft:"2px",
                 }}
               >
                 <Image
@@ -178,17 +178,24 @@ export const CanvasMenuBar = ({
                 />
               </div>
             </Popover>
+         
+            {/* {displayColorPicker ?
+             */}
+          
             {/* : null} */}
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 SHAPES.FREE_HAND === activeTab
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"none",
-                width:isMobileScreen?"24px":"none",
-                padding:isMobileScreen?"5px":"auto"
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.FREE_HAND)
@@ -196,19 +203,22 @@ export const CanvasMenuBar = ({
             >
               <Edit2 />
             </div>
-          </span>
+        
           {/* line */}
-          <span>
+        
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.LINE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"none",
-                width:isMobileScreen?"24px":"none",
-                padding:isMobileScreen?"5px":"auto"
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.LINE)
@@ -217,19 +227,22 @@ export const CanvasMenuBar = ({
             >
               <Image src="/icons/line.png" width={20} height={20} alt="line" />
             </div>
-          </span>
+          
           {/* circle */}
-          <span>
+      
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.CIRCLE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"none",
-                width:isMobileScreen?"24px":"none",
-                padding:isMobileScreen?"5px":"auto"
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.CIRCLE)
@@ -237,19 +250,22 @@ export const CanvasMenuBar = ({
             >
               <i className="fa fa-circle-thin" />
             </div>
-          </span>
+    
           {/* square */}
-          <span>
+         
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.SQUARE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
               style={{
-                height:isMobileScreen?"24px":"none",
-                width:isMobileScreen?"24px":"none",
-                padding:isMobileScreen?"5px":"auto"
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
               onClick={() => {
                 menuSelector(SHAPES.SQUARE)
@@ -257,19 +273,47 @@ export const CanvasMenuBar = ({
             >
               <i className="fa fa-square-o" />
             </div>
-          </span>
+
+            <div
+             style={{
+              height:"24px",
+              width:"24px",
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
+            }}
+              className={`icon-btn  button-effect btn-sm ${
+                activeTab === SHAPES.ARROW_RIGHT
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+              }`}
+              onClick={() => {
+                menuSelector(SHAPES.ARROW_RIGHT)
+              }}
+            >
+              <i className="fa fa-long-arrow-right" />
+            </div>
+          
           {!isMobileScreen &&
           <>
           {/* rectangle */}
-          <span>
+              
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.RECTANGLE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
               }`}
               onClick={() => {
                 menuSelector(SHAPES.RECTANGLE)
+              }}
+              style={{
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
             >
               <Image
@@ -279,11 +323,18 @@ export const CanvasMenuBar = ({
                 alt="rectangle"
               />
             </div>
-          </span> 
+         
           {/* oval */}
-          <span>
+  
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+             style={{
+              height:"24px",
+              width:"24px",
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
+            }}
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.OVAL
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -295,11 +346,18 @@ export const CanvasMenuBar = ({
            
               <Image src="/icons/oval.png" width={20} height={20} alt="oval" />
             </div>
-          </span> 
+    
           {/* triangle */}
-          <span>
+      
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
+             style={{
+              height:"24px",
+              width:"24px",
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
+            }}
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.TRIANGLE
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -315,26 +373,22 @@ export const CanvasMenuBar = ({
                 alt="triangle"
               />
             </div>
-          </span> 
+         
           {/* arrows */}
           
-          <span>
+    
+            
+       
+       
             <div
-              className={`icon-btn m-5 my-3  button-effect btn-sm ${
-                activeTab === SHAPES.ARROW_RIGHT
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              onClick={() => {
-                menuSelector(SHAPES.ARROW_RIGHT)
-              }}
-            >
-              <i className="fa fa-long-arrow-right" />
-            </div>
-          </span>
-          <span>
-            <div
-              className={`icon-btn m-5  button-effect btn-sm ${
+             style={{
+              height:"24px",
+              width:"24px",
+              padding:"5px",
+              margin:"5px",
+              marginLeft:"2px",
+            }}
+              className={`icon-btn  button-effect btn-sm ${
                 activeTab === SHAPES.TWO_SIDE_ARROW
                   ? "btn-outline-primary"
                   : "btn-outline-light"
@@ -345,37 +399,44 @@ export const CanvasMenuBar = ({
             >
               <i className="fa fa-arrows-v rotate-90" />
             </div>
-          </span>
+       
           </>}
-          <span>
+         { undoDrawing &&
+         
             <div
-              className={`icon-btn m-5  button-effect btn-sm my-3`}
+              className={`icon-btn  button-effect btn-sm`}
               onClick={undoDrawing}
               style={{
-                height:isMobileScreen?"24px":"none",
-                width:isMobileScreen?"24px":"none",
-                padding:isMobileScreen?"5px":"auto"
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
             >
               <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"none"}}/>
             </div>
-          </span>
-          <span>
+         }
+        
             <div
-              className={`icon-btn m-5  button-effect btn-sm my-3`}
+              className={`icon-btn  button-effect btn-sm`}
               onClick={refreshDrawing}
               style={{
-                height:isMobileScreen?"24px":"none",
-                width:isMobileScreen?"24px":"none",
-                padding:isMobileScreen?"5px":"auto"
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
               }}
             >
               <RefreshCw />
             </div>
-          </span>
+      
           {/* <span>
             <div
-              className={`icon-btn m-5  button-effect btn-sm my-3`}
+              className={`icon-btn  button-effect btn-sm`}
               onClick={() => { setIsOpen(true) }}
             >
               <i className="fa fa-film" />

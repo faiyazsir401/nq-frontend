@@ -1093,3 +1093,93 @@ export const navigateToMeeting = (_id) => {
   const queryString = new URLSearchParams({ id: _id }).toString();
   window.location.href = `/meeting?${queryString}`;
 };
+
+export class Point
+{
+	constructor(x0, y0)
+	{
+		this.x = x0 || 0;
+		this.y = y0 || 0;
+	}
+
+	plus(pt)
+	{
+		return new Point(this.x + pt.x, this.y + pt.y)
+	}
+
+	// Thank you JS for not having operator overload
+	minus(pt)
+	{
+		return new Point(this.x - pt.x, this.y - pt.y)
+	}
+
+	mult(nb)
+	{
+		return new Point(this.x * nb, this.y * nb)
+	}
+
+	angle()
+	{
+		return Math.atan2(this.y, this.x)
+	}
+
+	norm()
+	{
+		return Math.hypot(this.x, this.y)
+	}
+
+	rot()
+	{
+		return `rotate(${this.angle()}rad)`
+	}
+
+	eq(other)
+	{
+		return this.x === other.x && this.y === other.y
+	}
+
+	static dist(p1, p2)
+	{
+		return p2.minus(p1).norm()
+	}
+
+	// Generic constructor from fields ending with X and Y.
+	static fromField(obj, field)
+	{
+		return new Point(obj[field + "X"], obj[field + "Y"])
+	}
+
+	// Specialized for client field.
+	static fromEventClient(event)
+	{
+		return Point.fromField(event, "client")
+	}
+
+	// Specialized for page field.
+	static fromEventPage(event)
+	{
+		return Point.fromField(event, "page")
+	}
+
+	// Top-left corner
+	static fromRect(rect)
+	{
+		return new Point(rect.left, rect.top)
+	}
+
+	static fromItem(item)
+	{
+		return item && Point.fromRect(item.getBoundingClientRect())
+	}
+
+	static fromItemCenter(item)
+	{
+		const rect = item.getBoundingClientRect()
+		return new Point((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2)
+	}
+
+	static fromObj(obj)
+	{
+		return new Point(obj.x, obj.y)
+	}
+}

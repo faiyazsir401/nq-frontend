@@ -1022,6 +1022,13 @@ h3{
     order: 2;
   }
 
+  .scoll-content {
+    height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    width: 100%;
+  }
+
   #second {
     order: 4;
   }

@@ -1058,6 +1058,7 @@ useEffect(() => {
   };
 
   const sendDrawEvent = () => {
+    console.log("sendDrawEvent",canvasRef)
     const canvas = canvasRef.current;
     if (!canvas) return;
     const { width, height } = canvas;
@@ -2486,7 +2487,7 @@ useEffect(() => {
           src="https://vjs.zencdn.net/7.20.3/video.min.js"
           strategy="lazyOnload"
         />
-        <OrientationModal isOpen={modal} />
+    
         {/* <canvas
           ref={canvasRef}
           id="drawing-canvas"
@@ -3424,7 +3425,7 @@ useEffect(() => {
           src="https://vjs.zencdn.net/7.20.3/video.min.js"
           strategy="lazyOnload"
         />
-        <OrientationModal isOpen={modal} />
+
         <div
           className="row"
           style={{ height: "100vh", display: "flex", alignItems: "center" }}

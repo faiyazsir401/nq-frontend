@@ -17,6 +17,8 @@ export const EVENTS = {
     ON_VIDEO_SHOW: "ON_VIDEO_SHOW",
     ON_VIDEO_PLAY_PAUSE: "ON_VIDEO_PLAY_PAUSE",
     ON_VIDEO_TIME: "ON_VIDEO_TIME",
+    TOGGLE_DRAWING_MODE:"TOGGLE_DRAWING_MODE",
+    TOGGLE_FULL_SCREEN:"TOGGLE_FULL_SCREEN",
     VIDEO_CALL: {
         ON_OFFER: "offer",
         ON_SIGNAL: "signal",
@@ -28,8 +30,10 @@ export const EVENTS = {
         MUTE_ME: "MUTE_ME",
         STOP_FEED: "STOP_FEED"
     },
+    TOGGLE_LOCK_MODE:"TOGGLE_LOCK_MODE",
     PUSH_NOTIFICATIONS : {
         ON_SEND : 'send',
         ON_RECEIVE : 'receive'
-    }
+    },
+    ON_VIDEO_ZOOM_PAN:"ON_VIDEO_ZOOM_PAN"
 }
