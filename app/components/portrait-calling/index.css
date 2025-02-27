@@ -41,7 +41,6 @@
 
 .profile-box.mini {
   position: absolute;
-  bottom:120px;
   right: 10px;
   width: 100px;
   height: 150px;
@@ -50,7 +49,6 @@
 
 .profile-box.mini-landscape {
   position: absolute;
-  bottom:120px;
   right: 10px;
   width: 150px;
   height: 150px;

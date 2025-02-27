@@ -101,7 +101,8 @@ export const UserBoxMini = ({
   user,
   stream,
   isStreamOff,
-  zIndex
+  zIndex,
+  bottom
 }) => {
   const setVideoRef = useCallback(
     (node) => {
@@ -133,7 +134,8 @@ export const UserBoxMini = ({
   return (
     <Draggable bounds="parent" {...useClickObserver(handleBoxClick)}>
       <div className={`profile-box mini hide-in-screenshot`} style={{
-        zIndex: zIndex ?? 100
+        zIndex: zIndex ?? 100,
+        bottom:bottom??50
       }}>
         {!isStreamOff ? (
           <video
@@ -171,7 +173,7 @@ export const UserBoxMini = ({
   );
 };
 
-export const VideoMiniBox = ({ onClick, id, clips }) => {
+export const VideoMiniBox = ({ onClick, id, clips,bottom }) => {
   const handleBoxClick = () => {
     // event.stopPropagation();
     if (onClick) {
@@ -186,6 +188,7 @@ export const VideoMiniBox = ({ onClick, id, clips }) => {
         className={`profile-box mini-landscape hide-in-screenshot`}
         style={{
           zIndex: 5,
+          bottom:bottom??50
         }}
       >
         {clips.map((clip) => (

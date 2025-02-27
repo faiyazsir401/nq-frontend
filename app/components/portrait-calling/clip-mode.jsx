@@ -1389,6 +1389,7 @@ const ClipModeCall = ({
             videoRef={remoteVideoRef}
             stream={remoteStream}
             user={toUser}
+            bottom={300}
             isStreamOff={isRemoteStreamOff}
           />
         ) : (
@@ -1399,6 +1400,7 @@ const ClipModeCall = ({
             videoRef={localVideoRef}
             stream={localStream}
             user={fromUser}
+            bottom={300}
             isStreamOff={isLocalStreamOff}
           />
         )}
@@ -1406,6 +1408,7 @@ const ClipModeCall = ({
         <VideoMiniBox
           clips={selectedClips}
           id={null}
+          bottom={60}
           onClick={handleUserClick}
         />
       </div>
@@ -1546,6 +1549,7 @@ const ClipModeCall = ({
             <UserBoxMini
               id={fromUser._id}
               zIndex={20}
+              bottom={60}
               onClick={handleUserClick}
               selected={false}
               videoRef={remoteVideoRef}
@@ -1556,6 +1560,7 @@ const ClipModeCall = ({
             <UserBoxMini
               id={toUser._id}
               zIndex={10}
+              bottom={300}
               onClick={handleUserClick}
               selected={false}
               videoRef={localVideoRef}
