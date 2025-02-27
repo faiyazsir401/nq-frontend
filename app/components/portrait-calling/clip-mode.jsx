@@ -385,7 +385,7 @@ useEffect(() => {
             : isMaximized
             ? isLock
               ? "44.5dvh"
-              : "43dvh" // If isMaximized is true and isSingle is false
+              : "42.5dvh" // If isMaximized is true and isSingle is false
             : isLock
             ? "40dvh"
             : "37dvh", // If isMaximized is false and isSingle is false
