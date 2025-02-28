@@ -580,7 +580,7 @@ const TrainerSessionInfo = ({
         </div>
 
         <div className="mt-2">
-          <h2 className=" tag-name booking-text text-dark">Book session</h2>
+          {/* <h2 className=" tag-name booking-text text-dark">Book session</h2> */}
           <div className="mt-1 text-dark">{element}</div>
         </div>
 

@@ -43,6 +43,13 @@ import { SettalInBankAccount } from "../../app/components/trainer/settings/setta
 import { settelReqestToBankAccount } from "../../app/components/trainer/trainer.api";
 import { updateAccountPrivacy } from "../../app/common/common.api";
 
+const NOTIFICATION_TYPES = [
+  "Promotional Email",
+  "Promotional SMS",
+  "Transcational Email",
+  "Transcational SMS"
+]
+
 const SettingSection = (props) => {
   const dispatch = useAppDispatch();
   const socialFormRef = useRef(null);
@@ -305,8 +312,8 @@ const SettingSection = (props) => {
 
   const updatePrivateAccount = async (isPrivate) => {
     try {
-      const result = await updateAccountPrivacy({isPrivate})
-       dispatch(getMeAsync());
+      const result = await updateAccountPrivacy({ isPrivate })
+      dispatch(getMeAsync());
       toast.success(result?.msg);
     } catch (error) {
       toast.error("updateAccountPrivacy -> error");
@@ -316,9 +323,8 @@ const SettingSection = (props) => {
 
   return (
     <div
-      className={`settings-tab submenu-width dynemic-sidebar custom-scroll ${
-        props.tab === "setting" ? "active" : ""
-      }`}
+      className={`settings-tab submenu-width dynemic-sidebar custom-scroll ${props.tab === "setting" ? "active" : ""
+        }`}
       id="settings"
     >
       <div className="theme-title">
@@ -360,9 +366,8 @@ const SettingSection = (props) => {
                   }}
                 />
                 <img
-                  className={`bg-img rounded ${
-                    accountType === !AccountType.TRAINEE && "mt-1"
-                  }`}
+                  className={`bg-img rounded ${accountType === !AccountType.TRAINEE && "mt-1"
+                    }`}
                   src={Utils?.getImageUrlOfS3(profile?.profile_picture)}
                   alt="Avatar"
                   width={44}
@@ -383,9 +388,8 @@ const SettingSection = (props) => {
                   </>
                 ) : (
                   <img
-                    className={`bg-img rounded ${
-                      accountType === AccountType.TRAINEE ? "mt-2" : "mt-3"
-                    }`}
+                    className={`bg-img rounded ${accountType === AccountType.TRAINEE ? "mt-2" : "mt-3"
+                      }`}
                     src={
                       profile.profile_picture
                         ? Utils?.getImageUrlOfS3(profile?.profile_picture)
@@ -457,9 +461,8 @@ const SettingSection = (props) => {
 
       <div className="setting-block">
         <div
-          className={`block ${
-            settingTab === "account" ? "open custom-block-height" : ""
-          }`}
+          className={`block ${settingTab === "account" ? "open custom-block-height" : ""
+            }`}
           style={{ maxWidth: "95%" }}
         >
           <div className="media">
@@ -494,7 +497,7 @@ const SettingSection = (props) => {
                 }
               >
                 <a href="#javascript">
-                  Security
+                  Notifications
                   <i className="fa fa-angle-down" />
                 </a>
               </div>
@@ -504,20 +507,22 @@ const SettingSection = (props) => {
                 data-parent="#accordion"
               >
                 <div className="card-body">
-                  <div className="media">
-                    <div className="media-body">
-                      <h5>Show Security notification</h5>
+                  {NOTIFICATION_TYPES.map((notification) =>
+                    <div className="media">
+                      <div className="media-body">
+                        <h5>{notification}</h5>
+                      </div>
+                      <div className="media-right">
+                        <Label className="switch">
+                          <Input type="checkbox" />
+                          <span className="switch-state" />
+                        </Label>
+                      </div>
                     </div>
-                    <div className="media-right">
-                      <Label className="switch">
-                        <Input type="checkbox" />
-                        <span className="switch-state" />
-                      </Label>
-                    </div>
-                  </div>
+                  )}
                   <p>
-                    <b>Note : </b>turn on this setting to recive notification
-                    when a contact's security code has been changes.
+                    <b>Note : </b>enable or disable to control the type of notifications
+                    you will receive.
                   </p>
                 </div>
               </div>
@@ -551,7 +556,7 @@ const SettingSection = (props) => {
                         </div>
                         <div className="media-right">
                           <Label className="switch mb-0">
-                            <Input type="checkbox" checked={userInfo.isPrivate} onChange={(e)=>updatePrivateAccount(e.target.checked)}/>
+                            <Input type="checkbox" checked={userInfo.isPrivate} onChange={(e) => updatePrivateAccount(e.target.checked)} />
                             <span className="switch-state"></span>
                           </Label>
                         </div>
@@ -662,7 +667,7 @@ const SettingSection = (props) => {
                 </div>
               </div>
             </div>
-            <div className="card">
+            {/* <div className="card">
               <div
                 className="card-header collapsed"
                 onClick={() =>
@@ -707,7 +712,7 @@ const SettingSection = (props) => {
                   </p>
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="card">
               <div
                 className="card-header"
@@ -729,9 +734,8 @@ const SettingSection = (props) => {
                 </a>
               </div>
               <div
-                className={`collapse ${
-                  collapseShow.changeNumber ? "show" : ""
-                }`}
+                className={`collapse ${collapseShow.changeNumber ? "show" : ""
+                  }`}
               >
                 <div className="card-body change-number">
                   <h5>Your old country code & phone number</h5>
@@ -809,9 +813,8 @@ const SettingSection = (props) => {
                     </a>
                   </div>
                   <div
-                    className={`collapse ${
-                      collapseShow.hourlyRate ? "show" : ""
-                    }`}
+                    className={`collapse ${collapseShow.hourlyRate ? "show" : ""
+                      }`}
                   >
                     <div className="card-body change-number">
                       <UpdateHourlyRateForm
@@ -829,192 +832,6 @@ const SettingSection = (props) => {
                           );
                         }}
                       />
-                    </div>
-                  </div>
-                </div>
-                <div className="card">
-                  <div
-                    className="card-header"
-                    onClick={() =>
-                      setCollapseShow({
-                        ...collapseShow,
-                        changeNumber: false,
-                        hourlyRate: false,
-                        workingHours: !collapseShow.workingHours,
-                        verfication: false,
-                        settelBankAccount: false,
-                        accountInfo: false,
-                        deleteAccount: false,
-                        privacy: false,
-                        security: false,
-                      })
-                    }
-                  >
-                    <a href="#javascript">
-                      Working Hours
-                      <i className="fa fa-angle-down" />
-                    </a>
-                  </div>
-                  <div
-                    className={`collapse ${
-                      collapseShow.workingHours ? "show" : ""
-                    }`}
-                  >
-                    <div className="card-body change-number">
-                      <h5>Add your working hours...</h5>
-
-                      <div className="row">
-                        <div className="col-6 col-sm-3 col-md-3 col-lg-2">
-                          <p
-                            className="ml-2"
-                            style={{ paddingTop: "10px", margin: "auto" }}
-                          >
-                            From
-                          </p>
-                          <TimePicker
-                            name="from"
-                            className={`ml-2 mt-2 ${
-                              isTimeConflicts ? `border border-danger` : ``
-                            }  rounded`}
-                            placeholder="09:00 am"
-                            clearIcon={true}
-                            showSecond={false}
-                            minuteStep={5}
-                            defaultValue={Utils.getFormattedTime(
-                              workingHours?.from
-                            )}
-                            // defaultValue={
-                            //   userInfo &&
-                            //     userInfo?.extraInfo &&
-                            //     userInfo?.extraInfo?.working_hours
-                            //     ? Utils.getFormattedTime(
-                            //       userInfo?.extraInfo?.working_hours.from
-                            //     )
-                            //     : null
-                            // }
-                            use12Hours
-                            onChange={(value) => {
-                              if (value) {
-                                const fromTime =
-                                  Utils.getFormattedDateDb(value);
-                                const hasTimeConflicts = Utils.hasTimeConflicts(
-                                  fromTime,
-                                  workingHours.to
-                                );
-                                setIsTimeConflicts(hasTimeConflicts);
-                                setWorkingHours((prev) => ({
-                                  ...prev,
-                                  from: fromTime,
-                                }));
-                              }
-                            }}
-                          />
-                          {isTimeConflicts && (
-                            <label className="mt-2 ml-2 text-danger">
-                              {Message.timeConflicts}
-                            </label>
-                          )}
-                        </div>
-                        <div className="col-6 col-sm-3 col-md-3 col-lg-2">
-                          <p
-                            className="ml-2"
-                            style={{ paddingTop: "10px", margin: "auto" }}
-                          >
-                            To
-                          </p>
-                          <TimePicker
-                            name="to"
-                            className={`ml-2 mt-2 ${
-                              isTimeConflicts ? `border border-danger` : ``
-                            }  rounded`}
-                            clearIcon={true}
-                            defaultValue={Utils.getFormattedTime(
-                              workingHours?.to
-                            )}
-                            // defaultValue={
-                            //   userInfo &&
-                            //     userInfo?.extraInfo &&
-                            //     userInfo?.extraInfo?.working_hours
-                            //     ? Utils.getFormattedTime(
-                            //       userInfo?.extraInfo?.working_hours.to
-                            //     )
-                            //     : null
-                            // }
-                            placeholder="10:00 pm"
-                            showSecond={false}
-                            minuteStep={5}
-                            use12Hours
-                            onChange={(value) => {
-                              if (value) {
-                                const toTime = Utils.getFormattedDateDb(value);
-                                const hasTimeConflicts = Utils.hasTimeConflicts(
-                                  workingHours.from,
-                                  toTime
-                                );
-                                setIsTimeConflicts(hasTimeConflicts);
-                                setWorkingHours((prev) => ({
-                                  ...prev,
-                                  to: toTime,
-                                }));
-                              }
-                            }}
-                          />
-                          {isTimeConflicts && (
-                            <label className="mt-2 ml-2 text-danger">
-                              {Message.timeConflicts}
-                            </label>
-                          )}
-                        </div>
-                        <div className="col-6 col-sm-3 col-md-3 col-lg-2">
-                          <p className="ml-2">Time Zone</p>
-                          <select
-                            name="timezone_offset"
-                            id="timezone-offset"
-                            style={{ marginRight: "10px", maxWidth: "100%" }}
-                            className="timezone_offset mt-2 ml-2"
-                            value={workingHours?.time_zone}
-                            onChange={(event) => {
-                              const { value } = event.target;
-                              setWorkingHours((prev) => ({
-                                ...prev,
-                                time_zone: value,
-                              }));
-                            }}
-                          >
-                            {TimeZone.map(({ timezone, value }, index) => {
-                              return (
-                                <option key={`timezone_${index}`} value={value}>
-                                  {timezone}
-                                </option>
-                              );
-                            })}
-                          </select>
-                        </div>
-                        <div className="col-12">
-                          <button
-                            type="button"
-                            className="ml-2 btn btn-sm btn-primary"
-                            disabled={isTimeConflicts}
-                            onClick={() => {
-                              const working_hours = {
-                                working_hours: workingHours,
-                              };
-                              if (working_hours) {
-                                dispatch(
-                                  updateProfileAsync({
-                                    extraInfo: {
-                                      ...userInfo?.extraInfo,
-                                      ...working_hours,
-                                    },
-                                  })
-                                );
-                              }
-                            }}
-                          >
-                            Save
-                          </button>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -1093,9 +910,8 @@ const SettingSection = (props) => {
       {accountType === AccountType.TRAINER ? (
         <div className="setting-block">
           <div
-            className={`block ${
-              settingTab === "my-profile" ? "open custom-block-height" : ""
-            }`}
+            className={`block ${settingTab === "my-profile" ? "open custom-block-height" : ""
+              }`}
             style={{ maxWidth: "95%", paddingBottom: "80px" }}
           >
             <div className="media">
@@ -1333,13 +1149,12 @@ const SettingSection = (props) => {
         </div>
       </div> */}
       {!settingMenuFilterSection.includes(settingTab) &&
-      accountType === AccountType.TRAINER ? (
+        accountType === AccountType.TRAINER ? (
         <>
           <div className="setting-block">
             <div
-              className={`block ${
-                settingTab === "integratin" ? "open custom-block-height" : ""
-              }`}
+              className={`block ${settingTab === "integratin" ? "open custom-block-height" : ""
+                }`}
               style={{ maxWidth: "95%" }}
             >
               <div className="media">
@@ -1777,7 +1592,7 @@ const SettingSection = (props) => {
                                   }}
                                   isError={
                                     touched.profile_image_url &&
-                                    errors.profile_image_url
+                                      errors.profile_image_url
                                       ? true
                                       : false
                                   }
@@ -1831,7 +1646,7 @@ const SettingSection = (props) => {
                                     isError={errors.profile_image_url}
                                     isTouched={
                                       touched.profile_image_url &&
-                                      errors.profile_image_url
+                                        errors.profile_image_url
                                         ? true
                                         : false
                                     }
@@ -1894,9 +1709,8 @@ const SettingSection = (props) => {
       {!settingMenuFilterSection.includes(settingTab) && (
         <div className="setting-block">
           <div
-            className={`block ${
-              settingTab === "help" ? "open custom-block-height" : ""
-            }`}
+            className={`block ${settingTab === "help" ? "open custom-block-height" : ""
+              }`}
             style={{ maxWidth: "95%" }}
           >
             <div className="media">

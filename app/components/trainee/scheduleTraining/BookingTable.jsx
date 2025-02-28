@@ -596,7 +596,7 @@ const BookingTable = ({
               style={{ display: "flex", alignItems: "center", width: "100%" }}
             >
               {" "}
-              <h2
+              {/* <h2
                 style={{
                   fontSize: "1.2rem",
                   fontWeight: "bold",
@@ -607,7 +607,7 @@ const BookingTable = ({
                 }}
               >
                 Book Instant Lesson
-              </h2>
+              </h2> */}
               {/* <button
                 style={{
                   backgroundColor: "#28a745",
