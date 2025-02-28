@@ -14,6 +14,8 @@ import StudentDetail from "../Header/StudentTab/StudentDetail";
 import { Utils } from "../../../utils/utils";
 import './index.js';
 import { useMediaQuery } from "../../hook/useMediaQuery.js";
+import BookingTable from "../trainee/scheduleTraining/BookingTable.jsx";
+import { TrainerDetails } from "../trainer/trainerDetails.jsx";
 
 // const placeholderImageUrl = '/assets/images/avtar/user.png'; // Placeholder image path
 const placeholderImageUrl = "/assets/images/demoUser.png"; // Placeholder image path
@@ -32,7 +34,7 @@ const RecentUsers = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStudentData, SetselectedStudentData] = useState({});
   const width600 = useMediaQuery(600);
-  
+
   useEffect(() => {
     getRecentStudentApi();
     getRecentTrainerApi();
@@ -75,8 +77,88 @@ const RecentUsers = () => {
     setRecentStudentClips(null);
   };
 
+  const [startDate, setStartDate] = useState(new Date());
+  const [activeTrainer, setActiveTrainer] = useState([]);
+  const [getParams, setParams] = useState("");
+  const [query, setQuery] = useState("");
+  const [trainer, setTrainer] = useState({ trainer_id: "" });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(null);
+  const [selectedTrainer, setSelectedTrainer] = useState({
+    id: null,
+    trainer_id: null,
+    data: {},
+  });
+  const [trainerInfo, setTrainerInfo] = useState({
+    userInfo: null,
+    selected_category: null,
+  });
+  const [categoryList, setCategoryList] = useState([]);
+
   return (
+
     <div className="card rounded trainer-profile-card Select Recent Student">
+      {trainerInfo && trainerInfo.userInfo ? (
+        <Modal
+          className="recent-user-modal"
+          isOpen={isModalOpen}
+          allowFullWidth={true}
+          element={
+            <TrainerDetails
+              selectOption={trainerInfo}
+              isPopoverOpen={isPopoverOpen}
+              categoryList={categoryList}
+              key={`trainerDetails`}
+              searchQuery={query}
+              trainerInfo={trainerInfo?.userInfo}
+              selectTrainer={(_id, trainer_id, data) => {
+                if (_id) {
+                  setSelectedTrainer({
+                    ...selectedTrainer,
+                    id: _id,
+                    trainer_id,
+                    data,
+                  });
+                }
+                setTrainerInfo((pre) => {
+                  return {
+                    ...pre,
+                    userInfo: {
+                      ...pre?.userInfo,
+                      ...data,
+                    },
+                  };
+                });
+              }}
+              onClose={() => {
+                setTrainerInfo((prev) => ({
+                  ...prev,
+                  userInfo: undefined,
+                  selected_category: undefined,
+                }));
+                setParams((prev) => ({
+                  ...prev,
+                  search: null,
+                }));
+                setIsModalOpen(false);
+              }}
+              isUserOnline={true}
+              element={
+                <BookingTable
+                  selectedTrainer={selectedTrainer}
+                  trainerInfo={trainerInfo}
+                  setStartDate={setStartDate}
+                  startDate={startDate}
+                  getParams={getParams}
+                  isUserOnline={true}
+                />
+              }
+            />
+          }
+        />
+      ) : (
+        <></>
+      )}
       <h2
         className="Recent-Heading"
         style={{ textAlign: "center", fontSize: "20px" }}
@@ -102,9 +184,9 @@ const RecentUsers = () => {
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(2, minmax(100px, 1fr))",
-              gridGap: width600?"15px":"10px",
+              gridGap: width600 ? "15px" : "10px",
               paddingTop: "5px",
-              width: width600?"50%":"100%",
+              width: width600 ? "50%" : "100%",
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -118,7 +200,7 @@ const RecentUsers = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    
+
                     // padding : "5px",
                     textAlign: "center",
                     overflow: "hidden",
@@ -157,10 +239,10 @@ const RecentUsers = () => {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    
+
                     // padding: "5px",
                     textAlign: "center",
-                    overflow:"hidden"
+                    overflow: "hidden"
                   }}
                 >
                   <img
@@ -175,9 +257,20 @@ const RecentUsers = () => {
                       Utils?.getImageUrlOfS3(item.profile_picture) ||
                       "/assets/images/demoUser.png"
                     }
-                    onClick={() =>
-                      handleStudentClick({ profile_picture: item.profile_picture })
-                    }
+                    onClick={() => {
+                      setTrainerInfo((prev) => ({
+                        ...prev,
+                        userInfo: item,
+                        selected_category: null,
+                      }));
+                      setSelectedTrainer({
+                        id: item?.id,
+                        trainer_id: item?.id,
+                        data: trainer,
+                      });
+                      setParams({ search: item?.fullName });
+                      setIsModalOpen(true);
+                    }}
                     onError={(e) => {
                       e.target.src = "/assets/images/demoUser.png"; // Set default image on error
                     }}
