@@ -119,27 +119,22 @@ const SettingSection = (props) => {
 
   const validationSchema = Yup.object().shape({
     fb: Yup.string()
-      .required(validationMessage.social_media.field_required)
       .matches(urlRegex, Message.validUrl)
       .max(URL_MAX_LENGTH.MAX_LENGTH, URL_MAX_LENGTH.MESSAGE)
       .nullable(),
     instagram: Yup.string()
-      .required(validationMessage.social_media.field_required)
       .matches(urlRegex, Message.validUrl)
       .max(URL_MAX_LENGTH.MAX_LENGTH, URL_MAX_LENGTH.MESSAGE)
       .nullable(),
     twitter: Yup.string()
-      .required(validationMessage.social_media.field_required)
       .matches(urlRegex, Message.validUrl)
       .max(URL_MAX_LENGTH.MAX_LENGTH, URL_MAX_LENGTH.MESSAGE)
       .nullable(),
     google: Yup.string()
-      .required(validationMessage.social_media.field_required)
       .matches(urlRegex, Message.validUrl)
       .max(URL_MAX_LENGTH.MAX_LENGTH, URL_MAX_LENGTH.MESSAGE)
       .nullable(),
     slack: Yup.string()
-      .required(validationMessage.social_media.field_required)
       .matches(urlRegex, Message.validUrl)
       .max(URL_MAX_LENGTH.MAX_LENGTH, URL_MAX_LENGTH.MESSAGE)
       .nullable(),
@@ -1519,87 +1514,7 @@ const SettingSection = (props) => {
                               <h5>My website</h5>
                             </a>
                           </div>
-                          {values.profile_image_url && isSocialFormOpen ? (
-                            <div
-                              style={{
-                                position: "absolute",
-                                left: "51%",
-                                top: "15%",
-                              }}
-                            >
-                              <i
-                                className="fa fa-times pointer"
-                                aria-hidden="true"
-                                onClick={() => {
-                                  setValues({
-                                    ...values,
-                                    profile_image_url: undefined,
-                                  });
-                                  dispatch(removeProfileImageUrl(undefined));
-                                }}
-                                style={{
-                                  position: "absolute",
-                                  left: "100%",
-                                  bottom: "80%",
-                                }}
-                              />
-                              <img
-                                style={{ width: "34px", marginTop: "12px" }}
-                                src={
-                                  profile_image_url || values.profile_image_url
-                                }
-                                alt="profile_image_url"
-                              />
-                            </div>
-                          ) : (
-                            <div
-                              style={{
-                                position: "absolute",
-                                left: "51%",
-                                top: "15%",
-                              }}
-                            >
-                              {isSocialFormOpen && !values.profile_image_url ? (
-                                <UploadFile
-                                  name="profile_image_url"
-                                  values={null}
-                                  onChange={(event) => {
-                                    if (
-                                      event &&
-                                      event.target &&
-                                      event.target.files &&
-                                      event.target.files[0]
-                                    ) {
-                                      const isValidSelectedPNG =
-                                        Utils.isValidSelectedPNG(
-                                          event.target.files[0]
-                                        );
-                                      const fileSizeLessthan2Mb =
-                                        Utils.fileSizeLessthan2Mb(
-                                          event.target.files[0]
-                                        );
-                                      if (
-                                        isValidSelectedPNG &&
-                                        fileSizeLessthan2Mb
-                                      ) {
-                                        dispatch(
-                                          uploadProfilePictureAsync({
-                                            files: event.target.files[0],
-                                          })
-                                        );
-                                      }
-                                    }
-                                  }}
-                                  isError={
-                                    touched.profile_image_url &&
-                                      errors.profile_image_url
-                                      ? true
-                                      : false
-                                  }
-                                />
-                              ) : null}
-                            </div>
-                          )}
+                          
                           {/* <div className="media-right">
                         <div className="profile">
                           <a href="https://slack.com/get-started#/" target="_blank">
