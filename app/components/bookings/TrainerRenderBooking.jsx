@@ -13,7 +13,7 @@ import { CovertTimeAccordingToTimeZone, formatTimeInLocalZone, navigateToMeeting
 import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
-import { notificiationTitles } from "../../../utils/constant";
+import { NotificationType, notificiationTitles } from "../../../utils/constant";
 import { DateTime } from "luxon";
 
 const TrainerRenderBooking = ({
@@ -191,6 +191,7 @@ const TrainerRenderBooking = ({
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
                       bookingInfo: bookingInfo,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }}
                 >
@@ -220,6 +221,7 @@ const TrainerRenderBooking = ({
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
                       bookingInfo: bookingInfo,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }}
                 >
@@ -257,6 +259,7 @@ const TrainerRenderBooking = ({
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
                       bookingInfo: null,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }
                 }}

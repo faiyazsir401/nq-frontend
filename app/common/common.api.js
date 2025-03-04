@@ -219,4 +219,26 @@ export const updateAccountPrivacy = async (payload) => {
 };
 
 
+export const updateNotificationSettings = async (payload) => {
+  try {
+    const response = await axiosInstance({
+      url: `/user/update-notifications-settings`,
+      method: "patch",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${Utils.getToken(
+          LOCAL_STORAGE_KEYS.ACCESS_TOKEN
+        )}`,
+      },
+      data: payload,
+    });
+    console.log("response", response.data);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 

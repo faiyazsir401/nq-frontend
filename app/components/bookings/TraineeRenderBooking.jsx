@@ -21,7 +21,7 @@ import AddClip from "./start/AddClip";
 import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
-import { notificiationTitles } from "../../../utils/constant";
+import { NotificationType, notificiationTitles } from "../../../utils/constant";
 import { DateTime } from "luxon";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -245,6 +245,7 @@ const TraineeRenderBooking = ({
                       senderId: trainee_info?._id,
                       receiverId: trainer_info?._id,
                       bookingInfo: bookingInfo,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }}
                 >
@@ -283,6 +284,7 @@ const TraineeRenderBooking = ({
                       senderId: trainee_info?._id,
                       receiverId: trainer_info?._id,
                       bookingInfo: null,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }
                 }}

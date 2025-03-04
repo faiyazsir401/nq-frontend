@@ -43,6 +43,7 @@ import { SettalInBankAccount } from "../../app/components/trainer/settings/setta
 import { settelReqestToBankAccount } from "../../app/components/trainer/trainer.api";
 import { updateAccountPrivacy } from "../../app/common/common.api";
 import ChangePhoneNumber from "../../app/components/change-number";
+import NotificationSettings from "../../app/components/notification-settings";
 
 const NOTIFICATION_TYPES = [
   "Promotional Email",
@@ -317,6 +318,11 @@ const SettingSection = (props) => {
     }
   }
 
+  const handleNotificationChange= (category,channel,e)=>{
+    console.log("category",category,channel,e.target.value)
+
+  }
+
   return (
     <div
       className={`settings-tab submenu-width dynemic-sidebar custom-scroll ${props.tab === "setting" ? "active" : ""
@@ -502,25 +508,7 @@ const SettingSection = (props) => {
                 id="collapseTwo"
                 data-parent="#accordion"
               >
-                <div className="card-body">
-                  {NOTIFICATION_TYPES.map((notification) =>
-                    <div className="media">
-                      <div className="media-body">
-                        <h5>{notification}</h5>
-                      </div>
-                      <div className="media-right">
-                        <Label className="switch">
-                          <Input type="checkbox" />
-                          <span className="switch-state" />
-                        </Label>
-                      </div>
-                    </div>
-                  )}
-                  <p>
-                    <b>Note : </b>enable or disable to control the type of notifications
-                    you will receive.
-                  </p>
-                </div>
+                <NotificationSettings/>
               </div>
             </div>
             <div className="card">
@@ -709,7 +697,7 @@ const SettingSection = (props) => {
                 </div>
               </div>
             </div> */}
-            <ChangePhoneNumber setCollapseShow={setCollapseShow} collapseShow={collapseShow}/>
+            <ChangePhoneNumber setCollapseShow={setCollapseShow} collapseShow={collapseShow} />
             {accountType === AccountType.TRAINER ? (
               <React.Fragment>
                 <div className="card">
@@ -1442,7 +1430,7 @@ const SettingSection = (props) => {
                               <h5>My website</h5>
                             </a>
                           </div>
-                          
+
                           {/* <div className="media-right">
                         <div className="profile">
                           <a href="https://slack.com/get-started#/" target="_blank">
