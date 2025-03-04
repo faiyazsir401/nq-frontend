@@ -42,6 +42,7 @@ import TimePicker from "rc-time-picker";
 import { SettalInBankAccount } from "../../app/components/trainer/settings/settal_in_bank";
 import { settelReqestToBankAccount } from "../../app/components/trainer/trainer.api";
 import { updateAccountPrivacy } from "../../app/common/common.api";
+import ChangePhoneNumber from "../../app/components/change-number";
 
 const NOTIFICATION_TYPES = [
   "Promotional Email",
@@ -708,80 +709,7 @@ const SettingSection = (props) => {
                 </div>
               </div>
             </div> */}
-            <div className="card">
-              <div
-                className="card-header"
-                onClick={() =>
-                  setCollapseShow({
-                    ...collapseShow,
-                    changeNumber: !collapseShow.changeNumber,
-                    verfication: false,
-                    accountInfo: false,
-                    deleteAccount: false,
-                    privacy: false,
-                    security: false,
-                  })
-                }
-              >
-                <a href="#javascript">
-                  Change Number
-                  <i className="fa fa-angle-down" />
-                </a>
-              </div>
-              <div
-                className={`collapse ${collapseShow.changeNumber ? "show" : ""
-                  }`}
-              >
-                <div className="card-body change-number">
-                  <h5>Your old country code & phone number</h5>
-                  <div className="input-group">
-                    <div className="input-group-prepend">
-                      <span className="input-group-text form-control m-0">
-                        +
-                      </span>
-                    </div>
-                    <input
-                      className="form-control country-code"
-                      type="number"
-                      placeholder="01"
-                    />
-                    <input
-                      className="form-control"
-                      type="number"
-                      placeholder="1234567895"
-                    />
-                  </div>
-                  <h5>Your new country code & phone number</h5>
-                  <div className="input-group">
-                    <div className="input-group-prepend">
-                      <span className="input-group-text form-control m-0">
-                        +
-                      </span>
-                    </div>
-                    <input
-                      className="form-control country-code"
-                      type="number"
-                      placeholder="01"
-                    />
-                    <input
-                      className="form-control"
-                      type="number"
-                      placeholder=""
-                    />
-                  </div>
-                  <div className="text-right">
-                    {" "}
-                    <a
-                      className="btn btn-outline-primary button-effect btn-sm"
-                      href="#"
-                    >
-                      confirm
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            <ChangePhoneNumber setCollapseShow={setCollapseShow} collapseShow={collapseShow}/>
             {accountType === AccountType.TRAINER ? (
               <React.Fragment>
                 <div className="card">

@@ -114,6 +114,26 @@ export const updateBookedSessionScheduledMeeting = async (payload) => {
   }
 };
 
+export const updateMobileNumber = async (payload) => {
+  try {
+    const response = await axiosInstance({
+      method: "put",
+      url: `/user/update-mobile-number`,
+      data: payload,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${Utils.getToken(
+          LOCAL_STORAGE_KEYS.ACCESS_TOKEN
+        )}`,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const uploadProfilePicture = async (payload) => {
   try {
     const formData = new FormData();
