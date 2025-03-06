@@ -44,6 +44,7 @@ import Notes from "../practiceLiveExperience/Notes";
 import CustomModal from "../../common/modal";
 import ScreenShotDetails from "../video/screenshotDetails";
 import Timer from "../video/Timer";
+import { getTraineeClips } from "../NavHomePage/navHomePage.api";
 const VideoCallUI = ({
   id,
   isClose,
@@ -130,29 +131,41 @@ const VideoCallUI = ({
   const getMyClips = async () => {
     var res = await myClips({});
     setClips(res?.data);
-    var res2 = await traineeClips({});
-    let selectedClips = [];
-    var arr = res2?.data || [];
-    for (let index = 0; index < arr?.length; index++) {
-      if (arr[index]._id._id === traineeInfo._id) {
-        var el = arr[index]?.clips;
+    var trainee_clips = await myClips({ trainee_id: traineeInfo._id });
 
-        arr[index].clips = arr[index].clips.map((clip) => {
+    let sharedClips = [];
+    var arr = trainee_clips?.data || [];
+    let res3 = await traineeClips({});
+    const clipsSharedByTrainee = res3?.data
+    console.log("clipsSharedByTrainee",clipsSharedByTrainee)
+    for (let index = 0; index < clipsSharedByTrainee?.length; index++) {
+      if (clipsSharedByTrainee[index]._id._id === traineeInfo._id) {
+        
+        clipsSharedByTrainee[index].clips.map((clip) => {
           // Check if the current clip's _id matches the given id
           if (clip._id === id) {
             // Add the extra field 'duringSession' to the clip
-            clip.duringSession = true;
+            console.log("clips",clip)
+            sharedClips.push(clip.clips._id)
           }
-          return clip; // Return the modified or unmodified clip
+          // return clip; // Return the modified or unmodified clip
         });
-        arr[index].clips = [
-          ...new Map(el.map((item) => [item.clips._id, item])).values(),
-        ];
-        selectedClips = [arr[index]];
       }
     }
-    console.log("selectedClips", selectedClips);
-    setTraineeClips(selectedClips);
+
+    
+    console.log("shared_clips", sharedClips);
+
+    arr[0]?.clips?.forEach(item => {
+      if (sharedClips.includes(item._id)) {
+          item.duringSession = true; // Add the duringSession field with value `true`
+      } else {
+          item.duringSession = false; // Optionally, you can set it to false or leave it undefined
+      }
+  });
+  console.log("trainee_clips",arr)
+
+    setTraineeClips(arr);
   };
 
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos, type }) => {
@@ -843,17 +856,17 @@ const VideoCallUI = ({
                                 setTraineeClips([...temp]);
                               }}
                             >
-                              {cl?._id?.fullname}
+                              {/* {cl?._id?.fullname}
                               <label className="badge badge-primary sm ml-2">
                                 {cl?.clips?.length}
-                              </label>
+                              </label> */}
                             </h5>
                             {/*  NORMAL  STRUCTURE END  */}
                             <div className={`block-content `}>
                               <div className="row" style={{ margin: 0 }}>
                                 {cl?.clips.map((clp, index) => {
                                   var sld = selectClips.find(
-                                    (val) => val?._id === clp?.clips?._id
+                                    (val) => val?._id === clp?._id
                                   );
                                   return (
                                     <div
@@ -862,14 +875,14 @@ const VideoCallUI = ({
                                       style={{ borderRadius: 5 }}
                                       onClick={() => {
                                         if (!sld && selectClips?.length < 2) {
-                                          selectClips.push(clp?.clips);
+                                          selectClips.push(clp);
                                           setSelectClips([...selectClips]);
                                         } else {
                                           var temp = JSON.parse(
                                             JSON.stringify(selectClips)
                                           );
                                           temp = temp.filter(
-                                            (val) => val._id !== clp?.clips?._id
+                                            (val) => val._id !== clp?._id
                                           );
                                           setSelectClips([...temp]);
                                         }
@@ -877,7 +890,7 @@ const VideoCallUI = ({
                                     >
                                       <video
                                         poster={Utils?.generateThumbnailURL(
-                                          clp?.clips
+                                          clp
                                         )}
                                         style={{
                                           // border: `${sld ? "2px" : "0px"} solid green`,
@@ -901,7 +914,7 @@ const VideoCallUI = ({
                                       >
                                         <source
                                           src={Utils?.generateVideoURL(
-                                            clp?.clips
+                                            clp
                                           )}
                                           // src={Utils?.generateVideoURL(clp)}
                                           type="video/mp4"
