@@ -301,8 +301,12 @@ const VideoCallUI = ({
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: true,
+        audio: {
+          echoCancellation:true
+        },
       });
+
+  
 
       setPermissionModal(false);
       setLocalStream(stream);
@@ -312,6 +316,12 @@ const VideoCallUI = ({
       });
       if (videoRef?.current) {
         videoRef.current.srcObject = stream;
+        if (videoRef.current && videoRef.current.srcObject) {
+          const localAudioTrack = videoRef.current.srcObject.getAudioTracks()[0];
+          if (localAudioTrack) {
+              localAudioTrack.enabled = false; // Mute the local audio track
+          }
+      }
       }
 
       const peer = new Peer(fromUser._id, {
