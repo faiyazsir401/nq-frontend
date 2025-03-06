@@ -8,9 +8,9 @@ const ChangePhoneNumber = ({ setCollapseShow, collapseShow }) => {
   // Formik setup
   const formik = useFormik({
     initialValues: {
-      oldCountryCode: '+1',
+      oldCountryCode: '1',
       oldPhoneNumber: '',
-      newCountryCode: '+1',
+      newCountryCode: '1',
       newPhoneNumber: '',
     },
     validationSchema: Yup.object({
@@ -32,9 +32,14 @@ const ChangePhoneNumber = ({ setCollapseShow, collapseShow }) => {
     onSubmit: async (values) => {
       try {
         const payload = {
-          oldPhoneNumber: `${values.oldCountryCode}${values.oldPhoneNumber}`,
-          newPhoneNumber: `${values.newCountryCode}${values.newPhoneNumber}`,
+          oldPhoneNumber: `${values.oldPhoneNumber}`,
+          newPhoneNumber: `${values.newPhoneNumber}`,
         };
+
+        if(payload.oldPhoneNumber === payload.newPhoneNumber){
+          toast.error("New phone number should be different than the old phone number")
+          return
+          }
 
         const response = await updateMobileNumber(payload);
         toast.success('Phone number updated successfully!')

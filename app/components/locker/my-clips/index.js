@@ -270,7 +270,6 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                               </div>
                               <div
                                 style={{
-                                  padding: isMobileScreen?"5px":"8px",
                                   paddingTop:"0px",
                                   cursor: "pointer",
                                 }}

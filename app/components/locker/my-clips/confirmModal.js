@@ -18,7 +18,7 @@ const ConfirmModal = (
             style={{
             fontSize : "22px !important"
           }}
-            >{`Are you sure? ${message??"you want to delete it"}`}</h5>
+            >{`Are you sure? ${message??""}`}</h5>
           </ModalHeader>
           <ModalBody>
             <div className="row"
