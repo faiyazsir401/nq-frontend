@@ -1380,6 +1380,7 @@ const ClipModeCall = ({
           stream={localStream}
           isStreamOff={isLocalStreamOff}
           isLandscape={isLandscape}
+          muted={true}
         />
         {selectedUser === toUser._id ? (
           <UserBoxMini
@@ -1402,6 +1403,7 @@ const ClipModeCall = ({
             user={fromUser}
             bottom={300}
             isStreamOff={isLocalStreamOff}
+            muted={true}
           />
         )}
 
@@ -1567,6 +1569,7 @@ const ClipModeCall = ({
               stream={localStream}
               user={fromUser}
               isStreamOff={isLocalStreamOff}
+              muted={true}
             />
           </>
         )}

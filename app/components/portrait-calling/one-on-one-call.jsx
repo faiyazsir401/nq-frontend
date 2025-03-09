@@ -67,6 +67,7 @@ const OneOnOneCall = ({
           stream={localStream}
           isStreamOff={isLocalStreamOff}
           isLandscape={isLandscape}
+          muted={true}
         />
         <UserBox
           id={fromUser._id}
@@ -92,6 +93,7 @@ const OneOnOneCall = ({
             isStreamOff={
               selectedUser === toUser._id ? isRemoteStreamOff : isLocalStreamOff
             }
+            muted={selectedUser === toUser._id ? false : true}
           />
         )}
       </div>

@@ -14,7 +14,6 @@ import { SocketContext } from "../socket";
 import OneOnOneCall from "./one-on-one-call";
 import ClipModeCall from "./clip-mode";
 import ActionButtons from "./action-buttons";
-import Peer from "peerjs";
 import { toast } from "react-toastify";
 import { useAppSelector } from "../../store";
 import { bookingsState } from "../common/common.slice";
@@ -45,6 +44,9 @@ import CustomModal from "../../common/modal";
 import ScreenShotDetails from "../video/screenshotDetails";
 import Timer from "../video/Timer";
 import { getTraineeClips } from "../NavHomePage/navHomePage.api";
+import PermissionModal from "../video/PermissionModal";
+
+let Peer;
 const VideoCallUI = ({
   id,
   isClose,
@@ -92,11 +94,12 @@ const VideoCallUI = ({
   const [traineeClip, setTraineeClips] = useState([]);
   const [isScreenShotModelOpen, setIsScreenShotModelOpen] = useState(false);
   const [screenShots, setScreenShots] = useState([]);
-  const [currentScreenShot,setCurrentScreenshot] = useState("")
+  const [currentScreenShot, setCurrentScreenshot] = useState("")
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
   const [isCallEnded, setIsCallEnded] = useState(false);
   const [screenStream, setScreenStream] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [errorMessageForPermission, setErrorMessageForPermission] = useState("Kindly allow us access to your camera and microphone.")
 
   const [isModelOpen, setIsModelOpen] = useState(false);
   const netquixVideos = [
@@ -137,15 +140,15 @@ const VideoCallUI = ({
     var arr = trainee_clips?.data || [];
     let res3 = await traineeClips({});
     const clipsSharedByTrainee = res3?.data
-    console.log("clipsSharedByTrainee",clipsSharedByTrainee)
+    console.log("clipsSharedByTrainee", clipsSharedByTrainee)
     for (let index = 0; index < clipsSharedByTrainee?.length; index++) {
       if (clipsSharedByTrainee[index]._id._id === traineeInfo._id) {
-        
+
         clipsSharedByTrainee[index].clips.map((clip) => {
           // Check if the current clip's _id matches the given id
           if (clip._id === id) {
             // Add the extra field 'duringSession' to the clip
-            console.log("clips",clip)
+            console.log("clips", clip)
             sharedClips.push(clip.clips._id)
           }
           // return clip; // Return the modified or unmodified clip
@@ -153,17 +156,17 @@ const VideoCallUI = ({
       }
     }
 
-    
+
     console.log("shared_clips", sharedClips);
 
     arr[0]?.clips?.forEach(item => {
       if (sharedClips.includes(item._id)) {
-          item.duringSession = true; // Add the duringSession field with value `true`
+        item.duringSession = true; // Add the duringSession field with value `true`
       } else {
-          item.duringSession = false; // Optionally, you can set it to false or leave it undefined
+        item.duringSession = false; // Optionally, you can set it to false or leave it undefined
       }
-  });
-  console.log("trainee_clips",arr)
+    });
+    console.log("trainee_clips", arr)
 
     setTraineeClips(arr);
   };
@@ -296,17 +299,36 @@ const VideoCallUI = ({
 
   console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
 
-  // Handle start call
   const handleStartCall = async () => {
     try {
+      // Check permissions for camera and microphone
+      const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+      const micPermission = await navigator.permissions.query({ name: 'microphone' });
+
+      // Handle camera and mic permission states
+      if (cameraPermission.state === 'denied' && micPermission.state === 'denied') {
+        setPermissionModal(true);
+        setErrorMessageForPermission("Kindly allow us access to your camera and microphone.");
+        return;
+      }
+
+      if (cameraPermission.state === 'denied') {
+        setPermissionModal(true);
+        setErrorMessageForPermission("Camera permission is denied. Please enable camera for video call.");
+        return;
+      }
+
+      if (micPermission.state === 'denied') {
+        setPermissionModal(true);
+        setErrorMessageForPermission("Microphone permission is denied. Please enable microphone for video call.");
+        return;
+      }
+
+      // If permissions are granted, proceed with starting the call
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
-        audio: {
-          echoCancellation:true
-        },
+        audio: true,
       });
-
-  
 
       setPermissionModal(false);
       setLocalStream(stream);
@@ -314,14 +336,8 @@ const VideoCallUI = ({
         showMsg: true,
         msg: `Waiting for ${toUser?.fullname} to join...`,
       });
-      if (videoRef?.current) {
+      if(videoRef.current){
         videoRef.current.srcObject = stream;
-        if (videoRef.current && videoRef.current.srcObject) {
-          const localAudioTrack = videoRef.current.srcObject.getAudioTracks()[0];
-          if (localAudioTrack) {
-              localAudioTrack.enabled = false; // Mute the local audio track
-          }
-      }
       }
 
       const peer = new Peer(fromUser._id, {
@@ -346,19 +362,16 @@ const VideoCallUI = ({
         call.on("stream", (remoteStream) => {
           setIsTraineeJoined(true);
           setDisplayMsg({ showMsg: false, msg: "" });
-          if (remoteVideoRef?.current)
-            remoteVideoRef.current.srcObject = remoteStream;
           setRemoteStream(remoteStream);
         });
       });
     } catch (err) {
       console.log("error", err);
       setPermissionModal(true);
-      toast.error(
-        "Please allow media permission to microphone and camera for video call..."
-      );
+      setErrorMessageForPermission("Kindly allow us access to your camera and microphone.");
     }
   };
+
 
   useMemo(() => {
     if (
@@ -391,40 +404,45 @@ const VideoCallUI = ({
     });
   };
   console.log("isTraineeJoined", isTraineeJoined);
-  useEffect(() => {
-    socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
-      setTimeout(() => {
-        isClose();
-      }, 3000);
-    });
+
+  const listenSocketEvents = () => {
 
     socket.on("ON_CALL_JOIN", ({ userInfo }) => {
       const { to_user, from_user } = userInfo;
-      if (peerRef.current) {
-        connectToPeer(peerRef.current, from_user);
-      }
+      if (!(peerRef && peerRef.current)) return;
+      connectToPeer(peerRef.current, from_user);
     });
 
+    // Handle signaling events from the signaling server
     socket.on(EVENTS.VIDEO_CALL.ON_OFFER, (offer) => {
+      // console.log(` -- on OFFER --`);
       peerRef.current?.signal(offer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ANSWER, (answer) => {
+      // console.log(` -- on answer --`);
       peerRef.current?.signal(answer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, (candidate) => {
+      // console.log(` -- on ICE candidate --`);
       peerRef.current?.signal(candidate);
     });
 
-    socket.on(EVENTS.ON_CLEAR_CANVAS, () => {
-      // clearCanvas();
-    });
 
     socket.on(EVENTS.VIDEO_CALL.STOP_FEED, ({ feedStatus }) => {
       setIsRemoteStreamOff(feedStatus);
     });
-  }, [socket]);
+
+
+    socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
+      setDisplayMsg({
+        showMsg: true,
+        msg: `${toUser?.fullname} left the meeting, redirecting back to home screen in 5 seconds...`,
+      });
+      cleanupFunction();
+    });
+  };
 
   // NOTE - handle user offline
   const handleOffline = () => {
@@ -528,18 +546,40 @@ const VideoCallUI = ({
   };
 
   useEffect(() => {
-    if (fromUser && toUser) {
-      handleStartCall();
-    }
-    window.addEventListener("offline", handleOffline);
-    window.addEventListener("beforeunload", handelTabClose);
+  
 
-    return () => {
-      window.removeEventListener("beforeunload", handelTabClose);
-      window.removeEventListener("offline", handleOffline);
-      cutCall();
-    };
-  }, [fromUser, toUser]);
+      const handleBeforeUnload = (event) => {
+        event.preventDefault();
+          event.returnValue = 'You are currently in a call. Are you sure you want to leave or reload? This will disconnect the call.';
+        };
+  
+        // Attach the event listener for beforeunload
+      window.addEventListener('beforeunload', handleBeforeUnload);
+  
+        // Cleanup the event listener when the component unmounts
+      return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+
+    }, []); 
+
+  useEffect(() => {
+    if (fromUser && toUser) {
+      if (typeof navigator !== "undefined") {
+        Peer = require("peerjs").default;
+      }
+      handleStartCall();
+      listenSocketEvents()
+      window.addEventListener("offline", handleOffline);
+      window.addEventListener("beforeunload", handelTabClose);
+
+      return () => {
+        window.removeEventListener("beforeunload", handelTabClose);
+        window.removeEventListener("offline", handleOffline);
+        cutCall();
+      };
+    }
+  }, []);
 
   console.log("refs", videoRef, remoteVideoRef, remoteStream);
 
@@ -830,7 +870,7 @@ const VideoCallUI = ({
                         </>
                       )}
                     </div>
-                    {clips && clips.length !==0 && (
+                    {clips && clips.length !== 0 && (
                       <div className="d-flex justify-content-around w-100 p-3">
                         <Button
                           color="success"
@@ -950,7 +990,7 @@ const VideoCallUI = ({
                       )}
                     </div>
 
-                    {traineeClip && traineeClip.length !==0 && (
+                    {traineeClip && traineeClip.length !== 0 && (
                       <div className="d-flex justify-content-around w-100 p-3">
                         <Button
                           color="success"
@@ -1103,6 +1143,8 @@ const VideoCallUI = ({
         isTraineeJoined={isTraineeJoined}
         isCallEnded={isCallEnded}
       />
+
+      <PermissionModal isOpen={permissionModal} errorMessage={errorMessageForPermission} />
     </div>
   );
 };
