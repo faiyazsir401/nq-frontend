@@ -343,6 +343,12 @@ const VideoCallUI = ({
       const peer = new Peer(fromUser._id, {
         config: startMeeting.iceServers,
       });
+
+      peer.on("error", (error) => {
+        setDisplayMsg({show:true,msg:error.message})
+        return;
+      });
+
       peerRef.current = peer;
 
       // Handle Peer events
@@ -354,9 +360,7 @@ const VideoCallUI = ({
         console.log("call joined");
       });
 
-      peer.on("error", (error) => {
-        console.error("Peer error:", error);
-      });
+     
 
       peer.on("call", (call) => {
         call.answer(stream);
