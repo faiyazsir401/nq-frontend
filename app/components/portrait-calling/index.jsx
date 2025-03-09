@@ -100,7 +100,7 @@ const VideoCallUI = ({
   const [isCallEnded, setIsCallEnded] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [errorMessageForPermission, setErrorMessageForPermission] = useState("Kindly allow us access to your camera and microphone.")
-
+  const [userAlreadyInCall, setUserAlreadyInCall] = useState(false)
   const [isModelOpen, setIsModelOpen] = useState(false);
   const netquixVideos = [
     {
@@ -298,7 +298,7 @@ const VideoCallUI = ({
   };
 
   console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
-  console.log("TimeOut",timeoutId)
+  console.log("TimeOut", timeoutId)
   const handleStartCall = async () => {
     try {
       // Check permissions for camera and microphone
@@ -324,6 +324,24 @@ const VideoCallUI = ({
         return;
       }
 
+      // Check if any camera or microphone device is connected
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameraDevices = devices.filter(device => device.kind === 'videoinput');
+      const micDevices = devices.filter(device => device.kind === 'audioinput');
+
+      // Handle the case where no camera or microphone is connected
+      if (cameraDevices.length === 0) {
+        setPermissionModal(true);
+        setErrorMessageForPermission("No camera device detected. Please connect a camera.");
+        return;
+      }
+
+      if (micDevices.length === 0) {
+        setPermissionModal(true);
+        setErrorMessageForPermission("No microphone device detected. Please connect a microphone.");
+        return;
+      }
+
       // If permissions are granted, proceed with starting the call
       const stream = await navigator.mediaDevices.getUserMedia({
         video: true,
@@ -340,13 +358,77 @@ const VideoCallUI = ({
         videoRef.current.srcObject = stream;
       }
 
+      // Handle socket disconnect or errors after initial connection
+      socket.on('disconnect', (reason) => {
+        console.log('Socket disconnected due to:', reason);
+        toast.error("You have been disconnected from the server. Please reconnect.");
+        // Additional logic to handle the disconnect (e.g., retry connection or show UI)
+      });
+
+      socket.on('connect_error', (err) => {
+        console.error('Socket connect error:', err);
+        toast.error("Socket connection error occurred. Please try again later.");
+        // Handle reconnection or other recovery mechanisms
+      });
+
+      socket.on('reconnect_error', (err) => {
+        console.error('Socket reconnect error:', err);
+        toast.error("Unable to reconnect to the server. Please try again later.");
+      });
+
+      socket.on('reconnect_failed', () => {
+        toast.error("Reconnection to the server failed. Please check your internet and try again.");
+      });
+
       const peer = new Peer(fromUser._id, {
         config: startMeeting.iceServers,
       });
 
       peer.on("error", (error) => {
-        setDisplayMsg({show:true,msg:error.message})
-        return;
+        console.error("Peer error:", error);
+        console.log("error", error.type, error.message)
+
+        switch (error.type) {
+          case 'browser-incompatible':
+            toast.error("The browser does not support some or all WebRTC features.");
+            break;
+          case 'disconnected':
+            toast.error("You have been disconnected from the server. No new connections can be made.");
+            break;
+          case 'invalid-id':
+            toast.error("The ID contains illegal characters.");
+            break;
+          case 'invalid-key':
+            toast.error("The API key contains illegal characters or is not recognized.");
+            break;
+          case 'network':
+            toast.error("Lost or unable to establish a connection to the signaling server.");
+            break;
+          case 'peer-unavailable':
+            toast.error("The peer you're trying to connect to does not exist.");
+            break;
+          case 'ssl-unavailable':
+            toast.error("SSL is unavailable on the server. Consider using a custom PeerServer.");
+            break;
+          case 'server-error':
+            toast.error("Unable to reach the server. Please try again later.");
+            break;
+          case 'socket-error':
+            toast.error("A socket error occurred.");
+            break;
+          case 'socket-closed':
+            toast.error("The underlying socket was closed unexpectedly.");
+            break;
+          case 'unavailable-id':
+            setUserAlreadyInCall(true);
+            toast.error("The ID is already taken. Please try again.");
+            break;
+          case 'webrtc':
+            toast.error("A native WebRTC error occurred.");
+            break;
+          default:
+            toast.error("An error occurred while trying to start the call.");
+        }
       });
 
       peerRef.current = peer;
@@ -356,11 +438,11 @@ const VideoCallUI = ({
         socket.emit("ON_CALL_JOIN", {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
         });
-        
+
         console.log("call joined");
       });
 
-     
+
 
       peer.on("call", (call) => {
         call.answer(stream);
@@ -372,8 +454,7 @@ const VideoCallUI = ({
       });
     } catch (err) {
       console.log("error", err);
-      setPermissionModal(true);
-      setErrorMessageForPermission("Kindly allow us access to your camera and microphone.");
+      toast.error("Something Went Wrong.")
     }
   };
 
@@ -446,10 +527,10 @@ const VideoCallUI = ({
         msg: `${toUser?.fullname} left the meeting, this call will end in 5 minutes...`,
       });
       console.log("Hmmm.....")
-      timeoutId = setTimeout(()=>{
-        console.log("isTraineeJoined",isTraineeJoined)
+      timeoutId = setTimeout(() => {
+        console.log("isTraineeJoined", isTraineeJoined)
         cutCall()
-      },300000)
+      }, 300000)
       // },20000)
     });
   };
@@ -478,7 +559,9 @@ const VideoCallUI = ({
   }
 
   const cleanupFunction = () => {
-    handlePeerDisconnect();
+    if (!userAlreadyInCall) {
+      handlePeerDisconnect();
+    }
     setIsCallEnded(true);
 
     if (localStream) {
@@ -531,10 +614,12 @@ const VideoCallUI = ({
     // clearCanvas();
   };
 
-  console.log("displayMessage",displayMsg)
+  console.log("displayMessage", displayMsg)
 
   const cutCall = () => {
-    socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, { userInfo: { from_user: fromUser._id, to_user: toUser._id } });
+    if (!userAlreadyInCall) {
+      socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, { userInfo: { from_user: fromUser._id, to_user: toUser._id } });
+    }
     cleanupFunction();
     if (isTraineeJoined && AccountType.TRAINER === accountType) {
       setIsOpenReport(true);
@@ -551,11 +636,11 @@ const VideoCallUI = ({
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
-        event.preventDefault();
-        event.returnValue = 'You are currently in a call. Are you sure you want to leave or reload? This will disconnect the call.';
+      event.preventDefault();
+      event.returnValue = 'You are currently in a call. Are you sure you want to leave or reload? This will disconnect the call.';
     };
 
-    const handleUnload = ()=>{
+    const handleUnload = () => {
       cutCall()
     }
 
@@ -564,11 +649,11 @@ const VideoCallUI = ({
 
 
     return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-        window.removeEventListener('unload', handleUnload);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('unload', handleUnload);
 
     };
-}, []);
+  }, []);
 
 
 
