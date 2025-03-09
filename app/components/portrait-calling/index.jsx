@@ -47,6 +47,7 @@ import { getTraineeClips } from "../NavHomePage/navHomePage.api";
 import PermissionModal from "../video/PermissionModal";
 
 let Peer;
+let timeoutId;
 const VideoCallUI = ({
   id,
   isClose,
@@ -73,7 +74,7 @@ const VideoCallUI = ({
   const [isTraineeJoined, setIsTraineeJoined] = useState(false);
   const [permissionModal, setPermissionModal] = useState(true);
   const [localStream, setLocalStream] = useState(null);
-  const [displayMsg, setDisplayMsg] = useState({ showMsg: false, msg: "" });
+  const [displayMsg, setDisplayMsg] = useState({ show: false, msg: "" });
   const [remoteStream, setRemoteStream] = useState(null);
   const [micStream, setMicStream] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -97,7 +98,6 @@ const VideoCallUI = ({
   const [currentScreenShot, setCurrentScreenshot] = useState("")
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
   const [isCallEnded, setIsCallEnded] = useState(false);
-  const [screenStream, setScreenStream] = useState(null);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [errorMessageForPermission, setErrorMessageForPermission] = useState("Kindly allow us access to your camera and microphone.")
 
@@ -298,7 +298,7 @@ const VideoCallUI = ({
   };
 
   console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
-
+  console.log("TimeOut",timeoutId)
   const handleStartCall = async () => {
     try {
       // Check permissions for camera and microphone
@@ -333,10 +333,10 @@ const VideoCallUI = ({
       setPermissionModal(false);
       setLocalStream(stream);
       setDisplayMsg({
-        showMsg: true,
+        show: true,
         msg: `Waiting for ${toUser?.fullname} to join...`,
       });
-      if(videoRef.current){
+      if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
 
@@ -350,6 +350,7 @@ const VideoCallUI = ({
         socket.emit("ON_CALL_JOIN", {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
         });
+        
         console.log("call joined");
       });
 
@@ -361,7 +362,7 @@ const VideoCallUI = ({
         call.answer(stream);
         call.on("stream", (remoteStream) => {
           setIsTraineeJoined(true);
-          setDisplayMsg({ showMsg: false, msg: "" });
+          setDisplayMsg({ show: false, msg: "" });
           setRemoteStream(remoteStream);
         });
       });
@@ -383,9 +384,6 @@ const VideoCallUI = ({
       accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
     }
 
-    return () => {
-      cutCall();
-    };
   }, [remoteStream]);
 
   const connectToPeer = (peer, peerId) => {
@@ -393,7 +391,10 @@ const VideoCallUI = ({
     const call = peer.call(peerId, videoRef?.current?.srcObject);
     call?.on("stream", (remoteStream) => {
       // console.log(`setting remoteStream for 2nd user here ---- `);
-      setDisplayMsg({ showMsg: false, msg: "" });
+      setDisplayMsg({ show: false, msg: "" });
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       setIsTraineeJoined(true);
       console.log("remoteVideoRef", remoteVideoRef?.current);
       if (remoteVideoRef?.current) {
@@ -437,10 +438,15 @@ const VideoCallUI = ({
 
     socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
       setDisplayMsg({
-        showMsg: true,
-        msg: `${toUser?.fullname} left the meeting, redirecting back to home screen in 5 seconds...`,
+        show: true,
+        msg: `${toUser?.fullname} left the meeting, this call will end in 5 minutes...`,
       });
-      cleanupFunction();
+      console.log("Hmmm.....")
+      timeoutId = setTimeout(()=>{
+        console.log("isTraineeJoined",isTraineeJoined)
+        cutCall()
+      },300000)
+      // },20000)
     });
   };
 
@@ -479,15 +485,6 @@ const VideoCallUI = ({
         track.stop();
       });
       setLocalStream(null);
-    }
-    if (screenStream) {
-      screenStream.getAudioTracks().forEach(function (track) {
-        track.stop();
-      });
-      screenStream.getVideoTracks().forEach((track) => {
-        track.stop();
-      });
-      setScreenStream(null);
     }
 
     if (remoteStream) {
@@ -530,7 +527,10 @@ const VideoCallUI = ({
     // clearCanvas();
   };
 
+  console.log("displayMessage",displayMsg)
+
   const cutCall = () => {
+    socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, { userInfo: { from_user: fromUser._id, to_user: toUser._id } });
     cleanupFunction();
     if (isTraineeJoined && AccountType.TRAINER === accountType) {
       setIsOpenReport(true);
@@ -546,22 +546,27 @@ const VideoCallUI = ({
   };
 
   useEffect(() => {
-  
-
-      const handleBeforeUnload = (event) => {
+    const handleBeforeUnload = (event) => {
         event.preventDefault();
-          event.returnValue = 'You are currently in a call. Are you sure you want to leave or reload? This will disconnect the call.';
-        };
-  
-        // Attach the event listener for beforeunload
-      window.addEventListener('beforeunload', handleBeforeUnload);
-  
-        // Cleanup the event listener when the component unmounts
-      return () => {
-        window.removeEventListener('beforeunload', handleBeforeUnload);
-      };
+        event.returnValue = 'You are currently in a call. Are you sure you want to leave or reload? This will disconnect the call.';
+    };
 
-    }, []); 
+    const handleUnload = ()=>{
+      cutCall()
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('unload', handleUnload);
+
+
+    return () => {
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        window.removeEventListener('unload', handleUnload);
+
+    };
+}, []);
+
+
 
   useEffect(() => {
     if (fromUser && toUser) {
@@ -576,7 +581,8 @@ const VideoCallUI = ({
       return () => {
         window.removeEventListener("beforeunload", handelTabClose);
         window.removeEventListener("offline", handleOffline);
-        cutCall();
+
+        // cutCall();
       };
     }
   }, []);
@@ -592,7 +598,7 @@ const VideoCallUI = ({
         width: isLandscape ? "50%" : "100%",
       }}
     >
-      {displayMsg?.msg ? <div>{displayMsg?.msg}</div> : null}
+      {displayMsg?.show ? <div>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
           timeRemaining={session_end_time}
