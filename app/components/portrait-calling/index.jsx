@@ -383,44 +383,7 @@ const VideoCallUI = ({
       console.log("startMeeting",startMeeting)
 
       const peer = new Peer(fromUser._id, {
-        config:{iceServers: [
-          { 
-              urls: "stun:stun.cloudflare.com:3478"
-          },
-          { 
-              urls: "stun:stun.cloudflare.com:53"
-          },
-          { 
-              urls: "turn:turn.cloudflare.com:3478?transport=udp", 
-              username: "g00dd14bd7f0ce2f5183272aaf8d9c0c5cf3928816b4ab366686b1d3f2e74c3b",
-              credential: "9c3b772d95f957198f71375481d432282dd6d676fd991983cb9380e479326361"
-          },
-          { 
-              urls: "turn:turn.cloudflare.com:53?transport=udp", 
-              username: "g00dd14bd7f0ce2f5183272aaf8d9c0c5cf3928816b4ab366686b1d3f2e74c3b",
-              credential: "9c3b772d95f957198f71375481d432282dd6d676fd991983cb9380e479326361"
-          },
-          { 
-              urls: "turn:turn.cloudflare.com:3478?transport=tcp", 
-              username: "g00dd14bd7f0ce2f5183272aaf8d9c0c5cf3928816b4ab366686b1d3f2e74c3b",
-              credential: "9c3b772d95f957198f71375481d432282dd6d676fd991983cb9380e479326361"
-          },
-          { 
-              urls: "turn:turn.cloudflare.com:80?transport=tcp", 
-              username: "g00dd14bd7f0ce2f5183272aaf8d9c0c5cf3928816b4ab366686b1d3f2e74c3b",
-              credential: "9c3b772d95f957198f71375481d432282dd6d676fd991983cb9380e479326361"
-          },
-          { 
-              urls: "turns:turn.cloudflare.com:5349?transport=tcp", 
-              username: "g00dd14bd7f0ce2f5183272aaf8d9c0c5cf3928816b4ab366686b1d3f2e74c3b",
-              credential: "9c3b772d95f957198f71375481d432282dd6d676fd991983cb9380e479326361"
-          },
-          { 
-              urls: "turns:turn.cloudflare.com:443?transport=tcp", 
-              username: "g00dd14bd7f0ce2f5183272aaf8d9c0c5cf3928816b4ab366686b1d3f2e74c3b",
-              credential: "9c3b772d95f957198f71375481d432282dd6d676fd991983cb9380e479326361"
-          }
-      ]},
+        config:{iceServers: startMeeting.iceServers},
       });
 
       peer.on("error", (error) => {

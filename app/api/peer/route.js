@@ -8,7 +8,7 @@ export async function GET(req) {
         // Call Cloudflare API to generate TURN credentials
         const response = await axios.post(
             `https://rtc.live.cloudflare.com/v1/turn/keys/${TURN_KEY_ID}/credentials/generate`,
-            { ttl: 21600 }, 
+            { ttl: 21600 },
             {
                 headers: {
                     Authorization: `Bearer ${TURN_KEY_API_TOKEN}`,
@@ -20,17 +20,34 @@ export async function GET(req) {
         // Extract the generated ICE servers from the response
         const { iceServers } = response.data;
 
+        console.log("iceServers", iceServers)
+
         const formattedIceServers = [
-            { urls: iceServers.urls }, // STUN server unchanged
+            { urls: iceServers.urls[0] },
+            { urls: iceServers.urls[1] },
             {
-                username: iceServers.username, // Use the actual username from the response
-                credential: iceServers.credential, // Use the actual credential from the response
-                urls: "turn:turn.cloudflare.com:3478?transport=tcp", // TURN server with TCP transport
+                urls: iceServers.urls[2], username: iceServers.username,
+                credential: iceServers.credential,
             },
             {
-                username: iceServers.username, // Same username from response
-                credential: iceServers.credential, // Same credential from response
-                urls: "turn:turn.cloudflare.com:3478?transport=udp", // TURN server with UDP transport
+                urls: iceServers.urls[3], username: iceServers.username,
+                credential: iceServers.credential,
+            },
+            {
+                urls: iceServers.urls[4], username: iceServers.username,
+                credential: iceServers.credential,
+            },
+            {
+                urls: iceServers.urls[5], username: iceServers.username,
+                credential: iceServers.credential,
+            },
+            {
+                urls: iceServers.urls[6], username: iceServers.username,
+                credential: iceServers.credential,
+            },
+            {
+                urls: iceServers.urls[7], username: iceServers.username,
+                credential: iceServers.credential,
             }
         ];
         // Return the iceServers in the response
