@@ -48,6 +48,30 @@ import PermissionModal from "../video/PermissionModal";
 
 let Peer;
 let timeoutId;
+
+const getTimeDifferenceStatus = (session_end_time) => {
+  const now = new Date();
+
+  if (typeof session_end_time === "string" && session_end_time.includes(":")) {
+    const [endHours, endMinutes] = session_end_time.split(":").map(Number);
+    const endTime = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      endHours,
+      endMinutes
+    );
+
+    const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
+
+    return timeDiff <= -5; // Returns true if timeDiff is -5 or less
+  } else {
+    console.error("Invalid session_end_time:", session_end_time);
+    return false; // Handle invalid input
+  }
+};
+
+
 const VideoCallUI = ({
   id,
   isClose,
@@ -130,6 +154,25 @@ const VideoCallUI = ({
       getMyClips();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const checkStatus = () => {
+      const isEndCall = getTimeDifferenceStatus(session_end_time);
+
+      if(isEndCall){
+        cutCall()
+      }
+    };
+
+    // Initial check
+    checkStatus();
+
+    // Check every second
+    const intervalId = setInterval(checkStatus, 1000);
+
+    // Cleanup on unmount
+    return () => clearInterval(intervalId);
+  }, [session_end_time]);
 
   const getMyClips = async () => {
     var res = await myClips({});
