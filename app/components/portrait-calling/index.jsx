@@ -301,6 +301,21 @@ const VideoCallUI = ({
   console.log("TimeOut", timeoutId)
   const handleStartCall = async () => {
     try {
+
+      const checkIPVersion = async () => {
+        try {
+            const res = await fetch("https://api64.ipify.org?format=json");
+            const data = await res.json();
+            const ipAddress = data.ip;
+            const isIPv6 = ipAddress.includes(":");
+            toast.success(`You are using ${isIPv6 ? 'IPv6' : 'IPv4'}.`);
+        } catch (error) {
+            console.error("Error fetching IP version:", error);
+            toast.error("Failed to determine IP version.");
+        }
+    };
+    
+    checkIPVersion();
       // Check permissions for camera and microphone
       const cameraPermission = await navigator.permissions.query({ name: 'camera' });
       const micPermission = await navigator.permissions.query({ name: 'microphone' });
