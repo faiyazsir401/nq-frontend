@@ -465,7 +465,7 @@ const SettingSection = (props) => {
         <div
           className={`block ${settingTab === "account" ? "open custom-block-height" : ""
             }`}
-          style={{ maxWidth: "95%" }}
+          style={{ maxWidth: "100%" }}
         >
           <div className="media">
             <div className="media-body">
@@ -823,7 +823,7 @@ const SettingSection = (props) => {
           <div
             className={`block ${settingTab === "my-profile" ? "open custom-block-height" : ""
               }`}
-            style={{ maxWidth: "95%", paddingBottom: "80px" }}
+            style={{ maxWidth: "100%", paddingBottom: "80px" }}
           >
             <div className="media">
               <div className="media-body">
@@ -1066,7 +1066,7 @@ const SettingSection = (props) => {
             <div
               className={`block ${settingTab === "integratin" ? "open custom-block-height" : ""
                 }`}
-              style={{ maxWidth: "95%" }}
+              style={{ maxWidth: "100%" }}
             >
               <div className="media">
                 <div className="media-body">
@@ -1542,7 +1542,7 @@ const SettingSection = (props) => {
           <div
             className={`block ${settingTab === "help" ? "open custom-block-height" : ""
               }`}
-            style={{ maxWidth: "95%" }}
+            style={{ maxWidth: "100%" }}
           >
             <div className="media">
               <div className="media-body">
