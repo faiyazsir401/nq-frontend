@@ -522,7 +522,6 @@ useEffect(() => {
           videoRef={videoRef}
           setIsPlaying={setIsPlaying}
           setCurrentTime={setCurrentTime}
-          isFixed={true}
         />
       )}
     </>
@@ -689,23 +688,40 @@ const ClipModeCall = ({
     }
   };
 
-  // Handle seeking for both videos when locked
   const handleSeek = (e) => {
-    const progress = e.target.value;
-    console.log("progress", progress);
+    const newProgress = parseFloat(e.target.value);
+  
+    if (!videoRef?.current || !videoRef2?.current) return;
+  
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
-    if (video1 && video2) {
-      video1.currentTime = progress;
-      video2.currentTime = progress;
-      setCurrentTime(progress);
-      socket?.emit(EVENTS?.ON_VIDEO_TIME, {
-        both: true,
-        userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-        progress,
-      });
-    }
+  
+    const isVideo1Longer = video1.duration >= video2.duration;
+    const longerVideo = isVideo1Longer ? video1 : video2;
+    const shorterVideo = isVideo1Longer ? video2 : video1;
+  
+    // Calculate the delta (difference) in progress
+    const delta = newProgress - longerVideo.currentTime;
+  
+    // Apply delta to both videos while ensuring shorterVideo does not exceed limits
+    longerVideo.currentTime = newProgress;
+    shorterVideo.currentTime = Math.min(
+      Math.max(shorterVideo.currentTime + delta, 0),
+      shorterVideo.duration
+    );
+  
+    // Update state
+    setCurrentTime(longerVideo.currentTime);
+  
+    // Emit event with the new progress
+    socket?.emit(EVENTS?.ON_VIDEO_TIME, {
+      userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
+      both:true,
+      progress: longerVideo.currentTime, // Sync using the longer video
+    });
   };
+
+
 
   const sendClearCanvasEvent = () => {
     if (remoteVideoRef && remoteVideoRef.current) {
@@ -1511,8 +1527,9 @@ const ClipModeCall = ({
                 // toggleMute={toggleMute}
                 togglePlayPause={togglePlayPause}
                 videoRef={videoRef}
+                videoRef2={videoRef2}
                 setIsPlaying={setIsPlayingBoth}
-                isFixed={isLock}
+                isLock={isLock}
                 setCurrentTime={setCurrentTime}
               />
             )}
