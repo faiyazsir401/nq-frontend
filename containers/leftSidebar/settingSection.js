@@ -823,7 +823,7 @@ const SettingSection = (props) => {
           <div
             className={`block ${settingTab === "my-profile" ? "open custom-block-height" : ""
               }`}
-            style={{ maxWidth: "100%", paddingBottom: "80px" }}
+            style={{  paddingBottom: "80px" }}
           >
             <div className="media">
               <div className="media-body">
