@@ -747,7 +747,7 @@ const VideoCallUI = ({
         width: isLandscape ? "50%" : "100%",
       }}
     >
-      {displayMsg?.show ? <div>{displayMsg?.msg}</div> : null}
+      {displayMsg?.show ? <div style={{textAlign:"center"}}>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
           timeRemaining={session_end_time}

@@ -45,7 +45,8 @@ export const CanvasMenuBar = ({
   clipSelectNote,
   setCountClipNoteOpen,
   resetInitialPinnedUser,
-  isFromPotrait
+  isFromPotrait,
+  isFullScreen
 }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
@@ -85,6 +86,7 @@ export const CanvasMenuBar = ({
     setTraineeClips(arr);
   };
   const isMobileScreen = useMediaQuery("(max-width: 1000px)");
+  const isSmallScreen = useMediaQuery("(max-width: 410px)");
 
   var netquixVideos = [
     {
@@ -123,6 +125,9 @@ export const CanvasMenuBar = ({
     <div style={{ margin: isFromPotrait ? "0.5rem" : "1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
+        style={{
+          width: (isSmallScreen &&isFullScreen)  ? "222px" : "auto"
+        }}
       // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
         <div className="CreationBarCustomizable" style={{ overflow: 'auto', display: isFromPotrait ? "flex" : "block" }}>
@@ -166,7 +171,7 @@ export const CanvasMenuBar = ({
               style={{
                 height: "24px",
                 width: "24px",
-                padding: "5px",
+                padding: isSmallScreen ? "12px" : "5px",
                 margin: "5px",
                 marginLeft: "2px",
               }}
@@ -186,13 +191,13 @@ export const CanvasMenuBar = ({
           {/* : null} */}
           <div
             className={`icon-btn  button-effect btn-sm ${SHAPES.FREE_HAND === activeTab
-                ? "btn-outline-primary"
-                : "btn-outline-light"
+              ? "btn-outline-primary"
+              : "btn-outline-light"
               }`}
             style={{
               height: "24px",
               width: "24px",
-              padding: "5px",
+              padding: isSmallScreen ? "12px" : "5px",
 
               margin: "5px",
               marginLeft: "2px",
@@ -201,20 +206,20 @@ export const CanvasMenuBar = ({
               menuSelector(SHAPES.FREE_HAND)
             }}
           >
-            <Edit2 />
+            <Edit2 height={20} width={20} style={{minWidth:"12px"}}/>
           </div>
 
           {/* line */}
 
           <div
             className={`icon-btn  button-effect btn-sm ${SHAPES.ANGLE === activeTab
-                ? "btn-outline-primary"
-                : "btn-outline-light"
+              ? "btn-outline-primary"
+              : "btn-outline-light"
               }`}
             style={{
               height: "24px",
               width: "24px",
-              padding: "5px",
+              padding: isSmallScreen ? "12px" : "5px",
 
               margin: "5px",
               marginLeft: "2px",
@@ -229,13 +234,13 @@ export const CanvasMenuBar = ({
 
           <div
             className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.LINE
-                ? "btn-outline-primary"
-                : "btn-outline-light"
+              ? "btn-outline-primary"
+              : "btn-outline-light"
               }`}
             style={{
               height: "24px",
               width: "24px",
-              padding: "5px",
+              padding: isSmallScreen ? "12px" : "5px",
 
               margin: "5px",
               marginLeft: "2px",
@@ -252,13 +257,13 @@ export const CanvasMenuBar = ({
 
           <div
             className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.CIRCLE
-                ? "btn-outline-primary"
-                : "btn-outline-light"
+              ? "btn-outline-primary"
+              : "btn-outline-light"
               }`}
             style={{
               height: "24px",
               width: "24px",
-              padding: "5px",
+              padding: isSmallScreen ? "12px" : "5px",
 
               margin: "5px",
               marginLeft: "2px",
@@ -274,13 +279,13 @@ export const CanvasMenuBar = ({
 
           <div
             className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.SQUARE
-                ? "btn-outline-primary"
-                : "btn-outline-light"
+              ? "btn-outline-primary"
+              : "btn-outline-light"
               }`}
             style={{
               height: "24px",
               width: "24px",
-              padding: "5px",
+              padding: isSmallScreen ? "12px" : "5px",
 
               margin: "5px",
               marginLeft: "2px",
@@ -296,13 +301,13 @@ export const CanvasMenuBar = ({
             style={{
               height: "24px",
               width: "24px",
-              padding: "5px",
+              padding: isSmallScreen ? "12px" : "5px",
               margin: "5px",
               marginLeft: "2px",
             }}
             className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.ARROW_RIGHT
-                ? "btn-outline-primary"
-                : "btn-outline-light"
+              ? "btn-outline-primary"
+              : "btn-outline-light"
               }`}
             onClick={() => {
               menuSelector(SHAPES.ARROW_RIGHT)
@@ -317,8 +322,8 @@ export const CanvasMenuBar = ({
 
               <div
                 className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.RECTANGLE
-                    ? "btn-outline-primary"
-                    : "btn-outline-light"
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
                   }`}
                 onClick={() => {
                   menuSelector(SHAPES.RECTANGLE)
@@ -326,7 +331,7 @@ export const CanvasMenuBar = ({
                 style={{
                   height: "24px",
                   width: "24px",
-                  padding: "5px",
+                  padding: isSmallScreen ? "12px" : "5px",
 
                   margin: "5px",
                   marginLeft: "2px",
@@ -346,13 +351,13 @@ export const CanvasMenuBar = ({
                 style={{
                   height: "24px",
                   width: "24px",
-                  padding: "5px",
+                  padding: isSmallScreen ? "12px" : "5px",
                   margin: "5px",
                   marginLeft: "2px",
                 }}
                 className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.OVAL
-                    ? "btn-outline-primary"
-                    : "btn-outline-light"
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
                   }`}
                 onClick={() => {
                   menuSelector(SHAPES.OVAL)
@@ -368,13 +373,13 @@ export const CanvasMenuBar = ({
                 style={{
                   height: "24px",
                   width: "24px",
-                  padding: "5px",
+                  padding: isSmallScreen ? "12px" : "5px",
                   margin: "5px",
                   marginLeft: "2px",
                 }}
                 className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.TRIANGLE
-                    ? "btn-outline-primary"
-                    : "btn-outline-light"
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
                   }`}
                 onClick={() => {
                   menuSelector(SHAPES.TRIANGLE)
@@ -398,13 +403,13 @@ export const CanvasMenuBar = ({
                 style={{
                   height: "24px",
                   width: "24px",
-                  padding: "5px",
+                  padding: isSmallScreen ? "12px" : "5px",
                   margin: "5px",
                   marginLeft: "2px",
                 }}
                 className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.TWO_SIDE_ARROW
-                    ? "btn-outline-primary"
-                    : "btn-outline-light"
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
                   }`}
                 onClick={() => {
                   menuSelector(SHAPES.TWO_SIDE_ARROW)
@@ -422,7 +427,7 @@ export const CanvasMenuBar = ({
               style={{
                 height: "24px",
                 width: "24px",
-                padding: "5px",
+                padding: isSmallScreen ? "12px" : "5px",
 
                 margin: "5px",
                 marginLeft: "2px",
@@ -438,13 +443,13 @@ export const CanvasMenuBar = ({
             style={{
               height: "24px",
               width: "24px",
-              padding: "5px",
+              padding: isSmallScreen ? "12px" : "5px",
 
               margin: "5px",
               marginLeft: "2px",
             }}
           >
-            <RefreshCw />
+            <RefreshCw height={20} width={20} style={{minWidth:"12px"}}/>
           </div>
 
           {/* <span>

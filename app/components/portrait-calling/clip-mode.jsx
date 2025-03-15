@@ -1442,6 +1442,7 @@ const ClipModeCall = ({
                     clipSelectNote={clipSelectNote}
                     setCountClipNoteOpen={setCountClipNoteOpen}
                     resetInitialPinnedUser={resetInitialPinnedUser}
+                    isFullScreen={isMaximized}
                   />
                 </div>
               )}
