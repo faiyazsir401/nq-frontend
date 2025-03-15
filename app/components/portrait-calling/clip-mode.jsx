@@ -927,11 +927,11 @@ const ClipModeCall = ({
     const context2 = canvas2?.getContext("2d");
 
     const drawFrame = () => {
-      if (canvas1 && context1 && video) {
+      if (canvas1 && context1 && video1) {
         context1.fillStyle = "rgba(255, 255, 255, 0.5)";
         context1.fillRect(0, 0, canvas1.width, canvas1.height);
       }
-      if (canvas2 && context2 && video) {
+      if (canvas2 && context2 && video2) {
         context2.fillStyle = "rgba(255, 255, 255, 0.5)";
         context2.fillRect(0, 0, canvas2.width, canvas2.height);
       }
@@ -1241,9 +1241,9 @@ const ClipModeCall = ({
             mousePos
           );
           // Optionally, display the angle computed (you can use context.fillText)
-          context.fillStyle = "black";
-          context.font = "16px Arial";
-          context.fillText(`${computedAngle.toFixed(2)}°`, mousePos.x + 10, mousePos.y - 10);
+          context.fillStyle = canvasConfigs.sender.strokeStyle;
+          context.font = "14xpx Arial";
+          context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 5, currPos[`canvas${canvasIndex}`].y - 5);
         }
 
       } else {
