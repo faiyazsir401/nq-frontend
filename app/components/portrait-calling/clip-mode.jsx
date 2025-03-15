@@ -14,7 +14,7 @@ import { UserBox, UserBoxMini, VideoMiniBox } from "./user-box";
 import TimeRemaining from "./time-remaining";
 import { useRef } from "react";
 import CustomVideoControls from "./custom-video-controls";
-import { AccountType } from "../../common/constants";
+import { AccountType, SHAPES } from "../../common/constants";
 import { useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";
 import { SocketContext } from "../socket";
@@ -30,17 +30,6 @@ import { screenShotTake } from "../videoupload/videoupload.api";
 import html2canvas from "html2canvas";
 import { FaLock, FaUndo, FaUnlock } from "react-icons/fa";
 import NextImage from "next/image";
-const SHAPES = {
-  FREE_HAND: "hand",
-  LINE: "line",
-  CIRCLE: "circle",
-  SQUARE: "square",
-  OVAL: "oval",
-  RECTANGLE: "rectangle",
-  TRIANGLE: "triangle",
-  ARROW_RIGHT: "arrow_right",
-  TWO_SIDE_ARROW: "two_side_arrow",
-};
 
 let isDrawing = false;
 let savedPos = { canvas1: null, canvas2: null };
@@ -48,6 +37,7 @@ let startPos = { canvas1: null, canvas2: null };
 let currPos = { canvas1: null, canvas2: null };
 let strikes = { canvas1: [], canvas2: [] };
 
+let drawingStep = "baseline"
 let canvasConfigs = {
   sender: {
     strokeStyle: "red",
@@ -71,6 +61,8 @@ let storedLocalDrawPaths = {
   canvas1: { sender: [], receiver: [] },
   canvas2: { sender: [], receiver: [] }, // Separate history for each canvas
 };
+
+let anglePoint = { canvas1: null, canvas2: null };
 
 let extraStream;
 let localVideoRef;
@@ -360,16 +352,16 @@ const VideoContainer = ({
 
   const [aspectRatio, setAspectRatio] = useState("16 / 9");
 
-useEffect(() => {
-  if (videoRef.current) {
-    const video = videoRef.current;
-    video.onloadedmetadata = () => {
-      const ratio = video.videoWidth / video.videoHeight;
-      setAspectRatio(`${video.videoWidth} / ${video.videoHeight}`);
-    };
-  }
-}, [videoRef]);
-  console.log("videoRef",aspectRatio)
+  useEffect(() => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      video.onloadedmetadata = () => {
+        const ratio = video.videoWidth / video.videoHeight;
+        setAspectRatio(`${video.videoWidth} / ${video.videoHeight}`);
+      };
+    }
+  }, [videoRef]);
+  console.log("videoRef", aspectRatio)
 
   return (
     <>
@@ -383,12 +375,12 @@ useEffect(() => {
               ? "88dvh"
               : "80dvh" // If isSingle is true
             : isMaximized
-            ? isLock
-              ? "44.5dvh"
-              : "42.5dvh" // If isMaximized is true and isSingle is false
-            : isLock
-            ? "40dvh"
-            : "37dvh", // If isMaximized is false and isSingle is false
+              ? isLock
+                ? "44.5dvh"
+                : "42.5dvh" // If isMaximized is true and isSingle is false
+              : isLock
+                ? "40dvh"
+                : "37dvh", // If isMaximized is false and isSingle is false
           width: isLandscape ? "50vw" : "100vw",
           display: "flex",
           justifyContent: "center",
@@ -456,7 +448,7 @@ useEffect(() => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-               overflow: "hidden"
+              overflow: "hidden"
             }}
           >
             <video
@@ -467,8 +459,8 @@ useEffect(() => {
               style={{
                 touchAction: "manipulation",
                 maxWidth: "100%",
-                 width:"auto",
-                height: `${100*scale}%`,
+                width: "auto",
+                height: `${100 * scale}%`,
                 // maxHeight:"100%",
                 aspectRatio: aspectRatio, // Force a correct aspect ratio
                 objectFit: "contain", // Prevent stretching
@@ -690,33 +682,33 @@ const ClipModeCall = ({
 
   const handleSeek = (e) => {
     const newProgress = parseFloat(e.target.value);
-  
+
     if (!videoRef?.current || !videoRef2?.current) return;
-  
+
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
-  
+
     const isVideo1Longer = video1.duration >= video2.duration;
     const longerVideo = isVideo1Longer ? video1 : video2;
     const shorterVideo = isVideo1Longer ? video2 : video1;
-  
+
     // Calculate the delta (difference) in progress
     const delta = newProgress - longerVideo.currentTime;
-  
+
     // Apply delta to both videos while ensuring shorterVideo does not exceed limits
     longerVideo.currentTime = newProgress;
     shorterVideo.currentTime = Math.min(
       Math.max(shorterVideo.currentTime + delta, 0),
       shorterVideo.duration
     );
-  
+
     // Update state
     setCurrentTime(longerVideo.currentTime);
-  
+
     // Emit event with the new progress
     socket?.emit(EVENTS?.ON_VIDEO_TIME, {
       userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
-      both:true,
+      both: true,
       progress: longerVideo.currentTime, // Sync using the longer video
     });
   };
@@ -758,8 +750,25 @@ const ClipModeCall = ({
     }
   };
 
+  // const [drawingStep, setDrawingStep] = useState("baseline")
+  // console.log("drawingStep", drawingStep)
   const stopDrawing = (event, canvasIndex = 1) => {
+    console.log("stopDrawingexcuted")
     event.preventDefault();
+
+    if (selectedShape === SHAPES.ANGLE) {
+      if (drawingStep === 'baseline' && currPos[`canvas${canvasIndex}`]) {
+        console.log("stop-drawingStep", drawingStep,startPos,currPos)
+
+        // If we're in baseline step and we completed it, move to angle drawing step
+        drawingStep = "angle";
+      } else if (drawingStep === 'angle' && anglePoint[`canvas${canvasIndex}`]) {
+        // Save the angle calculation here
+        drawingStep = "baseline";
+        anglePoint = { canvas1: null, canvas2: null };
+      }
+    }
+
     if (state.mousedown[`canvas${canvasIndex}`]) {
       sendDrawEvent(canvasIndex);
       sendStopDrawingEvent(canvasIndex);
@@ -879,6 +888,25 @@ const ClipModeCall = ({
     }
   };
 
+  const calculateAngle = (start, end, angle) => {
+    console.log("start",start,end,angle)
+    const dx1 = end.x - start.x;
+    const dy1 = end.y - start.y;
+    const dx2 = angle.x - end.x;
+    const dy2 = angle.y - end.y;
+    console.log("start2",dx1,dy1,dx2,dy2)
+    const dotProduct = -(dx1 * dx2 + dy1 * dy2);
+    console.log("start3",dotProduct)
+    const magnitude1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+    const magnitude2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+    console.log("start4",magnitude1,magnitude2)
+    let angleRad = Math.acos(dotProduct / (magnitude1 * magnitude2));
+    let angleDeg = (angleRad * 180) / Math.PI;
+    console.log("start5",angleRad,angleDeg)
+
+    return isNaN(angleDeg) ? 0 : angleDeg;
+  };
+
   useEffect(() => {
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
@@ -941,7 +969,21 @@ const ClipModeCall = ({
         context.beginPath();
         context.moveTo(mousePos.x, mousePos.y);
         state.mousedown[`canvas${canvasIndex}`] = true;
-        startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
+        if (selectedShape === SHAPES.ANGLE) {
+          console.log("drawingStep", drawingStep)
+          if (drawingStep === "baseline") {
+            startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
+            currPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
+
+          } else if (drawingStep === "angle") {
+            anglePoint[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
+
+          }
+        } else {
+          startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
+
+        }
+
       } catch (error) {
         console.log("error", error);
       }
@@ -950,13 +992,30 @@ const ClipModeCall = ({
     const findDistance = (startPos, currPos) => {
       let dis = Math.sqrt(
         Math.pow(currPos.x - startPos.x, 2) +
-          Math.pow(currPos.y - startPos.y, 2)
+        Math.pow(currPos.y - startPos.y, 2)
       );
       return dis;
     };
 
     const drawShapes = (context, canvasIndex) => {
       switch (selectedShape) {
+        case SHAPES.ANGLE: {
+          // Draw baseline
+          context.moveTo(
+            startPos[`canvas${canvasIndex}`].x,
+            startPos[`canvas${canvasIndex}`].y
+          );
+          context.lineTo(
+            currPos[`canvas${canvasIndex}`].x,
+            currPos[`canvas${canvasIndex}`].y
+          );
+          // Draw angle lines
+          if (anglePoint[`canvas${canvasIndex}`]) {
+            context.moveTo(currPos[`canvas${canvasIndex}`].x, currPos[`canvas${canvasIndex}`].y);
+            context.lineTo(anglePoint[`canvas${canvasIndex}`].x, anglePoint[`canvas${canvasIndex}`].y);
+          }
+          break;
+        }
         case SHAPES.LINE: {
           context.moveTo(
             startPos[`canvas${canvasIndex}`].x,
@@ -1042,9 +1101,9 @@ const ClipModeCall = ({
         case SHAPES.TRIANGLE: {
           context.moveTo(
             startPos[`canvas${canvasIndex}`].x +
-              (currPos[`canvas${canvasIndex}`].x -
-                startPos[`canvas${canvasIndex}`].x) /
-                2,
+            (currPos[`canvas${canvasIndex}`].x -
+              startPos[`canvas${canvasIndex}`].x) /
+            2,
             startPos[`canvas${canvasIndex}`].y
           );
           context.lineTo(
@@ -1062,9 +1121,9 @@ const ClipModeCall = ({
           const arrowSize = 10;
           const direction = Math.atan2(
             currPos[`canvas${canvasIndex}`].y -
-              startPos[`canvas${canvasIndex}`].y,
+            startPos[`canvas${canvasIndex}`].y,
             currPos[`canvas${canvasIndex}`].x -
-              startPos[`canvas${canvasIndex}`].x
+            startPos[`canvas${canvasIndex}`].x
           );
           const arrowheadX =
             currPos[`canvas${canvasIndex}`].x + length * Math.cos(direction);
@@ -1081,9 +1140,9 @@ const ClipModeCall = ({
           context.moveTo(arrowheadX, arrowheadY);
           context.lineTo(
             currPos[`canvas${canvasIndex}`].x -
-              arrowSize * Math.cos(direction - Math.PI / 6),
+            arrowSize * Math.cos(direction - Math.PI / 6),
             currPos[`canvas${canvasIndex}`].y -
-              arrowSize * Math.sin(direction - Math.PI / 6)
+            arrowSize * Math.sin(direction - Math.PI / 6)
           );
           context.moveTo(
             currPos[`canvas${canvasIndex}`].x,
@@ -1091,9 +1150,9 @@ const ClipModeCall = ({
           );
           context.lineTo(
             currPos[`canvas${canvasIndex}`].x -
-              arrowSize * Math.cos(direction + Math.PI / 6),
+            arrowSize * Math.cos(direction + Math.PI / 6),
             currPos[`canvas${canvasIndex}`].y -
-              arrowSize * Math.sin(direction + Math.PI / 6)
+            arrowSize * Math.sin(direction + Math.PI / 6)
           );
           context.stroke();
           break;
@@ -1149,19 +1208,50 @@ const ClipModeCall = ({
       const mousePos = event.type.includes("touchmove")
         ? getTouchPos(event, canvas)
         : getMousePositionOnCanvas(event, canvas);
-      currPos[`canvas${canvasIndex}`] = { x: mousePos?.x, y: mousePos.y };
+      
       console.log("selectedShape1", selectedShape);
-      if (selectedShape !== SHAPES.FREE_HAND) {
-        context.putImageData(savedPos[`canvas${canvasIndex}`], 0, 0);
-        context.beginPath();
-        drawShapes(context, canvasIndex);
-        context.stroke();
-      } else {
-        // console.log(`--- drawing ---- `);
+      if (selectedShape === SHAPES.FREE_HAND) {
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
         context.lineCap = "round";
         context.lineTo(mousePos.x, mousePos.y);
+        context.stroke();
+        currPos[`canvas${canvasIndex}`] = { x: mousePos?.x, y: mousePos.y };
+      }
+      else if (selectedShape === SHAPES.ANGLE) {
+        // Handle angle tool logic
+
+        if (drawingStep === "baseline") {
+          // Draw the angle tool shape (line + angle marking)
+          currPos[`canvas${canvasIndex}`] = { x: mousePos?.x, y: mousePos.y };
+          context.putImageData(savedPos[`canvas${canvasIndex}`], 0, 0);
+          context.beginPath();
+          drawShapes(context, canvasIndex);
+          context.stroke();
+        } else {
+          anglePoint[`canvas${canvasIndex}`] = mousePos;
+
+          context.putImageData(savedPos[`canvas${canvasIndex}`], 0, 0);
+          context.beginPath();
+          drawShapes(context, canvasIndex);
+          context.stroke();
+          const computedAngle = calculateAngle(
+            startPos[`canvas${canvasIndex}`],
+            currPos[`canvas${canvasIndex}`],
+            mousePos
+          );
+          // Optionally, display the angle computed (you can use context.fillText)
+          context.fillStyle = "black";
+          context.font = "16px Arial";
+          context.fillText(`${computedAngle.toFixed(2)}°`, mousePos.x + 10, mousePos.y - 10);
+        }
+
+      } else {
+        // console.log(`--- drawing ---- `);
+        currPos[`canvas${canvasIndex}`] = { x: mousePos?.x, y: mousePos.y };
+        context.putImageData(savedPos[`canvas${canvasIndex}`], 0, 0);
+        context.beginPath();
+        drawShapes(context, canvasIndex);
         context.stroke();
       }
     };
@@ -1230,16 +1320,15 @@ const ClipModeCall = ({
     return { x, y };
   };
 
-  function resetInitialPinnedUser() {}
+  function resetInitialPinnedUser() { }
   const isSingle = selectedClips?.length === 1;
   return (
     <>
       <div
-        className={`d-flex  pl-1 pr-1 ${
-          accountType === AccountType.TRAINER && !selectedUser
-            ? "mt-1 mb-1 justify-content-between"
-            : "mt-2 mb-2  justify-content-end"
-        } ${isMaximized?"":"w-100"}`}
+        className={`d-flex  pl-1 pr-1 ${accountType === AccountType.TRAINER && !selectedUser
+          ? "mt-1 mb-1 justify-content-between"
+          : "mt-2 mb-2  justify-content-end"
+          } ${isMaximized ? "" : "w-100"}`}
       >
         {accountType === AccountType.TRAINER && !selectedUser && (
           <div className="d-flex">

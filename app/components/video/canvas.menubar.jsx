@@ -23,6 +23,7 @@ import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { isIOS } from "react-device-detect";
 import { useMediaQuery } from "usehooks-ts";
+import { RxAngle } from "react-icons/rx";
 
 export const CanvasMenuBar = ({
   isOpen,
@@ -205,6 +206,27 @@ export const CanvasMenuBar = ({
             </div>
         
           {/* line */}
+
+          <div
+              className={`icon-btn  button-effect btn-sm ${
+                SHAPES.ANGLE === activeTab
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+              }`}
+              style={{
+                height:"24px",
+                width:"24px",
+                padding:"5px",
+
+                margin:"5px",
+                marginLeft:"2px",
+              }}
+              onClick={() => {
+                menuSelector(SHAPES.ANGLE)
+              }}
+            >
+              <RxAngle />
+            </div>
         
             <div
               className={`icon-btn  button-effect btn-sm ${

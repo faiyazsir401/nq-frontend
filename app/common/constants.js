@@ -152,6 +152,7 @@ export const FormateHours = {
 };
 
 export const SHAPES = {
+  ANGLE:"angle",
   FREE_HAND: "hand",
   LINE: "line",
   CIRCLE: "circle",
