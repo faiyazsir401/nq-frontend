@@ -204,7 +204,7 @@ const VideoContainer = ({
 
   // Apply CSS transformations directly to the element
   const transformStyle = {
-    transform: `scale(${scale/ window.devicePixelRatio}) translate(${translate.x}px, ${translate.y}px)`,
+    transform: `scale(${scale}) translate(${translate.x}px, ${translate.y}px)`,
   };
 
   // const [cu,setCurrentTime]
