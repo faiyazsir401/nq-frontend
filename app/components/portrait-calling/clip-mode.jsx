@@ -1242,8 +1242,8 @@ const ClipModeCall = ({
           );
           // Optionally, display the angle computed (you can use context.fillText)
           context.fillStyle = canvasConfigs.sender.strokeStyle;
-          context.font = "14xpx Arial";
-          context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 5, currPos[`canvas${canvasIndex}`].y - 5);
+          context.font = "16px Arial";
+          context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 10, currPos[`canvas${canvasIndex}`].y + 10);
         }
 
       } else {
