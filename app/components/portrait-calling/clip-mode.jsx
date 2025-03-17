@@ -62,8 +62,9 @@ let storedLocalDrawPaths = {
   canvas2: { sender: [], receiver: [] }, // Separate history for each canvas
 };
 
-let anglePoint = { canvas1: null, canvas2: null };
+let lastDrawingStep;
 
+let anglePoint = { canvas1: null, canvas2: null };
 let extraStream;
 let localVideoRef;
 let Peer;
@@ -405,6 +406,8 @@ const VideoContainer = ({
             <div
               className="button"
               onClick={() =>
+                {
+                
                 undoDrawing(
                   {
                     coordinates: storedLocalDrawPaths[`canvas${index}`].sender,
@@ -420,7 +423,7 @@ const VideoContainer = ({
                   },
                   true,
                   index
-                )
+                )}
               }
             >
               <FaUndo />
@@ -761,10 +764,12 @@ const ClipModeCall = ({
         console.log("stop-drawingStep", drawingStep,startPos,currPos)
 
         // If we're in baseline step and we completed it, move to angle drawing step
+        lastDrawingStep = "baseline"
         drawingStep = "angle";
       } else if (drawingStep === 'angle' && anglePoint[`canvas${canvasIndex}`]) {
         // Save the angle calculation here
         drawingStep = "baseline";
+        lastDrawingStep = "angle"
         anglePoint = { canvas1: null, canvas2: null };
       }
     }
@@ -846,6 +851,8 @@ const ClipModeCall = ({
       if (removeLastCoordinate)
         storedLocalDrawPaths[`canvas${canvasIndex}`].sender.splice(-1, 1);
 
+      
+
       // Draw all the paths in the paths array
       await senderConfig.coordinates.forEach((path) => {
         context.beginPath();
@@ -878,7 +885,10 @@ const ClipModeCall = ({
 
       if (strikes[`canvas${canvasIndex}`].length <= 0) return;
       context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
-
+      console.log("drawingStep",drawingStep,selectedShape,lastDrawingStep)
+      if(drawingStep === "baseline" && selectedShape === SHAPES.ANGLE && lastDrawingStep === "angle"){
+        context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
+      }
       // Send event to the other user (if needed)
       if (removeLastCoordinate) {
         sendEmitUndoEvent(canvasIndex);
@@ -955,6 +965,7 @@ const ClipModeCall = ({
           canvas.width,
           canvas.height
         );
+        
         if (strikes[`canvas${canvasIndex}`].length >= 10)
           strikes[`canvas${canvasIndex}`].shift();
         strikes[`canvas${canvasIndex}`].push(savedPos[`canvas${canvasIndex}`]);
@@ -972,6 +983,7 @@ const ClipModeCall = ({
         if (selectedShape === SHAPES.ANGLE) {
           console.log("drawingStep", drawingStep)
           if (drawingStep === "baseline") {
+            
             startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
             currPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
 
