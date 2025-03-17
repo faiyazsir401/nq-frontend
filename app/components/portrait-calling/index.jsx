@@ -584,13 +584,9 @@ const VideoCallUI = ({
     socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
       setDisplayMsg({
         show: true,
-        msg: `${toUser?.fullname} left the meeting, this call will end in 5 minutes...`,
+        msg: `${toUser?.fullname} left the meeting. Waiting for them to join`,
       });
-      console.log("Hmmm.....")
-      timeoutId = setTimeout(() => {
-        console.log("isTraineeJoined", isTraineeJoined)
-        cutCall()
-      }, 300000)
+
       // },20000)
     });
   };
