@@ -481,7 +481,7 @@ const VideoCallUI = ({
             break;
           case 'unavailable-id':
             setUserAlreadyInCall(true);
-            toast.error("The ID is already taken. Please try again.");
+            toast.error("You have joined the lesson from another device or browser. Please end call there to join..");
             break;
           case 'webrtc':
             toast.error("A native WebRTC error occurred.");
@@ -714,7 +714,7 @@ const VideoCallUI = ({
 
 
   useEffect(() => {
-    if (fromUser && toUser && startMeeting?.iceServers) {
+    if (fromUser && toUser && startMeeting?.iceServers &&accountType ) {
       if (typeof navigator !== "undefined") {
         Peer = require("peerjs").default;
       }
@@ -730,7 +730,7 @@ const VideoCallUI = ({
         // cutCall();
       };
     }
-  }, [startMeeting]);
+  }, [startMeeting,accountType]);
 
   console.log("refs", videoRef, remoteVideoRef, remoteStream);
 
