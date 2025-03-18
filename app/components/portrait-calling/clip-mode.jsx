@@ -463,7 +463,7 @@ const VideoContainer = ({
                 touchAction: "manipulation",
                 maxWidth: "100%",
                 width: "auto",
-                height: `${100 * scale}%`,
+                height: `${100}%`,
                 // maxHeight:"100%",
                 aspectRatio: aspectRatio, // Force a correct aspect ratio
                 objectFit: "contain", // Prevent stretching
