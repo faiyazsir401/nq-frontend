@@ -659,7 +659,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
 
                   ToggleTab("notification")
                 }}>
-                  <div className={`${notifications[0]?.isRead == false ? "dot-btn dot-danger grow" : ""}`}>
+                  <div >
 
                     <NavLink id="sidebar-item-notification"
                       className={`icon-btn btn-light button-effect ${activeTab === "notification" ? "active" : ""
