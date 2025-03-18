@@ -315,67 +315,129 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     // Convert start and end times to local time if the time zone is different
     const localStartTime = formatTimeInLocalZone(start_time);
     const localEndTime = formatTimeInLocalZone(end_time);
+
+    // const isMobileScreen = useMediaQuery("(max-width:600px)")
     
     console.log("bookingInfo:" + _id, localStartTime); // Displaying the converted start time
     const isMobileScreen = useMediaQuery('(max-width:600px)')
     return (
-      <div
-        className="card mb-4 mt-4 trainer-bookings-card"
-        key={`booking-schedule-training${booking_index}`}
-      >
-        <div className="card-body">
-          <div className="row">
-            <div className="col">
-              <dl className="row">
-                <dd className="ml-3">Trainer :</dd>
-                <dt className="ml-1">{trainer_info.fullname}</dt>
-              </dl>
-            </div>
-            <div className="col">
-              <dl className="row ml-1">
-                <dd>Date :</dd>
-                <dt className="ml-1">{Utils.getDateInFormat(booked_date)}</dt>
-              </dl>
-            </div>
-            <div className="w-100"></div>
-            <div className="col">
-              <dl className="row">
-                <dd className="ml-3">Trainee :</dd>
-                <dt className="ml-1">{trainee_info.fullname}</dt>
-              </dl>
-            </div>
-            <div className="col">
-              <dl className="row">
-                <dd className="ml-3">Time Durations :</dd>
-                <dt className="ml-1">{`${localStartTime} - ${localEndTime}`}</dt>
-              </dl>
-            </div>
-          </div>
-        </div>
-        <div className="card-footer" style={{padding:isMobileScreen?"5px":"auto"}}>
-          <div className="row">
-            <div className="col-11">{showRatingLabel(ratings)}</div>
-            <div className="col-12 col-lg-auto">
-              {renderBooking(
-                bookingInfo,
-                status,
-                booking_index,
-                booked_date,
-                session_start_time,
-                session_end_time,
-                _id,
-                trainee_info,
-                trainer_info,
-                ratings,
-                trainee_clips,
-                report,
-                start_time,
-                end_time
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+     <div
+                   className="card mt-2 trainer-bookings-card upcoming_session_content"
+                   key={`booking-schedule-training`}
+                 >
+                   <div className="card-body" style={{padding:"5px"}}>
+                     <div className="d-flex justify-content-center " style={{gap:isMobileScreen?"5px":"30px"}}>
+                       <div className="">
+                         <div className="">
+                           <div className="">
+                             <div className="">
+                               <div
+                                 style={{
+                                   width: "80px",
+                                   height: "80px",
+                                   border: "2px solid rgb(0, 0, 128)",
+                                   borderRadius: "5px",
+                                   padding: "5px",
+                                 }}
+                               >
+                                 <img
+                                   src={
+                                     trainer_info.profile_picture ||
+                                     trainee_info.profile_picture
+                                       ? Utils.getImageUrlOfS3(
+                                         accountType === AccountType.TRAINER
+                                             ?trainee_info.profile_picture
+                                             :  trainer_info.profile_picture
+                                         )
+                                       : "/assets/images/demoUser.png"
+                                   }
+                                   alt="trainer_image"
+                                   className="rounded"
+                                   style={{
+                                     width: "100%",
+                                     height: "100%",
+                                     objectFit: "contain",
+                                     borderRadius: "50%",
+                                     transition: "all 0.6s linear",
+                                   }}
+                                   onError={(e) => {
+                                     e.target.src = "/assets/images/demoUser.png";
+                                   }}
+                                 />
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                         <div className="">
+                           <div className="d-flex">
+                             
+                             <dt className="ml-1">
+                               {accountType === AccountType.TRAINER
+                                 ? trainee_info.fullname
+                                 : trainer_info.fullname}
+                             </dt>
+                           </div>
+                         </div>
+                       </div>
+     
+                       <div className="d-flex flex-column justify-content-center">
+                         <div className="">
+                           <div
+                             className={`d-flex ${
+                               isMobileScreen ? "flex-column" : "flex-row"
+                             }`}
+                           >
+                             <div>Date :</div>
+                             <dt className="ml-1">
+                               {Utils.getDateInFormat(booked_date)}
+                             </dt>
+                           </div>
+                         </div>
+     
+                         <div className="">
+                           <div
+                             className={`d-flex ${
+                               isMobileScreen ? "flex-column" : "flex-row"
+                             }`}
+                           >
+                             <div className="">Time :</div>
+                             <dt className="ml-1">{`${formatTimeInLocalZone(
+                               start_time
+                             )} - ${formatTimeInLocalZone(end_time)}`}</dt>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                   <div
+                     className="card-footer"
+                     style={{ padding: isMobileScreen ? "5px" : "5px",display:'flex',justifyContent:"center" }}
+                   >
+                     <div className="">
+                       <div className="">
+                         <div className="">{showRatingLabel(ratings)}</div>
+                         <div className="">
+                           {renderBooking(
+                             bookingInfo,
+                             status,
+                             booking_index,
+                             booked_date,
+                             session_start_time,
+                             session_end_time,
+                             _id,
+                             trainee_info,
+                             trainer_info,
+                             ratings,
+                             trainee_clips,
+                             report,
+                             start_time,
+                             end_time
+                           )}
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
     );
   };
 

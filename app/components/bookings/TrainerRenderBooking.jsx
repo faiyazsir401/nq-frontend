@@ -119,7 +119,7 @@ const TrainerRenderBooking = ({
       )}
       <span>
         <span>
-          {trainee_info?.fullname} shared the following clips with you.{" "}
+          {trainee_info?.fullname} has shared the following clips with you.{" "}
         </span>
         <span
           onClick={() => {
@@ -129,9 +129,9 @@ const TrainerRenderBooking = ({
           }}
           style={{ textDecoration: "underline", cursor: "pointer" }}
         >
-          click here
+          Click here
         </span>{" "}
-        to view Clip
+        to view.
       </span>
       <br />
       {status === BookedSession.canceled && isMeetingDone && (
@@ -295,7 +295,7 @@ const TrainerRenderBooking = ({
               </div>
               <div className="d-flex flex-column  align-items-center">
                 <h1 className="p-3">
-                  {trainee_info.fullname} shared the following clips with you.
+                  {trainee_info.fullname} has shared the following clips with you.
                 </h1>
                 {selectedClips?.length ? (
                   <div>

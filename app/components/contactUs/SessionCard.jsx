@@ -58,7 +58,7 @@ const SessionCard = ({ bookingInfo, booking_index }) => {
             </div>
             <div className="col">
               <dl className="row">
-                <dd className="ml-3">Time Durations :</dd>
+                <dd className="ml-3">Time :</dd>
                 <dt className="ml-1">{`${customStartDateTime} - ${customEndDateTime}`}</dt>
               </dl>
             </div>

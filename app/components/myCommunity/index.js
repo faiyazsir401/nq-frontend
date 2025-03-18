@@ -379,9 +379,7 @@ const MyCommunity = (props) => {
                         <h5>
                           <b>{data?.fullname}</b>
                         </h5>
-                        <h5>
-                          <b>{data?.account_type}</b>
-                        </h5>
+                        
 
                         {isFriend(data?._id) ? (
                           <button
@@ -517,9 +515,7 @@ const MyCommunity = (props) => {
                         <h5>
                           <b>{data?.fullname}</b>
                         </h5>
-                        <h5>
-                          <b>{data?.account_type}</b>
-                        </h5>
+                       
 
                         <button
                           style={{
@@ -611,9 +607,7 @@ const MyCommunity = (props) => {
                       <h5>
                         <b>{request.senderId?.fullname}</b>
                       </h5>
-                      <h5>
-                        <b>{request.senderId?.account_type}</b>
-                      </h5>
+                     
 
                       <div className="d-flex" style={{ gap: 5 }}>
                         <button
