@@ -15,6 +15,7 @@ import { Utils } from "../../../../utils/utils";
 
 export const UpdateHourlyRateForm = ({ userInfo, onFormSubmit, extraInfo }) => {
   const formRef = useRef(null);
+  console.log("userInfo1",userInfo)
   const initialValues = {
     hourly_rate: "",
   };
@@ -23,10 +24,10 @@ export const UpdateHourlyRateForm = ({ userInfo, onFormSubmit, extraInfo }) => {
     if (formRef && formRef.current) {
       formRef.current.setValues({
         // by default it's TRAINER_AMOUNT_USD
-        hourly_rate: +extraInfo?.hourly_rate || TRAINER_AMOUNT_USD,
+        hourly_rate: +userInfo.extraInfo?.hourly_rate || TRAINER_AMOUNT_USD,
       });
     }
-  }, [formRef]);
+  }, [formRef,userInfo]);
 
   const validationSchema = Yup.object().shape({
     hourly_rate: Yup.number()

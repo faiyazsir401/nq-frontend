@@ -13,7 +13,7 @@ import { CovertTimeAccordingToTimeZone, formatTimeInLocalZone, navigateToMeeting
 import { commonState } from "../../common/common.slice";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
-import { notificiationTitles } from "../../../utils/constant";
+import { NotificationType, notificiationTitles } from "../../../utils/constant";
 import { DateTime } from "luxon";
 
 const TrainerRenderBooking = ({
@@ -119,7 +119,7 @@ const TrainerRenderBooking = ({
       )}
       <span>
         <span>
-          {trainee_info?.fullname} shared the following clips with you.{" "}
+          {trainee_info?.fullname} has shared the following clips with you.{" "}
         </span>
         <span
           onClick={() => {
@@ -129,9 +129,9 @@ const TrainerRenderBooking = ({
           }}
           style={{ textDecoration: "underline", cursor: "pointer" }}
         >
-          click here
+          Click here
         </span>{" "}
-        to view Clip
+        to view.
       </span>
       <br />
       {status === BookedSession.canceled && isMeetingDone && (
@@ -191,6 +191,7 @@ const TrainerRenderBooking = ({
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
                       bookingInfo: bookingInfo,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }}
                 >
@@ -220,6 +221,7 @@ const TrainerRenderBooking = ({
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
                       bookingInfo: bookingInfo,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }}
                 >
@@ -257,6 +259,7 @@ const TrainerRenderBooking = ({
                       senderId: trainer_info?._id,
                       receiverId: trainee_info?._id,
                       bookingInfo: null,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   }
                 }}
@@ -292,7 +295,7 @@ const TrainerRenderBooking = ({
               </div>
               <div className="d-flex flex-column  align-items-center">
                 <h1 className="p-3">
-                  {trainee_info.fullname} shared the following clips with you.
+                  {trainee_info.fullname} has shared the following clips with you.
                 </h1>
                 {selectedClips?.length ? (
                   <div>

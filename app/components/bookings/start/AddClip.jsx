@@ -53,8 +53,9 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
             className='d-flex'
             style={{
               gap: 10,
-              flexWrap:"wrap"
-             
+              flexWrap:"wrap",
+              height: '60dvh',
+              overflow:"scroll"
             }}
           >
             {clips?.length ? (

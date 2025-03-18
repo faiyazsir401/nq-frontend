@@ -23,17 +23,18 @@ const CustomVideoControls = ({
   volume,
   changeVolume,
   videoRef,
+  videoRef2,
   handleSeek,
   handleSeekMouseDown,
   handleSeekMouseUp,
   isFullscreen,
   toggleFullscreen,
   setIsPlaying,
-  isFixed,
+  isLock,
   currentTime,
   setCurrentTime,
 }) => {
-    const { accountType } = useAppSelector(authState);
+  const { accountType } = useAppSelector(authState);
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
 
@@ -61,8 +62,8 @@ const CustomVideoControls = ({
   return (
     <div
       style={{
-        position: isFixed ? "relative" : "absolute",
-        bottom: isFixed ? "0px" : "10px",
+        position: "relative",
+        bottom: "0px",
         left: "50%",
         transform: "translateX(-50%)",
         display: "flex",
@@ -136,24 +137,42 @@ const CustomVideoControls = ({
                 </div> */}
 
             {/* Progress Bar */}
+            {/* Progress Bar */}
             <input
               type="range"
               min="0"
               step="0.01"
               disabled={accountType === AccountType.TRAINEE}
-              value={videoRef.current?.currentTime || 0}
-              max={videoRef.current?.duration || 100}
+              value={
+                isLock
+                  ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                    ? videoRef.current?.currentTime || 0
+                    : videoRef2.current?.currentTime || 0
+                  : videoRef.current?.currentTime || 0
+              }
+              max={
+                isLock
+                  ? Math.max(videoRef.current?.duration || 0, videoRef2.current?.duration || 0)
+                  : videoRef.current?.duration || 100
+              }
               onChange={handleSeek}
               style={{
                 flex: 1,
                 cursor: "pointer",
                 height: "5px",
                 appearance: "none",
-                background: `linear-gradient(to right, #2566e8 ${
-                  ((videoRef.current?.currentTime || 0) /
-                    (videoRef.current?.duration || 100)) *
+                background: `linear-gradient(to right, #2566e8 ${((
+                    isLock
+                      ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                        ? videoRef.current?.currentTime || 0
+                        : videoRef2.current?.currentTime || 0
+                      : videoRef.current?.currentTime || 0
+                  ) /
+                    (isLock
+                      ? Math.max(videoRef.current?.duration || 0, videoRef2.current?.duration || 0)
+                      : videoRef.current?.duration || 100)) *
                   100
-                }%, #ccc 0%)`,
+                  }%, #ccc 0%)`,
                 borderRadius: "5px",
                 outline: "none",
                 transition: "background 0.3s ease",
@@ -162,28 +181,6 @@ const CustomVideoControls = ({
           </motion.div>
         )}
       </AnimatePresence>
-      {!isFixed && (
-        <button
-          onClick={() => setControlsVisible(!controlsVisible)}
-          style={{
-            background: "none",
-            border: "none",
-            color: "black",
-            fontSize: "22px",
-            cursor: "pointer",
-            marginBottom: "5px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            //   border:"2px solid black",
-            backgroundColor: "white",
-            aspectRatio: "1",
-            borderRadius: 99,
-          }}
-        >
-          {controlsVisible ? <FaChevronDown /> : <FaChevronUp />}
-        </button>
-      )}
     </div>
   );
 };

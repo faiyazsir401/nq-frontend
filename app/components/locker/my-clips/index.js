@@ -261,16 +261,15 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                   setSelectedId(clp?._id);
                                 }}
                                 style={{
-                                  padding: isMobileScreen?"5px":"10px",
-                                  paddingBottom:isMobileScreen?"0px":"10px",
+                                  padding: isMobileScreen?"5px":"8px",
+                                  paddingBottom:isMobileScreen?"0px":"2px",
                                   cursor: "pointer",
                                 }}
                               >
-                                <FaTrash  size={isMobileScreen?15:18}/>
+                                <FaTrash  size={isMobileScreen?15:17}/>
                               </div>
                               <div
                                 style={{
-                                  padding: isMobileScreen?"5px":"10px",
                                   paddingTop:"0px",
                                   cursor: "pointer",
                                 }}
@@ -285,7 +284,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                   }}
                                   target="_self"
                                 >
-                                  <FaDownload size={isMobileScreen?15:18}/>
+                                  <FaDownload size={isMobileScreen?15:17}/>
                                 </a>
                               </div>
                             </div>

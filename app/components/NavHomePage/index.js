@@ -374,11 +374,7 @@ const NavHomePage = () => {
                     </div>
                     <div className="">
                       <div className="d-flex">
-                        <div className="">
-                          {accountType === AccountType.TRAINER
-                            ? "Trainee:"
-                            : "Trainer:"}
-                        </div>
+                        
                         <dt className="ml-1">
                           {accountType === AccountType.TRAINER
                             ? session.trainee_info.fullname
@@ -408,7 +404,7 @@ const NavHomePage = () => {
                           width600 ? "flex-column" : "flex-row"
                         }`}
                       >
-                        <div className="">Time Durations :</div>
+                        <div className="">Time :</div>
                         <dt className="ml-1">{`${formatTimeInLocalZone(
                           session.start_time
                         )} - ${formatTimeInLocalZone(session.end_time)}`}</dt>

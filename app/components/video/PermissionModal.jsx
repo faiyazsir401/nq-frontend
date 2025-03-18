@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, ModalBody } from 'reactstrap';
 import device from '../../../public/assets/images/devices-allow.svg';
 
-const PermissionModal = ({isOpen}) => {
+const PermissionModal = ({ isOpen, errorMessage }) => {
   return (
     <Modal
       isOpen={isOpen}
@@ -38,10 +38,10 @@ const PermissionModal = ({isOpen}) => {
         <p
           style={{
             margin: '10 auto',
-            fontSize : '16px'
+            fontSize: '16px'
           }}
         >
-          Kindly allow us access to your camera and microphone.
+          {errorMessage}
         </p>
       </ModalBody>
     </Modal>

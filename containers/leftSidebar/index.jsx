@@ -66,7 +66,7 @@ const steps = [
   },
 ];
 
-const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
+const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
   // const width = useWindowSize();
 
   const socket = useContext(SocketContext);
@@ -84,7 +84,7 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
   // const [onlineUsers, setOnlineUsers] = useState(null);
 
   const { notifications, isLoading } = useAppSelector(notificationState)
-  const isMobileScreen  = useMediaQuery(600)
+  const isMobileScreen = useMediaQuery(600)
   console.log("notifications********>>>>>>>>>>>", notifications[0]?.isRead)
 
 
@@ -226,7 +226,7 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
 
   let isMobile = useMediaQuery(452)
 
-  
+
   useEffect(() => {
     const updateIsMobile = (event) => {
       const isMobile = window.matchMedia(`(max-width: 452px)`).matches;
@@ -241,7 +241,7 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
       window.removeEventListener('orientationchange', updateIsMobile);
     };
   }, []);
-  
+
   useEffect(() => {
     // let getDashboard = document.querySelector("#get-dashboard");
     let getNavbarTabs = document.querySelector("#get-navbar-tabs");
@@ -406,7 +406,7 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
 
 
     }
-  }, [openCloseToggleSideNav, sidebarModalActiveTab, sidebarActiveTab, activeTab, size , isMobile])
+  }, [openCloseToggleSideNav, sidebarModalActiveTab, sidebarActiveTab, activeTab, size, isMobile])
 
   useEffect(() => {
     if (isMobile) {
@@ -418,7 +418,7 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
 
   const width1000 = useMediaQuery(1000)
 
-  console.log("activeTab",activeTab,topNavbarOptions?.HOME)
+  console.log("activeTab", activeTab, topNavbarOptions?.HOME)
   return (
     <Fragment>
       {/* <AppListSection
@@ -438,11 +438,11 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
             {/* logo section */}
             {(width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM) && <div className="logo-warpper">
               <img id="Net"
-                  src="/assets/images/logo/netquix-logo.png"
-                  alt="logo"
-                  className="custom-image"
+                src="/assets/images/logo/netquix-logo.png"
+                alt="logo"
+                className="custom-image"
 
-                />
+              />
             </div>}
 
 
@@ -485,12 +485,12 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
 
           </ul> */}
               <ul className="sidebar-top">
-                <li>
+                <li onClick={() => { setActiveTab(topNavbarOptions?.HOME); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)) }}
+                >
 
                   <NavLink id="sidebar-item-home"
                     className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.HOME ? "active" : ""
                       }`}
-                    onClick={() => {setActiveTab(topNavbarOptions?.HOME); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)) }}
                   >
                     <i className="fa fa-home" />
                   </NavLink>
@@ -498,27 +498,27 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                   <p className="menu-name px-2">My Locker</p>
                 </li>
 
-                {accountType === AccountType.TRAINEE && <li>
+                {accountType === AccountType.TRAINEE && <li onClick={() => { setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
+                >
 
                   <NavLink id="sidebar-item-booking"
                     className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.UPCOMING_SESSION
                       ? "active"
                       : ""
                       }`}
-                    // onClick={() => TogglTab(leftSideBarOptions.SCHEDULE_TRAINING)}
-                    onClick={() => {setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
+                  // onClick={() => TogglTab(leftSideBarOptions.SCHEDULE_TRAINING)}
                   >
                     <i className="fa fa-calendar" />
                   </NavLink>
 
                   <p className="menu-name px-2">Upcoming Sessions</p>
                 </li>}
-                {accountType === AccountType?.TRAINEE && <li>
+                {accountType === AccountType?.TRAINEE && <li onClick={() => { setActiveTab(topNavbarOptions?.BOOK_LESSON); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON)) }}
+                >
 
                   <NavLink id="sidebar-item-locker"
                     className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.BOOK_LESSON ? "active" : ""
                       }`}
-                    onClick={() => {setActiveTab(topNavbarOptions?.BOOK_LESSON); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON)) }}
                     data-intro=""
                   >
                     {activeTab === topNavbarOptions?.BOOK_LESSON
@@ -530,12 +530,12 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
 
                   <p className="menu-name px-2">Book Trainer</p>
                 </li>}
-                <li>
+                <li onClick={() => ToggleTab("file")}>
 
                   <NavLink id="sidebar-item-locker"
                     className={`icon-btn btn-light button-effect step2 ${activeTab === "file" ? "active" : ""
                       }`}
-                    onClick={() => ToggleTab("file")}
+
                     data-intro=""
                   >
                     {activeTab === "file"
@@ -637,12 +637,12 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
               </Tooltip>
             </li> */}
 
-                {accountType === AccountType?.TRAINER && <li>
+                {accountType === AccountType?.TRAINER && <li onClick={() => { setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
+                >
 
                   <NavLink id="sidebar-item-upcoming"
                     className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.UPCOMING_SESSION ? "active" : ""
                       }`}
-                    onClick={() => {setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
                     data-intro=""
                   >
                     {activeTab === topNavbarOptions?.UPCOMING_SESSION
@@ -655,16 +655,16 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                   <p className="menu-name px-2">Upcoming Sessions</p>
                 </li>}
 
-                <li>
-                  <div className={`${notifications[0]?.isRead == false ? "dot-btn dot-danger grow" : ""}`}>
+                <li onClick={() => {
+
+                  ToggleTab("notification")
+                }}>
+                  <div >
 
                     <NavLink id="sidebar-item-notification"
                       className={`icon-btn btn-light button-effect ${activeTab === "notification" ? "active" : ""
                         }`}
-                      onClick={() => {
 
-                        ToggleTab("notification")
-                      }}
                     >
                       <i className="fa fa-bell" />
                     </NavLink>
@@ -673,12 +673,12 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                   <p className="menu-name px-2">Notifications</p>
                 </li>
 
-                <li>
+                <li onClick={() => { ToggleTab("setting") }}
+                >
 
                   <NavLink id="sidebar-item-setting"
                     className={`icon-btn btn-light button-effect step2 ${activeTab === "setting" ? "active" : ""
                       }`}
-                    onClick={() => { ToggleTab("setting") }}
                     data-intro="You can change settings by clicking here"
                   >
                     <i className="fa fa-cog" />
@@ -707,13 +707,13 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                   <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}>Change Mode</p>
                 </li> */}
                 {/* {accountType === AccountType?.TRAINER && */}
-                <li>
+                <li onClick={() => ToggleTab("transaction")}
+                >
                   {/* <div className="dot-btn dot-danger grow"> */}
 
                   <NavLink id="sidebar-item-setting"
                     className={`icon-btn btn-light button-effect step2 ${activeTab === "transaction" ? "active" : ""
                       }`}
-                    onClick={() => ToggleTab("transaction")}
                   >
                     <i class="fa fa-exchange" aria-hidden="true" />
                   </NavLink>
@@ -725,12 +725,12 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                 {width < 800 && <>
                   {/* My Community */}
 
-                  <li>
+                  <li onClick={() => ToggleTab("my_community")}
+                  >
 
                     <NavLink id="sidebar-item-setting"
                       className={`icon-btn btn-light button-effect step2 ${activeTab === "my_community" ? "active" : ""
                         }`}
-                      onClick={() => ToggleTab("my_community")}
                     >
                       <i class="fa fa-users" aria-hidden="true" />
                     </NavLink>
@@ -757,12 +757,12 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
 
                   {/* Contact Us */}
 
-                  <li>
+                  <li onClick={() => ToggleTab("contact_us")}
+                  >
 
                     <NavLink id="sidebar-item-setting"
                       className={`icon-btn btn-light button-effect step2 ${activeTab === "contact_us" ? "active" : ""
                         }`}
-                      onClick={() => ToggleTab("contact_us")}
                     >
                       <i class="fa fa-commenting-o" aria-hidden="true" />
                     </NavLink>
@@ -789,12 +789,12 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                   </li>*/}
                 </>}
 
-                <li>
+                <li onClick={() => Logout()}
+                >
 
                   <NavLink
                     id="sidebar-item-logout"
                     className="icon-btn btn-light"
-                    onClick={() => Logout()}
                   >
                     {" "}
                     <i className="fa fa-power-off"> </i>
@@ -844,8 +844,8 @@ const Index = ({openCloseToggleSideNav,setOpenCloseToggleSideNav}) => {
                 </li>
               </ul> */}
             </div>
-            {openCloseToggleSideNav &&    
-            <ChevronLeft id="ChevronLeft" style={{ right:"-12px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(false)} />
+            {openCloseToggleSideNav &&
+              <ChevronLeft id="ChevronLeft" style={{ right: "-12px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(false)} />
             }
           </aside>}
         {!openCloseToggleSideNav &&

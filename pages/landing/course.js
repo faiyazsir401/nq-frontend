@@ -115,10 +115,10 @@ const Course = (masterRecords) => {
     }
   };
 
-  if(activeTrainer && activeTrainer?.length){
+  if (activeTrainer && activeTrainer?.length) {
     return (
       <React.Fragment>
-       
+
         <div
           className="container recent-trainers"
           style={{
@@ -132,110 +132,110 @@ const Course = (masterRecords) => {
               Recently Online Trainers{" "}
             </h3>
           </div>
-  
+
           <div className={`row gy-3`}>
-            
-              <div className="slider-container m-3 mb-5">
-                <button onClick={slideToPrev} className="prev-button shadow">
-                  &#10094;
-                </button>
-                <div ref={sliderRef} className="slider-content">
-                  {activeTrainer.map((data, index) => (
-                    <div key={index} className="slider-item">
-                      <Card className="overflow-hidden rounded shadow-sm h-100">
-                        <img
-                          className="card-img-top"
-                          src={
-                            data?.trainer_info.profile_picture
-                              ? Utils?.getImageUrlOfS3(
-                                  data?.trainer_info.profile_picture
-                                )
-                              : "/assets/images/demoUser.png"
-                          }
-                          alt="Card image cap"
-                          style={{
-                            width: "100%",
-                            maxHeight: isMobileScreen ? 150 : 250,
-                            minHeight: isMobileScreen ? 150 : 250,
-                            maxWidth: "100%",
-                            objectFit: "cover",
-                          }}
-                          onError={(e) => {
-                            e.target.src =
-                              arrOfDemoImg[index] ??
-                              "/assets/images/demoUser.png";
-                            // e.target.src = "/assets/images/Almer.jpeg";
-                          }}
-                        />
-                        <CardBody>
-                          <CardTitle tag="h5">
-                            <div className="d-flex align-items-center">
-                              <div style={{ fontSize: isMobileScreen ? 12 : 14 }}>
-                                {data?.trainer_info?.fullName}
-                              </div>
-                              <i
-                                className="fa fa-check-circle mx-2"
-                                style={{ color: "green" }}
-                              ></i>
-                              <span
-                                style={{
-                                  color: "green",
-                                  fontWeight: 600,
-                                  fontSize: isMobileScreen ? 10 : 14,
-                                }}
-                              >
-                                Verified
-                              </span>
+
+            <div className="slider-container m-3 mb-5">
+              <button onClick={slideToPrev} className="prev-button shadow">
+                &#10094;
+              </button>
+              <div ref={sliderRef} className="slider-content">
+                {activeTrainer.map((data, index) => (
+                  <div key={index} className="slider-item">
+                    <Card className="overflow-hidden rounded shadow-sm h-100" onClick={() => {
+                      setTrainerInfo((prev) => ({
+                        ...prev,
+                        userInfo: data?.trainer_info,
+                        selected_category: null,
+                      }));
+                      setSelectedTrainer({
+                        id: data?.trainer_info?.id,
+                        trainer_id: data?.trainer_info?.id,
+                        data: trainer,
+                      });
+                      setParams({ search: data?.trainer_info?.fullName });
+                      setIsModalOpen(true);
+                    }}>
+                      <img
+                        className="card-img-top"
+                        src={
+                          data?.trainer_info.profile_picture
+                            ? Utils?.getImageUrlOfS3(
+                              data?.trainer_info.profile_picture
+                            )
+                            : "/assets/images/demoUser.png"
+                        }
+                        alt="Card image cap"
+                        style={{
+                          width: "100%",
+                          maxHeight: isMobileScreen ? 150 : 250,
+                          minHeight: isMobileScreen ? 150 : 250,
+                          maxWidth: "100%",
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          e.target.src =
+                            arrOfDemoImg[index] ??
+                            "/assets/images/demoUser.png";
+                          // e.target.src = "/assets/images/Almer.jpeg";
+                        }}
+                      />
+                      <CardBody>
+                        <CardTitle tag="h5">
+                          <div className="d-flex align-items-center">
+                            <div style={{ fontSize: isMobileScreen ? 12 : 14 }}>
+                              {data?.trainer_info?.fullName}
                             </div>
-                          </CardTitle>
-                          <CardText>
-                            <div style={{ fontSize: isMobileScreen ? 10 : 12 }}>
-                              <i className="fa fa-list-alt mr-2"></i>
-                              {"Hourly Rate"}{" "}
-                              <span>
-                                {data?.trainer_info &&
+                            <i
+                              className="fa fa-check-circle mx-2"
+                              style={{ color: "green" }}
+                            ></i>
+                            <span
+                              style={{
+                                color: "green",
+                                fontWeight: 600,
+                                fontSize: isMobileScreen ? 10 : 14,
+                              }}
+                            >
+                              Verified
+                            </span>
+                          </div>
+                        </CardTitle>
+                        <CardText>
+                          <div style={{ fontSize: isMobileScreen ? 10 : 12 }}>
+                            <i className="fa fa-list-alt mr-2"></i>
+                            {"Hourly Rate"}{" "}
+                            <span>
+                              {data?.trainer_info &&
                                 data?.trainer_info.extraInfo
-                                  ? `: ${data?.trainer_info.extraInfo.hourly_rate}`
-                                  : null}
-                              </span>
-                            </div>
-                          </CardText>
-  
-                          <Button
-                            className="btn btn-primary btn-sm d-flex"
-                            style={{
-                              cursor: "pointer",
-                              fontSize: isMobileScreen ? 10 : 14,
-                            }}
-                            onClick={() => {
-                              setTrainerInfo((prev) => ({
-                                ...prev,
-                                userInfo: data?.trainer_info,
-                                selected_category: null,
-                              }));
-                              setSelectedTrainer({
-                                id: data?.trainer_info?.id,
-                                trainer_id: data?.trainer_info?.id,
-                                data: trainer,
-                              });
-                              setParams({ search: data?.trainer_info?.fullName });
-                              setIsModalOpen(true);
-                            }}
-                          >
-                            <div>Book session</div>
-                          </Button>
-                        </CardBody>
-                      </Card>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={slideToNext} className="next-button shadow">
-                  &#10095;
-                </button>
+                                ? `: ${data?.trainer_info.extraInfo.hourly_rate}`
+                                : null}
+                            </span>
+                          </div>
+                        </CardText>
+
+                        <Button
+                          className="btn btn-primary btn-sm d-flex"
+                          style={{
+                            cursor: "pointer",
+                            fontSize: isMobileScreen ? 10 : 14,
+                          }}
+
+                        >
+                          <div>Book session</div>
+                        </Button>
+                      </CardBody>
+                    </Card>
+                  </div>
+                ))}
               </div>
-           
+              <button onClick={slideToNext} className="next-button shadow">
+                &#10095;
+              </button>
+            </div>
+
           </div>
-  
+
           {trainerInfo && trainerInfo.userInfo ? (
             <Modal
               className="recent-user-modal"
@@ -301,7 +301,7 @@ const Course = (masterRecords) => {
       </React.Fragment>
     );
   }
- 
+
   return <></>
 };
 

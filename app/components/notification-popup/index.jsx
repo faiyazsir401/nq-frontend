@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { SocketContext } from "../socket";
 import { notificationAction } from "../notifications-service/notification.slice";
-import { notificiationTitles } from "../../../utils/constant";
+import { NotificationType, notificiationTitles } from "../../../utils/constant";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { EVENTS } from "../../../helpers/events";
 import AppModel from "../../common/modal";
@@ -121,7 +121,8 @@ const NotificationPopup = () => {
                       description: `Trainer has Confirmed and started the session. Join the session via the upcoming sessions tab in My Locker.`,
                       senderId: userInfo._id,
                       receiverId: newBooking.trainee_info._id,
-                      bookingInfo:newBooking
+                      bookingInfo:newBooking,
+                      type:NotificationType.TRANSCATIONAL
                     });
                   toggle();
                 }

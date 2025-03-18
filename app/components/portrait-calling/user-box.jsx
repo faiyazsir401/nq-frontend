@@ -14,7 +14,8 @@ export const UserBox = ({
   stream,
   isStreamOff,
   selectedUser,
-  isLandscape
+  isLandscape,
+  muted
 }) => {
   console.log("user", id);
 
@@ -51,6 +52,7 @@ export const UserBox = ({
         <video
           playsInline
           autoPlay
+          muted={muted}
           ref={setVideoRef}
           style={{
             height: "100%",
@@ -102,7 +104,8 @@ export const UserBoxMini = ({
   stream,
   isStreamOff,
   zIndex,
-  bottom
+  bottom,
+  muted
 }) => {
   const setVideoRef = useCallback(
     (node) => {
@@ -141,6 +144,7 @@ export const UserBoxMini = ({
           <video
             playsInline
             autoPlay
+            muted={muted}
             ref={setVideoRef}
             style={{
               height: "100%",

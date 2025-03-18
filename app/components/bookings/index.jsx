@@ -308,7 +308,7 @@ const Bookings = ({ accountType = null }) => {
         )}
         <span className="px-2">
           <span>
-            {trainee_info?.fullname} shared the following clips with you.{" "}
+            {trainee_info?.fullname} has shared the following clips with you.{" "}
           </span>
           <span
             onClick={() => {
@@ -318,9 +318,9 @@ const Bookings = ({ accountType = null }) => {
             }}
             style={{ textDecoration: "underline", cursor: "pointer" }}
           >
-            click here
+            Click here
           </span>{" "}
-          to view Clip
+          to view.
         </span>
         {status === BookedSession.canceled && isMeetingDone && (
           <button
@@ -463,7 +463,7 @@ const Bookings = ({ accountType = null }) => {
                 </div>
                 <div className="d-flex flex-column  align-items-center">
                   <h1 className="p-3">
-                    {trainee_info.fullname} shared the following clips with you.
+                    {trainee_info.fullname} has shared the following clips with you.
                   </h1>
                   {selectedClips?.length ? (
                     <div>
@@ -921,7 +921,7 @@ const Bookings = ({ accountType = null }) => {
               </div>
               <div className="col">
                 <dl className="row">
-                  <dd className="ml-3">Time Durations :</dd>
+                  <dd className="ml-3">Time :</dd>
                   <dt className="ml-1">{`${Utils.convertToAmPm(
                     session_start_time
                   )}-${Utils.convertToAmPm(session_end_time)}`}</dt>

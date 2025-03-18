@@ -646,11 +646,14 @@ slick-slider .slick-list,
   height: 120vh !important;
   overflow-y: auto !important;
   scroll-behavior: smooth !important;
-
+  max-width: 100%;
   @media (max-width: 576px) {
     overflow-y: auto !important;
     scroll-behavior: smooth !important;
     top: 95px !important;
+  }
+  @media (max-width: 450px) {
+    max-width: 95%;
   }
 }
 

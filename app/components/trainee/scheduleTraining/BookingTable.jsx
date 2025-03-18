@@ -42,7 +42,7 @@ import { DateTime } from "luxon";
 import { SocketContext } from "../../socket";
 import { EVENTS } from "../../../../helpers/events";
 import { getScheduledMeetingDetailsAsync } from "../../common/common.slice";
-import { notificiationTitles } from "../../../../utils/constant";
+import { NotificationType, notificiationTitles } from "../../../../utils/constant";
 // import { SocketContext } from "../socket";
 
 const BookingTable = ({
@@ -139,7 +139,8 @@ const BookingTable = ({
         description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
         senderId: userInfo?._id,
         receiverId: payload?.trainer_id,
-        bookingInfo:null
+        bookingInfo:null,
+        type:NotificationType.TRANSCATIONAL
       });
 
       // Refecting the current Booking 
@@ -596,7 +597,7 @@ const BookingTable = ({
               style={{ display: "flex", alignItems: "center", width: "100%" }}
             >
               {" "}
-              <h2
+              {/* <h2
                 style={{
                   fontSize: "1.2rem",
                   fontWeight: "bold",
@@ -607,7 +608,7 @@ const BookingTable = ({
                 }}
               >
                 Book Instant Lesson
-              </h2>
+              </h2> */}
               {/* <button
                 style={{
                   backgroundColor: "#28a745",

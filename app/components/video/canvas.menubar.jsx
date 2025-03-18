@@ -23,6 +23,7 @@ import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { isIOS } from "react-device-detect";
 import { useMediaQuery } from "usehooks-ts";
+import { RxAngle } from "react-icons/rx";
 
 export const CanvasMenuBar = ({
   isOpen,
@@ -44,7 +45,8 @@ export const CanvasMenuBar = ({
   clipSelectNote,
   setCountClipNoteOpen,
   resetInitialPinnedUser,
-  isFromPotrait
+  isFromPotrait,
+  isFullScreen
 }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
@@ -83,7 +85,8 @@ export const CanvasMenuBar = ({
     }
     setTraineeClips(arr);
   };
-  const isMobileScreen =useMediaQuery("(max-width: 1000px)");
+  const isMobileScreen = useMediaQuery("(max-width: 1000px)");
+  const isSmallScreen = useMediaQuery("(max-width: 410px)");
 
   var netquixVideos = [
     {
@@ -108,332 +111,347 @@ export const CanvasMenuBar = ({
     },
   ];
 
-  const menuSelector = (shapeType)=>{
-    if(shapeType !== activeTab){
+  const menuSelector = (shapeType) => {
+    if (shapeType !== activeTab) {
       drawShapes(shapeType);
       setActiveTab(shapeType);
-    }else{
+    } else {
       drawShapes(null);
       setActiveTab(null);
     }
   }
-  console.log("isMobileScreen",isMobileScreen)
+  console.log("isMobileScreen", isMobileScreen)
   return (
-    <div style={{ margin: isFromPotrait?"0.5rem":"1rem", display: "flex", justifyContent: "center" }}>
+    <div style={{ margin: isFromPotrait ? "0.5rem" : "1rem", display: "flex", justifyContent: "center" }}>
       <div
         className="creationBarItem "
-        // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
+        style={{
+          width: (isSmallScreen &&isFullScreen)  ? "222px" : "auto"
+        }}
+      // style={mediaQuery.matches ? { width: 52 } : { width: "100%" }}
       >
-        <div className="CreationBarCustomizable" style={{overflow: 'auto',display:isFromPotrait?"flex":"block"}}>
-         
+        <div className="CreationBarCustomizable" style={{ overflow: 'auto', display: isFromPotrait ? "flex" : "block" }}>
+
           {/* free hand */}
           <Popover
-              className="color-picker-popover"
-              isOpen={displayColorPicker}
-              positions={["left", "right"]} // if you'd like, you can limit the positions
-              padding={10} // adjust padding here!
-              reposition={true} // prevents automatic readjustment of content position that keeps your popover content within its parent's bounds
-              onClickOutside={() => setDisplayColorPicker(false)} // handle click events outside of the popover/target here!
-              content={(
-                { position, nudgedLeft, nudgedTop } // you can also provide a render function that injects some useful stuff!
-              ) => (
-                <div>
-                  <SketchPicker
-                    onChange={(color) => {
-                      const payload = {
-                        ...canvasConfigs,
-                        sender: {
-                          ...canvasConfigs.sender,
-                          strokeStyle: color.hex,
-                        },
-                      };
-                      setCanvasConfigs(payload);
-                      canvasConfigs = payload;
-                      // canvasConfigs.sender.strokeStyle = color.hex;
-                      setSketchPickerColor(color.rgb);
-                    }}
-                    color={sketchPickerColor}
-                  />
-                </div>
-              )}
+            className="color-picker-popover"
+            isOpen={displayColorPicker}
+            positions={["left", "right"]} // if you'd like, you can limit the positions
+            padding={10} // adjust padding here!
+            reposition={true} // prevents automatic readjustment of content position that keeps your popover content within its parent's bounds
+            onClickOutside={() => setDisplayColorPicker(false)} // handle click events outside of the popover/target here!
+            content={(
+              { position, nudgedLeft, nudgedTop } // you can also provide a render function that injects some useful stuff!
+            ) => (
+              <div>
+                <SketchPicker
+                  onChange={(color) => {
+                    const payload = {
+                      ...canvasConfigs,
+                      sender: {
+                        ...canvasConfigs.sender,
+                        strokeStyle: color.hex,
+                      },
+                    };
+                    setCanvasConfigs(payload);
+                    canvasConfigs = payload;
+                    // canvasConfigs.sender.strokeStyle = color.hex;
+                    setSketchPickerColor(color.rgb);
+                  }}
+                  color={sketchPickerColor}
+                />
+              </div>
+            )}
+          >
+            <div
+              className="icon-btn  button-effect btn-sm"
+              onClick={() => {
+                setDisplayColorPicker(true);
+              }}
+              style={{
+                height: "24px",
+                width: "24px",
+                padding: isSmallScreen ? "12px" : "5px",
+                margin: "5px",
+                marginLeft: "2px",
+              }}
             >
+              <Image
+                src="/icons/color-wheel.png"
+                width={20}
+                height={20}
+                alt="color-picker"
+              />
+            </div>
+          </Popover>
+
+          {/* {displayColorPicker ?
+             */}
+
+          {/* : null} */}
+          <div
+            className={`icon-btn  button-effect btn-sm ${SHAPES.FREE_HAND === activeTab
+              ? "btn-outline-primary"
+              : "btn-outline-light"
+              }`}
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+            onClick={() => {
+              menuSelector(SHAPES.FREE_HAND)
+            }}
+          >
+            <Edit2 height={20} width={20} style={{minWidth:"12px"}}/>
+          </div>
+
+          {/* line */}
+
+          <div
+            className={`icon-btn  button-effect btn-sm ${SHAPES.ANGLE === activeTab
+              ? "btn-outline-primary"
+              : "btn-outline-light"
+              }`}
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+            onClick={() => {
+              menuSelector(SHAPES.ANGLE)
+            }}
+          >
+            <Image src="/icons/angle.png" width={15} height={15} alt="angle" />
+
+          </div>
+
+          <div
+            className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.LINE
+              ? "btn-outline-primary"
+              : "btn-outline-light"
+              }`}
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+            onClick={() => {
+              menuSelector(SHAPES.LINE)
+
+            }}
+          >
+            <Image src="/icons/line.png" width={20} height={20} alt="line" />
+          </div>
+
+          {/* circle */}
+
+          <div
+            className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.CIRCLE
+              ? "btn-outline-primary"
+              : "btn-outline-light"
+              }`}
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+            onClick={() => {
+              menuSelector(SHAPES.CIRCLE)
+            }}
+          >
+            <i className="fa fa-circle-thin" />
+          </div>
+
+          {/* square */}
+
+          <div
+            className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.SQUARE
+              ? "btn-outline-primary"
+              : "btn-outline-light"
+              }`}
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+            onClick={() => {
+              menuSelector(SHAPES.SQUARE)
+            }}
+          >
+            <i className="fa fa-square-o" />
+          </div>
+
+          <div
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+            className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.ARROW_RIGHT
+              ? "btn-outline-primary"
+              : "btn-outline-light"
+              }`}
+            onClick={() => {
+              menuSelector(SHAPES.ARROW_RIGHT)
+            }}
+          >
+            <i className="fa fa-long-arrow-right" />
+          </div>
+
+          {!isMobileScreen &&
+            <>
+              {/* rectangle */}
+
               <div
-                className="icon-btn  button-effect btn-sm"
+                className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.RECTANGLE
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+                  }`}
                 onClick={() => {
-                  setDisplayColorPicker(true);
+                  menuSelector(SHAPES.RECTANGLE)
                 }}
                 style={{
-                  height:"24px",
-                  width:"24px",
-                  padding:"5px",
-                  margin:"5px",
-                  marginLeft:"2px",
+                  height: "24px",
+                  width: "24px",
+                  padding: isSmallScreen ? "12px" : "5px",
+
+                  margin: "5px",
+                  marginLeft: "2px",
                 }}
               >
                 <Image
-                  src="/icons/color-wheel.png"
+                  src="/icons/rectangle.png"
                   width={20}
                   height={20}
-                  alt="color-picker"
+                  alt="rectangle"
                 />
               </div>
-            </Popover>
-         
-            {/* {displayColorPicker ?
-             */}
-          
-            {/* : null} */}
-            <div
-              className={`icon-btn  button-effect btn-sm ${
-                SHAPES.FREE_HAND === activeTab
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              style={{
-                height:"24px",
-                width:"24px",
-                padding:"5px",
 
-                margin:"5px",
-                marginLeft:"2px",
-              }}
-              onClick={() => {
-                menuSelector(SHAPES.FREE_HAND)
-              }}
-            >
-              <Edit2 />
-            </div>
-        
-          {/* line */}
-        
-            <div
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.LINE
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              style={{
-                height:"24px",
-                width:"24px",
-                padding:"5px",
+              {/* oval */}
 
-                margin:"5px",
-                marginLeft:"2px",
-              }}
-              onClick={() => {
-                menuSelector(SHAPES.LINE)
+              <div
+                style={{
+                  height: "24px",
+                  width: "24px",
+                  padding: isSmallScreen ? "12px" : "5px",
+                  margin: "5px",
+                  marginLeft: "2px",
+                }}
+                className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.OVAL
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+                  }`}
+                onClick={() => {
+                  menuSelector(SHAPES.OVAL)
+                }}
+              >
 
-              }}
-            >
-              <Image src="/icons/line.png" width={20} height={20} alt="line" />
-            </div>
-          
-          {/* circle */}
-      
-            <div
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.CIRCLE
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              style={{
-                height:"24px",
-                width:"24px",
-                padding:"5px",
+                <Image src="/icons/oval.png" width={20} height={20} alt="oval" />
+              </div>
 
-                margin:"5px",
-                marginLeft:"2px",
-              }}
-              onClick={() => {
-                menuSelector(SHAPES.CIRCLE)
-              }}
-            >
-              <i className="fa fa-circle-thin" />
-            </div>
-    
-          {/* square */}
-         
-            <div
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.SQUARE
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              style={{
-                height:"24px",
-                width:"24px",
-                padding:"5px",
+              {/* triangle */}
 
-                margin:"5px",
-                marginLeft:"2px",
-              }}
-              onClick={() => {
-                menuSelector(SHAPES.SQUARE)
-              }}
-            >
-              <i className="fa fa-square-o" />
-            </div>
+              <div
+                style={{
+                  height: "24px",
+                  width: "24px",
+                  padding: isSmallScreen ? "12px" : "5px",
+                  margin: "5px",
+                  marginLeft: "2px",
+                }}
+                className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.TRIANGLE
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+                  }`}
+                onClick={() => {
+                  menuSelector(SHAPES.TRIANGLE)
+                }}
+              >
+                <Image
+                  src="/icons/triangle.png"
+                  width={20}
+                  height={20}
+                  alt="triangle"
+                />
+              </div>
 
-            <div
-             style={{
-              height:"24px",
-              width:"24px",
-              padding:"5px",
-              margin:"5px",
-              marginLeft:"2px",
-            }}
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.ARROW_RIGHT
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              onClick={() => {
-                menuSelector(SHAPES.ARROW_RIGHT)
-              }}
-            >
-              <i className="fa fa-long-arrow-right" />
-            </div>
-          
-          {!isMobileScreen &&
-          <>
-          {/* rectangle */}
-              
-            <div
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.RECTANGLE
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              onClick={() => {
-                menuSelector(SHAPES.RECTANGLE)
-              }}
-              style={{
-                height:"24px",
-                width:"24px",
-                padding:"5px",
+              {/* arrows */}
 
-                margin:"5px",
-                marginLeft:"2px",
-              }}
-            >
-              <Image
-                src="/icons/rectangle.png"
-                width={20}
-                height={20}
-                alt="rectangle"
-              />
-            </div>
-         
-          {/* oval */}
-  
-            <div
-             style={{
-              height:"24px",
-              width:"24px",
-              padding:"5px",
-              margin:"5px",
-              marginLeft:"2px",
-            }}
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.OVAL
+
+
+
+
+              <div
+                style={{
+                  height: "24px",
+                  width: "24px",
+                  padding: isSmallScreen ? "12px" : "5px",
+                  margin: "5px",
+                  marginLeft: "2px",
+                }}
+                className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.TWO_SIDE_ARROW
                   ? "btn-outline-primary"
                   : "btn-outline-light"
-              }`}
-              onClick={() => {
-                menuSelector(SHAPES.OVAL)
-              }}
-            >
-           
-              <Image src="/icons/oval.png" width={20} height={20} alt="oval" />
-            </div>
-    
-          {/* triangle */}
-      
-            <div
-             style={{
-              height:"24px",
-              width:"24px",
-              padding:"5px",
-              margin:"5px",
-              marginLeft:"2px",
-            }}
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.TRIANGLE
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              onClick={() => {
-                menuSelector(SHAPES.TRIANGLE)
-              }}
-            >
-              <Image
-                src="/icons/triangle.png"
-                width={20}
-                height={20}
-                alt="triangle"
-              />
-            </div>
-         
-          {/* arrows */}
-          
-    
-            
-       
-       
-            <div
-             style={{
-              height:"24px",
-              width:"24px",
-              padding:"5px",
-              margin:"5px",
-              marginLeft:"2px",
-            }}
-              className={`icon-btn  button-effect btn-sm ${
-                activeTab === SHAPES.TWO_SIDE_ARROW
-                  ? "btn-outline-primary"
-                  : "btn-outline-light"
-              }`}
-              onClick={() => {
-                menuSelector(SHAPES.TWO_SIDE_ARROW)
-              }}
-            >
-              <i className="fa fa-arrows-v rotate-90" />
-            </div>
-       
-          </>}
-         { undoDrawing &&
-         
+                  }`}
+                onClick={() => {
+                  menuSelector(SHAPES.TWO_SIDE_ARROW)
+                }}
+              >
+                <i className="fa fa-arrows-v rotate-90" />
+              </div>
+
+            </>}
+          {undoDrawing &&
+
             <div
               className={`icon-btn  button-effect btn-sm`}
               onClick={undoDrawing}
               style={{
-                height:"24px",
-                width:"24px",
-                padding:"5px",
+                height: "24px",
+                width: "24px",
+                padding: isSmallScreen ? "12px" : "5px",
 
-                margin:"5px",
-                marginLeft:"2px",
+                margin: "5px",
+                marginLeft: "2px",
               }}
             >
-              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{height:isMobileScreen?"16px":"none"}}/>
+              <Image src="/icons/undo.png" width={20} height={20} alt="Undo" style={{ height: isMobileScreen ? "16px" : "none" }} />
             </div>
-         }
-        
-            <div
-              className={`icon-btn  button-effect btn-sm`}
-              onClick={refreshDrawing}
-              style={{
-                height:"24px",
-                width:"24px",
-                padding:"5px",
+          }
 
-                margin:"5px",
-                marginLeft:"2px",
-              }}
-            >
-              <RefreshCw />
-            </div>
-      
+          <div
+            className={`icon-btn  button-effect btn-sm`}
+            onClick={refreshDrawing}
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+          >
+            <RefreshCw height={20} width={20} style={{minWidth:"12px"}}/>
+          </div>
+
           {/* <span>
             <div
               className={`icon-btn  button-effect btn-sm`}
@@ -454,7 +472,7 @@ export const CanvasMenuBar = ({
             top: "-4px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setIsCanvasMenuNoteShow(false);
             setColorNote(true);
@@ -471,7 +489,7 @@ export const CanvasMenuBar = ({
             top: "10px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setColorNote(false);
             setPencilNote(true);
@@ -488,7 +506,7 @@ export const CanvasMenuBar = ({
             top: "65px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setPencilNote(false);
             setLineNote(true);
@@ -505,7 +523,7 @@ export const CanvasMenuBar = ({
             top: "108px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setLineNote(false);
             setCircleNote(true);
@@ -522,7 +540,7 @@ export const CanvasMenuBar = ({
             top: "150px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setCircleNote(false);
             setSquareNote(true);
@@ -539,7 +557,7 @@ export const CanvasMenuBar = ({
             top: "195px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setSquareNote(false);
             setRectangleNote(true);
@@ -556,7 +574,7 @@ export const CanvasMenuBar = ({
             top: "240px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setRectangleNote(false);
             setOvalNote(true);
@@ -573,7 +591,7 @@ export const CanvasMenuBar = ({
             top: "285px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setOvalNote(false);
             setTriangleNote(true);
@@ -590,7 +608,7 @@ export const CanvasMenuBar = ({
             top: "330px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setTriangleNote(false);
             setArrowRightNote(true);
@@ -607,7 +625,7 @@ export const CanvasMenuBar = ({
             top: "375px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setArrowRightNote(false);
             setTwoSideArrowNote(true);
@@ -624,7 +642,7 @@ export const CanvasMenuBar = ({
             top: "418px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setTwoSideArrowNote(false);
             setUndoNote(true);
@@ -641,7 +659,7 @@ export const CanvasMenuBar = ({
             top: "460px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setUndoNote(false);
             setRefreshNote(true);
@@ -658,7 +676,7 @@ export const CanvasMenuBar = ({
             top: "505px",
             left: "90px",
           }}
-          triangle = {"triangle-left"}
+          triangle={"triangle-left"}
           nextFunc={() => {
             setRefreshNote(false);
             setMicNote(true);
@@ -678,7 +696,7 @@ export const CanvasMenuBar = ({
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => {
-                      if(selectClips && selectClips?.length){
+                      if (selectClips && selectClips?.length) {
                         setSelectedClips(selectClips);
                         setClipSelectNote(false);
                         resetInitialPinnedUser()
@@ -699,9 +717,8 @@ export const CanvasMenuBar = ({
                 <Nav tabs className="justify-content-around">
                   <NavItem className="ml-5px  mt-2">
                     <NavLink
-                      className={`button-effect ${
-                        videoActiveTab === "media" ? "active" : ""
-                      } select-clip-width`}
+                      className={`button-effect ${videoActiveTab === "media" ? "active" : ""
+                        } select-clip-width`}
                       onClick={() => setAideoActiveTab("media")}
                     >
                       My Clips
@@ -709,9 +726,8 @@ export const CanvasMenuBar = ({
                   </NavItem>
                   <NavItem className="ml-5px  mt-2">
                     <NavLink
-                      className={`button-effect ${
-                        videoActiveTab === "trainee" ? "active" : ""
-                      } select-clip-width`}
+                      className={`button-effect ${videoActiveTab === "trainee" ? "active" : ""
+                        } select-clip-width`}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
                       Trainee
@@ -719,9 +735,8 @@ export const CanvasMenuBar = ({
                   </NavItem>
                   <NavItem className="ml-5px  mt-2">
                     <NavLink
-                      className={`button-effect ${
-                        videoActiveTab === "docs" ? "active" : ""
-                      } select-clip-width`}
+                      className={`button-effect ${videoActiveTab === "docs" ? "active" : ""
+                        } select-clip-width`}
                       onClick={() => setAideoActiveTab("docs")}
                     >
                       NetQwix
@@ -797,7 +812,7 @@ export const CanvasMenuBar = ({
                                             : "4px solid rgb(180, 187, 209)",
                                           borderRadius: "5px",
                                           objectFit: "cover",
-                                          aspectRatio:"1/1"
+                                          aspectRatio: "1/1"
                                         }}
                                       >
                                         <source
@@ -883,14 +898,14 @@ export const CanvasMenuBar = ({
                                           // maxHeight: "150px",
                                           // height: "100%",
                                           marginBottom: "10px",
-                                 
+
                                           width: "100%",
                                           border: sld
                                             ? "4px solid green"
                                             : "4px solid rgb(180, 187, 209)",
                                           borderRadius: "5px",
                                           objectFit: "cover",
-                                            aspectRatio:"1/1"
+                                          aspectRatio: "1/1"
                                         }}
                                         preload="none"
                                       >
@@ -931,45 +946,45 @@ export const CanvasMenuBar = ({
                               );
                               return (
                                 clp?.file_name ?
-                                <div
-                                  key={index}
-                                  className={`col-3 p-1`}
-                                  style={{ borderRadius: 5 }}
-                                  onClick={() => {
-                                    if (!sld && selectClips?.length < 2) {
-                                      selectClips.push(clp);
-                                      setSelectClips([...selectClips]);
-                                    } else {
-                                      var temp = JSON.parse(
-                                        JSON.stringify(selectClips)
-                                      );
-                                      temp = temp.filter(
-                                        (val) => val._id !== clp?._id
-                                      );
-                                      setSelectClips([...temp]);
-                                    }
-                                  }}
-                                >
-                                  <video
-                                    // style={{ border: `${sld ? "2px" : "0px"} solid green`, width: "98%", maxHeight: "150px", height: "100%", marginBottom: "10px", display: "flex", justifyContent: "center" }}
-                                    style={{
-                                      marginBottom: "10px",
-                            
-                                      width: "100%",
-                                      border: sld
-                                        ? "4px solid green"
-                                        : "4px solid rgb(180, 187, 209)",
-                                      borderRadius: "5px",
-                                      objectFit: "cover",
-                                        aspectRatio:"1/1"
+                                  <div
+                                    key={index}
+                                    className={`col-3 p-1`}
+                                    style={{ borderRadius: 5 }}
+                                    onClick={() => {
+                                      if (!sld && selectClips?.length < 2) {
+                                        selectClips.push(clp);
+                                        setSelectClips([...selectClips]);
+                                      } else {
+                                        var temp = JSON.parse(
+                                          JSON.stringify(selectClips)
+                                        );
+                                        temp = temp.filter(
+                                          (val) => val._id !== clp?._id
+                                        );
+                                        setSelectClips([...temp]);
+                                      }
                                     }}
                                   >
-                                    <source
-                                      src={Utils?.generateVideoURL(clp)}
-                                      type="video/mp4"
-                                    />
-                                  </video>
-                                </div> : null
+                                    <video
+                                      // style={{ border: `${sld ? "2px" : "0px"} solid green`, width: "98%", maxHeight: "150px", height: "100%", marginBottom: "10px", display: "flex", justifyContent: "center" }}
+                                      style={{
+                                        marginBottom: "10px",
+
+                                        width: "100%",
+                                        border: sld
+                                          ? "4px solid green"
+                                          : "4px solid rgb(180, 187, 209)",
+                                        borderRadius: "5px",
+                                        objectFit: "cover",
+                                        aspectRatio: "1/1"
+                                      }}
+                                    >
+                                      <source
+                                        src={Utils?.generateVideoURL(clp)}
+                                        type="video/mp4"
+                                      />
+                                    </video>
+                                  </div> : null
                               );
                             })}
                           </div>
@@ -981,22 +996,22 @@ export const CanvasMenuBar = ({
               </div>
             </div>
 
-        {clipSelectNote && (
-        <Notes
-          isOpen={clipSelectNote}
-          onClose={setClipSelectNote}
-          title={"Select clips"}
-          desc={"Select clips to choose up to two clips, videos will load onto your board when you click the X (cross)."}
-          style={{
-            top: "10px",
-            left: "10px",
-          }}
-          triangle = {"clip-select"}
-          nextFunc={() => {
-            setClipSelectNote(false);
-          }}
-        />
-      )}
+            {clipSelectNote && (
+              <Notes
+                isOpen={clipSelectNote}
+                onClose={setClipSelectNote}
+                title={"Select clips"}
+                desc={"Select clips to choose up to two clips, videos will load onto your board when you click the X (cross)."}
+                style={{
+                  top: "10px",
+                  left: "10px",
+                }}
+                triangle={"clip-select"}
+                nextFunc={() => {
+                  setClipSelectNote(false);
+                }}
+              />
+            )}
           </>
 
 
