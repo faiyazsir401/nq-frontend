@@ -217,6 +217,7 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
     setSelectedReportId(null)
     setselectedRecordingId(null)
   }
+  console.log("reportsData",reportsData)
   return (
     <>
       {/* <ToastContainer /> */}

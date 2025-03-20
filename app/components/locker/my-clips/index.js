@@ -33,7 +33,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const [isOpenPlayVideo, setIsOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState("");
   const [reportsData, setReportsData] = useState([]);
-  const { sidebarLockerActiveTab, accountType } = useAppSelector(authState);
+  const { sidebarLockerActiveTab, accountType,userInfo } = useAppSelector(authState);
   const { masterData } = useAppSelector(masterState).master;
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -43,6 +43,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
     height: "587px",
   });
   const isMobileScreen= useMediaQuery(600)
+  //  const { userInfo } = useAppSelector(authState);
 
   // console.log("allClips ========>*", allClips)
   useEffect(() => {
@@ -153,6 +154,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
       };
       //NOTE -  call the SortClips funtion 
       const sortedClips = sortClips(clips);
+      console.log("sortedClips",sortedClips)
       setSortedClips(sortedClips);
     }
   }, [clips]);
@@ -233,6 +235,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                             >
                               <source src={Utils?.generateVideoURL(clp)} />
                             </video>
+                            {clp.user_id === userInfo._id &&
                             <div
                               className="download-delete"
                               style={{
@@ -287,7 +290,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                   <FaDownload size={isMobileScreen?15:17}/>
                                 </a>
                               </div>
-                            </div>
+                            </div>}
                           </div>
                         </Tooltip>
                       </div>
