@@ -114,7 +114,7 @@ const MyCommunity = (props) => {
         )
       );
       getFriendRequestsApi();
-    } catch (error) {
+      } catch (error) {
       toast.error(error);
     }
   };
@@ -123,7 +123,9 @@ const MyCommunity = (props) => {
     try {
       await acceptFriendRequest({ requestId });
       toast.success("Friend request accepted");
+      setActiveTab("friends")
       getFriendRequestsApi();
+      getFriendsApi()
     } catch (error) {
       toast.error(error);
     }
@@ -205,6 +207,7 @@ const MyCommunity = (props) => {
             console.log("e12", searchTerm);
             const data = await getAllUsers({ search: searchTerm });
             setSearchData(data.result);
+            
             setActiveTab("search");
             console.log("searchTerm", data);
           }}
@@ -379,39 +382,42 @@ const MyCommunity = (props) => {
                         </h5>
 
 
-                        {friendRequests.some((req) => req.senderId?._id === data?._id) ? (
-                           <div className="d-flex" style={{ gap: 5 }}>
-                           <button
-                             style={{
-                               padding: 5,
-   
-                               marginTop: 5,
-                               fontSize: isMobileScreen ? "revert-layer" : "12px",
-                             }}
-                             className="btn btn-success btn-sm"
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               handleAcceptFriendRequest(request?._id);
-                             }}
-                           >
-                             Accept
-                           </button>
-                           <button
-                             style={{
-                               padding: 5,
-   
-                               marginTop: 5,
-                               fontSize: isMobileScreen ? "revert-layer" : "12px",
-                             }}
-                             className="btn btn-danger btn-sm"
-                             onClick={(e) => {
-                               e.stopPropagation();
-                               handleRejectFriendRequest(request?._id);
-                             }}
-                           >
-                             Reject
-                           </button>
-                         </div>
+                        {friendRequests.find((req) => req.senderId?._id === data?._id) ? (
+                          (() => {
+                            const request = friendRequests.find((req) => req.senderId?._id === data?._id);
+                            return (
+                              <div className="d-flex" style={{ gap: 5 }}>
+                                <button
+                                  style={{
+                                    padding: 5,
+                                    marginTop: 5,
+                                    fontSize: isMobileScreen ? "revert-layer" : "12px",
+                                  }}
+                                  className="btn btn-success btn-sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAcceptFriendRequest(request?._id); // ✅ Send request._id
+                                  }}
+                                >
+                                  Accept
+                                </button>
+                                <button
+                                  style={{
+                                    padding: 5,
+                                    marginTop: 5,
+                                    fontSize: isMobileScreen ? "revert-layer" : "12px",
+                                  }}
+                                  className="btn btn-danger btn-sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRejectFriendRequest(request?._id); // ✅ Send request._id
+                                  }}
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            );
+                          })()
                         ) : isFriend(data?._id) ? (
                           <button
                             style={{
