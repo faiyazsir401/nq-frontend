@@ -21,7 +21,7 @@ import { AccountType } from "../../common/constants";
 import './common.css'
 import { getFriends } from "../../common/common.api";
 const FriendsPopup = ({ props }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
   const [friends, setFriends] = useState([]);
   const userInfo = useSelector((state) => state.auth.userInfo);

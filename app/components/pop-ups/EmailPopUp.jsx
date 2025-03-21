@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 
 const EmailsPopup = ({ props }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const [email, setEmail] = useState('');
 
@@ -81,7 +81,7 @@ const EmailsPopup = ({ props }) => {
                 <Input
                   type="text"
                   value={email}
-                  placeholder="Enter email"
+                  placeholder="Enter new user email"
                   onChange={handleEmailChange}
                   onKeyDown={handleKeyDown}
                   style={{ border: 'none', outline: 'none', minWidth: '100px' }}
