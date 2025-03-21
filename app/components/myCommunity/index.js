@@ -195,7 +195,7 @@ const MyCommunity = (props) => {
       }}
       id="files"
     >
-        <ConfirmModal closeModal={()=>setIsDeleteOpen(false) } deleteFunc={handleRemoveFriend} isModelOpen={isDeleteOpen} message={"You want to Unfriend?"} selectedId={selectedId} setIsModelOpen={setIsDeleteOpen}/>
+      <ConfirmModal closeModal={() => setIsDeleteOpen(false)} deleteFunc={handleRemoveFriend} isModelOpen={isDeleteOpen} message={"You want to Unfriend?"} selectedId={selectedId} setIsModelOpen={setIsDeleteOpen} />
       {!isMobileScreen && <h2 className="mb-3">My Community</h2>}
       <div>
         <form
@@ -261,9 +261,8 @@ const MyCommunity = (props) => {
             <div className="col" style={{ padding: "0px", marginTop: "10px" }}>
               <NavItem className="ml-5px">
                 <NavLink
-                  className={`button-effect ${
-                    activeTab === "friends" ? "active" : ""
-                  }`}
+                  className={`button-effect ${activeTab === "friends" ? "active" : ""
+                    }`}
                   onClick={() => {
                     setActiveTab("friends");
                     getFriendsApi();
@@ -303,9 +302,8 @@ const MyCommunity = (props) => {
               </div>
               <NavItem className="ml-5px">
                 <NavLink
-                  className={`button-effect ${
-                    activeTab === "pending-requests" ? "active" : ""
-                  }`}
+                  className={`button-effect ${activeTab === "pending-requests" ? "active" : ""
+                    }`}
                   onClick={() => {
                     setActiveTab("pending-requests");
                     getFriendRequestsApi();
@@ -379,9 +377,42 @@ const MyCommunity = (props) => {
                         <h5>
                           <b>{data?.fullname}</b>
                         </h5>
-                        
 
-                        {isFriend(data?._id) ? (
+
+                        {friendRequests.some((req) => req.senderId?._id === data?._id) ? (
+                           <div className="d-flex" style={{ gap: 5 }}>
+                           <button
+                             style={{
+                               padding: 5,
+   
+                               marginTop: 5,
+                               fontSize: isMobileScreen ? "revert-layer" : "12px",
+                             }}
+                             className="btn btn-success btn-sm"
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               handleAcceptFriendRequest(request?._id);
+                             }}
+                           >
+                             Accept
+                           </button>
+                           <button
+                             style={{
+                               padding: 5,
+   
+                               marginTop: 5,
+                               fontSize: isMobileScreen ? "revert-layer" : "12px",
+                             }}
+                             className="btn btn-danger btn-sm"
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               handleRejectFriendRequest(request?._id);
+                             }}
+                           >
+                             Reject
+                           </button>
+                         </div>
+                        ) : isFriend(data?._id) ? (
                           <button
                             style={{
                               position: "absolute",
@@ -391,9 +422,7 @@ const MyCommunity = (props) => {
                               color: "white",
                               border: "none",
                               right: 0,
-                              fontSize: isMobileScreen
-                                ? "revert-layer"
-                                : "12px",
+                              fontSize: isMobileScreen ? "revert-layer" : "12px",
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
@@ -409,9 +438,7 @@ const MyCommunity = (props) => {
                               padding: 5,
                               width: 110,
                               marginTop: 5,
-                              fontSize: isMobileScreen
-                                ? "revert-layer"
-                                : "12px",
+                              fontSize: isMobileScreen ? "revert-layer" : "12px",
                             }}
                             className="btn btn-danger btn-sm"
                             onClick={(e) => {
@@ -427,9 +454,7 @@ const MyCommunity = (props) => {
                               padding: 5,
                               width: 110,
                               marginTop: 5,
-                              fontSize: isMobileScreen
-                                ? "revert-layer"
-                                : "12px",
+                              fontSize: isMobileScreen ? "revert-layer" : "12px",
                             }}
                             className="btn btn-primary btn-sm"
                             onClick={(e) => {
@@ -515,7 +540,7 @@ const MyCommunity = (props) => {
                         <h5>
                           <b>{data?.fullname}</b>
                         </h5>
-                       
+
 
                         <button
                           style={{
@@ -607,7 +632,7 @@ const MyCommunity = (props) => {
                       <h5>
                         <b>{request.senderId?.fullname}</b>
                       </h5>
-                     
+
 
                       <div className="d-flex" style={{ gap: 5 }}>
                         <button
@@ -687,7 +712,7 @@ const MyCommunity = (props) => {
                     }}
                   />
                 </div>
-                <div className="media-body media-body text-right" style={{flex:isMobileScreen?"none":"auto"}}>
+                <div className="media-body media-body text-right" style={{ flex: isMobileScreen ? "none" : "auto" }}>
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => {
