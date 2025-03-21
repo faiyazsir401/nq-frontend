@@ -9,6 +9,7 @@ const initialState = {
   session_durations: { from: "", to: "" },
   availableSlots: [],
   clips: [],
+  myClips:[],
   slots:[]
 };
 
@@ -28,6 +29,19 @@ export const getClipsAsync = createAsyncThunk(
   async (payload) => {
     try {
       const response = await myClips(payload);
+      return response;
+    } catch (err) {
+      toast.error(err.response.data.error);
+      throw err;
+    }
+  }
+);
+
+export const getMyClipsAsync = createAsyncThunk(
+  "get/myclips",
+  async () => {
+    try {
+      const response = await myClips();
       return response;
     } catch (err) {
       toast.error(err.response.data.error);
@@ -90,7 +104,21 @@ export const commonSlice = createSlice({
       })
       .addCase(getClipsAsync.rejected, (state, action) => {
         state.status = "rejected";
-      });
+      })
+      .addCase(getMyClipsAsync.pending, (state) => {
+        state.status = "pending";
+      })
+      .addCase(getMyClipsAsync.fulfilled, (state, action) => {
+        state.status = "fulfilled";
+        let temp = action.payload.data;
+        temp = temp?.map((clp) => {
+          return { ...clp, show: true };
+        });
+        state.myClips = temp;
+      })
+      .addCase(getMyClipsAsync.rejected, (state, action) => {
+        state.status = "rejected";
+      })
   },
 });
 export default commonSlice.reducer;
