@@ -20,6 +20,7 @@ import { AccountType } from "../../common/constants";
 // Sample friend data
 import './common.css'
 import { getFriends } from "../../common/common.api";
+import { X } from "react-feather";
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
@@ -77,19 +78,30 @@ const FriendsPopup = ({ props }) => {
         isOpen={isOpen}
         toggle={toggle}
         centered={true}
-        style={{ maxWidth: "1440px"}}
+        style={{ maxWidth: "1440px" }}
         fade={true}
         className="friends-modal"
+
       >
+
         <ModalBody>
+          <div style={{
+            marginBottom: "50px"
+          }}>
+            <button type="button" className="close" onClick={toggle}>
+              <X />
+            </button>
+          </div>
           <div
             style={{
               display: "flex",
               justifyContent: "start",
               flexWrap: "wrap",
               gap: "10px",
-              alignItems:'center',
-              justifyContent:'center'
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: "50dvh",
+              overflowY: "scroll"
             }}
           >
             {friends.map((friend) => (
@@ -107,7 +119,7 @@ const FriendsPopup = ({ props }) => {
               >
                 <CardImg
                   top
-                  style={{ minHeight: 145 , maxHeight: 145 , objectFit:"cover" }}
+                  style={{ minHeight: 145, maxHeight: 145, objectFit: "cover" }}
                   src={
                     Utils.getImageUrlOfS3(friend.profile_picture) ||
                     "/assets/images/demoUser.png"
@@ -120,14 +132,15 @@ const FriendsPopup = ({ props }) => {
                   type="checkbox"
                   checked={selectedFriends.includes(friend._id)}
                   onChange={() => handleSelectFriend(friend._id)}
-                  style={{ marginTop: "5px" , right:'5px'}}
+                  style={{ marginTop: "5px", right: '5px' }}
                 />
               </Card>
             ))}
+            
           </div>
         </ModalBody>
         <ModalFooter className="d-flex">
-          <Button className="m-auto" color="white" onClick={toggle} style={{backgroundColor:'rgb(83 233 89)'}}>
+          <Button className="m-auto" color="white" onClick={toggle} style={{ backgroundColor: 'rgb(83 233 89)' }}>
             Select
           </Button>
         </ModalFooter>
