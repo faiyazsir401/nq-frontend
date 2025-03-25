@@ -505,7 +505,7 @@ export const UpdateSettingProfileForm = ({
 
       await pushFileToS3(data.url, selectedFile);
       
-      const publicUrl = data.url.split("?")[0];
+      const publicUrl = data.url.split("?")[0].split('/').pop() || "";
       
       setFieldValue(`media.${currentMediaIndex}.url`, publicUrl);
       
@@ -514,7 +514,7 @@ export const UpdateSettingProfileForm = ({
         if (thumbnail?.thumbnailFile) {
           await pushFileToS3(data.thumbnailURL, thumbnail.thumbnailFile);
         }
-        const thumbnailURL = data.thumbnailURL.split("?")[0];
+        const thumbnailURL = data.thumbnailURL.split("?")[0].split('/').pop() || "";
         setFieldValue(`media.${currentMediaIndex}.thumbnail`, thumbnailURL);
       } else if (fileType === "image") {
         setFieldValue(`media.${currentMediaIndex}.thumbnail`, publicUrl);
@@ -690,7 +690,7 @@ export const UpdateSettingProfileForm = ({
                                   if (event.target.value === "video") {
                                     thumbnail = DUMMY_URLS.YOUTUBE;
                                   } else if (event.target.value === "image") {
-                                    thumbnail = values.media?.[index]?.url || "";
+                                    thumbnail = values.media?.[index]?.url?.split('/').pop() || "";
                                   }
                                   setFieldValue(`media.${index}.thumbnail`, thumbnail);
                                   setFieldValue(`media.${index}.type`, event.target.value);
