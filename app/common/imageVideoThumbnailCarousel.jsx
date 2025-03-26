@@ -80,7 +80,7 @@ class ImageVideoThumbnailCarousel extends React.Component {
             <img
               alt="sample video cover"
               className="image-gallery-image"
-              src={item.thumbnail}
+              src={`https://data.netqwix.com/${item.thumbnail}`}
             />
             {this.renderLabels(item)}
             </div>
@@ -112,7 +112,8 @@ class ImageVideoThumbnailCarousel extends React.Component {
         <img
           alt="sample video cover"
           className="image-gallery-image"
-          src={item.original}
+          // src={item.original} 
+          src={`https://data.netqwix.com/${item.original}`}
         />
         {this.renderLabels(item)}
       </div>

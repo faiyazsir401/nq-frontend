@@ -412,6 +412,7 @@ const UploadClipCard = (props) => {
         try{
           await pushProfilePhotoToS3(data.url, selectedFile, 'video');
           // Create a new file input element
+          console.log("thumbnail.thumbnailFile",thumbnail.thumbnailFile,data.thumbnailURL)
           await pushProfilePhotoToS3(data.thumbnailURL, thumbnail.thumbnailFile);
           const newFileInput = document.createElement("input");
           newFileInput.type = "file";
