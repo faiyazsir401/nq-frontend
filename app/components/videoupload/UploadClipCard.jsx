@@ -304,7 +304,7 @@ const UploadClipCard = (props) => {
   const handleFileChange = async (e) => {
     if (e.target.files.length) {
       const newFiles = Array.from(e.target.files);
-      
+
       // Check file sizes
       const invalidFiles = newFiles.filter(file => (file.size / 1024 / 1024) > 150);
       if (invalidFiles.length > 0) {
@@ -312,26 +312,26 @@ const UploadClipCard = (props) => {
       }
 
       const validFiles = newFiles.filter(file => (file.size / 1024 / 1024) <= 150);
-      
+
       // Initialize state arrays for new files
       const newVideos = [...videos];
       const newThumbnails = [...thumbnails];
       const newTitles = [...titles];
       const newLoading = [...loading];
       const newProgress = [...progress];
-      
+
       for (const file of validFiles) {
         const videoIndex = videos.length + newFiles.indexOf(file);
-        
+
         // Create video element
         const video = document.createElement('video');
         video.playsInline = true;
         video.muted = true; // Important for autoplay in some browsers
         video.preload = 'metadata';
-        
+
         const videoUrl = URL.createObjectURL(file);
         video.src = videoUrl;
-        
+
         // Store references
         videoRefs.current[videoIndex] = video;
         newVideos[videoIndex] = file;
@@ -339,11 +339,11 @@ const UploadClipCard = (props) => {
         newTitles[videoIndex] = "";
         newLoading[videoIndex] = true;
         newProgress[videoIndex] = 0;
-        
+
         // Generate thumbnail after slight delay to ensure video is ready
         setTimeout(() => generateThumbnail(videoIndex), 100);
       }
-      
+
       setSelectedFiles(prev => [...prev, ...validFiles]);
       setVideos(newVideos);
       setThumbnails(newThumbnails);
@@ -456,7 +456,7 @@ const UploadClipCard = (props) => {
         "Content-Type": uploadPhoto.type,
         "Content-Disposition": "inline",
       });
-      
+
       const response = await axios.put(presignedUrl, uploadPhoto, {
         headers: myHeaders,
         onUploadProgress: (progressEvent) => {
@@ -593,7 +593,7 @@ const UploadClipCard = (props) => {
             <div key={index} className="mb-3 p-2 border rounded">
               <div className="d-flex justify-content-between align-items-center">
                 <span>{file.name}</span>
-                <button 
+                <button
                   className="btn btn-sm btn-danger"
                   onClick={() => removeFile(index)}
                   disabled={isUploading}
@@ -601,7 +601,7 @@ const UploadClipCard = (props) => {
                   <X size={16} />
                 </button>
               </div>
-              
+
               <div className="form-group mt-2">
                 <label className="col-form-label">Title</label>
                 <input
@@ -614,7 +614,7 @@ const UploadClipCard = (props) => {
                   required
                 />
               </div>
-              
+
               {loading[index] ? (
                 <div className="d-flex align-items-center mt-2">
                   <div className="spinner-border text-primary" role="status">
@@ -624,31 +624,18 @@ const UploadClipCard = (props) => {
                 </div>
               ) : thumbnails[index]?.dataUrl ? (
                 <div className="d-flex align-items-center mt-2">
-                  <img 
-                    src={thumbnails[index]?.dataUrl} 
-                    alt="thumbnail" 
-                    style={{ 
-                      width: 100, 
-                      height: 100, 
+                  <img
+                    src={thumbnails[index]?.dataUrl}
+                    alt="thumbnail"
+                    style={{
+                      width: 100,
+                      height: 100,
                       objectFit: 'cover',
                       border: '1px solid #ddd'
                     }}
                   />
                   <div className="ml-2">
-                    {progress[index] > 0 && (
-                      <div className="progress mt-2">
-                        <div 
-                          className="progress-bar" 
-                          role="progressbar" 
-                          style={{ width: `${progress[index]}%` }}
-                          aria-valuenow={progress[index]}
-                          aria-valuemin="0" 
-                          aria-valuemax="100"
-                        >
-                          {progress[index]}%
-                        </div>
-                      </div>
-                    )}
+                   <h2>{progress[index]}%</h2> 
                   </div>
                 </div>
               ) : (

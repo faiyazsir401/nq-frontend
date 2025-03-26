@@ -12,13 +12,14 @@ import { getFriends } from "../../common/common.api";
 import { Utils } from "../../../utils/utils";
 import { X } from "react-feather";
 import "./common.css";
+import { useMediaQuery } from "usehooks-ts";
 
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const width500 = useMediaQuery("(max-width:500px)")
   const toggle = () => setIsOpen((prev) => !prev);
 
   const handleSelectFriend = (id) => {
@@ -56,17 +57,17 @@ const FriendsPopup = ({ props }) => {
         {props.buttonLabel}
       </button>
 
-      <Modal 
-        isOpen={isOpen} 
-        toggle={toggle} 
-        centered 
-        fade 
+      <Modal
+        isOpen={isOpen}
+        toggle={toggle}
+        centered
+        fade
         className="friends-modal"
         contentClassName="d-flex flex-column"
         style={{ height: '100vh' }}
       >
-        <div 
-          className="d-flex justify-content-end p-2" 
+        <div
+          className="d-flex justify-content-end p-2"
           style={{ position: 'absolute', top: 0, right: 0, zIndex: 10 }}
         >
           <button type="button" className="close" onClick={toggle}>
@@ -74,12 +75,13 @@ const FriendsPopup = ({ props }) => {
           </button>
         </div>
 
-        <ModalBody 
-          className="d-flex flex-column p-0" 
-          style={{ 
-            flexGrow: 1, 
-            overflowY: 'auto', 
-            paddingBottom: '60px' // Space for the select button
+        <ModalBody
+          className="d-flex flex-column p-0"
+          style={{
+            flexGrow: 1,
+            overflowY: 'auto',
+            paddingBottom: '60px', // Space for the select button
+            justifyContent:width500?"flex-start":"center"
           }}
         >
           {loading ? (
@@ -93,16 +95,21 @@ const FriendsPopup = ({ props }) => {
               style={{
                 display: "flex",
                 justifyContent: "center",
-                flexWrap: "wrap",
+      
+               flexWrap: "wrap",
                 gap: "15px",
                 padding: "15px",
+                maxHeight:"80dvh",
+                // height:"100%",
+                overflowY: 'auto',
+                marginTop:"20px"
               }}
             >
               {friends.map((friend) => {
-                const profileImage = 
-                friend.profile_picture 
-                  ? Utils.getImageUrlOfS3(friend.profile_picture) 
-                  : "/assets/images/demoUser.png";
+                const profileImage =
+                  friend.profile_picture
+                    ? Utils.getImageUrlOfS3(friend.profile_picture)
+                    : "/assets/images/demoUser.png";
                 return (
                   <Card
                     key={friend._id}
@@ -110,6 +117,7 @@ const FriendsPopup = ({ props }) => {
                       width: "150px",
                       border: selectedFriends.includes(friend._id) ? "2px solid green" : "1px solid gray",
                       cursor: "pointer",
+                      height: "fit-content"
                     }}
                     onClick={() => handleSelectFriend(friend._id)}
                     className="rounded"
@@ -135,23 +143,20 @@ const FriendsPopup = ({ props }) => {
               })}
             </div>
           )}
+          <div
+            className="w-100 d-flex justify-content-center p-2"
+          >
+            <Button
+              className="m-auto"
+              style={{ backgroundColor: "rgb(83 233 89)" }}
+              onClick={toggle}
+            >
+              Select
+            </Button>
+          </div>
         </ModalBody>
 
-        <ModalFooter 
-          className="position-absolute bottom-0 w-100 d-flex justify-content-center p-2"
-          style={{ 
-            backgroundColor: "white",
-            boxShadow: '0 -2px 5px rgba(0,0,0,0.1)' 
-          }}
-        >
-          <Button 
-            className="m-auto" 
-            style={{ backgroundColor: "rgb(83 233 89)" }} 
-            onClick={toggle}
-          >
-            Select
-          </Button>
-        </ModalFooter>
+
       </Modal>
     </div>
   );
