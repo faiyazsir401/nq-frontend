@@ -81,7 +81,7 @@ class ImageVideoThumbnailCarousel extends React.Component {
             <img
               alt="sample video cover"
               className="image-gallery-image"
-              src={`https://data.netqwix.com/${item.thumbnail}`}
+              src={`${item.thumbnail}`}
             />
             {this.renderLabels(item)}
             </div>
