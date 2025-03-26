@@ -204,80 +204,101 @@ const UploadClipCard = (props) => {
     });
   };
 
-  const generateThumbnail1 = (index) => {
-    setTimeout(() => {
-      setLoading(prev => {
-        const newLoading = [...prev];
-        newLoading[index] = true;
-        return newLoading;
+
+  const generateThumbnail = async (index) => {
+    setLoading(prev => {
+      const newLoading = [...prev];
+      newLoading[index] = true;
+      return newLoading;
+    });
+
+    try {
+      const video = videoRefs.current[index];
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+
+      // Wait for video metadata to load
+      await new Promise((resolve) => {
+        video.onloadedmetadata = resolve;
+        if (video.readyState >= 1) resolve(); // If already loaded
       });
 
-      if (deviceInfo?.os?.name?.toLowerCase() === OS.ios.toLowerCase()) {
-        trimVideo(videos[index], index);
-      }
-      else if (deviceInfo?.os?.name?.toLowerCase() === OS.windows.toLowerCase() || 
-               deviceInfo?.os?.name?.toLowerCase() === OS.android.toLowerCase() || 
-               (deviceInfo?.os?.name?.toLowerCase() === OS.mac.toLowerCase() && 
-                deviceInfo?.browser?.name?.toLowerCase() === BROWSER.chrome.toLowerCase())) {
-        generateThumbnailFormWindowsOSAndMacChrome(index);
-      } else {
-        generateThumbnailMacAndiOS(index);
-      }
-    }, 3000);
-  };
-
-  const generateThumbnailMacAndiOS = (index) => {
-    const video = videoRefs.current[index];
-    const canvas = canvasRefs.current[index];
-    const context = canvas.getContext('2d');
-
-    const captureFrame = () => {
+      // Set canvas dimensions
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
+
+      // Seek to a good position for thumbnail (25% of duration or 1 second)
+      const seekTime = Math.min(1, video.duration * 0.25);
+      video.currentTime = seekTime;
+
+      // Wait for seek to complete
+      await new Promise((resolve) => {
+        video.onseeked = resolve;
+      });
+
+      // Wait a bit more to ensure frame is ready (especially for H.264 videos)
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Draw the frame
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      const imageFormat = 'image/jpeg';
-      const quality = 0.8;
-      const dataUrl = canvas.toDataURL(imageFormat, quality);
-      const fileType = dataUrl.split(';')[0].split(':')[1];
-      const thumbnailFile = dataURLtoFile(dataUrl, `thumbnail.${fileType.split('/')[1]}`);
+      // Convert to blob
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      const blob = await fetch(dataUrl).then(res => res.blob());
 
       setThumbnails(prev => {
         const newThumbnails = [...prev];
         newThumbnails[index] = {
-          thumbnailFile: thumbnailFile,
+          thumbnailFile: blob,
           dataUrl: dataUrl,
-          fileType: fileType
+          fileType: blob.type
         };
         return newThumbnails;
       });
-
+    } catch (error) {
+      console.error('Error generating thumbnail:', error);
+      // Fallback to server-side thumbnail generation if client-side fails
+      await generateThumbnailOnServer(index);
+    } finally {
       setLoading(prev => {
         const newLoading = [...prev];
         newLoading[index] = false;
         return newLoading;
       });
-    };
+    }
+  };
 
-    video.play().then(() => {
-      video.pause();
-      const seekTime = Math.min(1, video.duration * 0.25);
-      video.currentTime = seekTime;
+  const generateThumbnailOnServer = async (index) => {
+    try {
+      const formData = new FormData();
+      formData.append('video', videos[index]);
 
-      const handleFrame = () => {
-        if (video.currentTime >= seekTime) {
-          video.removeEventListener('timeupdate', handleFrame);
-          video.removeEventListener('seeked', handleFrame);
-          captureFrame();
-        }
-      };
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/common/generate-thumbnail`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+      });
 
-      video.addEventListener('timeupdate', handleFrame);
-      video.addEventListener('seeked', handleFrame);
-    }).catch(error => {
-      console.error('Error playing video:', error);
-      captureFrame();
-    });
+      if (!response.ok) throw new Error('Failed to generate thumbnail');
+
+      const blob = await response.blob();
+      const thumbnailUrl = URL.createObjectURL(blob);
+
+      setThumbnails(prev => {
+        const newThumbnails = [...prev];
+        newThumbnails[index] = {
+          thumbnailFile: blob,
+          dataUrl: thumbnailUrl,
+          fileType: blob.type
+        };
+        return newThumbnails;
+      });
+    } catch (error) {
+      console.error('Server-side thumbnail generation failed:', error);
+      toast.error(`Failed to generate thumbnail for ${selectedFiles[index]?.name}`);
+    }
   };
 
   const handleFileChange = async (e) => {
@@ -288,7 +309,6 @@ const UploadClipCard = (props) => {
       const invalidFiles = newFiles.filter(file => (file.size / 1024 / 1024) > 150);
       if (invalidFiles.length > 0) {
         alert("Some files exceed 150 MiB and will not be uploaded");
-        return;
       }
 
       const validFiles = newFiles.filter(file => (file.size / 1024 / 1024) <= 150);
@@ -298,37 +318,41 @@ const UploadClipCard = (props) => {
       const newThumbnails = [...thumbnails];
       const newTitles = [...titles];
       const newLoading = [...loading];
+      const newProgress = [...progress];
       
-      validFiles.forEach((file, index) => {
+      for (const file of validFiles) {
+        const videoIndex = videos.length + newFiles.indexOf(file);
+        
+        // Create video element
+        const video = document.createElement('video');
+        video.playsInline = true;
+        video.muted = true; // Important for autoplay in some browsers
+        video.preload = 'metadata';
+        
         const videoUrl = URL.createObjectURL(file);
-        const videoIndex = videos.length + index;
+        video.src = videoUrl;
         
-        // Create new video and canvas elements if needed
-        if (!videoRefs.current[videoIndex]) {
-          videoRefs.current[videoIndex] = document.createElement('video');
-          videoRefs.current[videoIndex].playsInline = true;
-          videoRefs.current[videoIndex].onloadedmetadata = () => generateThumbnail1(videoIndex);
-          
-          canvasRefs.current[videoIndex] = document.createElement('canvas');
-          canvasRefs.current[videoIndex].style.display = 'none';
-          document.body.appendChild(canvasRefs.current[videoIndex]);
-        }
-        
-        videoRefs.current[videoIndex].src = videoUrl;
-        
+        // Store references
+        videoRefs.current[videoIndex] = video;
         newVideos[videoIndex] = file;
         newThumbnails[videoIndex] = null;
         newTitles[videoIndex] = "";
         newLoading[videoIndex] = true;
-      });
+        newProgress[videoIndex] = 0;
+        
+        // Generate thumbnail after slight delay to ensure video is ready
+        setTimeout(() => generateThumbnail(videoIndex), 100);
+      }
       
       setSelectedFiles(prev => [...prev, ...validFiles]);
       setVideos(newVideos);
       setThumbnails(newThumbnails);
       setTitles(newTitles);
       setLoading(newLoading);
+      setProgress(newProgress);
     }
   };
+
 
   const handleTitleChange = (index, value) => {
     setTitles(prev => {
@@ -592,25 +616,51 @@ const UploadClipCard = (props) => {
               </div>
               
               {loading[index] ? (
-                <div style={{ color: "black" }}>Generating thumbnail...</div>
-              ) : thumbnails[index]?.fileType ? (
+                <div className="d-flex align-items-center mt-2">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                  <span className="ml-2">Generating thumbnail...</span>
+                </div>
+              ) : thumbnails[index]?.dataUrl ? (
                 <div className="d-flex align-items-center mt-2">
                   <img 
                     src={thumbnails[index]?.dataUrl} 
                     alt="thumbnail" 
-                    style={{ width: 100, height: 100, objectFit: 'cover' }}
+                    style={{ 
+                      width: 100, 
+                      height: 100, 
+                      objectFit: 'cover',
+                      border: '1px solid #ddd'
+                    }}
                   />
                   <div className="ml-2">
                     {progress[index] > 0 && (
-                      <div>Upload progress: {progress[index]}%</div>
+                      <div className="progress mt-2">
+                        <div 
+                          className="progress-bar" 
+                          role="progressbar" 
+                          style={{ width: `${progress[index]}%` }}
+                          aria-valuenow={progress[index]}
+                          aria-valuemin="0" 
+                          aria-valuemax="100"
+                        >
+                          {progress[index]}%
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
-              ) : null}
+              ) : (
+                <div className="text-danger mt-2">
+                  Failed to generate thumbnail. Try another video.
+                </div>
+              )}
             </div>
           ))}
         </div>
       )}
+
 
       {selectedFiles.length > 0 && !loading.some(l => l) && (
         <div className="d-flex justify-content-center btn_css">
