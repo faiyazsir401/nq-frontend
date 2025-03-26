@@ -41,71 +41,41 @@ const shareWithConstants = {
 }
 
 const UploadClipCard = (props) => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [title, setTitle] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [titles, setTitles] = useState([""]);
   const [category, setCategory] = useState({});
   const [categoryList, setCategoryList] = useState([]);
   const ref = useRef();
   const dispatch = useAppDispatch();
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState([]);
   const { isOpen } = useAppSelector(videouploadState);
   const userInfo = useSelector((state) => state.auth.userInfo)
   const [isUploading, setIsUploading] = useState(false)
-  const [thumbnail, setThumbnail] = useState('');
-  console.log("thumbnail===================>", thumbnail)
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  // const ffmpegRef = useRef(null);
+  const [thumbnails, setThumbnails] = useState([]);
+  const videoRefs = useRef([]);
+  const canvasRefs = useRef([]);
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
-
-  const [video, setVideo] = useState(null);
-  // const [printLog, setPrintLog] = useState(null);
-
-  const [loading, setLoading] = useState(false);
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState([]);
   const ffmpegRef = useRef(null);
   const [deviceInfo, setDeviceInfo] = useState({});
-  console.log("deviceInfo===================>", deviceInfo)
   const [shareWith, setShareWith] = useState(shareWithConstants.myClips)
   const [selectedFriends, setSelectedFriends] = useState([]);
-  const [selectedEmails, setSelectedEmails] = useState([])
-  useEffect(() => {
+  const [selectedEmails, setSelectedEmails] = useState([]);
 
+  useEffect(() => {
     const result = parser.getResult();
     setDeviceInfo(result);
   }, []);
 
-  // useEffect(() => {
-  //   const load = async () => {
-  //     const ffmpeg = new FFmpeg();
-  //     ffmpegRef.current = ffmpeg;
-  //     await ffmpeg.load({
-  //       coreURL: await toBlobURL('/ffmpeg-core.js', 'text/javascript'),
-  //       wasmURL: await toBlobURL('/ffmpeg-core.wasm', 'application/wasm'),
-  //     });
-  //   };
-  //   load();
-  // }, []);
-
   useEffect(() => {
     const loadFFmpeg = async () => {
       try {
-        // console.log("1===================>")
         const ffmpeg = new FFmpeg();
-        // console.log("2===================>")
         ffmpegRef.current = ffmpeg;
-        // console.log("3===================>")
-        // await ffmpeg.load({
-        //   coreURL: await toBlobURL('/ffmpeg-core.js', 'text/javascript'),
-        //   wasmURL: await toBlobURL('/ffmpeg-core.wasm', 'application/wasm'),
-        // });
-
         const coreURL = '/ffmpeg-core.js';
         const wasmURL = '/ffmpeg-core.wasm';
-
         await ffmpeg.load({ coreURL, wasmURL });
-        setFfmpegLoaded(true);
-
-        // console.log("4===================>")
         setFfmpegLoaded(true);
       } catch (error) {
         console.error('Error loading FFmpeg:', error);
@@ -114,20 +84,21 @@ const UploadClipCard = (props) => {
     loadFFmpeg();
   }, []);
 
-
-
-  const trimVideo = async () => {
+  const trimVideo = async (video, index) => {
     if (!video) return;
 
-    setLoading(true);
+    setLoading(prev => {
+      const newLoading = [...prev];
+      newLoading[index] = true;
+      return newLoading;
+    });
+
     const inputFileName = 'input.mp4';
     const outputFileName = 'output.mp4';
 
     try {
       const ffmpeg = ffmpegRef.current;
       await ffmpeg.writeFile(inputFileName, await fetchFile(video));
-
-      let compressionSettings = '-crf 23';
 
       await ffmpeg.exec([
         '-i', inputFileName,
@@ -137,42 +108,20 @@ const UploadClipCard = (props) => {
         outputFileName
       ]);
 
-      // await ffmpeg.exec([
-      //   '-i', inputFileName,
-      //   '-ss', '0',
-      //   '-to', '2',
-      //   '-c:v', 'libx264',
-      //   '-preset', 'medium',
-      //   ...compressionSettings.split(' '),
-      //   '-c:a', 'aac',
-      //   '-b:a', '128k',
-      //   outputFileName
-      // ]);
-
       const data = await ffmpeg.readFile(outputFileName);
       const trimmedVideoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-      // setTrimmedVideo(URL.createObjectURL(trimmedVideoBlob));
-
-
-      // console.log("4===================>", {video, trimmedVideoBlob})
-      // Generate thumbnail 
 
       const formData = new FormData();
       formData.append('video', trimmedVideoBlob);
 
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/common/generate-thumbnail`, {
-          // const response = await fetch(`https://6d3e-59-99-53-84.ngrok-free.app/common/generate-thumbnail`, {
           method: 'POST',
           headers: {
-            // "Content-Type": "application/json",
-            // "Access-Control-Allow-Origin": "*",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: formData,
-          // credentials: 'include' 
         });
-        // const response = await generateThumbnailURL(formData);
 
         if (!response.ok) {
           throw new Error('Failed to generate thumbnail');
@@ -181,26 +130,28 @@ const UploadClipCard = (props) => {
         const blob = await response.blob();
         const thumbnailUrl = URL.createObjectURL(blob);
 
-        setThumbnail({
-          thumbnailFile: blob,
-          dataUrl: thumbnailUrl,
-          fileType: blob.type
+        setThumbnails(prev => {
+          const newThumbnails = [...prev];
+          newThumbnails[index] = {
+            thumbnailFile: blob,
+            dataUrl: thumbnailUrl,
+            fileType: blob.type
+          };
+          return newThumbnails;
         });
 
-        // console.log("=============>", {thumbnailUrl,blob })
-        // setThumbnail(thumbnailUrl);
       } catch (error) {
         console.error('Error generating thumbnail:', error);
         alert('Error generating thumbnail');
-      } finally {
       }
-
-
-
     } catch (error) {
       console.error('Error trimming video:', error);
     } finally {
-      setLoading(false);
+      setLoading(prev => {
+        const newLoading = [...prev];
+        newLoading[index] = false;
+        return newLoading;
+      });
     }
   };
 
@@ -216,111 +167,103 @@ const UploadClipCard = (props) => {
     return new File([u8arr], filename, { type: mime });
   }
 
-
-  const generateThumbnailFormWindowsOSAndMacChrome = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
+  const generateThumbnailFormWindowsOSAndMacChrome = (index) => {
+    const video = videoRefs.current[index];
+    const canvas = canvasRefs.current[index];
     const context = canvas.getContext('2d');
 
-    // Set canvas dimensions to match the video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
-    // Seek to 1 second (or 25% of the video, whichever is less)
     const seekTime = Math.min(1, video.duration * 0.25);
     video.currentTime = seekTime;
 
-    // Wait for the seek to complete before capturing the frame
     video.onseeked = () => {
-      // Draw the current video frame on the canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Convert canvas to data URL
-      // const dataUrl = canvas.toDataURL('image/jpeg');
-      // setThumbnail(dataUrl);
-
       const imageFormat = 'image/jpeg';
-      const quality = 0.8;  // Optional: quality for JPEG (0 to 1)
-
-      // Convert canvas to data URL
+      const quality = 0.8;
       const dataUrl = canvas.toDataURL(imageFormat, quality);
-
-      // Extract file type from the data URL
       const fileType = dataUrl.split(';')[0].split(':')[1];
-
       const thumbnailFile = dataURLtoFile(dataUrl, `thumbnail.${fileType.split('/')[1]}`);
 
-      setThumbnail({
-        thumbnailFile: thumbnailFile,
-        dataUrl: dataUrl,
-        fileType: fileType
+      setThumbnails(prev => {
+        const newThumbnails = [...prev];
+        newThumbnails[index] = {
+          thumbnailFile: thumbnailFile,
+          dataUrl: dataUrl,
+          fileType: fileType
+        };
+        return newThumbnails;
       });
     };
 
-    setLoading(false)
+    setLoading(prev => {
+      const newLoading = [...prev];
+      newLoading[index] = false;
+      return newLoading;
+    });
   };
 
-  const generateThumbnail1 = () => {
+  const generateThumbnail1 = (index) => {
     setTimeout(() => {
-      setLoading(true)
+      setLoading(prev => {
+        const newLoading = [...prev];
+        newLoading[index] = true;
+        return newLoading;
+      });
+
       if (deviceInfo?.os?.name?.toLowerCase() === OS.ios.toLowerCase()) {
-        trimVideo();
+        trimVideo(videos[index], index);
       }
-      else if (deviceInfo?.os?.name?.toLowerCase() === OS.windows.toLowerCase() || deviceInfo?.os?.name?.toLowerCase() === OS.android.toLowerCase() || (deviceInfo?.os?.name?.toLowerCase() === OS.mac.toLowerCase() && deviceInfo?.browser?.name?.toLowerCase() === BROWSER.chrome.toLowerCase())) {
-        generateThumbnailFormWindowsOSAndMacChrome();
+      else if (deviceInfo?.os?.name?.toLowerCase() === OS.windows.toLowerCase() || 
+               deviceInfo?.os?.name?.toLowerCase() === OS.android.toLowerCase() || 
+               (deviceInfo?.os?.name?.toLowerCase() === OS.mac.toLowerCase() && 
+                deviceInfo?.browser?.name?.toLowerCase() === BROWSER.chrome.toLowerCase())) {
+        generateThumbnailFormWindowsOSAndMacChrome(index);
       } else {
-        generateThumbnailMacAndiOS()
+        generateThumbnailMacAndiOS(index);
       }
-
     }, 3000);
-    setLoading(false)
-  }
+  };
 
-
-  const generateThumbnailMacAndiOS = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
+  const generateThumbnailMacAndiOS = (index) => {
+    const video = videoRefs.current[index];
+    const canvas = canvasRefs.current[index];
     const context = canvas.getContext('2d');
 
-    // Function to capture the frame
     const captureFrame = () => {
-      // Set canvas dimensions to match the video
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-
-      // Draw the current video frame on the canvas
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       const imageFormat = 'image/jpeg';
       const quality = 0.8;
-
-      // Convert canvas to data URL
       const dataUrl = canvas.toDataURL(imageFormat, quality);
-
-      // Extract file type from the data URL
       const fileType = dataUrl.split(';')[0].split(':')[1];
-
       const thumbnailFile = dataURLtoFile(dataUrl, `thumbnail.${fileType.split('/')[1]}`);
 
-      setThumbnail({
-        thumbnailFile: thumbnailFile,
-        dataUrl: dataUrl,
-        fileType: fileType
+      setThumbnails(prev => {
+        const newThumbnails = [...prev];
+        newThumbnails[index] = {
+          thumbnailFile: thumbnailFile,
+          dataUrl: dataUrl,
+          fileType: fileType
+        };
+        return newThumbnails;
       });
 
-      setLoading(false)
+      setLoading(prev => {
+        const newLoading = [...prev];
+        newLoading[index] = false;
+        return newLoading;
+      });
     };
 
-    // Play the video (this might trigger autoplay on iOS)
     video.play().then(() => {
-      // Pause immediately after starting playback
       video.pause();
-
-      // Seek to 1 second (or 25% of the video, whichever is less)
       const seekTime = Math.min(1, video.duration * 0.25);
       video.currentTime = seekTime;
 
-      // Use both timeupdate and seeked events
       const handleFrame = () => {
         if (video.currentTime >= seekTime) {
           video.removeEventListener('timeupdate', handleFrame);
@@ -333,42 +276,75 @@ const UploadClipCard = (props) => {
       video.addEventListener('seeked', handleFrame);
     }).catch(error => {
       console.error('Error playing video:', error);
-      // Handle the error, maybe try to capture the frame anyway
       captureFrame();
     });
   };
 
   const handleFileChange = async (e) => {
-    setThumbnail(null);
-    setVideo(null);
-    setSelectedFile(null);
-    setLoading(true)
     if (e.target.files.length) {
-      // console.log("e.target.files======>", e.target.files.length)
-      const file = e.target.files[0];
-
-      const videoUrl = URL.createObjectURL(file);
-      videoRef.current.src = videoUrl;
-
-      const fileSize = file?.size / 1024 / 1024; // in MiB
-      if (fileSize > 150) {
-        alert("File size exceeds 50 MiB");
-        setThumbnail(null);
-        setVideo(null);
-        setSelectedFile(null);
-        setLoading(false)
-      } else {
-        setSelectedFile(file);
-
-        // *********************************************************
-        if (file) {
-          setVideo(file);
-        }
-
-        setLoading(false)
-
+      const newFiles = Array.from(e.target.files);
+      
+      // Check file sizes
+      const invalidFiles = newFiles.filter(file => (file.size / 1024 / 1024) > 150);
+      if (invalidFiles.length > 0) {
+        alert("Some files exceed 150 MiB and will not be uploaded");
+        return;
       }
+
+      const validFiles = newFiles.filter(file => (file.size / 1024 / 1024) <= 150);
+      
+      // Initialize state arrays for new files
+      const newVideos = [...videos];
+      const newThumbnails = [...thumbnails];
+      const newTitles = [...titles];
+      const newLoading = [...loading];
+      
+      validFiles.forEach((file, index) => {
+        const videoUrl = URL.createObjectURL(file);
+        const videoIndex = videos.length + index;
+        
+        // Create new video and canvas elements if needed
+        if (!videoRefs.current[videoIndex]) {
+          videoRefs.current[videoIndex] = document.createElement('video');
+          videoRefs.current[videoIndex].playsInline = true;
+          videoRefs.current[videoIndex].onloadedmetadata = () => generateThumbnail1(videoIndex);
+          
+          canvasRefs.current[videoIndex] = document.createElement('canvas');
+          canvasRefs.current[videoIndex].style.display = 'none';
+          document.body.appendChild(canvasRefs.current[videoIndex]);
+        }
+        
+        videoRefs.current[videoIndex].src = videoUrl;
+        
+        newVideos[videoIndex] = file;
+        newThumbnails[videoIndex] = null;
+        newTitles[videoIndex] = "";
+        newLoading[videoIndex] = true;
+      });
+      
+      setSelectedFiles(prev => [...prev, ...validFiles]);
+      setVideos(newVideos);
+      setThumbnails(newThumbnails);
+      setTitles(newTitles);
+      setLoading(newLoading);
     }
+  };
+
+  const handleTitleChange = (index, value) => {
+    setTitles(prev => {
+      const newTitles = [...prev];
+      newTitles[index] = value;
+      return newTitles;
+    });
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setVideos(prev => prev.filter((_, i) => i !== index));
+    setThumbnails(prev => prev.filter((_, i) => i !== index));
+    setTitles(prev => prev.filter((_, i) => i !== index));
+    setLoading(prev => prev.filter((_, i) => i !== index));
+    setProgress(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleUpload = async () => {
@@ -380,106 +356,104 @@ const UploadClipCard = (props) => {
       return;
     }
 
-    if (!selectedFile || selectedFile.length === 0) {
+    if (selectedFiles.length === 0) {
       toast.error("Please select at least one video file.");
       return;
     }
 
-    if (!thumbnail?.fileType) {
-      toast.error("Please select a thumbnail.");
-      return;
-    }
-
-    let IsTrainer = userInfo.account_type === AccountType.TRAINER;
-
-    var payload = {
-      filename: selectedFile?.name,
-      fileType: selectedFile?.type,
-      thumbnail: thumbnail?.fileType,
-      title: title,
-      category: IsTrainer ? userInfo.category : category,
-    };
-
-    if (shareWith === shareWithConstants.myFriends) {
-      payload.user_id = selectedFriends;
-    } else if (shareWith === shareWithConstants.newUsers) {
-      payload.invites = selectedEmails
-    }
-    setIsUploading(true)
-    const data = await getS3SignUrl(payload);
-
-    if (data?.url) {
-      try {
-        const response = await pushProfilePhotoToS3(data.url, selectedFile, 'video');
-        // Create a new file input element
-        console.log("thumbnail.thumbnailFile", thumbnail.thumbnailFile, data.thumbnailURL)
-        const response2 = await pushProfilePhotoToS3(data.thumbnailURL, thumbnail.thumbnailFile);
-
-        if (response && response2) {
-
-          dispatch(videouploadAction.uploadVideoS3(selectedFile));
-          setTitle("");
-          setCategory({});
-          setSelectedFile(null);
-          setThumbnail(null);
-          setVideo(null);
-          dispatch(getClipsAsync({}));
-
-        }
-        const newFileInput = document.createElement("input");
-        newFileInput.type = "file";
-        newFileInput.id = "fileUpload";
-        newFileInput.name = "file";
-        newFileInput.onchange = handleFileChange;
-        newFileInput.style.width = "67%";
-        // Replace the existing file input with the new one
-        const existingFileInput = document.getElementById("fileUpload");
-        existingFileInput.parentNode.replaceChild(
-          newFileInput,
-          existingFileInput
-        );
-        toast.success("Clip upload successfully.");
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setIsUploading(false)
+    for (let i = 0; i < selectedFiles.length; i++) {
+      if (!thumbnails[i]?.fileType) {
+        toast.error(`Please wait for thumbnail to generate for video ${i + 1}`);
+        return;
       }
+      if (!titles[i] || titles[i].trim() === "") {
+        toast.error(`Please enter a title for video ${i + 1}`);
+        return;
+      }
+    }
+
+    setIsUploading(true);
+    const uploadPromises = selectedFiles.map(async (file, index) => {
+      let IsTrainer = userInfo.account_type === AccountType.TRAINER;
+
+      var payload = {
+        filename: file?.name,
+        fileType: file?.type,
+        thumbnail: thumbnails[index]?.fileType,
+        title: titles[index],
+        category: IsTrainer ? userInfo.category : category,
+      };
+
+      if (shareWith === shareWithConstants.myFriends) {
+        payload.user_id = selectedFriends;
+      } else if (shareWith === shareWithConstants.newUsers) {
+        payload.invites = selectedEmails;
+      }
+
+      try {
+        const data = await getS3SignUrl(payload);
+        if (data?.url) {
+          await pushProfilePhotoToS3(data.url, file, index);
+          await pushProfilePhotoToS3(data.thumbnailURL, thumbnails[index].thumbnailFile, index);
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error(`Error uploading file ${index}:`, error);
+        return false;
+      }
+    });
+
+    try {
+      const results = await Promise.all(uploadPromises);
+      if (results.every(r => r)) {
+        toast.success("All clips uploaded successfully.");
+        setSelectedFiles([]);
+        setVideos([]);
+        setThumbnails([]);
+        setTitles([""]);
+        setLoading([]);
+        setProgress([]);
+        dispatch(getClipsAsync({}));
+      } else {
+        toast.error("Some clips failed to upload.");
+      }
+    } catch (error) {
+      console.error("Error during upload:", error);
+      toast.error("Error during upload");
+    } finally {
+      setIsUploading(false);
     }
   };
 
-  async function pushProfilePhotoToS3(presignedUrl, uploadPhoto, type) {
+  async function pushProfilePhotoToS3(presignedUrl, uploadPhoto, index) {
     try {
       const myHeaders = new Headers({
-        "Content-Type": selectedFile.type,
+        "Content-Type": uploadPhoto.type,
         "Content-Disposition": "inline",
       });
-      // console.log("HEADERSSSSSS :       ==>", myHeaders);
-      const response = await axios
-        .put(presignedUrl, uploadPhoto, {
-          headers: myHeaders,
-          onUploadProgress: (progressEvent) => {
-            const { loaded, total } = progressEvent;
-            const percentCompleted = (loaded / total) * 100;
-            // if(type === 'video'){
-            console.log("percentCompleted =====", percentCompleted)
-            setProgress(
-              Math.trunc(percentCompleted === 100 ? 0 : percentCompleted)
-            );
-            // }
-          },
-        })
-      return response
+      
+      const response = await axios.put(presignedUrl, uploadPhoto, {
+        headers: myHeaders,
+        onUploadProgress: (progressEvent) => {
+          const { loaded, total } = progressEvent;
+          const percentCompleted = (loaded / total) * 100;
+          setProgress(prev => {
+            const newProgress = [...prev];
+            newProgress[index] = Math.trunc(percentCompleted === 100 ? 0 : percentCompleted);
+            return newProgress;
+          });
+        },
+      });
+      return response;
     } catch (error) {
       console.error("Error:", error);
-
       if (error.response) {
         console.error("Response data:", error.response.data);
       }
+      throw error;
     }
-
   }
-
-
 
   const getCategoryData = async () => {
     var res = await getMasterData();
@@ -499,19 +473,12 @@ const UploadClipCard = (props) => {
   }, []);
 
   useEffect(() => {
-    if (progress == 100) {
-      dispatch(videouploadAction?.setIsOpen(false));
-    }
-  }, [progress]);
-
-  useEffect(() => {
     if (!isOpen) {
-      setTitle("");
+      setTitles([""]);
       setCategory({});
-      setSelectedFile(false);
+      setSelectedFiles([]);
     }
   }, [isOpen]);
-
 
   return (
     <div
@@ -520,17 +487,6 @@ const UploadClipCard = (props) => {
     >
       <h2>Upload Clip</h2>
       <div className="form-group" style={{ color: "black" }}>
-        <label className="col-form-label">Title</label>
-        <input
-          disabled={progress}
-          className="form-control"
-          type="text"
-          name="fullname"
-          placeholder="Title"
-          onChange={(e) => setTitle(e?.target?.value)}
-          value={title}
-          required
-        />
         {
           userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER &&
           <>
@@ -538,7 +494,7 @@ const UploadClipCard = (props) => {
               Choose Category
             </label>
             <select
-              disabled={progress}
+              disabled={isUploading}
               id="account_type"
               className="form-control"
               name="account_type"
@@ -560,7 +516,7 @@ const UploadClipCard = (props) => {
             Upload To
           </label>
           <select
-            disabled={progress}
+            disabled={isUploading}
             id="account_type"
             className="form-control"
             name="account_type"
@@ -568,7 +524,7 @@ const UploadClipCard = (props) => {
             value={shareWith}
           >
             {Object.values(shareWithConstants)?.map((category_type, index) => (
-              <option key={index} value={category_type.label}>
+              <option key={index} value={category_type}>
                 {" "}
                 {category_type}
               </option>
@@ -592,59 +548,84 @@ const UploadClipCard = (props) => {
 
         <div style={{ textAlign: "center" }}>
           <label className="col-form-label mt-2">
-            Select a clip to upload: &nbsp;
+            Select clips to upload: &nbsp;
           </label>
           <input
-            disabled={progress}
+            disabled={isUploading}
             type="file"
             name="file"
             id="fileUpload"
             onChange={handleFileChange}
             style={{ width: "67%" }}
             accept="video/*,video/mp4,video/webm,video/quicktime"
+            multiple
           />
         </div>
       </div>
 
-      {loading ?
-        <div style={{ color: "black" }}>loading...</div>
-        : thumbnail?.fileType && <div className="d-flex justify-content-center btn_css">
+      {selectedFiles.length > 0 && (
+        <div className="w-100 mt-3">
+          {selectedFiles.map((file, index) => (
+            <div key={index} className="mb-3 p-2 border rounded">
+              <div className="d-flex justify-content-between align-items-center">
+                <span>{file.name}</span>
+                <button 
+                  className="btn btn-sm btn-danger"
+                  onClick={() => removeFile(index)}
+                  disabled={isUploading}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              
+              <div className="form-group mt-2">
+                <label className="col-form-label">Title</label>
+                <input
+                  disabled={isUploading}
+                  className="form-control"
+                  type="text"
+                  placeholder="Title"
+                  value={titles[index] || ""}
+                  onChange={(e) => handleTitleChange(index, e.target.value)}
+                  required
+                />
+              </div>
+              
+              {loading[index] ? (
+                <div style={{ color: "black" }}>Generating thumbnail...</div>
+              ) : thumbnails[index]?.fileType ? (
+                <div className="d-flex align-items-center mt-2">
+                  <img 
+                    src={thumbnails[index]?.dataUrl} 
+                    alt="thumbnail" 
+                    style={{ width: 100, height: 100, objectFit: 'cover' }}
+                  />
+                  <div className="ml-2">
+                    {progress[index] > 0 && (
+                      <div>Upload progress: {progress[index]}%</div>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {selectedFiles.length > 0 && !loading.some(l => l) && (
+        <div className="d-flex justify-content-center btn_css">
           <Button
             className="mx-3 btn_css"
             color="primary"
-            onClick={() => handleUpload()}
+            onClick={handleUpload}
             disabled={isUploading}
           >
-             {isUploading?"Uploading "+progress+"%":"Upload"}
+            {isUploading ? "Uploading..." : `Upload ${selectedFiles.length} Videos`}
           </Button>
-        </div>}
-
-      {/* <img src={thumbnailUrl} alt="thumbnail"/> */}
-
-      {/* <video 
-        ref={videoRef} 
-        style={{ display: 'none' }} 
-        onLoadedMetadata={generateThumbnail}
-      /> */}
-
-      {/* <video ref={videoRef} style={{ display: 'none' }} playsInline /> */}
-      <video ref={videoRef} style={{ display: 'none' }} playsInline onLoadedMetadata={() => generateThumbnail1()} />
-
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-      {/* {video && ffmpegLoaded && !thumbnail?.dataUrl && (<button onClick={trimVideo} disabled={loading}>
-        {loading ? 'Wait Thumbnail is genrating...' : 'Create Thumbnail'}
-      </button>)} */}
-
-      {/* {thumbnail && (
-        <div>
-          <img src={thumbnail?.dataUrl} alt="Video Thumbnail" height="100" width="100" />
         </div>
-      )} */}
-      {/* <span >{deviceInfo?.browser?.name } = {deviceInfo?.os?.name}</span> */}
-      {/* <span >{JSON.stringify(thumbnail?.thumbnailFile)}</span>
-      <span >{JSON.stringify(thumbnail?.thumbnail?.fileType)}</span> */}
+      )}
 
+      {/* Hidden video and canvas elements are created dynamically in handleFileChange */}
     </div>
   );
 };
