@@ -8,6 +8,7 @@ import {
   MIN_DESCRIPTION_LENGTH,
   validationMessage,
 } from "../../../common/constants";
+import { axiosInstance } from "../../../../config/axios-interceptor";
 import { MinusCircle, PlusCircle, Upload } from "react-feather";
 import { useMediaQuery } from "usehooks-ts";
 import axios from "axios";
@@ -425,9 +426,9 @@ export const UpdateSettingProfileForm = ({
 
   const getS3SignedUrl = async (payload) => {
     try {
-      const response = await axios({
+      const response = await axiosInstance({
         method: "POST",
-        url: `http://localhost:8000/common/featured-content-upload-url`,
+        url: `/common/featured-content-upload-url`,
         data: payload,
         headers: {
           "Content-Type": "application/json",
