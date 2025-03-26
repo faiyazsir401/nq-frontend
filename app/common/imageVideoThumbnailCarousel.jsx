@@ -22,15 +22,16 @@ class ImageVideoThumbnailCarousel extends React.Component {
           ? {
               original,
               title,
-              thumbnail,
-              embedUrl: original,
+              thumbnail: `https://data.netqwix.com/${thumbnail}`,
+              embedUrl: `https://data.netqwix.com/${original}`,
               description,
               renderItem: this._renderVideo.bind(this),
             }
           : {
               original,
               title,
-              thumbnail,
+              thumbnail: `https://data.netqwix.com/${thumbnail}`,
+             
               description,
               renderItem: this._renderImage.bind(this),
             };
