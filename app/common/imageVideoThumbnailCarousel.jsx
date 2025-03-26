@@ -59,7 +59,7 @@ class ImageVideoThumbnailCarousel extends React.Component {
 
   _renderVideo(item) {
     return (
-      <div>
+      <div className="flex">
         {this?.state?.showVideo ? (
           <div className="video-wrapper">
             <button className="close-video" onClick={this._toggleShowVideo} style={{ marginRight: "-20px"}} />

@@ -483,18 +483,20 @@ export const UpdateSettingProfileForm = ({
   // Improved file change handler
   const handleUploadChange = async (e, index, setFieldValue) => {
     try {
-      // Reset states
+      // Reset states to ensure no previous thumbnail remains
       setThumbnail(null);
       setSelectedFile(null);
       setCurrentMediaIndex(null);
       setLoading(true);
-
+      setFieldValue(`media.${index}.thumbnail`, ""); // Reset thumbnail in form state
+      setFieldValue(`media.${index}.url`, ""); // Reset URL in form state
+  
       const file = e.target.files?.[0];
       if (!file) {
         setLoading(false);
         return;
       }
-
+  
       // Validate file size
       const fileSizeMB = file.size / (1024 * 1024);
       if (fileSizeMB > 150) {
@@ -502,10 +504,10 @@ export const UpdateSettingProfileForm = ({
         setLoading(false);
         return;
       }
-
+  
       setCurrentMediaIndex(index);
-
-      if (file.type.startsWith('image/')) {
+  
+      if (file.type.startsWith("image/")) {
         // Handle image upload
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -520,34 +522,34 @@ export const UpdateSettingProfileForm = ({
             setThumbnail({
               thumbnailFile: file,
               dataUrl: event.target.result,
-              fileType: file.type
+              fileType: file.type,
             });
+            setFieldValue(`media.${index}.thumbnail`, event.target.result);
             setLoading(false);
           };
           img.src = event.target.result;
         };
         reader.readAsDataURL(file);
-      }
-      else if (file.type.startsWith('video/')) {
+      } else if (file.type.startsWith("video/")) {
         // Handle video upload
         const videoUrl = URL.createObjectURL(file);
-
+  
         // Create new video element
-        const videoElement = document.createElement('video');
+        const videoElement = document.createElement("video");
         videoElement.src = videoUrl;
         videoElement.muted = true;
-        videoElement.preload = 'metadata';
-
+        videoElement.preload = "metadata";
+  
         // Store reference
         videoRef.current = videoElement;
         setSelectedFile(file);
-
+  
         // Set timeout for video loading
         const loadingTimeout = setTimeout(() => {
-          toast.error('Video loading is taking too long. Try a different video.');
+          toast.error("Video loading is taking too long. Try a different video.");
           setLoading(false);
         }, 15000); // 15 second timeout
-
+  
         videoElement.onloadedmetadata = () => {
           clearTimeout(loadingTimeout);
           if (videoElement.videoWidth < MIN_DIMENSION || videoElement.videoHeight < MIN_DIMENSION) {
@@ -557,20 +559,19 @@ export const UpdateSettingProfileForm = ({
           }
           generateThumbnail();
         };
-
+  
         videoElement.onerror = () => {
           clearTimeout(loadingTimeout);
-          toast.error('Error loading video file');
+          toast.error("Error loading video file");
           setLoading(false);
         };
-      }
-      else {
-        toast.error('Unsupported file type');
+      } else {
+        toast.error("Unsupported file type");
         setLoading(false);
       }
     } catch (error) {
-      console.error('File processing error:', error);
-      toast.error('Error processing file');
+      console.error("File processing error:", error);
+      toast.error("Error processing file");
       setLoading(false);
     }
   };
@@ -824,14 +825,8 @@ export const UpdateSettingProfileForm = ({
                                 />
                               </div>
 
-                              <div className="row mb-4 items-center" key={`media-list-${index}`}>
-                                <div
-                                  className="col-3"
-                                  style={{
-                                    paddingLeft: "15px",
-                                    paddingRight: isMobileScreen ? "5px" : "15px",
-                                  }}
-                                >
+                              <div className="row mb-4 align-items-center" key={`media-list-${index}`}>
+                                <div className="col-12 col-md-3 mb-2 mb-md-0">
                                   <select
                                     value={values.media?.[index]?.type || "image"}
                                     name={`media.${index}.type`}
@@ -852,8 +847,7 @@ export const UpdateSettingProfileForm = ({
                                   </select>
                                 </div>
 
-                                {/* File input and upload button */}
-                                <div className="col-5">
+                                <div className="col-12 col-md-5 mb-2 mb-md-0">
                                   <div className="d-flex align-items-center">
                                     <input
                                       type="file"
@@ -869,7 +863,7 @@ export const UpdateSettingProfileForm = ({
                                   )}
                                 </div>
 
-                                <div className="col-2">
+                                <div className="col-12 col-md-2 text-center mb-2 mb-md-0">
                                   {loading && currentMediaIndex === index ? (
                                     <div className="d-flex flex-column align-items-center">
                                       <div className="spinner-border text-primary" role="status">
@@ -882,16 +876,16 @@ export const UpdateSettingProfileForm = ({
                                       <img
                                         src={thumbnail?.dataUrl}
                                         alt="Thumbnail"
+                                        className="img-fluid mb-2"
                                         style={{
-                                          height: '60px',
-                                          width: 'auto',
+                                          maxHeight: '100px',
                                           objectFit: 'contain',
                                           border: '1px solid #ddd'
                                         }}
                                       />
                                       <button
                                         type="button"
-                                        className="btn btn-primary mt-2"
+                                        className="btn btn-primary btn-sm"
                                         disabled={isUploading}
                                         onClick={() => handleUpload(values, setFieldValue)}
                                       >
@@ -902,17 +896,13 @@ export const UpdateSettingProfileForm = ({
                                   ) : null}
                                 </div>
 
-
-
-                                <div
-                                  className="col-2 mt-2 items-center"
-                                  onClick={() => remove(index)}
-                                  style={{
-                                    paddingLeft: isMobileScreen ? "5px" : "15px",
-                                    paddingRight: isMobileScreen ? "5px" : "15px",
-                                  }}
-                                >
-                                  <MinusCircle />
+                                <div className="col-12 col-md-2 text-center">
+                                  <div 
+                                    onClick={() => remove(index)}
+                                    className="text-danger cursor-pointer"
+                                  >
+                                    <MinusCircle />
+                                  </div>
                                 </div>
                               </div>
                               <hr />
