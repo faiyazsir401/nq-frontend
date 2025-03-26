@@ -37,7 +37,7 @@ export const UpdateSettingProfileForm = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const MIN_DIMENSION = 150;
-  
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const ffmpegRef = useRef(null);
@@ -51,13 +51,13 @@ export const UpdateSettingProfileForm = ({
     const result = parser.getResult();
     setDeviceInfo(result);
   }, []);
-  
+
   useEffect(() => {
     const loadFFmpeg = async () => {
       try {
         const ffmpeg = new FFmpeg();
         ffmpegRef.current = ffmpeg;
-        
+
         const coreURL = '/ffmpeg-core.js';
         const wasmURL = '/ffmpeg-core.wasm';
 
@@ -221,7 +221,7 @@ export const UpdateSettingProfileForm = ({
         dataUrl: dataUrl,
         fileType: fileType
       });
-      
+
       setLoading(false);
     };
   };
@@ -338,91 +338,244 @@ export const UpdateSettingProfileForm = ({
     }
   };
 
-  const generateThumbnail = () => {
-    setTimeout(() => {
-      setLoading(true);
-      if (deviceInfo?.os?.name?.toLowerCase() === OS.ios.toLowerCase()) {
-        trimVideo();
-      }
-      else if (deviceInfo?.os?.name?.toLowerCase() === OS.windows.toLowerCase() || 
-               deviceInfo?.os?.name?.toLowerCase() === OS.android.toLowerCase() || 
-               (deviceInfo?.os?.name?.toLowerCase() === OS.mac.toLowerCase() && 
-                deviceInfo?.browser?.name?.toLowerCase() === BROWSER.chrome.toLowerCase())) {
-        generateThumbnailFormWindowsOSAndMacChrome();
-      } else {
-        generateThumbnailMacAndiOS();
-      }
-    }, 3000);
+  const generateThumbnail = async () => {
+    if (!selectedFile || !videoRef.current) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    const video = videoRef.current;
+
+    try {
+      // Create a promise that resolves when video metadata is loaded
+      const metadataLoaded = new Promise((resolve, reject) => {
+        if (video.readyState >= 2) { // HAVE_CURRENT_DATA
+          resolve();
+          return;
+        }
+
+        const timer = setTimeout(() => {
+          reject(new Error('Video metadata loading timed out'));
+        }, 10000); // 10 second timeout
+
+        video.onloadedmetadata = () => {
+          clearTimeout(timer);
+          resolve();
+        };
+        video.onerror = () => {
+          clearTimeout(timer);
+          reject(new Error('Video loading error'));
+        };
+      });
+
+      await metadataLoaded;
+
+      // Create canvas for thumbnail
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      // Seek to 1 second or 25% of duration
+      const seekTime = Math.min(1, video.duration * 0.25);
+      video.currentTime = seekTime;
+
+      // Wait for seek to complete
+      const seekCompleted = new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          reject(new Error('Video seeking timed out'));
+        }, 5000); // 5 second timeout
+
+        video.onseeked = () => {
+          clearTimeout(timer);
+          resolve();
+        };
+        video.onerror = () => {
+          clearTimeout(timer);
+          reject(new Error('Video seeking error'));
+        };
+      });
+
+      await seekCompleted;
+
+      // Small delay to ensure frame is ready
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Draw the frame
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Convert to blob with timeout
+      const blobPromise = new Promise((resolve, reject) => {
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('Canvas to blob conversion failed'));
+              return;
+            }
+            resolve(blob);
+          },
+          'image/jpeg',
+          0.8
+        );
+      });
+
+      const blob = await Promise.race([
+        blobPromise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Thumbnail generation timeout')), 5000)
+      )]);
+
+      const thumbnailUrl = URL.createObjectURL(blob);
+      setThumbnail({
+        thumbnailFile: blob,
+        dataUrl: thumbnailUrl,
+        fileType: blob.type
+      });
+
+    } catch (error) {
+      console.error('Client-side thumbnail error:', error);
+      // Fallback to server-side generation
+      await generateThumbnailOnServer();
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleUploadChange = (e, index, setFieldValue) => {
+  // Server-side fallback
+  const generateThumbnailOnServer = async () => {
+    if (!selectedFile) return;
+
     try {
+      const formData = new FormData();
+      formData.append('video', selectedFile);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/common/generate-thumbnail`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) throw new Error('Server returned error');
+
+      const blob = await response.blob();
+      const thumbnailUrl = URL.createObjectURL(blob);
+
+      setThumbnail({
+        thumbnailFile: blob,
+        dataUrl: thumbnailUrl,
+        fileType: blob.type
+      });
+    } catch (error) {
+      console.error('Server thumbnail error:', error);
+      toast.error('Thumbnail generation failed. Try a different video.');
+    }
+  };
+
+  // Improved file change handler
+  const handleUploadChange = async (e, index, setFieldValue) => {
+    try {
+      // Reset states
       setThumbnail(null);
       setSelectedFile(null);
       setCurrentMediaIndex(null);
       setLoading(true);
-      
+
       const file = e.target.files?.[0];
       if (!file) {
         setLoading(false);
         return;
       }
-      
-      const fileType = file.type.split("/")[0]; // Get 'image' or 'video'
-      const fileSize = file?.size / 1024 / 1024; // in MiB
-      
-      if (fileSize > 150) {
-        toast.error("File size exceeds 150 MiB");
+
+      // Validate file size
+      const fileSizeMB = file.size / (1024 * 1024);
+      if (fileSizeMB > 150) {
+        toast.error("File size exceeds 150 MB");
         setLoading(false);
         return;
       }
-      
+
       setCurrentMediaIndex(index);
-      
-      const reader = new FileReader();
-      reader.addEventListener("load", () => {
-        const url = reader.result?.toString() || "";
-        
-        if (fileType === "image") {
-          const imageElement = new Image();
-          imageElement.src = url;
-          imageElement.addEventListener("load", (event) => {
-            const { naturalWidth, naturalHeight } = event.currentTarget;
-            if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
-              toast.error(`Image must be at least ${MIN_DIMENSION} x ${MIN_DIMENSION} pixels.`);
+
+      if (file.type.startsWith('image/')) {
+        // Handle image upload
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const img = new Image();
+          img.onload = () => {
+            if (img.naturalWidth < MIN_DIMENSION || img.naturalHeight < MIN_DIMENSION) {
+              toast.error(`Image must be at least ${MIN_DIMENSION}x${MIN_DIMENSION} pixels`);
               setLoading(false);
               return;
             }
             setSelectedFile(file);
             setThumbnail({
               thumbnailFile: file,
-              dataUrl: url,
+              dataUrl: event.target.result,
               fileType: file.type
             });
             setLoading(false);
-          });
-        } else if (fileType === "video") {
-          const videoElement = document.createElement("video");
-          videoElement.src = url;
-          videoElement.addEventListener("loadedmetadata", () => {
-            const { videoWidth, videoHeight } = videoElement;
-            if (videoWidth < MIN_DIMENSION || videoHeight < MIN_DIMENSION) {
-              toast.error(`Video must be at least ${MIN_DIMENSION} x ${MIN_DIMENSION} pixels.`);
-              setLoading(false);
-              return;
-            }
-            setSelectedFile(file);
-            videoRef.current.src = url;
-          });
-        }
-      });
-      reader.readAsDataURL(file);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+      else if (file.type.startsWith('video/')) {
+        // Handle video upload
+        const videoUrl = URL.createObjectURL(file);
+
+        // Create new video element
+        const videoElement = document.createElement('video');
+        videoElement.src = videoUrl;
+        videoElement.muted = true;
+        videoElement.preload = 'metadata';
+
+        // Store reference
+        videoRef.current = videoElement;
+        setSelectedFile(file);
+
+        // Set timeout for video loading
+        const loadingTimeout = setTimeout(() => {
+          toast.error('Video loading is taking too long. Try a different video.');
+          setLoading(false);
+        }, 15000); // 15 second timeout
+
+        videoElement.onloadedmetadata = () => {
+          clearTimeout(loadingTimeout);
+          if (videoElement.videoWidth < MIN_DIMENSION || videoElement.videoHeight < MIN_DIMENSION) {
+            toast.error(`Video must be at least ${MIN_DIMENSION}x${MIN_DIMENSION} pixels`);
+            setLoading(false);
+            return;
+          }
+          generateThumbnail();
+        };
+
+        videoElement.onerror = () => {
+          clearTimeout(loadingTimeout);
+          toast.error('Error loading video file');
+          setLoading(false);
+        };
+      }
+      else {
+        toast.error('Unsupported file type');
+        setLoading(false);
+      }
     } catch (error) {
-      console.error("Error processing file:", error);
-      toast.error("Error processing file");
+      console.error('File processing error:', error);
+      toast.error('Error processing file');
       setLoading(false);
     }
   };
+
+
 
   const getS3SignedUrl = async (payload) => {
     try {
@@ -445,24 +598,24 @@ export const UpdateSettingProfileForm = ({
 
   async function pushFileToS3(presignedUrl, file) {
     const fileType = file.type.split("/")[0];
-    
+
     const myHeaders = new Headers({
       "Content-Type": file.type,
       "Content-Disposition": "inline",
     });
-    
+
     try {
       const response = await axios.put(presignedUrl, file, {
         headers: myHeaders,
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
           const percentCompleted = (loaded / total) * 100;
-          if (fileType === 'video') {
+          // if (fileType === 'video') {
             console.log("percentCompleted =====", percentCompleted);
             setUploadProgress(
               Math.trunc(percentCompleted === 100 ? 0 : percentCompleted)
             );
-          }
+          // }
         },
       });
       return response;
@@ -480,23 +633,23 @@ export const UpdateSettingProfileForm = ({
       toast.error("No file selected or media index is unknown");
       return;
     }
-  
+
     if (!thumbnail?.fileType) {
       toast.error("Thumbnail is not ready yet. Please wait.");
       return;
     }
-  
+
     setIsUploading(true);
     try {
       const fileType = selectedFile.type.split("/")[0];
-      
+
       const payload = {
         filename: selectedFile.name,
         fileType: selectedFile.type,
         thumbnail: thumbnail.fileType,
         title: values.media[currentMediaIndex].title,
       };
-      
+
       const data = await getS3SignedUrl(payload);
       // console.log(data);
       // return;
@@ -505,11 +658,11 @@ export const UpdateSettingProfileForm = ({
       }
 
       await pushFileToS3(data.url, selectedFile);
-      
+
       const publicUrl = data.url.split("?")[0].split('/').pop() || "";
-      
+
       setFieldValue(`media.${currentMediaIndex}.url`, publicUrl);
-      
+
       // If this is a video and we have a thumbnail URL from the API response
       if (fileType === "video" && data.thumbnailURL) {
         if (thumbnail?.thumbnailFile) {
@@ -520,7 +673,7 @@ export const UpdateSettingProfileForm = ({
       } else if (fileType === "image") {
         setFieldValue(`media.${currentMediaIndex}.thumbnail`, publicUrl);
       }
-      
+
       toast.success("File uploaded successfully!");
 
       setSelectedFile(null);
@@ -552,12 +705,12 @@ export const UpdateSettingProfileForm = ({
         isValid,
         handleChange,
       }) => (
-        <Form onSubmit={(e)=>{e.preventDefault();handleSubmit(e)}}>
+        <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(e) }}>
           <div className="container mb-3">
             {/* Hidden video and canvas elements for thumbnail generation */}
             <video ref={videoRef} style={{ display: 'none' }} playsInline onLoadedMetadata={() => generateThumbnail()} />
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            
+
             {/* about */}
             <>
               <label className="col-form-label">About yourself</label>
@@ -572,11 +725,10 @@ export const UpdateSettingProfileForm = ({
                       value={values.about}
                       placeholder="About yourself"
                       onBlur={handleBlur}
-                      className={`form-control ${
-                        touched.about && errors.about
+                      className={`form-control ${touched.about && errors.about
                           ? `border border-danger`
                           : ``
-                      } mt-1`}
+                        } mt-1`}
                       name="about"
                       id="about"
                       cols="10"
@@ -618,147 +770,155 @@ export const UpdateSettingProfileForm = ({
                       </div>
                     </div>
                     <div className="row">
-                    <div className="col-12">
-                    {values.media?.length > 0 &&
-                      values.media.map((mediaInfo, index) => (
-                        <div key={`media-item-${index}`}>
-                          <div className="row">
-                            <div className="col-12">
-                              <label className="col-form-label">Title</label>
-                              <input
-                                type="text"
-                                onChange={(event) => {
-                                  setFieldValue(`media.${index}.title`, event.target.value);
-                                }}
-                                value={values.media?.[index]?.title || ""}
-                                placeholder="Media title"
-                                onBlur={handleBlur}
-                                className={`form-control mt-1 ${
-                                  touched?.media?.[index]?.title && errors?.media?.[index]?.title
-                                    ? "border border-danger"
-                                    : ""
-                                }`}
-                                name={`media.${index}.title`}
-                                id={`media-title-${index}`}
-                              />
-                              <HandleErrorLabel
-                                isError={errors?.media?.[index]?.title}
-                                isTouched={touched?.media?.[index]?.title}
-                              />
-                            </div>
-                          </div>
+                      <div className="col-12">
+                        {values.media?.length > 0 &&
+                          values.media.map((mediaInfo, index) => (
+                            <div key={`media-item-${index}`}>
+                              <div className="row">
+                                <div className="col-12">
+                                  <label className="col-form-label">Title</label>
+                                  <input
+                                    type="text"
+                                    onChange={(event) => {
+                                      setFieldValue(`media.${index}.title`, event.target.value);
+                                    }}
+                                    value={values.media?.[index]?.title || ""}
+                                    placeholder="Media title"
+                                    onBlur={handleBlur}
+                                    className={`form-control mt-1 ${touched?.media?.[index]?.title && errors?.media?.[index]?.title
+                                        ? "border border-danger"
+                                        : ""
+                                      }`}
+                                    name={`media.${index}.title`}
+                                    id={`media-title-${index}`}
+                                  />
+                                  <HandleErrorLabel
+                                    isError={errors?.media?.[index]?.title}
+                                    isTouched={touched?.media?.[index]?.title}
+                                  />
+                                </div>
+                              </div>
 
-                          <div className="mb-3">
-                            <label className="col-form-label">Media Description</label>
-                            <textarea
-                              onChange={(event) => {
-                                setFieldValue(`media.${index}.description`, event.target.value);
-                              }}
-                              value={values.media?.[index]?.description || ""}
-                              placeholder="Media description"
-                              onBlur={handleBlur}
-                              className={`form-control mt-1 ${
-                                touched?.media?.[index]?.description &&
-                                errors?.media?.[index]?.description
-                                  ? "border border-danger"
-                                  : ""
-                              }`}
-                              name={`media.${index}.description`}
-                              id={`media-description-${index}`}
-                              cols="10"
-                              rows="3"
-                            />
-                            <HandleErrorLabel
-                              isError={errors?.media?.[index]?.description}
-                              isTouched={touched?.media?.[index]?.description}
-                            />
-                          </div>
-
-                          <div className="row mb-4 items-center" key={`media-list-${index}`}>
-                            <div
-                              className="col-3"
-                              style={{
-                                paddingLeft: "15px",
-                                paddingRight: isMobileScreen ? "5px" : "15px",
-                              }}
-                            >
-                              <select
-                                value={values.media?.[index]?.type || "image"}
-                                name={`media.${index}.type`}
-                                className="form-control"
-                                onChange={(event) => {
-                                  let thumbnail = "";
-                                  if (event.target.value === "video") {
-                                    thumbnail = DUMMY_URLS.YOUTUBE;
-                                  } else if (event.target.value === "image") {
-                                    thumbnail = values.media?.[index]?.url?.split('/').pop() || "";
-                                  }
-                                  setFieldValue(`media.${index}.thumbnail`, thumbnail);
-                                  setFieldValue(`media.${index}.type`, event.target.value);
-                                }}
-                              >
-                                <option value="image">Image</option>
-                                <option value="video">Video</option>
-                              </select>
-                            </div>
-
-                            {/* File input and upload button */}
-                            <div className="col-5">
-                              <div className="d-flex align-items-center">
-                                <input
-                                  type="file"
-                                  className="form-control"
-                                  accept={values.media?.[index]?.type === "image" ? "image/*" : "video/*"}
-                                  onChange={(e) => handleUploadChange(e, index, setFieldValue)}
+                              <div className="mb-3">
+                                <label className="col-form-label">Media Description</label>
+                                <textarea
+                                  onChange={(event) => {
+                                    setFieldValue(`media.${index}.description`, event.target.value);
+                                  }}
+                                  value={values.media?.[index]?.description || ""}
+                                  placeholder="Media description"
+                                  onBlur={handleBlur}
+                                  className={`form-control mt-1 ${touched?.media?.[index]?.description &&
+                                      errors?.media?.[index]?.description
+                                      ? "border border-danger"
+                                      : ""
+                                    }`}
+                                  name={`media.${index}.description`}
+                                  id={`media-description-${index}`}
+                                  cols="10"
+                                  rows="3"
+                                />
+                                <HandleErrorLabel
+                                  isError={errors?.media?.[index]?.description}
+                                  isTouched={touched?.media?.[index]?.description}
                                 />
                               </div>
-                              {values.media?.[index]?.url && (
-                                <small className="text-muted d-block mt-1 text-truncate">
-                                  Current URL: {values.media?.[index]?.url}
-                                </small>
-                              )}
-                            </div>
-                            
-                            <div className="col-2">
-                              {loading && currentMediaIndex === index ? (
-                                <div className="spinner-border text-primary" role="status">
-                                  <span className="sr-only">Loading...</span>
-                                </div>
-                              ) : (selectedFile && currentMediaIndex === index && thumbnail?.dataUrl) ? (
-                                <div className="d-flex flex-column align-items-center">
-                                  <img 
-                                    src={thumbnail?.dataUrl} 
-                                    alt="Thumbnail" 
-                                    style={{ height: '60px', width: 'auto', objectFit: 'contain' }} 
-                                  />
-                                  <button
-                                    type="button"
-                                    className="btn btn-primary mt-2"
-                                    disabled={isUploading}
-                                    onClick={() => handleUpload(values, setFieldValue)}
-                                  >
-                                    <Upload size={16} className="mr-1" />
-                                    {isUploading ? `${uploadProgress}%` : "Upload"}
-                                  </button>
-                                </div>
-                              ) : null}
-                            </div>
 
-                            <div
-                              className="col-2 mt-2 items-center"
-                              onClick={() => remove(index)}
-                              style={{
-                                paddingLeft: isMobileScreen ? "5px" : "15px",
-                                paddingRight: isMobileScreen ? "5px" : "15px",
-                              }}
-                            >
-                              <MinusCircle />
+                              <div className="row mb-4 items-center" key={`media-list-${index}`}>
+                                <div
+                                  className="col-3"
+                                  style={{
+                                    paddingLeft: "15px",
+                                    paddingRight: isMobileScreen ? "5px" : "15px",
+                                  }}
+                                >
+                                  <select
+                                    value={values.media?.[index]?.type || "image"}
+                                    name={`media.${index}.type`}
+                                    className="form-control"
+                                    onChange={(event) => {
+                                      let thumbnail = "";
+                                      if (event.target.value === "video") {
+                                        thumbnail = DUMMY_URLS.YOUTUBE;
+                                      } else if (event.target.value === "image") {
+                                        thumbnail = values.media?.[index]?.url?.split('/').pop() || "";
+                                      }
+                                      setFieldValue(`media.${index}.thumbnail`, thumbnail);
+                                      setFieldValue(`media.${index}.type`, event.target.value);
+                                    }}
+                                  >
+                                    <option value="image">Image</option>
+                                    <option value="video">Video</option>
+                                  </select>
+                                </div>
+
+                                {/* File input and upload button */}
+                                <div className="col-5">
+                                  <div className="d-flex align-items-center">
+                                    <input
+                                      type="file"
+                                      className="form-control"
+                                      accept={values.media?.[index]?.type === "image" ? "image/*" : "video/*"}
+                                      onChange={(e) => handleUploadChange(e, index, setFieldValue)}
+                                    />
+                                  </div>
+                                  {values.media?.[index]?.url && (
+                                    <small className="text-muted d-block mt-1 text-truncate">
+                                      Current URL: {values.media?.[index]?.url}
+                                    </small>
+                                  )}
+                                </div>
+
+                                <div className="col-2">
+                                  {loading && currentMediaIndex === index ? (
+                                    <div className="d-flex flex-column align-items-center">
+                                      <div className="spinner-border text-primary" role="status">
+                                        <span className="sr-only">Loading...</span>
+                                      </div>
+                                      <small>Generating thumbnail...</small>
+                                    </div>
+                                  ) : (selectedFile && currentMediaIndex === index && thumbnail?.dataUrl) ? (
+                                    <div className="d-flex flex-column align-items-center">
+                                      <img
+                                        src={thumbnail?.dataUrl}
+                                        alt="Thumbnail"
+                                        style={{
+                                          height: '60px',
+                                          width: 'auto',
+                                          objectFit: 'contain',
+                                          border: '1px solid #ddd'
+                                        }}
+                                      />
+                                      <button
+                                        type="button"
+                                        className="btn btn-primary mt-2"
+                                        disabled={isUploading}
+                                        onClick={() => handleUpload(values, setFieldValue)}
+                                      >
+                                        <Upload size={16} className="mr-1" />
+                                        {isUploading ? `${uploadProgress}%` : "Upload"}
+                                      </button>
+                                    </div>
+                                  ) : null}
+                                </div>
+
+
+
+                                <div
+                                  className="col-2 mt-2 items-center"
+                                  onClick={() => remove(index)}
+                                  style={{
+                                    paddingLeft: isMobileScreen ? "5px" : "15px",
+                                    paddingRight: isMobileScreen ? "5px" : "15px",
+                                  }}
+                                >
+                                  <MinusCircle />
+                                </div>
+                              </div>
+                              <hr />
                             </div>
-                          </div>
-                          <hr />
-                        </div>
-                      ))}
-                  </div>
+                          ))}
+                      </div>
 
                     </div>
                   </>
@@ -782,11 +942,10 @@ export const UpdateSettingProfileForm = ({
                       value={values.teaching_style}
                       placeholder="Explain more about your teaching style"
                       onBlur={handleBlur}
-                      className={`form-control mt-1 ${
-                        touched.teaching_style && errors.teaching_style
+                      className={`form-control mt-1 ${touched.teaching_style && errors.teaching_style
                           ? `border border-danger`
                           : ``
-                      }`}
+                        }`}
                       name="teaching_style"
                       id="teaching_style"
                       cols="10"
@@ -825,12 +984,11 @@ export const UpdateSettingProfileForm = ({
                       value={values.credentials_and_affiliations}
                       placeholder="Credentials & Affiliations"
                       onBlur={handleBlur}
-                      className={`form-control mt-1 ${
-                        touched.credentials_and_affiliations &&
-                        errors.credentials_and_affiliations
+                      className={`form-control mt-1 ${touched.credentials_and_affiliations &&
+                          errors.credentials_and_affiliations
                           ? `border border-danger`
                           : ``
-                      }`}
+                        }`}
                       name="credentials_and_affiliations"
                       id="credentials_and_affiliations"
                       cols="10"
@@ -844,7 +1002,7 @@ export const UpdateSettingProfileForm = ({
                   isError={errors.credentials_and_affiliations}
                   isTouched={
                     touched.credentials_and_affiliations &&
-                    errors.credentials_and_affiliations
+                      errors.credentials_and_affiliations
                       ? true
                       : false
                   }
@@ -866,11 +1024,10 @@ export const UpdateSettingProfileForm = ({
                       value={values.curriculum}
                       placeholder="Curriculum"
                       onBlur={handleBlur}
-                      className={`form-control mt-1 ${
-                        touched.curriculum && errors.curriculum
+                      className={`form-control mt-1 ${touched.curriculum && errors.curriculum
                           ? `border border-danger`
                           : ``
-                      }`}
+                        }`}
                       name="curriculum"
                       id="curriculum"
                       cols="10"
