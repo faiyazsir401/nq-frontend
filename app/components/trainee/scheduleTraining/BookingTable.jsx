@@ -88,10 +88,10 @@ const BookingTable = ({
   const [isCommonBooking, setIsCommonBooking] = useState(false);
   const [selectedSlots, setSelectedSlot] = useState(null);
 
-    const sendNotifications = (data) => {
-      socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
-    };
-  
+  const sendNotifications = (data) => {
+    socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
+  };
+
   useEffect(() => {
     const todaySDate = Utils.getDateInFormatIOS(new Date());
     const { weekDates, weekDateFormatted } =
@@ -116,14 +116,14 @@ const BookingTable = ({
     );
   }, [getTraineeSlots]);
   useEffect(() => {
-    console.log("transaction",transaction)
+    console.log("transaction", transaction)
     if (
       transaction?.intent?.result?.client_secret
     ) {
       setShowTransactionModal(true);
     }
 
-    if(transaction?.intent?.result?.skip && bookSessionPayload?.trainer_id){
+    if (transaction?.intent?.result?.skip && bookSessionPayload?.trainer_id) {
       const payload = {
         ...bookSessionPayload,
         // payment_intent_id: transaction?.intent?.result?.id,
@@ -132,21 +132,21 @@ const BookingTable = ({
         //   transaction?.intent?.result?.application_fee_amount / 100,
       };
       dispatch(bookSessionAsync(payload));
-      console.log("newBookingData",payload)
+      console.log("newBookingData", payload)
 
       sendNotifications({
         title: notificiationTitles.newBookingRequest,
         description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
         senderId: userInfo?._id,
         receiverId: payload?.trainer_id,
-        bookingInfo:null,
-        type:NotificationType.TRANSCATIONAL
+        bookingInfo: null,
+        type: NotificationType.TRANSCATIONAL
       });
 
       // Refecting the current Booking 
 
-        // Redirecting to the Booking tab
-        dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
+      // Redirecting to the Booking tab
+      dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
 
       dispatch(
         getScheduledMeetingDetailsAsync({
@@ -154,13 +154,13 @@ const BookingTable = ({
         })
       );
 
-      
+
 
       setBookSessionPayload({});
     }
-  }, [transaction,bookSessionPayload]);
+  }, [transaction, bookSessionPayload]);
 
-  console.log("newBookingDatatesting",bookSessionPayload)
+  console.log("newBookingDatatesting", bookSessionPayload)
 
   // useEffect(() => {
   //   if (status === STATUS.fulfilled) {
@@ -282,9 +282,9 @@ const BookingTable = ({
     isUserOnline ||
     Utils.isTrainerOnline(
       trainerInfo?.userInfo?._id ||
-        trainerInfo?.userInfo?.trainer_id ||
-        selectedTrainer?.trainer_id ||
-        trainerInfo?.userInfo?.id,
+      trainerInfo?.userInfo?.trainer_id ||
+      selectedTrainer?.trainer_id ||
+      trainerInfo?.userInfo?.id,
       onlineUsers
     );
 
@@ -304,8 +304,8 @@ const BookingTable = ({
               minDate={moment().toDate()}
               onChange={(date) => {
                 if (date) {
-                  let booked_date = DateTime.fromJSDate(date,{zone:'utc'}); // Sample booked date
-                  console.log("booked_date",booked_date)
+                  let booked_date = DateTime.fromJSDate(date, { zone: 'utc' }); // Sample booked date
+                  console.log("booked_date", booked_date)
                   const today = DateTime.now();
 
                   // Initialize a variable to store the final formatted date
@@ -347,7 +347,7 @@ const BookingTable = ({
                       trainerInfo?.userInfo?.trainer_id ||
                       selectedTrainer?.trainer_id ||
                       trainerInfo?.userInfo?.id,
-                    booked_date:finalFormattedDate,
+                    booked_date: finalFormattedDate,
                     slotTime: {
                       from:
                         formateStartTime ||
@@ -417,7 +417,7 @@ const BookingTable = ({
 
         <div className="col-11">
           {
-          
+
             <div className="row">
               <label className="mt-1 ml-3" style={{ fontSize: "13px" }}>
                 Select Slot :{" "}
@@ -433,7 +433,7 @@ const BookingTable = ({
                 }}
               >
                 {slots?.length > 0 &&
-                Utils.isSlotAvailable(slots, startDate) ? (
+                  Utils.isSlotAvailable(slots, startDate) ? (
                   <>
                     {" "}
                     {slots?.map((item, i) => {
@@ -454,8 +454,8 @@ const BookingTable = ({
                             border: item?.status
                               ? "2px solid grey"
                               : item?.isSelected
-                              ? "2px solid green"
-                              : "1px solid",
+                                ? "2px solid green"
+                                : "1px solid",
                             cursor: "pointer",
                             padding: "10px 0px",
                           }}
@@ -568,16 +568,26 @@ const BookingTable = ({
                 )}
               </div>
             </div>
-  }
+          }
         </div>
       </div>
     );
   };
 
-  console.log("trainerInfo",trainerInfo)
+  console.log("trainerInfo", trainerInfo)
 
-  if ( trainerInfo?.userInfo?.status !== "approved") {
+  if (trainerInfo?.userInfo?.status !== "approved") {
     return <p style={{ textAlign: "center", color: "red" }}>You cannot book session with unverified trainer!</p>;
+  }
+
+  if (userInfo?.account_type === AccountType.TRAINEE) {
+    if (userInfo?.status === "pending") {
+      return <p style={{ textAlign: "center", color: "orange" }}>Please wait while the admin approves your request.</p>;
+    }
+
+    if (userInfo?.status === "rejected") {
+      return <p style={{ textAlign: "center", color: "darkred" }}>Your account has been rejected by the admin. Please contact customer support.</p>;
+    }
   }
 
 
@@ -691,8 +701,8 @@ const BookingTable = ({
             onClick={() => {
               let date = new Date();
               if (date) {
-                let booked_date = DateTime.fromJSDate(date,{zone:'utc'}); // Sample booked date
-                console.log("booked_date",booked_date)
+                let booked_date = DateTime.fromJSDate(date, { zone: 'utc' }); // Sample booked date
+                console.log("booked_date", booked_date)
                 const today = DateTime.now();
 
                 // Initialize a variable to store the final formatted date
@@ -734,7 +744,7 @@ const BookingTable = ({
                     trainerInfo?.userInfo?.trainer_id ||
                     selectedTrainer?.trainer_id ||
                     trainerInfo?.userInfo?.id,
-                  booked_date:finalFormattedDate,
+                  booked_date: finalFormattedDate,
                   slotTime: {
                     from:
                       formateStartTime ||

@@ -29,8 +29,6 @@ const Schedule = ({ activeCenterContainerTab }) => {
   useEffect(() => { }, [activeCenterContainerTab]);
   const { userInfo } = useAppSelector(authState);
 
-  if (userInfo?.account_type !== "Trainer") return null;
-
   if (!userInfo?.is_kyc_completed) {
     return <p style={{ textAlign: "center", color: "red" }}>Please complete your KYC to create slots.</p>;
   }
@@ -274,9 +272,9 @@ const NavHomePageCenterContainer = () => {
     <>
 
       <div id="navHomePageCenterContainer">
-        {userInfo?.account_type === "Trainer" && (
+        { (
           <>
-            {!userInfo?.is_kyc_completed ? (
+            {(userInfo?.account_type === "Trainer" &&!userInfo?.is_kyc_completed )? (
               <div style={{
                 padding: "5px",
                 background: "red",
