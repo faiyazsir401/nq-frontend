@@ -424,7 +424,7 @@ export const UpdateSettingProfileForm = ({
         blobPromise,
         new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Thumbnail generation timeout')), 5000)
-      )]);
+        )]);
 
       const thumbnailUrl = URL.createObjectURL(blob);
       setThumbnail({
@@ -490,13 +490,13 @@ export const UpdateSettingProfileForm = ({
       setLoading(true);
       setFieldValue(`media.${index}.thumbnail`, ""); // Reset thumbnail in form state
       setFieldValue(`media.${index}.url`, ""); // Reset URL in form state
-  
+
       const file = e.target.files?.[0];
       if (!file) {
         setLoading(false);
         return;
       }
-  
+
       // Validate file size
       const fileSizeMB = file.size / (1024 * 1024);
       if (fileSizeMB > 150) {
@@ -504,9 +504,9 @@ export const UpdateSettingProfileForm = ({
         setLoading(false);
         return;
       }
-  
+
       setCurrentMediaIndex(index);
-  
+
       if (file.type.startsWith("image/")) {
         // Handle image upload
         const reader = new FileReader();
@@ -531,40 +531,42 @@ export const UpdateSettingProfileForm = ({
         };
         reader.readAsDataURL(file);
       } else if (file.type.startsWith("video/")) {
-        // Handle video upload
         const videoUrl = URL.createObjectURL(file);
-  
-        // Create new video element
         const videoElement = document.createElement("video");
         videoElement.src = videoUrl;
         videoElement.muted = true;
         videoElement.preload = "metadata";
-  
-        // Store reference
         videoRef.current = videoElement;
         setSelectedFile(file);
-  
-        // Set timeout for video loading
-        const loadingTimeout = setTimeout(() => {
-          toast.error("Video loading is taking too long. Try a different video.");
+
+        // Create a promise for metadata loading
+        const metadataLoaded = new Promise((resolve, reject) => {
+          const timer = setTimeout(() => {
+            reject(new Error('Video metadata loading timed out'));
+          }, 10000); // 10 second timeout
+
+          videoElement.onloadedmetadata = () => {
+            clearTimeout(timer);
+            resolve();
+          };
+          videoElement.onerror = () => {
+            clearTimeout(timer);
+            reject(new Error('Video loading error'));
+          };
+        });
+
+        await metadataLoaded;
+
+        // Validate video dimensions
+        if (videoElement.videoWidth < MIN_DIMENSION || videoElement.videoHeight < MIN_DIMENSION) {
+          toast.error(`Video must be at least ${MIN_DIMENSION}x${MIN_DIMENSION} pixels`);
           setLoading(false);
-        }, 15000); // 15 second timeout
-  
-        videoElement.onloadedmetadata = () => {
-          clearTimeout(loadingTimeout);
-          if (videoElement.videoWidth < MIN_DIMENSION || videoElement.videoHeight < MIN_DIMENSION) {
-            toast.error(`Video must be at least ${MIN_DIMENSION}x${MIN_DIMENSION} pixels`);
-            setLoading(false);
-            return;
-          }
-          generateThumbnail();
-        };
-  
-        videoElement.onerror = () => {
-          clearTimeout(loadingTimeout);
-          toast.error("Error loading video file");
-          setLoading(false);
-        };
+          return;
+        }
+
+        // Proceed with thumbnail generation
+        await generateThumbnail();
+
       } else {
         toast.error("Unsupported file type");
         setLoading(false);
@@ -612,10 +614,10 @@ export const UpdateSettingProfileForm = ({
           const { loaded, total } = progressEvent;
           const percentCompleted = (loaded / total) * 100;
           // if (fileType === 'video') {
-            console.log("percentCompleted =====", percentCompleted);
-            setUploadProgress(
-              Math.trunc(percentCompleted === 100 ? 0 : percentCompleted)
-            );
+          console.log("percentCompleted =====", percentCompleted);
+          setUploadProgress(
+            Math.trunc(percentCompleted === 100 ? 0 : percentCompleted)
+          );
           // }
         },
       });
@@ -727,8 +729,8 @@ export const UpdateSettingProfileForm = ({
                       placeholder="About yourself"
                       onBlur={handleBlur}
                       className={`form-control ${touched.about && errors.about
-                          ? `border border-danger`
-                          : ``
+                        ? `border border-danger`
+                        : ``
                         } mt-1`}
                       name="about"
                       id="about"
@@ -787,8 +789,8 @@ export const UpdateSettingProfileForm = ({
                                     placeholder="Media title"
                                     onBlur={handleBlur}
                                     className={`form-control mt-1 ${touched?.media?.[index]?.title && errors?.media?.[index]?.title
-                                        ? "border border-danger"
-                                        : ""
+                                      ? "border border-danger"
+                                      : ""
                                       }`}
                                     name={`media.${index}.title`}
                                     id={`media-title-${index}`}
@@ -810,9 +812,9 @@ export const UpdateSettingProfileForm = ({
                                   placeholder="Media description"
                                   onBlur={handleBlur}
                                   className={`form-control mt-1 ${touched?.media?.[index]?.description &&
-                                      errors?.media?.[index]?.description
-                                      ? "border border-danger"
-                                      : ""
+                                    errors?.media?.[index]?.description
+                                    ? "border border-danger"
+                                    : ""
                                     }`}
                                   name={`media.${index}.description`}
                                   id={`media-description-${index}`}
@@ -869,7 +871,11 @@ export const UpdateSettingProfileForm = ({
                                       <div className="spinner-border text-primary" role="status">
                                         <span className="sr-only">Loading...</span>
                                       </div>
-                                      <small>Generating thumbnail...</small>
+                                      <small>
+                                        {selectedFile?.type.startsWith("video/")
+                                          ? "Processing video..."
+                                          : "Processing image..."}
+                                      </small>
                                     </div>
                                   ) : (selectedFile && currentMediaIndex === index && thumbnail?.dataUrl) ? (
                                     <div className="d-flex flex-column align-items-center">
@@ -897,8 +903,15 @@ export const UpdateSettingProfileForm = ({
                                 </div>
 
                                 <div className="col-12 col-md-2 text-center">
-                                  <div 
-                                    onClick={() => remove(index)}
+                                  <div
+                                    onClick={() => {
+                                      remove(index); if (currentMediaIndex === index) {
+                                        setThumbnail(null);
+                                        setSelectedFile(null);
+                                        setCurrentMediaIndex(null);
+                                        setUploadProgress(0);
+                                      }
+                                    }}
                                     className="text-danger cursor-pointer"
                                   >
                                     <MinusCircle />
@@ -933,8 +946,8 @@ export const UpdateSettingProfileForm = ({
                       placeholder="Explain more about your teaching style"
                       onBlur={handleBlur}
                       className={`form-control mt-1 ${touched.teaching_style && errors.teaching_style
-                          ? `border border-danger`
-                          : ``
+                        ? `border border-danger`
+                        : ``
                         }`}
                       name="teaching_style"
                       id="teaching_style"
@@ -975,9 +988,9 @@ export const UpdateSettingProfileForm = ({
                       placeholder="Credentials & Affiliations"
                       onBlur={handleBlur}
                       className={`form-control mt-1 ${touched.credentials_and_affiliations &&
-                          errors.credentials_and_affiliations
-                          ? `border border-danger`
-                          : ``
+                        errors.credentials_and_affiliations
+                        ? `border border-danger`
+                        : ``
                         }`}
                       name="credentials_and_affiliations"
                       id="credentials_and_affiliations"
@@ -1015,8 +1028,8 @@ export const UpdateSettingProfileForm = ({
                       placeholder="Curriculum"
                       onBlur={handleBlur}
                       className={`form-control mt-1 ${touched.curriculum && errors.curriculum
-                          ? `border border-danger`
-                          : ``
+                        ? `border border-danger`
+                        : ``
                         }`}
                       name="curriculum"
                       id="curriculum"
