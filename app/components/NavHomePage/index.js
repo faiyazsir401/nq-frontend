@@ -34,6 +34,7 @@ import TraineeRenderBooking from "../bookings/TraineeRenderBooking";
 import { fetchAllLatestOnlineUsers } from "../auth/auth.api";
 import { acceptFriendRequest, getFriendRequests, rejectFriendRequest } from "../../common/common.api";
 import { toast } from "react-toastify";
+import { Star } from "react-feather";
 const NavHomePage = () => {
   const [progress, setProgress] = useState(0);
   const width2000 = useMediaQuery(2000);

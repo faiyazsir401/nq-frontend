@@ -45,6 +45,9 @@ import ScreenShotDetails from "../video/screenshotDetails";
 import Timer from "../video/Timer";
 import { getTraineeClips } from "../NavHomePage/navHomePage.api";
 import PermissionModal from "../video/PermissionModal";
+import ReactStrapModal from "../../common/modal";
+import Ratings from "../bookings/ratings";
+
 
 let Peer;
 let timeoutId;
@@ -108,6 +111,8 @@ const VideoCallUI = ({
   const [isMaximized, setIsMaximized] = useState(false);
   const [isRemoteVideoOff, setRemoteVideoOff] = useState(false);
   const [isOpenReport, setIsOpenReport] = useState(false);
+  const [isOpenRating, setIsOpenRating] = useState(false);
+
   const remoteVideoRef = useRef(null);
   const [isLockMode, setIsLockMode] = useState(false);
   const [clipSelectNote, setClipSelectNote] = useState(false);
@@ -680,7 +685,8 @@ const VideoCallUI = ({
     if (isTraineeJoined && AccountType.TRAINER === accountType) {
       setIsOpenReport(true);
     } else {
-      isClose();
+      // isClose();
+      setIsOpenRating(true)
     }
   };
 
@@ -1295,6 +1301,26 @@ const VideoCallUI = ({
         isTraineeJoined={isTraineeJoined}
         isCallEnded={isCallEnded}
       />
+
+      {accountType === AccountType.TRAINEE &&
+        <ReactStrapModal
+          allowFullWidth={true}
+          element={
+            <Ratings
+              accountType={accountType}
+              booking_id={id}
+              key={id}
+              onClose={() => {
+                setIsOpenRating(false)
+              }}
+              isFromCall={true}
+              trainer={toUser}
+            />
+          }
+          isOpen={isOpenRating}
+          id={id}
+        // width={"50%"}
+        />}
 
       <PermissionModal isOpen={permissionModal} errorMessage={errorMessageForPermission} />
     </div>
