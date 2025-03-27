@@ -159,7 +159,7 @@ const VideoCallUI = ({
     const checkStatus = () => {
       const isEndCall = getTimeDifferenceStatus(session_end_time);
 
-      if(isEndCall){
+      if (isEndCall) {
         cutCall()
       }
     };
@@ -347,18 +347,18 @@ const VideoCallUI = ({
 
       const checkIPVersion = async () => {
         try {
-            const res = await fetch("https://api64.ipify.org?format=json");
-            const data = await res.json();
-            const ipAddress = data.ip;
-            const isIPv6 = ipAddress.includes(":");
-            toast.success(`You are using ${isIPv6 ? 'IPv6' : 'IPv4'}.`);
+          const res = await fetch("https://api64.ipify.org?format=json");
+          const data = await res.json();
+          const ipAddress = data.ip;
+          const isIPv6 = ipAddress.includes(":");
+          toast.success(`You are using ${isIPv6 ? 'IPv6' : 'IPv4'}.`);
         } catch (error) {
-            console.error("Error fetching IP version:", error);
-            toast.error("Failed to determine IP version.");
+          console.error("Error fetching IP version:", error);
+          toast.error("Failed to determine IP version.");
         }
-    };
-    
-    checkIPVersion();
+      };
+
+      checkIPVersion();
       // Check permissions for camera and microphone
       const cameraPermission = await navigator.permissions.query({ name: 'camera' });
       const micPermission = await navigator.permissions.query({ name: 'microphone' });
@@ -438,10 +438,10 @@ const VideoCallUI = ({
         toast.error("Reconnection to the server failed. Please check your internet and try again.");
       });
 
-      console.log("startMeeting",startMeeting)
+      console.log("startMeeting", startMeeting)
 
       const peer = new Peer(fromUser._id, {
-        config:{iceServers: startMeeting.iceServers},
+        config: { iceServers: startMeeting.iceServers },
       });
 
       peer.on("error", (error) => {
@@ -685,7 +685,7 @@ const VideoCallUI = ({
   };
 
   const handelTabClose = async () => {
-    mediaRecorder?.stop();
+    // mediaRecorder?.stop();
     // setRecording(false);
     socket.emit("chunksCompleted");
   };
@@ -714,7 +714,7 @@ const VideoCallUI = ({
 
 
   useEffect(() => {
-    if (fromUser && toUser && startMeeting?.iceServers &&accountType ) {
+    if (fromUser && toUser && startMeeting?.iceServers && accountType) {
       if (typeof navigator !== "undefined") {
         Peer = require("peerjs").default;
       }
@@ -730,7 +730,7 @@ const VideoCallUI = ({
         // cutCall();
       };
     }
-  }, [startMeeting,accountType]);
+  }, [startMeeting, accountType]);
 
   console.log("refs", videoRef, remoteVideoRef, remoteStream);
 
@@ -743,7 +743,7 @@ const VideoCallUI = ({
         width: isLandscape ? "50%" : "100%",
       }}
     >
-      {displayMsg?.show ? <div style={{textAlign:"center"}}>{displayMsg?.msg}</div> : null}
+      {displayMsg?.show ? <div style={{ textAlign: "center" }}>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
           timeRemaining={session_end_time}
@@ -784,6 +784,7 @@ const VideoCallUI = ({
       )}
       {!isMaximized && (
         <ActionButtons
+          setSelectedUser={setSelectedUser}
           isShowVideos={isShowVideos}
           setIsShowVideos={setIsShowVideos}
           setIsLockMode={setIsLockMode}

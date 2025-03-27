@@ -15,6 +15,7 @@ import { SocketContext } from "../socket";
 import { useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";
 import { AccountType } from "../../common/constants";
+import { RxHalf1 } from "react-icons/rx";
 
 const ActionButtons = ({
   isShowVideos,
@@ -36,6 +37,7 @@ const ActionButtons = ({
   selectedClips,
   setIsOpenReport,
   cutCall,
+  setSelectedUser
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -108,7 +110,7 @@ const ActionButtons = ({
             </div>
           </Tooltip>
 
-          {selectedClips && selectedClips?.length >=1 && (
+          {selectedClips && selectedClips?.length >= 1 && (
             <Tooltip>
               <div
                 className="button video-lock"
@@ -137,6 +139,19 @@ const ActionButtons = ({
               onClick={() => setIsOpenReport(true)}
             >
               <FilePlus size={16} />
+            </div>
+          </Tooltip>
+
+          <Tooltip>
+            <div className="button off" onClick={() => {
+              setSelectedUser(null); 
+              socket.emit(EVENTS.ON_VIDEO_SELECT, {
+                userInfo: { from_user: fromUser._id, to_user: toUser._id },
+                type:"swap",
+                id:null,
+              });
+            }}>
+              <RxHalf1 size={16} />
             </div>
           </Tooltip>
         </>
