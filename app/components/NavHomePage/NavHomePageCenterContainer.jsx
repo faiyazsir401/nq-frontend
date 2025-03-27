@@ -28,14 +28,32 @@ import Scheduler from "./Scheduler";
 const Schedule = ({ activeCenterContainerTab }) => {
   useEffect(() => { }, [activeCenterContainerTab]);
   const { userInfo } = useAppSelector(authState);
-  return (
-    userInfo?.account_type === "Trainer" && userInfo?.is_kyc_completed ? <>
-      {/* <Addworkinghour /> */}
-      <Scheduler/>
-      {/* <CalendarPage /> */}
-    </> :
-      <p style={{ textAlign: "center" }}>Please complete your KYC to create slot</p>
-  );
+
+  if (userInfo?.account_type !== "Trainer") return null;
+
+  if (!userInfo?.is_kyc_completed) {
+    return <p style={{ textAlign: "center", color: "red" }}>Please complete your KYC to create slots.</p>;
+  }
+
+  if (userInfo?.status === "pending") {
+    return <p style={{ textAlign: "center", color: "orange" }}>Please wait while the admin approves your request.</p>;
+  }
+
+  if (userInfo?.status === "rejected") {
+    return <p style={{ textAlign: "center", color: "darkred" }}>Your account has been rejected by the admin. Please contact customer support.</p>;
+  }
+
+  if (userInfo?.status === "approved" && userInfo?.is_kyc_completed) {
+    return (
+      <>
+        {/* <Addworkinghour /> */}
+        <Scheduler />
+        {/* <CalendarPage /> */}
+      </>
+    );
+  }
+
+  return null;
 };
 
 // class VerifyButton extends React.Component {
@@ -199,7 +217,7 @@ const NavHomePageCenterContainer = () => {
 
 
   const toggleTab = (tabValue) => {
- 
+
     if (activeTab !== tabValue) {
       setActiveTab(tabValue);
     }
@@ -217,23 +235,23 @@ const NavHomePageCenterContainer = () => {
     }
   }
 
-  const [modal,setModal] = useState(false)
+  const [modal, setModal] = useState(false)
 
   useEffect(() => {
-   
+
     const updateOrientation = () => {
-      
-        let width = window.innerWidth;
-        let height = window.innerHeight;
-        if (width > height == false && activeTab==="upcomingLesson") {
-          // console.log("=========if block")
-          setModal(true)
-        } else {
-          // console.log("=========else block")
-          setModal(false)
-        }
-      
-  
+
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      if (width > height == false && activeTab === "upcomingLesson") {
+        // console.log("=========if block")
+        setModal(true)
+      } else {
+        // console.log("=========else block")
+        setModal(false)
+      }
+
+
     };
 
     const handleOrientationChange = () => {
@@ -250,44 +268,66 @@ const NavHomePageCenterContainer = () => {
     return () => {
       window.removeEventListener('resize', handleOrientationChange);
     };
-  }, [isMobile,activeTab]);
+  }, [isMobile, activeTab]);
 
   return (
     <>
-     
-      <div id="navHomePageCenterContainer">
-        {
-          userInfo?.account_type === "Trainer" && !userInfo?.is_kyc_completed ?
-            <div style={{
-              padding: "5px",
-              background: "red",
-              marginBottom: "15px",
-              border: "1px",
-              borderRadius: "5px",
-              display: "flex",
-              justifyContent: "space-between"
-            }}>
-              <span style={{
-                padding: "5px",
-                color: "white"
-              }}>Please Complete your KYC</span>
-              <button
-                style={{
-                  borderRadius: "10px",
-                  background: "#000080",
-                  color: "white",
-                  fontWeight: 600,
-                  padding: "7px"
-                }}
-                onClick={handleKYCVarification}
-              >
-                complete KYC
-              </button>
 
-              {/* <a href={userInfo?.kyc_url ?? "#"} target="_blank" rel="noopener noreferrer">complete KYC</a> */}
-              {/* <VerifyButton stripePromise={stripePromise}/> */}
-            </div> : null
-        }
+      <div id="navHomePageCenterContainer">
+        {userInfo?.account_type === "Trainer" && (
+          <>
+            {!userInfo?.is_kyc_completed ? (
+              <div style={{
+                padding: "5px",
+                background: "red",
+                marginBottom: "15px",
+                borderRadius: "5px",
+                display: "flex",
+                justifyContent: "space-between"
+              }}>
+                <span style={{ padding: "5px", color: "white" }}>
+                  Please complete your KYC
+                </span>
+                <button
+                  style={{
+                    borderRadius: "10px",
+                    background: "#000080",
+                    color: "white",
+                    fontWeight: 600,
+                    padding: "7px"
+                  }}
+                  onClick={handleKYCVarification}
+                >
+                  Complete KYC
+                </button>
+              </div>
+            ) : userInfo?.status === "pending" ? (
+              <div style={{
+                padding: "5px",
+                background: "orange",
+                marginBottom: "15px",
+                borderRadius: "5px",
+                textAlign: "center"
+              }}>
+                <span style={{ padding: "5px", color: "white" }}>
+                  Please wait while the admin approves your request.
+                </span>
+              </div>
+            ) : userInfo?.status === "rejected" ? (
+              <div style={{
+                padding: "5px",
+                background: "darkred",
+                marginBottom: "15px",
+                borderRadius: "5px",
+                textAlign: "center"
+              }}>
+                <span style={{ padding: "5px", color: "white" }}>
+                  Your account has been rejected by the admin. Please contact customer support.
+                </span>
+              </div>
+            ) : null}
+          </>
+        )}
         <div className="theme-tab sub-nav">
           {!isMobile ? <Nav tabs>
             {allTabs?.map(
@@ -317,7 +357,7 @@ const NavHomePageCenterContainer = () => {
             <div className="theme-tab">
               <Nav tabs>
                 <div className="row mb-2" >
-                  <div className="col text-center" style={{flexBasis: "auto"}} >
+                  <div className="col text-center" style={{ flexBasis: "auto" }} >
                     <NavItem className="ml-1 text-center">
                       <NavLink
                         className={`button-effect ${activeTab === "myClips" ? "activelink" : ""
@@ -329,7 +369,7 @@ const NavHomePageCenterContainer = () => {
                       </NavLink>
                     </NavItem>
                   </div>
-                  <div className="col text-center" style={{flexBasis: "auto"}}>
+                  <div className="col text-center" style={{ flexBasis: "auto" }}>
                     <NavItem className="ml-1">
                       {accountType === "Trainer" && <NavLink
                         className={`button-effect ${activeTab === "schedule" ? "activelink" : ""}`}
@@ -342,7 +382,7 @@ const NavHomePageCenterContainer = () => {
                   </div>
                   {/* </div>
                 <div className="row" style={{ width: '100%', alignItems: 'center', margin: "0px" }}> */}
-                  <div className="col" style={{flexBasis: "auto"}}>
+                  <div className="col" style={{ flexBasis: "auto" }}>
                     <NavItem className="ml-1">
                       <NavLink
                         className={`button-effect ${activeTab === "upcomingLesson" ? "activelink" : ""
@@ -354,7 +394,7 @@ const NavHomePageCenterContainer = () => {
                       </NavLink>
                     </NavItem>
                   </div>
-                  <div className="col text-right" style={{flexBasis: "auto"}}>
+                  <div className="col text-right" style={{ flexBasis: "auto" }}>
 
                     <NavItem className="ml-1">
                       <NavLink
@@ -376,21 +416,21 @@ const NavHomePageCenterContainer = () => {
 
 
           <TabContent activeTab={activeTab}>
-           { 
-            allTabs?.map((el, index) => {
-              return (
-                <TabPane key={index} tabId={el?.value}>
-                  {el?.component ? (
-                    <el.component
-                      key={index}
-                      activeCenterContainerTab={activeTab}
-                    />
-                  ) : (
-                    <h1>{el?.name}</h1>
-                  )}
-                </TabPane>
-              );
-            })}
+            {
+              allTabs?.map((el, index) => {
+                return (
+                  <TabPane key={index} tabId={el?.value}>
+                    {el?.component ? (
+                      <el.component
+                        key={index}
+                        activeCenterContainerTab={activeTab}
+                      />
+                    ) : (
+                      <h1>{el?.name}</h1>
+                    )}
+                  </TabPane>
+                );
+              })}
           </TabContent>
         </div>
       </div>

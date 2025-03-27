@@ -71,11 +71,14 @@ const Category = (masterRecords) => {
           name: trainer?.fullname,
           isCategory: false,
           extraInfo: trainer.extraInfo,
+          status:trainer?.status,
           ...trainer
         };
       })
     );
   }, [getTraineeSlots]);
+
+  console.log("listoftrainers",listOfTrainers)
 
   const handleClose = () => {
     setIsTrainerModal(false);

@@ -575,7 +575,7 @@ const UploadClipCard = (props) => {
             Select clips to upload: &nbsp;
           </label>
           <input
-            disabled={isUploading}
+            disabled={isUploading || userInfo.status!== "approved"}
             type="file"
             name="file"
             id="fileUpload"
@@ -583,6 +583,7 @@ const UploadClipCard = (props) => {
             style={{ width: "67%" }}
             accept="video/*,video/mp4,video/webm,video/quicktime"
             multiple
+            
           />
         </div>
       </div>

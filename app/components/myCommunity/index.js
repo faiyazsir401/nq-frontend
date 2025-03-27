@@ -114,7 +114,7 @@ const MyCommunity = (props) => {
         )
       );
       getFriendRequestsApi();
-      } catch (error) {
+    } catch (error) {
       toast.error(error);
     }
   };
@@ -188,7 +188,18 @@ const MyCommunity = (props) => {
     );
   };
 
+  if (userInfo?.status === "pending") {
+    return <p style={{ textAlign: "center", color: "orange" }}>Please wait while the admin approves your request.</p>;
+  }
+
+  if (userInfo?.status === "rejected") {
+    return <p style={{ textAlign: "center", color: "darkred" }}>Your account has been rejected by the admin. Please contact customer support.</p>;
+  }
+
+
   return (
+
+
     <div
       className={`apps-content `}
       style={{
@@ -207,7 +218,7 @@ const MyCommunity = (props) => {
             console.log("e12", searchTerm);
             const data = await getAllUsers({ search: searchTerm });
             setSearchData(data.result);
-            
+
             setActiveTab("search");
             console.log("searchTerm", data);
           }}

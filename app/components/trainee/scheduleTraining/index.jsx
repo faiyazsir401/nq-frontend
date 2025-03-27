@@ -354,6 +354,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
           is_kyc_completed: trainer?.is_kyc_completed,
           stripe_account_id: trainer?.stripe_account_id,
           commission: trainer?.commission ?? 5,
+          status:trainer?.status
         };
       })
     );

@@ -574,6 +574,13 @@ const BookingTable = ({
     );
   };
 
+  console.log("trainerInfo",trainerInfo)
+
+  if ( trainerInfo?.userInfo?.status !== "approved") {
+    return <p style={{ textAlign: "center", color: "red" }}>You cannot book session with unverified trainer!</p>;
+  }
+
+
   return (
     <>
       {/* <ToastContainer /> */}
