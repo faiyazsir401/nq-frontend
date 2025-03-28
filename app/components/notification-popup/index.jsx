@@ -22,7 +22,7 @@ const initialModelValue = {
   description: "",
   cta: {
     title: "",
-    call: () => {},
+    call: () => { },
   },
 };
 
@@ -36,9 +36,9 @@ const NotificationPopup = () => {
   const socket = useContext(SocketContext);
   const [modelObj, setModelObj] = useState(initialModelValue);
   const [isOpen, SetIsOpen] = useState(false);
-  const { startMeeting , scheduledMeetingDetails} = useAppSelector(bookingsState);
+  const { startMeeting, scheduledMeetingDetails } = useAppSelector(bookingsState);
   const { userInfo } = useAppSelector(authState);
-
+  const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
     if (socket) {
       socket.on(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE, (notification) => {
@@ -50,8 +50,8 @@ const NotificationPopup = () => {
     }
   }, [socket, dispatch]);
 
-  const getUpcomingBookings = async  () => {
-    try{
+  const getUpcomingBookings = async () => {
+    try {
       const response = await getScheduledMeetingDetails({
         status: bookingButton[0],
       });
@@ -62,19 +62,19 @@ const NotificationPopup = () => {
         })
       );
       return response.data;
-    }catch(err){
+    } catch (err) {
       console.log(err)
     }
 
   };
 
-  const updateBookedStatusApi = (_id, booked_status) => {
+  const updateBookedStatusApi = async (_id, booked_status) => {
 
     const updatePayload = {
       id: _id,
       booked_status: booked_status,
     };
-    dispatch(updateBookedSessionScheduledMeetingAsync({status:"upcoming", updatePayload}));
+    await dispatch(updateBookedSessionScheduledMeetingAsync({ status: "upcoming", updatePayload })).unwrap();
   };
 
   const sendNotifications = (data) => {
@@ -86,22 +86,27 @@ const NotificationPopup = () => {
 
     switch (notification.title) {
       case notificiationTitles.newBookingRequest:
+        
         tempObj.cta.title = ctaTitle.confirmBooking;
         // getUpcomingBookings();
         // const newBooking = scheduledMeetingDetails[0];
         // updateBookedStatusApi(newBooking._id , BookedSession.confirmed)
         // Wrap the logic inside an async IIFE (Immediately Invoked Function Expression)
-        
+
         tempObj.cta.call = () => {
           (async () => {
             try {
+              setIsLoading(true)
+              tempObj.cta.title = "Confirming..";
               const bookingdata = await getUpcomingBookings();
 
               // Access the updated state after fetching
               const newBooking = bookingdata[0];
               if (newBooking) {
-
+              
                 await updateBookedStatusApi(newBooking._id, BookedSession.confirmed);
+                setIsLoading(false)
+                tempObj.cta.title = ctaTitle.joinSession;
                 const MeetingPayload = {
                   ...startMeeting,
                   id: userInfo._id,
@@ -114,16 +119,16 @@ const NotificationPopup = () => {
                 };
 
                 tempObj.cta.call = () => {
-                  console.log("newBooking",newBooking)
+                  console.log("newBooking", newBooking)
                   navigateToMeeting(newBooking?._id)
-                      sendNotifications({
-                      title: notificiationTitles.sessionStrated,
-                      description: `Trainer has Confirmed and started the session. Join the session via the upcoming sessions tab in My Locker.`,
-                      senderId: userInfo._id,
-                      receiverId: newBooking.trainee_info._id,
-                      bookingInfo:newBooking,
-                      type:NotificationType.TRANSCATIONAL
-                    });
+                  sendNotifications({
+                    title: notificiationTitles.sessionStrated,
+                    description: `Trainer has Confirmed and started the session. Join the session via the upcoming sessions tab in My Locker.`,
+                    senderId: userInfo._id,
+                    receiverId: newBooking.trainee_info._id,
+                    bookingInfo: newBooking,
+                    type: NotificationType.TRANSCATIONAL
+                  });
                   toggle();
                 }
               } else {
@@ -148,9 +153,9 @@ const NotificationPopup = () => {
     }
 
 
-    
 
-    if (notification.title !== notificiationTitles.newBookingRequest ) {
+
+    if (notification.title !== notificiationTitles.newBookingRequest) {
       const MeetingPayload = {
         ...startMeeting,
         id: userInfo._id,
@@ -163,7 +168,7 @@ const NotificationPopup = () => {
       };
 
       tempObj.cta.call = () => {
-        console.log("notification?.bookingInfo",notification?.bookingInfo)
+        console.log("notification?.bookingInfo", notification?.bookingInfo)
         navigateToMeeting(notification?.bookingInfo?._id)
         toggle();
       };
@@ -206,6 +211,7 @@ const NotificationPopup = () => {
                   style={{
                     background: "green",
                   }}
+                  disabled={isLoading}
                   onClick={() => modelObj.cta.call()}
                 >
                   {modelObj?.cta?.title}

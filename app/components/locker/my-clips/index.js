@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import ConfirmModal from "./confirmModal";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
 import "../../trainer/dashboard/index.css";
-import { commonState, getClipsAsync } from "../../../common/common.slice";
+import { commonState, getClipsAsync, getMyClipsAsync } from "../../../common/common.slice";
 import { masterState } from "../../master/master.slice";
 import { MY_CLIPS_LABEL_LIMIT } from "../../../../utils/constant";
 import { AccountType } from "../../../common/constants";
@@ -28,12 +28,14 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
 
   const { isOpen } = useAppSelector(videouploadState);
   const { clips } = useAppSelector(commonState);
+  const { myClips } = useAppSelector(commonState);
+
   const [activeTab, setActiveTab] = useState("media");
   const [sortedClips, setSortedClips] = useState([]);
   const [isOpenPlayVideo, setIsOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState("");
   const [reportsData, setReportsData] = useState([]);
-  const { sidebarLockerActiveTab, accountType } = useAppSelector(authState);
+  const { sidebarLockerActiveTab, accountType,userInfo } = useAppSelector(authState);
   const { masterData } = useAppSelector(masterState).master;
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -43,6 +45,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
     height: "587px",
   });
   const isMobileScreen= useMediaQuery(600)
+  //  const { userInfo } = useAppSelector(authState);
 
   // console.log("allClips ========>*", allClips)
   useEffect(() => {
@@ -119,7 +122,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
     if (trainee_id) {
       dispatch(getClipsAsync({ trainee_id }));
     } else {
-      dispatch(getClipsAsync({}));
+      dispatch(getMyClipsAsync());
     }
   };
 
@@ -141,26 +144,46 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   };
 
   useEffect(() => {
-    if (clips?.length && masterData?.category?.length) {
-      //NOTE -  Function to sort clips based on the desired order
-      const desiredOrder = masterData?.category?.map((data) => data);
-
-      const sortClips = (clips) => {
-        const clipsCopy = clips.slice();
-        return clipsCopy.sort((a, b) => {
-          return desiredOrder.indexOf(a._id) - desiredOrder.indexOf(b._id);
-        });
-      };
-      //NOTE -  call the SortClips funtion 
-      const sortedClips = sortClips(clips);
-      setSortedClips(sortedClips);
+    if(trainee_id){
+      if (clips?.length && masterData?.category?.length) {
+        //NOTE -  Function to sort clips based on the desired order
+        const desiredOrder = masterData?.category?.map((data) => data);
+  
+        const sortClips = (clips) => {
+          const clipsCopy = clips.slice();
+          return clipsCopy.sort((a, b) => {
+            return desiredOrder.indexOf(a._id) - desiredOrder.indexOf(b._id);
+          });
+        };
+        //NOTE -  call the SortClips funtion 
+        const sortedClips = sortClips(clips);
+        console.log("sortedClips",sortedClips)
+        setSortedClips(sortedClips);
+      }
+    }else{
+      if (myClips?.length && masterData?.category?.length) {
+        //NOTE -  Function to sort myClips based on the desired order
+        const desiredOrder = masterData?.category?.map((data) => data);
+  
+        const sortClips = (myClips) => {
+          const clipsCopy = myClips.slice();
+          return clipsCopy.sort((a, b) => {
+            return desiredOrder.indexOf(a._id) - desiredOrder.indexOf(b._id);
+          });
+        };
+        //NOTE -  call the SortClips funtion 
+        const sortedClips = sortClips(myClips);
+        console.log("sortedClips",sortedClips)
+        setSortedClips(sortedClips);
+      }
     }
-  }, [clips]);
+    
+  }, [clips,trainee_id,myClips]);
 
   return (
     <>
       <div className="media-gallery portfolio-section grid-portfolio">
-        {clips?.length ? (
+        {(trainee_id?clips?.length:myClips.length) ? (
           sortedClips?.map((cl, ind) => (
             <div className={`collapse-block ${!cl?.show ? "" : "open"}`}>
      {accountType !== AccountType.TRAINER && <h5 className="block-title" onClick={() => { }}>
@@ -233,6 +256,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                             >
                               <source src={Utils?.generateVideoURL(clp)} />
                             </video>
+                            {clp.user_id === userInfo._id &&
                             <div
                               className="download-delete"
                               style={{
@@ -287,7 +311,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                   <FaDownload size={isMobileScreen?15:17}/>
                                 </a>
                               </div>
-                            </div>
+                            </div>}
                           </div>
                         </Tooltip>
                       </div>

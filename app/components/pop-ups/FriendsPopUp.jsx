@@ -4,32 +4,24 @@ import {
   Modal,
   ModalBody,
   ModalFooter,
-  ModalHeader,
   Card,
-  CardBody,
   CardImg,
   CardTitle,
 } from "reactstrap";
-import {
-  getRecentStudent,
-  getRecentTrainers,
-} from "../NavHomePage/navHomePage.api";
-import { Utils } from "../../../utils/utils";
-import { useSelector } from "react-redux";
-import { AccountType } from "../../common/constants";
-// Sample friend data
-import './common.css'
 import { getFriends } from "../../common/common.api";
-const FriendsPopup = ({ props }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedFriends, setSelectedFriends] = useState([]); // Array of selected friend IDs
-  const [friends, setFriends] = useState([]);
-  const userInfo = useSelector((state) => state.auth.userInfo);
+import { Utils } from "../../../utils/utils";
+import { X } from "react-feather";
+import "./common.css";
+import { useMediaQuery } from "usehooks-ts";
 
-  // Toggle the popup
+const FriendsPopup = ({ props }) => {
+  const [isOpen, setIsOpen] = useState(true);
+  const [selectedFriends, setSelectedFriends] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const width500 = useMediaQuery("(max-width:500px)")
   const toggle = () => setIsOpen((prev) => !prev);
 
-  // Handle selecting or deselecting a friend
   const handleSelectFriend = (id) => {
     setSelectedFriends((prev) =>
       prev.includes(id)
@@ -38,25 +30,21 @@ const FriendsPopup = ({ props }) => {
     );
   };
 
-  // Confirm selection (can be used to perform some action)
-  const confirmSelection = () => {
-    console.log("Selected Friends IDs:", selectedFriends);
-    toggle(); // Close the modal
-  };
-
   const fetchFriends = async () => {
+    setLoading(true);
     try {
       const response = await getFriends();
-      setFriends(response?.friends); // Set the fetched students in state
-      console.log("fetched data", response?.friends);
+      console.log("Fetched friends:", response?.friends);
+      setFriends(response?.friends || []);
     } catch (error) {
-      console.log("Error fetching recent students:", error);
+      console.error("Error fetching friends list:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-
   useEffect(() => {
-    fetchFriends()
+    fetchFriends();
   }, []);
 
   useEffect(() => {
@@ -64,73 +52,111 @@ const FriendsPopup = ({ props }) => {
   }, [selectedFriends]);
 
   return (
-    <div className="d-flex flex-direction-column my-2  ">
-      <button
-        className="m-auto px-3 py-2 rounded border-0"
-        color="primary"
-        onClick={toggle}
-      >
+    <div className="d-flex flex-direction-column my-2">
+      <button className="m-auto px-3 py-2 rounded border-0" onClick={toggle}>
         {props.buttonLabel}
       </button>
 
       <Modal
         isOpen={isOpen}
         toggle={toggle}
-        centered={true}
-        style={{ maxWidth: "1440px"}}
-        fade={true}
+        centered
+        fade
         className="friends-modal"
+        contentClassName="d-flex flex-column"
+        style={{ height: '100vh' }}
       >
-        <ModalBody>
+        <div
+          className="d-flex justify-content-end p-2"
+          style={{ position: 'absolute', top: 0, right: 0, zIndex: 10 }}
+        >
+          <button type="button" className="close" onClick={toggle}>
+            <X />
+          </button>
+        </div>
+
+        <ModalBody
+          className="d-flex flex-column p-0"
+          style={{
+            flexGrow: 1,
+            overflowY: 'auto',
+            paddingBottom: '60px', // Space for the select button
+            justifyContent:width500?"flex-start":"center"
+          }}
+        >
+          {loading ? (
+            <div className="d-flex justify-content-center align-items-center flex-grow-1">
+              <div className="spinner-border text-primary" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+      
+               flexWrap: "wrap",
+                gap: "15px",
+                padding: "15px",
+                maxHeight:"80dvh",
+                // height:"100%",
+                overflowY: 'auto',
+                marginTop:"20px"
+              }}
+            >
+              {friends.map((friend) => {
+                const profileImage =
+                  friend.profile_picture
+                    ? Utils.getImageUrlOfS3(friend.profile_picture)
+                    : "/assets/images/demoUser.png";
+                return (
+                  <Card
+                    key={friend._id}
+                    style={{
+                      width: "150px",
+                      border: selectedFriends.includes(friend._id) ? "2px solid green" : "1px solid gray",
+                      cursor: "pointer",
+                      height: "fit-content"
+                    }}
+                    onClick={() => handleSelectFriend(friend._id)}
+                    className="rounded"
+                  >
+                    <CardImg
+                      top
+                      style={{ minHeight: 145, maxHeight: 145, objectFit: "cover" }}
+                      src={profileImage}
+                      alt="profile"
+                    />
+                    <CardTitle className="text-center m-0 p-2 bg-secondary text-white">
+                      {friend.fullname}
+                    </CardTitle>
+                    <input
+                      className="position-absolute"
+                      type="checkbox"
+                      checked={selectedFriends.includes(friend._id)}
+                      onChange={() => handleSelectFriend(friend._id)}
+                      style={{ marginTop: "5px", right: "5px" }}
+                    />
+                  </Card>
+                );
+              })}
+            </div>
+          )}
           <div
-            style={{
-              display: "flex",
-              justifyContent: "start",
-              flexWrap: "wrap",
-              gap: "10px",
-              alignItems:'center',
-              justifyContent:'center'
-            }}
+            className="w-100 d-flex justify-content-center p-2"
           >
-            {friends.map((friend) => (
-              <Card
-                key={friend._id}
-                style={{
-                  width: "150px",
-                  border: selectedFriends.includes(friend._id)
-                    ? "2px solid green"
-                    : "1px solid gray",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleSelectFriend(friend._id)}
-                className="rounded"
-              >
-                <CardImg
-                  top
-                  style={{ minHeight: 145 , maxHeight: 145 , objectFit:"cover" }}
-                  src={
-                    Utils.getImageUrlOfS3(friend.profile_picture) ||
-                    "/assets/images/demoUser.png"
-                  }
-                  alt={"profile"}
-                />
-                <CardTitle className="text-center m-0 p-2 bg-secondary text-white">{friend.fullname}</CardTitle>
-                <input
-                  className="position-absolute"
-                  type="checkbox"
-                  checked={selectedFriends.includes(friend._id)}
-                  onChange={() => handleSelectFriend(friend._id)}
-                  style={{ marginTop: "5px" , right:'5px'}}
-                />
-              </Card>
-            ))}
+            <Button
+              className="m-auto"
+              style={{ backgroundColor: "rgb(83 233 89)" }}
+              onClick={toggle}
+            >
+              Select
+            </Button>
           </div>
         </ModalBody>
-        <ModalFooter className="d-flex">
-          <Button className="m-auto" color="white" onClick={toggle} style={{backgroundColor:'rgb(83 233 89)'}}>
-            Select
-          </Button>
-        </ModalFooter>
+
+
       </Modal>
     </div>
   );

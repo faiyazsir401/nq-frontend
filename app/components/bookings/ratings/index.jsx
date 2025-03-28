@@ -5,6 +5,7 @@ import {
   BookedSession,
   Message,
   STATUS,
+  topNavbarOptions,
   validationMessage,
 } from "../../../common/constants";
 import { X } from "react-feather";
@@ -18,11 +19,14 @@ import * as Yup from "yup";
 import { Form, Formik } from "formik";
 import { HandleErrorLabel } from "../../../common/error";
 import ColoredRating from "../../../common/rating";
+import { authAction } from "../../auth/auth.slice";
+import { useRouter } from "next/router";
+import { useMediaQuery } from "usehooks-ts";
 
-const Ratings = ({ onClose, booking_id, accountType, tabBook }) => {
+const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, trainer }) => {
   const dispatch = useAppDispatch();
   const formRef = useRef(null);
-
+  const router = useRouter()
   const initialValues = {
     sessionRating: null,
     audioVideoRating: null,
@@ -52,6 +56,23 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook }) => {
       .required(validationMessage.rating.remarksInfo),
   });
 
+  const isMobileScreen = useMediaQuery("(max-width:1000px)")
+  const getImageUrl = (image) => {
+    const backendUrl = "https://data.netqwix.com/";
+
+    // Check if the image URL is already a full URL (starts with http or https)
+    if (
+      image &&
+      (image.startsWith("http://") || image.startsWith("https://"))
+    ) {
+      return image;
+    }
+
+    // If the image is just a filename, append the backend URL
+    return image ? `${backendUrl}${image}` : "/assets/images/demoUser.png";
+  };
+
+
   return (
     <Formik
       innerRef={formRef}
@@ -73,6 +94,10 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook }) => {
         };
         dispatch(updateBookedSessionScheduledMeetingAsync(payload));
         dispatch(addRatingAsync(commonPayload));
+        if (isFromCall) {
+          dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
+          router.push("/dashboard")
+        }
       }}
     >
       {({
@@ -105,12 +130,33 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook }) => {
                 </div>
               </div>
             </div>
-            <h3 className="fs-1 p-3 mb-2 rounded">
-              {Message.successMessage.rating}
+            <div style={{
+              display: "flex"
+            }}>
+              <img
+                alt={trainer.fullname}
+                style={{
+                  width: "100%",
+                  maxHeight: isMobileScreen ? 150 : 250,
+                  minHeight: isMobileScreen ? 150 : 250,
+                  maxWidth: isMobileScreen ? 150 : 250,
+                  objectFit: "cover",
+                  margin: "auto"
+                }}
+                src={
+                  trainer.profile_picture
+                    ? getImageUrl(trainer.profile_picture)
+                    : "/assets/images/demoUser.png"
+                }
+              />
+            </div>
+
+            <h3 className="fs-1 p-3 mb-2 rounded" style={{textAlign:"center"}}>
+              {isFromCall ? "Thank you for taking a session with " + trainer?.fullname : Message.successMessage.rating}
             </h3>
             <div className="container">
               <div className="row">
-                <h4 className="col-8">How was your session?</h4>
+                <h4 className="col-6">{isFromCall ? "How would you rate your expert?" : "How was your session?"}</h4>
                 <div className="col">
                   <ColoredRating
                     initialRating={values.sessionRating}
@@ -130,7 +176,7 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook }) => {
                 />
               </div>
               <div className="row mt-3 mb-3">
-                <h4 className="col-8">Please rate Audio/Video connection</h4>
+                <h4 className="col-6">{isFromCall ? "How strongly would you recommend " + trainer?.fullname : "Please rate Audio/Video connection"}</h4>
                 <div className="col">
                   <ColoredRating
                     key={"audioVideoRating"}
@@ -156,8 +202,8 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook }) => {
               ) : (
                 <>
                   <div className="row mt-3 mb-3">
-                    <h4 className="col-8">
-                      How strongly would you like to recommend?
+                    <h4 className="col-6">
+                      {isFromCall ? "Please rate your audio/video connection?" : "How strongly would you like to recommend?"}
                     </h4>
                     <div className="col">
                       <ColoredRating

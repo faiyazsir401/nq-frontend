@@ -408,12 +408,12 @@ const SettingSection = (props) => {
             <div className="details">
               <h5>{profile.username}</h5>
               <h6>{profile.address}</h6>
-              {accountType === AccountType.TRAINER && (
+              {/* {accountType === AccountType.TRAINER && (
                 <h6>
                   {" "}
                   Wallet Amount: <b> ${profile.wallet_amount} </b>{" "}
                 </h6>
-              )}
+              )} */}
             </div>
             <div className="details edit">
               <form className="form-radious form-sm">

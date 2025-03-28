@@ -120,6 +120,14 @@ const UpcomingSession = ({ accountType = null }) => {
   }, [isMobile]);
 
   
+  if (userInfo?.status === "pending") {
+    return <p style={{ textAlign: "center", color: "orange" }}>Please wait while the admin approves your request.</p>;
+  }
+
+  if (userInfo?.status === "rejected") {
+    return <p style={{ textAlign: "center", color: "darkred" }}>Your account has been rejected by the admin. Please contact customer support.</p>;
+  }
+
     return (
       <>
         <div>

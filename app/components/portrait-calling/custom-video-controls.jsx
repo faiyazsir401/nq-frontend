@@ -67,6 +67,7 @@ const CustomVideoControls = ({
         left: "50%",
         transform: "translateX(-50%)",
         display: "flex",
+        visibility:accountType === AccountType.TRAINER ?"visible":"hidden", 
         alignItems: "Center",
         justifyContent: "center",
         gap: "5px",

@@ -32,10 +32,14 @@ import { addRating } from "../common/common.api";
 import TrainerRenderBooking from "../bookings/TrainerRenderBooking";
 import TraineeRenderBooking from "../bookings/TraineeRenderBooking";
 import { fetchAllLatestOnlineUsers } from "../auth/auth.api";
+import { acceptFriendRequest, getFriendRequests, rejectFriendRequest } from "../../common/common.api";
+import { toast } from "react-toastify";
+import { Star } from "react-feather";
 const NavHomePage = () => {
   const [progress, setProgress] = useState(0);
   const width2000 = useMediaQuery(2000);
   const width1200 = useMediaQuery(1200);
+  const width1000 = useMediaQuery(1000);
   const width900 = useMediaQuery(900);
 
   const width600 = useMediaQuery(700);
@@ -52,6 +56,41 @@ const NavHomePage = () => {
   const { isLoading, configs, startMeeting } = useAppSelector(bookingsState);
   const { accountType, onlineUsers } = useAppSelector(authState);
   const [activeTrainer, setActiveTrainer] = useState([]);
+  const [friendRequests, setFriendRequests] = useState([])
+  const getFriendRequestsApi = async () => {
+    try {
+      let res = await getFriendRequests();
+      setFriendRequests(res?.friendRequests);
+      console.log("Friend Requests:", res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    // getFriendsApi();
+    getFriendRequestsApi();
+  }, []);
+
+  const handleAcceptFriendRequest = async (requestId) => {
+    try {
+      await acceptFriendRequest({ requestId });
+      toast.success("Friend request accepted");
+      getFriendRequestsApi();
+    } catch (error) {
+      toast.error(error);
+    }
+  };
+
+  const handleRejectFriendRequest = async (requestId) => {
+    try {
+      await rejectFriendRequest({ requestId });
+      toast.success("Friend request rejected");
+      getFriendRequestsApi();
+    } catch (error) {
+      toast.error(error);
+    }
+  };
 
   const getAllLatestActiveTrainer = async () => {
     const response = await fetchAllLatestOnlineUsers();
@@ -62,9 +101,9 @@ const NavHomePage = () => {
   };
 
 
-    const [userTimeZone, setUserTimeZone] = useState(
-      Intl.DateTimeFormat().resolvedOptions().timeZone
-    );
+  const [userTimeZone, setUserTimeZone] = useState(
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  );
   const dispatch = useAppDispatch();
   const { scheduledMeetingDetails } = useAppSelector(bookingsState);
   useEffect(() => {
@@ -163,26 +202,26 @@ const NavHomePage = () => {
     dispatch(addRating(data));
   };
 
-    const showRatingLabel = (ratingInfo) => {
-      // for trainee we're showing recommends
-      return ratingInfo &&
-        ratingInfo[accountType.toLowerCase()] &&
-        (ratingInfo[accountType.toLowerCase()].sessionRating ||
-          ratingInfo[accountType.toLowerCase()].sessionRating) ? (
-        <div className="d-flex items-center">
-          {" "}
-          {/* You rated{" "} */}
-          You rated this session{" "}
-          <b className="pl-2">
-            {ratingInfo[accountType.toLowerCase()].sessionRating ||
-              ratingInfo[accountType.toLowerCase()].sessionRating}
-          </b>
-          <Star color="#FFC436" size={28} className="star-container star-svg" />{" "}
-          stars
-          {/* to this {accountType?.toLowerCase()}. */}
-        </div>
-      ) : null;
-    };
+  const showRatingLabel = (ratingInfo) => {
+    // for trainee we're showing recommends
+    return ratingInfo &&
+      ratingInfo[accountType.toLowerCase()] &&
+      (ratingInfo[accountType.toLowerCase()].sessionRating ||
+        ratingInfo[accountType.toLowerCase()].sessionRating) ? (
+      <div className="d-flex items-center">
+        {" "}
+        {/* You rated{" "} */}
+        You rated this session{" "}
+        <b className="pl-2">
+          {ratingInfo[accountType.toLowerCase()].sessionRating ||
+            ratingInfo[accountType.toLowerCase()].sessionRating}
+        </b>
+        <Star color="#FFC436" size={28} className="star-container star-svg" />{" "}
+        stars
+        {/* to this {accountType?.toLowerCase()}. */}
+      </div>
+    ) : null;
+  };
 
   const renderBooking = (
     bookingInfo,
@@ -299,8 +338,8 @@ const NavHomePage = () => {
       {/* top  baaner */}
 
       {accountType === AccountType.TRAINEE &&
-      activeTrainer &&
-      activeTrainer?.length ? (
+        activeTrainer &&
+        activeTrainer?.length ? (
         <div className="banner">
           <h1>
             Coaches online <span>Now!</span>
@@ -324,13 +363,13 @@ const NavHomePage = () => {
       {filteredSessions && filteredSessions?.length ? (
         <div className="upcoming_session">
           <h2 className="text-center">Active Sessions</h2>
-          {filteredSessions.map((session,booking_index) => (
+          {filteredSessions.map((session, booking_index) => (
             <div
               className="card mt-2 trainer-bookings-card upcoming_session_content"
               key={`booking-schedule-training`}
             >
-              <div className="card-body" style={{padding:"5px"}}>
-                <div className="d-flex justify-content-center " style={{gap:width600?"10px":"30px"}}>
+              <div className="card-body" style={{ padding: "5px" }}>
+                <div className="d-flex justify-content-center " style={{ gap: width600 ? "10px" : "30px" }}>
                   <div className="">
                     <div className="">
                       <div className="">
@@ -347,12 +386,12 @@ const NavHomePage = () => {
                             <img
                               src={
                                 session.trainer_info.profile_picture ||
-                                session.trainee_info.profile_picture
+                                  session.trainee_info.profile_picture
                                   ? Utils.getImageUrlOfS3(
                                     accountType === AccountType.TRAINER
-                                        ?session.trainee_info.profile_picture
-                                        :  session.trainer_info.profile_picture
-                                    )
+                                      ? session.trainee_info.profile_picture
+                                      : session.trainer_info.profile_picture
+                                  )
                                   : "/assets/images/demoUser.png"
                               }
                               alt="trainer_image"
@@ -374,7 +413,7 @@ const NavHomePage = () => {
                     </div>
                     <div className="">
                       <div className="d-flex">
-                        
+
                         <dt className="ml-1">
                           {accountType === AccountType.TRAINER
                             ? session.trainee_info.fullname
@@ -387,9 +426,8 @@ const NavHomePage = () => {
                   <div className="d-flex flex-column justify-content-center">
                     <div className="">
                       <div
-                        className={`d-flex ${
-                          width600 ? "flex-column" : "flex-row"
-                        }`}
+                        className={`d-flex ${width600 ? "flex-column" : "flex-row"
+                          }`}
                       >
                         <div>Date :</div>
                         <dt className="ml-1">
@@ -400,9 +438,8 @@ const NavHomePage = () => {
 
                     <div className="">
                       <div
-                        className={`d-flex ${
-                          width600 ? "flex-column" : "flex-row"
-                        }`}
+                        className={`d-flex ${width600 ? "flex-column" : "flex-row"
+                          }`}
                       >
                         <div className="">Time :</div>
                         <dt className="ml-1">{`${formatTimeInLocalZone(
@@ -415,7 +452,7 @@ const NavHomePage = () => {
               </div>
               <div
                 className="card-footer"
-                style={{ padding: width600 ? "5px" : "5px",display:'flex',justifyContent:"center" }}
+                style={{ padding: width600 ? "5px" : "5px", display: 'flex', justifyContent: "center" }}
               >
                 <div className="">
                   <div className="">
@@ -455,50 +492,176 @@ const NavHomePage = () => {
       >
         {/* Right side */}
         <div
-          className={`${
-            width600
-              ? "row"
-              : width1200
+          className={`${width600
+            ? "row"
+            : width1200
               ? "col-sm-12"
               : width2000
-              ? "col-sm-3"
-              : ""
-          } my-3`}
+                ? "col-sm-3"
+                : ""
+            } my-3`}
           style={{
             width: "auto !important",
             padding: "0px",
             height: "100%",
             display: width1200 || width600 ? "flex" : "block",
             gap: width600 ? "30px" : "0px",
-            
+
           }}
         >
           <div
-            className={`${
-              width600
-                ? "col-sm-12"
-                : width1200
+            className={`${width600
+              ? "col-sm-12"
+              : width1200
                 ? "col-sm-6"
                 : width2000
-                ? "col-sm-12"
-                : ""
-            }`}
+                  ? "col-sm-12"
+                  : ""
+              }`}
             style={{
               height: width600 ? "" : "400px",
             }}
           >
             <UserInfoCard />
           </div>
-          <div
-            className={`${
-              width600
+
+          {(width1000 && friendRequests && friendRequests.length > 0) ? (
+            <div
+              className={`${width600
                 ? "col-sm-12"
                 : width1200
+                  ? "col-sm-6"
+                  : width2000
+                    ? "col-sm-12"
+                    : ""
+                }  ${!width1200 ? "my-3" : ""}`}
+              style={{
+                height: width1200 ? "100%" : "calc(100% - 400px)",
+              }}
+            >
+              <div
+                className={`card trainer-profile-card Home-main-Cont `}
+                style={{ width: "100%", color: "black", height: "100%" }}
+              >
+                <div
+                  className="card-body"
+                  style={{
+                    height: "100%",
+
+                  }}
+                >
+                  <h3 style={{
+                    textAlign: "center",
+                    marginBottom: "20px",
+                  }}>Recent Friend Requests</h3>
+                  <div style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "10px",
+                    justifyContent: "center",
+                    alignItems: 'center',
+                  }}>
+                    {
+                      friendRequests?.map((request, index) => (
+                        <div
+                          style={{
+                            cursor: "pointer",
+                            border: "2px solid rgb(0, 0, 128)",
+                            borderRadius: "5px",
+                            display: "flex",
+                            gap: "5px",
+                            // maxWidth: 300,
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: 'center',
+                            // width:  "100%" ,
+                            padding: 5,
+
+                            width: "fit-content",
+                          }}
+                          key={index}
+                        >
+                          <div>
+                            <img
+                              height={100}
+                              width={100}
+                              src={
+                                Utils?.getImageUrlOfS3(
+                                  request.senderId?.profile_picture
+                                ) || "/assets/images/userdemo.png"
+                              }
+                              alt="Card image cap"
+                              onError={(e) => {
+                                e.target.src = "/assets/images/demoUser.png"; // Set default image on error
+                              }}
+                            />
+                          </div>
+
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 5,
+                              marginTop: 10,
+                              justifyContent: "center",
+                              alignItems: 'center',
+                            }}
+                          >
+                            <h5 >
+                              <b>{request.senderId?.fullname}</b>
+                            </h5>
+
+
+                            <div className="d-flex" style={{ gap: 5 }}>
+                              <button
+                                style={{
+                                  padding: 5,
+
+                                  marginTop: 5,
+                                  fontSize: "revert-layer",
+                                }}
+                                className="btn btn-success btn-sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleAcceptFriendRequest(request?._id);
+                                }}
+                              >
+                                Accept
+                              </button>
+                              <button
+                                style={{
+                                  padding: 5,
+
+                                  marginTop: 5,
+                                  fontSize: "revert-layer",
+                                }}
+                                className="btn btn-danger btn-sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRejectFriendRequest(request?._id);
+                                }}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+          <div
+            className={`${width600
+              ? "col-sm-12"
+              : width1200
                 ? "col-sm-6"
                 : width2000
-                ? "col-sm-12"
-                : ""
-            }  ${!width1200 ? "my-3" : ""}`}
+                  ? "col-sm-12"
+                  : ""
+              }  ${!width1200 ? "my-3" : ""}`}
             style={{
               height: width1200 ? "100%" : "calc(100% - 400px)",
             }}
@@ -525,15 +688,14 @@ const NavHomePage = () => {
         </div>
         {/* Middle */}
         <div
-          className={`${
-            width600
-              ? "col-sm-12"
-              : width1200
+          className={`${width600
+            ? "col-sm-12"
+            : width1200
               ? "col-sm-12"
               : width2000
-              ? "col-sm-6"
-              : ""
-          } my-3`}
+                ? "col-sm-6"
+                : ""
+            } my-3`}
           style={{ width: "auto !important", padding: "0px" }}
         >
           <div
@@ -556,27 +718,25 @@ const NavHomePage = () => {
 
         {/* Left side */}
         <div
-          className={`${
-            width600
-              ? "col-sm-12"
-              : width1200
+          className={`${width600
+            ? "col-sm-12"
+            : width1200
               ? "row"
               : width2000
-              ? "col-sm-3"
-              : ""
-          }`}
+                ? "col-sm-3"
+                : ""
+            }`}
           style={{ width: "auto !important", padding: "0px", marginTop: "5px" }}
         >
           <div
-            className={`${
-              width600
-                ? "col-sm-12"
-                : width1200
+            className={`${width600
+              ? "col-sm-12"
+              : width1200
                 ? "col-sm-6"
                 : width2000
-                ? "col-sm-12"
-                : ""
-            } my-3`}
+                  ? "col-sm-12"
+                  : ""
+              } my-3`}
             style={{
               padding: width600 ? "0px" : "0px 15px",
             }}
@@ -592,15 +752,14 @@ const NavHomePage = () => {
           </div>
 
           <div
-            className={`${
-              width600
-                ? "col-sm-12"
-                : width1200
+            className={`${width600
+              ? "col-sm-12"
+              : width1200
                 ? "col-sm-6"
                 : width2000
-                ? "col-sm-12"
-                : ""
-            } my-3`}
+                  ? "col-sm-12"
+                  : ""
+              } my-3`}
             style={{
               padding: width600 ? "0px" : "0px 15px",
             }}
@@ -636,15 +795,14 @@ const NavHomePage = () => {
             </div>
           </div>
           <div
-            className={`${
-              width600
-                ? "col-sm-12"
-                : width1200
+            className={`${width600
+              ? "col-sm-12"
+              : width1200
                 ? "col-sm-6"
                 : width2000
-                ? "col-sm-12"
-                : ""
-            } my-3`}
+                  ? "col-sm-12"
+                  : ""
+              } my-3`}
             style={{
               padding: width600 ? "0px" : "0px 15px",
             }}
@@ -660,15 +818,14 @@ const NavHomePage = () => {
           </div>
 
           <div
-            className={`${
-              width600
-                ? "col-sm-12"
-                : width1200
+            className={`${width600
+              ? "col-sm-12"
+              : width1200
                 ? "col-sm-6"
                 : width2000
-                ? "col-sm-12"
-                : ""
-            } my-3`}
+                  ? "col-sm-12"
+                  : ""
+              } my-3`}
             style={{
               padding: width600 ? "0px" : "0px 15px",
             }}
