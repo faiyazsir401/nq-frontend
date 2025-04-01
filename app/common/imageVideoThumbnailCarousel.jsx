@@ -1,71 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
-import "./imageVideoThumbnailCarousel.css"; // Import the CSS file
 
-class ImageVideoThumbnailCarousel extends React.Component {
-  constructor(props) {
-    super();
-    this.state = {
-      showGalleryPlayButton: true,
-      showVideo: false,
-    };
+const ImageVideoThumbnailCarousel = (props) => {
+  const [showVideo, setShowVideo] = useState(false);
 
-    this.images = props?.media?.map(
-      ({ type, original, thumbnail, title, description, showVideo = false }) => {
-        return type === "video"
-          ? {
-              original,
-              title,
-              thumbnail: `https://data.netqwix.com/${thumbnail}`,
-              embedUrl: `https://data.netqwix.com/${original}`,
-              description,
-              renderItem: this._renderVideo.bind(this),
-            }
-          : {
-              original,
-              title,
-              thumbnail: `https://data.netqwix.com/${thumbnail}`,
-              description,
-              renderItem: this._renderImage.bind(this),
-            };
-      }
-    );
-    this._toggleShowVideo = this._toggleShowVideo.bind(this);
-  }
+  const images = props?.media?.map(
+    ({ type, original, thumbnail, title, description, showVideo = false }) => {
+      return type === "video"
+        ? {
+            original,
+            title,
+            thumbnail: `https://data.netqwix.com/${thumbnail}`,
+            embedUrl: `https://data.netqwix.com/${original}`,
+            description,
+            renderItem: (item) => renderVideo(item),
+          }
+        : {
+            original,
+            title,
+            thumbnail: `https://data.netqwix.com/${thumbnail}`,
+            description,
+            renderItem: (item) => renderImage(item),
+          };
+    }
+  );
 
-  _toggleShowVideo() {
-    const { showVideo } = this.state;
-    this.setState({ showVideo: !showVideo });
-  }
+  const toggleShowVideo = () => {
+    setShowVideo((prevState) => !prevState);
+  };
 
-  _renderVideo(item) {
-    return (
-      <div className="video-wrapper">
-        {this?.state?.showVideo ? (
-          <div className="video-container">
-            <button className="close-video" onClick={this._toggleShowVideo} />
-            <iframe
-              className="slider-iframe"
-              src={item.embedUrl}
-              title="Video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        ) : (
-          <div className="video-container">
-            <button className="play-button" onClick={this._toggleShowVideo} />
-            <img alt="sample video cover" className="image-gallery-image" src={item.thumbnail} />
-            {this.renderLabels(item)}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  renderLabels = (item) => (
+  const renderLabels = (item) => (
     <>
       {item.description && (
         <span className="image-gallery-description">
@@ -76,29 +41,68 @@ class ImageVideoThumbnailCarousel extends React.Component {
     </>
   );
 
-  _renderImage(item) {
+  const videoRef = React.useRef(null);
+
+    const handleVideoClick = (e) => {
+      e.stopPropagation(); // Prevent parent div from interfering
+      if (videoRef.current) {
+        if (videoRef.current.paused) {
+          videoRef.current.play();
+        } else {
+          videoRef.current.pause();
+        }
+      }
+    };
+
+  const renderVideo = (item) => {
+    
+    return (
+      <div className="video-wrapper">
+        {showVideo ? (
+          <div className="video-container">
+            <video
+              ref={videoRef} 
+              controls
+              className="slider-iframe"
+              poster={item.thumbnail}
+              onClick={handleVideoClick}
+            >
+              <source src={item.embedUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        ) : (
+          <div className="video-container">
+            <button className="play-button" onClick={toggleShowVideo} />
+            <img alt="sample video cover" className="image-gallery-image" src={item.thumbnail} />
+            {renderLabels(item)}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderImage = (item) => {
     return (
       <div className="image-container">
         <img alt="sample image" className="image-gallery-image" src={`https://data.netqwix.com/${item.original}`} />
-        {this.renderLabels(item)}
+        {renderLabels(item)}
       </div>
     );
-  }
+  };
 
-  render() {
-    return (
-      <div className="carousel-container">
-        <ImageGallery
-          showThumbnails={true}
-          showFullscreenButton={false}
-          showPlayButton={false}
-          showNav={true}
-          items={this.images}
-          thumbnailPosition="bottom"
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div className="carousel-container">
+      <ImageGallery
+        showThumbnails={true}
+        showFullscreenButton={false}
+        showPlayButton={false}
+        showNav={true}
+        items={images}
+        thumbnailPosition="bottom"
+      />
+    </div>
+  );
+};
 
 export default ImageVideoThumbnailCarousel;

@@ -623,7 +623,7 @@ const TrainerSessionInfo = ({
           })
           : Message.notFound}
       </div>
-      <div className=" col-lg-6 px-5">
+      <div className=" col-lg-6">
         {/* <h2 className="ml-n1 tag-name booking-text">Book session</h2>
         <div className="mt-3">{element}</div> */}
         {/* {hasRatings && (

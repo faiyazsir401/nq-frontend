@@ -124,7 +124,7 @@ const Category = (masterRecords) => {
     };
   }, []);
 
-
+  console.log("trainerInfo?.userInfo",trainerInfo?.userInfo)
 
   return (
     <React.Fragment>

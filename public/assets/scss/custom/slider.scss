@@ -32,11 +32,11 @@
 .video-wrapper {
   // margin-left: 130px;
   margin: auto;
-  width: 500px;
-  height: 300px;
+  // width: 500px;
+  // height: 300px;
   @media (max-width: 576px) {
     margin: 0px !important;
-    width: 345px !important;
+    // width: 345px !important;
   }
 }
 
@@ -145,7 +145,7 @@ $ig-shadow: 0 2px 2px lighten($ig-black, 10%);
 
 .image-gallery-left-nav,
 .image-gallery-right-nav {
-  padding: 50px 10px;
+  padding: 0px !important;
   top: 50%;
   transform: translateY(-50%);
 
@@ -265,8 +265,10 @@ $ig-shadow: 0 2px 2px lighten($ig-black, 10%);
 
   .image-gallery-image {
     width: 100%;
+    height:auto !important;
     object-fit: contain;
   }
+
 }
 
 .image-gallery-bullets {
