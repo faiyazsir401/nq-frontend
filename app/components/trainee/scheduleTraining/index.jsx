@@ -310,6 +310,18 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       setParams({ search: selectedTrainerInfo?.selected_category });
   }, [selectedTrainerInfo?.selected_category]);
 
+  useEffect(() => {
+    if (selectedOnlineUser) {
+      setTrainerInfo((prev) => ({
+        ...prev,
+        userInfo: selectedOnlineUser,
+        selected_category: null,
+      }));
+      setSelectedTrainer({...selectedOnlineUser});
+      setParams({ search: selectedOnlineUser?.fullname });
+    }
+  }, [selectedOnlineUser]);
+
   const [bookSessionPayload, setBookSessionPayload] = useState({});
   const toggle = () => setInstantScheduleMeeting(!isOpenInstantScheduleMeeting);
 
