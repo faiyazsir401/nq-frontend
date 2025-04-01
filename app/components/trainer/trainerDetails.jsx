@@ -648,9 +648,9 @@ const TrainerSessionInfo = ({
         )}
 
         {hasRatings && (
-          <div>
+          <div className="mt-3">
             <h2 className="mb-3 booking-text  tag-name">Reviews</h2>
-            <div className="ml-lg-n4">
+            <div className="">
               <ReviewCard trainer={trainer} />
             </div>
           </div>

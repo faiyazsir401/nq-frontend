@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/css/image-gallery.css";
+import { useMediaQuery } from "usehooks-ts";
 
 const ImageVideoThumbnailCarousel = (props) => {
   const [showVideo, setShowVideo] = useState(false);
@@ -29,14 +30,15 @@ const ImageVideoThumbnailCarousel = (props) => {
   const toggleShowVideo = () => {
     setShowVideo((prevState) => !prevState);
   };
+  const width500 = useMediaQuery("(max-width:500px)")
 
   const renderLabels = (item) => (
     <>
       {item.description && (
-        <span className="image-gallery-description">
-          <div className="h3">{item?.title}</div>
+        <div className="image-gallery-description">
+          <div className={width500?"h6":"h3"}>{item?.title}</div>
           <div className="mt-2">{item?.description}</div>
-        </span>
+        </div>
       )}
     </>
   );
