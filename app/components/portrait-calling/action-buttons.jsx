@@ -15,7 +15,7 @@ import { SocketContext } from "../socket";
 import { useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";
 import { AccountType } from "../../common/constants";
-import { RxHalf1 } from "react-icons/rx";
+import { LuSquareSplitVertical } from "react-icons/lu";
 
 const ActionButtons = ({
   isShowVideos,
@@ -37,7 +37,8 @@ const ActionButtons = ({
   selectedClips,
   setIsOpenReport,
   cutCall,
-  setSelectedUser
+  setSelectedUser,
+  setIsConfirmModelOpen
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -88,7 +89,7 @@ const ActionButtons = ({
       </Tooltip>
 
       <Tooltip>
-        <div className="button end-call off" onClick={cutCall}>
+        <div className="button end-call off" onClick={()=>setIsConfirmModelOpen(true)}>
           <Phone size={16} />
         </div>
       </Tooltip>
@@ -141,7 +142,7 @@ const ActionButtons = ({
               <FilePlus size={16} />
             </div>
           </Tooltip>
-
+          {!selectedClips || selectedClips?.length == 0 &&
           <Tooltip>
             <div className="button off" onClick={() => {
               setSelectedUser(null); 
@@ -151,9 +152,9 @@ const ActionButtons = ({
                 id:null,
               });
             }}>
-              <RxHalf1 size={16} />
+              <LuSquareSplitVertical size={16} />
             </div>
-          </Tooltip>
+          </Tooltip>}
         </>
       )}
     </div>

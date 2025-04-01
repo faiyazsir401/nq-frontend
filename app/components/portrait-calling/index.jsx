@@ -131,6 +131,8 @@ const VideoCallUI = ({
   const [errorMessageForPermission, setErrorMessageForPermission] = useState("Kindly allow us access to your camera and microphone.")
   const [userAlreadyInCall, setUserAlreadyInCall] = useState(false)
   const [isModelOpen, setIsModelOpen] = useState(false);
+  const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
+
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -810,6 +812,7 @@ const VideoCallUI = ({
           selectedClips={selectedClips}
           setIsOpenReport={setIsOpenReport}
           cutCall={cutCall}
+          setIsConfirmModelOpen={setIsConfirmModelOpen}
         />
       )}
 
@@ -1323,6 +1326,42 @@ const VideoCallUI = ({
         />}
 
       <PermissionModal isOpen={permissionModal} errorMessage={errorMessageForPermission} />
+
+      <Modal isOpen={isConfirmModelOpen}>
+        <ModalHeader>
+          <h5
+            style={{
+              fontSize: "22px !important"
+            }}
+          >{`Are you sure you want to exit the session?`}</h5>
+        </ModalHeader>
+        <ModalBody>
+          <div className="row"
+            style={{
+              justifyContent: "space-between"
+            }}
+          >
+            <Button
+              className="mx-3"
+              color="primary"
+              onClick={() => {
+                setIsConfirmModelOpen(false)
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="mx-3"
+              color="danger"
+              onClick={() => {
+                cutCall();
+              }}
+            >
+              Yes
+            </Button>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   );
 };
