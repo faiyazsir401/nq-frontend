@@ -310,18 +310,8 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       setParams({ search: selectedTrainerInfo?.selected_category });
   }, [selectedTrainerInfo?.selected_category]);
 
-  useEffect(() => {
-    if (selectedOnlineUser) {
-      setTrainerInfo((prev) => ({
-        ...prev,
-        userInfo: selectedOnlineUser,
-        selected_category: null,
-      }));
-      setSelectedTrainer({...selectedOnlineUser});
-      setParams({ search: selectedOnlineUser?.fullname });
-    }
-  }, [selectedOnlineUser]);
 
+console.log("getParams1",getParams)
   const [bookSessionPayload, setBookSessionPayload] = useState({});
   const toggle = () => setInstantScheduleMeeting(!isOpenInstantScheduleMeeting);
 
@@ -337,6 +327,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   };
 
   useEffect(() => {
+    console.log("getParams",getParams)
     if (getParams.search) {
       dispatch(getTraineeWithSlotsAsync(getParams));
     }
@@ -429,7 +420,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         selected_category: null,
       }));
       setSelectedTrainer({...selectedOnlineUser});
-      setParams({ search: selectedOnlineUser?.fullname });
+      setParams({ search: selectedOnlineUser?.fullName });
     }
   }, [selectedOnlineUser]);
 
