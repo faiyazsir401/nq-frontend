@@ -409,7 +409,17 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
     }
   }, []);
 
-
+  useEffect(() => {
+    if (selectedOnlineUser) {
+      setTrainerInfo((prev) => ({
+        ...prev,
+        userInfo: selectedOnlineUser,
+        selected_category: null,
+      }));
+      setSelectedTrainer({...selectedOnlineUser});
+      setParams({ search: selectedOnlineUser?.fullname });
+    }
+  }, [selectedOnlineUser]);
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
@@ -889,8 +899,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                               selected_category: null,
                             }));
                             setSelectedTrainer(data.trainer_info);
-                            console.log("data.trainer_info",data.trainer_info)
-                            setParams({ search: data.trainer_info.fullname });
+                            setParams({ search: data.trainer_info?.fullName });
                           }}
                           
                         />
