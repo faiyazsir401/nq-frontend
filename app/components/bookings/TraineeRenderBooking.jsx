@@ -149,7 +149,7 @@ const TraineeRenderBooking = ({
               _id,
               isOpen: true,
             };
-            handleAddRatingModelState(payload);
+            handleAddRatingModelState(payload,trainer_info);
             sendNotifications({
               title: notificiationTitles.feedBackReceived,
               description:

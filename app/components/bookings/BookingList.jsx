@@ -28,6 +28,7 @@ import { commonState } from "../../common/common.slice";
 import { traineeAction, traineeState } from "../trainee/trainee.slice";
 import OrientationModal from "../modalComponent/OrientationModal";
 import { useMediaQuery } from "usehooks-ts";
+import TraineeRatings from "./ratings/trainee";
 
 
 
@@ -171,11 +172,15 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     setIsOpen(false);
     // setIsModalOpen(false);
   };
-
-  const handleAddRatingModelState = (data) => {
+  const [selectedTrainer,setSelectedTrainer] = useState(null)
+  const handleAddRatingModelState = (data,trainer_info) => {
     dispatch(addRating(data));
-   
+    if(trainer_info){
+      setSelectedTrainer(trainer_info)
+
+    }
   };
+
 
   const renderBooking = (
     bookingInfo,
@@ -493,10 +498,27 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   }, [startMeeting?.isOpenModal]);
 
   const renderRating = () => {
+    // console.log("trainer_info",trainer_info)
     return (
       <ReactStrapModal
         allowFullWidth={true}
         element={
+          accountType === AccountType.TRAINEE?
+          <TraineeRatings
+            accountType={accountType}
+            booking_id={addRatingModel._id}
+            key={addRatingModel._id}
+            trainer={selectedTrainer}
+            onClose={() => {
+              const payload = {
+                _id: null,
+                isOpen: false,
+              };
+              handleAddRatingModelState(payload);
+            }}
+            tabBook={tabBook}
+          />
+          :
           <Ratings
             accountType={accountType}
             booking_id={addRatingModel._id}
@@ -542,7 +564,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
           />
         ))
       )}
-      {addRatingModel.isOpen ? renderRating() : null}
+      {addRatingModel.isOpen ? renderRating(startMeeting.trainerInfo) : null}
     </div>
   );
 };

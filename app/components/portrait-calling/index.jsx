@@ -47,6 +47,7 @@ import { getTraineeClips } from "../NavHomePage/navHomePage.api";
 import PermissionModal from "../video/PermissionModal";
 import ReactStrapModal from "../../common/modal";
 import Ratings from "../bookings/ratings";
+import TraineeRatings from "../bookings/ratings/trainee";
 
 
 let Peer;
@@ -1309,7 +1310,7 @@ const VideoCallUI = ({
         <ReactStrapModal
           allowFullWidth={true}
           element={
-            <Ratings
+            <TraineeRatings
               accountType={accountType}
               booking_id={id}
               key={id}
