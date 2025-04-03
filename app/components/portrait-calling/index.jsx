@@ -48,6 +48,7 @@ import PermissionModal from "../video/PermissionModal";
 import ReactStrapModal from "../../common/modal";
 import Ratings from "../bookings/ratings";
 import TraineeRatings from "../bookings/ratings/trainee";
+import { useMediaQuery } from "usehooks-ts";
 
 
 let Peer;
@@ -720,7 +721,7 @@ const VideoCallUI = ({
     };
   }, []);
 
-
+  const width1200 = useMediaQuery("max-width:1200px")
 
   useEffect(() => {
     if (fromUser && toUser && startMeeting?.iceServers && accountType) {
@@ -899,8 +900,10 @@ const VideoCallUI = ({
                       My Videos
                     </NavLink>
                   </NavItem>
-                  <NavItem className="mb-2" style={{
-                    width: "100%"
+                  <NavItem className="mb-2 " style={{
+                    width: "100%",
+                    display: "flex",
+    justifyContent: "center"
                   }}>
                     <NavLink
                       className={`button-effect ${videoActiveTab === "trainee" ? "active" : ""
@@ -915,7 +918,9 @@ const VideoCallUI = ({
                     </NavLink>
                   </NavItem>
                   <NavItem className="mb-2" style={{
-                    width: "100%"
+                    width: "100%",
+                    display: "flex",
+    justifyContent: "end"
                   }}>
                     <NavLink
                       className={`button-effect ${videoActiveTab === "docs" ? "active" : ""
@@ -969,7 +974,7 @@ const VideoCallUI = ({
                                   return (
                                     <div
                                       key={index}
-                                      className={`col-3 p-1`}
+                                      className={`${width1200?"col-3" :"col-2" } p-1` }
                                       style={{ borderRadius: 5 }}
                                       onClick={() => {
                                         if (!sld && selectClips?.length < 2) {
