@@ -48,7 +48,7 @@ const Details = (props) => {
           <option>Choose account type</option>
           {LIST_OF_ACCOUNT_TYPE.map((account_type, index) => {
             return (
-              <option key={index} value={account_type.label}>
+              <option key={index} value={account_type.value}>
                 {account_type.label}
               </option>
             );

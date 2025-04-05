@@ -10,12 +10,12 @@ export const LIST_OF_ACCOUNT_TYPE = [
   {
     id: 1,
     label: "Enthusiast",
-    value: 1,
+    value: "Trainee",
   },
   {
     id: 2,
     label: "Expert",
-    value: 2,
+    value: "Trainer",
   },
 ];
 
