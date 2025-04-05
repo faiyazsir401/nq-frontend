@@ -86,10 +86,11 @@ const VideoContainer = ({
   sendDrawEvent,
   undoDrawing,
   isLandscape,
+  videoContainerRef
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
-  const videoContainerRef = useRef(null);
+  // const videoContainerRef = useRef(null);
   const movingVideoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -362,7 +363,6 @@ const VideoContainer = ({
       };
     }
   }, [videoRef]);
-  console.log("videoRef", aspectRatio)
 
   return (
     <>
@@ -405,9 +405,8 @@ const VideoContainer = ({
           >
             <div
               className="button"
-              onClick={() =>
-                {
-                
+              onClick={() => {
+
                 undoDrawing(
                   {
                     coordinates: storedLocalDrawPaths[`canvas${index}`].sender,
@@ -423,7 +422,8 @@ const VideoContainer = ({
                   },
                   true,
                   index
-                )}
+                )
+              }
               }
             >
               <FaUndo />
@@ -541,16 +541,19 @@ const ClipModeCall = ({
   isLocalStreamOff,
   takeScreenshot,
   isLandscape,
+  canvasRef,
+  canvasRef2,
+  videoRef,
+  videoRef2,
+  videoContainerRef,
+  videoContainerRef2,
 }) => {
   const socket = useContext(SocketContext);
   const [drawingMode, setDrawingMode] = useState(false);
   const [showDrawingTools, setShowDrawingTools] = useState(false);
   const { accountType } = useAppSelector(authState);
   const [isOpen, setIsOpen] = useState(false);
-  const canvasRef = useRef(null);
-  const canvasRef2 = useRef(null);
-  const videoRef = useRef(null);
-  const videoRef2 = useRef(null);
+
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
     g: 112,
@@ -761,7 +764,7 @@ const ClipModeCall = ({
 
     if (selectedShape === SHAPES.ANGLE) {
       if (drawingStep === 'baseline' && currPos[`canvas${canvasIndex}`]) {
-        console.log("stop-drawingStep", drawingStep,startPos,currPos)
+        console.log("stop-drawingStep", drawingStep, startPos, currPos)
 
         // If we're in baseline step and we completed it, move to angle drawing step
         lastDrawingStep = "baseline"
@@ -851,7 +854,7 @@ const ClipModeCall = ({
       if (removeLastCoordinate)
         storedLocalDrawPaths[`canvas${canvasIndex}`].sender.splice(-1, 1);
 
-      
+
 
       // Draw all the paths in the paths array
       await senderConfig.coordinates.forEach((path) => {
@@ -885,8 +888,8 @@ const ClipModeCall = ({
 
       if (strikes[`canvas${canvasIndex}`].length <= 0) return;
       context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
-      console.log("drawingStep",drawingStep,selectedShape,lastDrawingStep)
-      if(drawingStep === "baseline" && selectedShape === SHAPES.ANGLE && lastDrawingStep === "angle"){
+      console.log("drawingStep", drawingStep, selectedShape, lastDrawingStep)
+      if (drawingStep === "baseline" && selectedShape === SHAPES.ANGLE && lastDrawingStep === "angle") {
         context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
       }
       // Send event to the other user (if needed)
@@ -899,20 +902,20 @@ const ClipModeCall = ({
   };
 
   const calculateAngle = (start, end, angle) => {
-    console.log("start",start,end,angle)
+    console.log("start", start, end, angle)
     const dx1 = end.x - start.x;
     const dy1 = end.y - start.y;
     const dx2 = angle.x - end.x;
     const dy2 = angle.y - end.y;
-    console.log("start2",dx1,dy1,dx2,dy2)
+    console.log("start2", dx1, dy1, dx2, dy2)
     const dotProduct = -(dx1 * dx2 + dy1 * dy2);
-    console.log("start3",dotProduct)
+    console.log("start3", dotProduct)
     const magnitude1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
     const magnitude2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-    console.log("start4",magnitude1,magnitude2)
+    console.log("start4", magnitude1, magnitude2)
     let angleRad = Math.acos(dotProduct / (magnitude1 * magnitude2));
     let angleDeg = (angleRad * 180) / Math.PI;
-    console.log("start5",angleRad,angleDeg)
+    console.log("start5", angleRad, angleDeg)
 
     return isNaN(angleDeg) ? 0 : angleDeg;
   };
@@ -921,20 +924,20 @@ const ClipModeCall = ({
     // Vector from start to end point (baseline)
     const dx1 = end.x - start.x;
     const dy1 = end.y - start.y;
-    
+
     // Vector from end point to angle point
     const dx2 = angle.x - end.x;
     const dy2 = angle.y - end.y;
-    
+
     // Calculate the angle between the two vectors
     const angleRad = Math.atan2(dy2, dx2) - Math.atan2(dy1, dx1);
     let angleDeg = (angleRad * 180) / Math.PI;
-    
+
     // Normalize to 0-360 range
     if (angleDeg < 0) {
       angleDeg += 360;
     }
-    
+
     return isNaN(angleDeg) ? 0 : angleDeg;
   };
 
@@ -986,7 +989,7 @@ const ClipModeCall = ({
           canvas.width,
           canvas.height
         );
-        
+
         if (strikes[`canvas${canvasIndex}`].length >= 10)
           strikes[`canvas${canvasIndex}`].shift();
         strikes[`canvas${canvasIndex}`].push(savedPos[`canvas${canvasIndex}`]);
@@ -1004,7 +1007,7 @@ const ClipModeCall = ({
         if (selectedShape === SHAPES.ANGLE) {
           console.log("drawingStep", drawingStep)
           if (drawingStep === "baseline") {
-            
+
             startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
             currPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
 
@@ -1241,7 +1244,7 @@ const ClipModeCall = ({
       const mousePos = event.type.includes("touchmove")
         ? getTouchPos(event, canvas)
         : getMousePositionOnCanvas(event, canvas);
-      
+
       console.log("selectedShape1", selectedShape);
       if (selectedShape === SHAPES.FREE_HAND) {
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
@@ -1273,17 +1276,17 @@ const ClipModeCall = ({
             currPos[`canvas${canvasIndex}`],
             mousePos
           );
-          const completeComputedAngle = calculateCompleteAngle( startPos[`canvas${canvasIndex}`],
+          const completeComputedAngle = calculateCompleteAngle(startPos[`canvas${canvasIndex}`],
             currPos[`canvas${canvasIndex}`],
             mousePos)
-            console.log("completeComputedAngle",completeComputedAngle)
+          console.log("completeComputedAngle", completeComputedAngle)
           // Optionally, display the angle computed (you can use context.fillText)
           context.fillStyle = canvasConfigs.sender.strokeStyle;
           context.font = "16px Arial";
-          if(completeComputedAngle > 180){
+          if (completeComputedAngle > 180) {
             context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x - 60, currPos[`canvas${canvasIndex}`].y + 20);
-          }else{
-          context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 10, currPos[`canvas${canvasIndex}`].y - 20);
+          } else {
+            context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 10, currPos[`canvas${canvasIndex}`].y - 20);
 
           }
 
@@ -1365,8 +1368,13 @@ const ClipModeCall = ({
 
   function resetInitialPinnedUser() { }
   const isSingle = selectedClips?.length === 1;
+
+
+
+
   return (
     <>
+
       <div
         className={`d-flex  pl-1 pr-1 ${accountType === AccountType.TRAINER && !selectedUser
           ? "mt-1 mb-1 justify-content-between"
@@ -1623,6 +1631,7 @@ const ClipModeCall = ({
               sendDrawEvent={sendDrawEvent}
               undoDrawing={undoDrawing}
               isLandscape={isLandscape}
+              videoContainerRef={videoContainerRef}
             />
             <VideoContainer
               drawingMode={drawingMode}
@@ -1650,6 +1659,8 @@ const ClipModeCall = ({
               sendDrawEvent={sendDrawEvent}
               undoDrawing={undoDrawing}
               isLandscape={isLandscape}
+              videoContainerRef={videoContainerRef2}
+
             />
 
             {isLock && (
@@ -1694,6 +1705,7 @@ const ClipModeCall = ({
             sendDrawEvent={sendDrawEvent}
             undoDrawing={undoDrawing}
             isLandscape={isLandscape}
+            videoContainerRef={videoContainerRef}
           />
         )}
         {!isMaximized && (
