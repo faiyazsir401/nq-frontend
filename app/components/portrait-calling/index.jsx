@@ -141,7 +141,7 @@ const VideoCallUI = ({
   const [userAlreadyInCall, setUserAlreadyInCall] = useState(false)
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
-
+  const [showScreenshotButton,setShowScreenshotButton] = useState(false)
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -918,6 +918,7 @@ const VideoCallUI = ({
           videoRef2={videoRef2}
           videoContainerRef={videoContainerRef}
           videoContainerRef2={videoContainerRef2}
+          setShowScreenshotButton={setShowScreenshotButton}
         />
       ) : (
         <OneOnOneCall
@@ -935,6 +936,7 @@ const VideoCallUI = ({
           isRemoteStreamOff={isRemoteStreamOff}
           setIsRemoteStreamOff={setIsRemoteStreamOff}
           isLandscape={isLandscape}
+          setShowScreenshotButton={setShowScreenshotButton}
         />
       )}
       {!isMaximized && (
@@ -960,6 +962,7 @@ const VideoCallUI = ({
           setIsOpenReport={setIsOpenReport}
           cutCall={cutCall}
           setIsConfirmModelOpen={setIsConfirmModelOpen}
+          showScreenshotButton={showScreenshotButton}
         />
       )}
 

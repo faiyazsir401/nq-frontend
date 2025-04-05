@@ -38,7 +38,8 @@ const ActionButtons = ({
   setIsOpenReport,
   cutCall,
   setSelectedUser,
-  setIsConfirmModelOpen
+  setIsConfirmModelOpen,
+  showScreenshotButton
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -127,13 +128,13 @@ const ActionButtons = ({
               </div>
             </Tooltip>
           )}
-
+{showScreenshotButton &&
           <Tooltip>
             <div className="button aperture" onClick={takeScreenshot}>
               <Aperture size={16} />
             </div>
           </Tooltip>
-
+}
           <Tooltip>
             <div
               className="button file-add"

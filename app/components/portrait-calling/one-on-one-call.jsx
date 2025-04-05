@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { EVENTS } from "../../../helpers/events";
 import { AccountType } from "../../common/constants";
 import { useAppSelector } from "../../store";
@@ -21,12 +21,17 @@ const OneOnOneCall = ({
   setIsLocalStreamOff,
   isRemoteStreamOff,
   isLandscape,
+  setShowScreenshotButton
 }) => {
   const socket = useContext(SocketContext);
   const { accountType } = useAppSelector(authState);
   console.log("selectedUser", selectedUser);
   console.log("toUser", toUser._id);
   console.log("fromUser", fromUser._id);
+
+  useEffect(()=>{
+    setShowScreenshotButton(false)
+  },[])
 
   const handleUserClick = (id) => {
     if (accountType === AccountType.TRAINER) {

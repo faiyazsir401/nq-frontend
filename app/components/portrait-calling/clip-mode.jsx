@@ -547,12 +547,17 @@ const ClipModeCall = ({
   videoRef2,
   videoContainerRef,
   videoContainerRef2,
+  setShowScreenshotButton
 }) => {
   const socket = useContext(SocketContext);
   const [drawingMode, setDrawingMode] = useState(false);
   const [showDrawingTools, setShowDrawingTools] = useState(false);
   const { accountType } = useAppSelector(authState);
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(()=>{
+    setShowScreenshotButton(true)
+  },[])
 
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
@@ -575,6 +580,11 @@ const ClipModeCall = ({
   function handleUserClick(id) {
     if (accountType === AccountType.TRAINER) {
       setSelectedUser(id);
+      if(id){
+        setShowScreenshotButton(false)
+      }else{
+        setShowScreenshotButton(true)
+      }
       emitVideoSelectEvent("swap", id);
     }
   }
