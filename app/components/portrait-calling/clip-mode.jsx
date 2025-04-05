@@ -917,6 +917,27 @@ const ClipModeCall = ({
     return isNaN(angleDeg) ? 0 : angleDeg;
   };
 
+  const calculateCompleteAngle = (start, end, angle) => {
+    // Vector from start to end point (baseline)
+    const dx1 = end.x - start.x;
+    const dy1 = end.y - start.y;
+    
+    // Vector from end point to angle point
+    const dx2 = angle.x - end.x;
+    const dy2 = angle.y - end.y;
+    
+    // Calculate the angle between the two vectors
+    const angleRad = Math.atan2(dy2, dx2) - Math.atan2(dy1, dx1);
+    let angleDeg = (angleRad * 180) / Math.PI;
+    
+    // Normalize to 0-360 range
+    if (angleDeg < 0) {
+      angleDeg += 360;
+    }
+    
+    return isNaN(angleDeg) ? 0 : angleDeg;
+  };
+
   useEffect(() => {
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
@@ -1252,10 +1273,20 @@ const ClipModeCall = ({
             currPos[`canvas${canvasIndex}`],
             mousePos
           );
+          const completeComputedAngle = calculateCompleteAngle( startPos[`canvas${canvasIndex}`],
+            currPos[`canvas${canvasIndex}`],
+            mousePos)
+            console.log("completeComputedAngle",completeComputedAngle)
           // Optionally, display the angle computed (you can use context.fillText)
           context.fillStyle = canvasConfigs.sender.strokeStyle;
           context.font = "16px Arial";
-          context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 10, currPos[`canvas${canvasIndex}`].y + 10);
+          if(completeComputedAngle > 180){
+            context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x - 60, currPos[`canvas${canvasIndex}`].y + 20);
+          }else{
+          context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 10, currPos[`canvas${canvasIndex}`].y - 20);
+
+          }
+
         }
 
       } else {
