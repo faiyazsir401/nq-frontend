@@ -42,7 +42,7 @@ const InviteFriendsCard = () => {
         let failedEmails = [];
         await Promise.all(emailList.map(async (email) => {
             try {
-                await inviteFriend({ user_email: email });
+                await inviteFriend({ user_email: email.toLowerCase() });
             } catch (error) {
                 failedEmails.push(email);
             }

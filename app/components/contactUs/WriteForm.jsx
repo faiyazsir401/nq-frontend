@@ -44,7 +44,7 @@ const WriteForm = ({ isOpen, setIsWriteFormOpen }) => {
     dispatch(
       writeUsAsync({
         name: values?.name || userInfo?.fullname,
-        email: values?.email || userInfo?.email,
+        email: values?.email?.toLowerCase() || userInfo?.email?.toLowerCase(),
         phone_number: values?.phone || userInfo?.phone,
         subject: values?.subject,
         description: values?.desc,

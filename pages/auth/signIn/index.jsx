@@ -25,7 +25,10 @@ const Auth_SignIn = ({isRedirect = true}) => {
   // simple  login
   const Login = () => {
     dispatch(authAction.updateIsRedirectToDashboard(isRedirect))
-    dispatch(loginAsync(credential));
+    dispatch(loginAsync({
+      email:credential.email.toLowerCase(),
+      password:credential.password
+    }));
   };
   // const redirectToSignUpPage = () => {
   //   router.push("/auth/signUp");

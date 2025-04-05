@@ -69,7 +69,7 @@ const Auth_SignUp = (props) => {
     ) {
       setBasicInfo({
         ...basicInfo,
-        email: authSelector.showGoogleRegistrationForm.email,
+        email: authSelector.showGoogleRegistrationForm.email?.toLowerCase(),
         password: "*****",
         isGoogleRegister: true,
       });
@@ -117,7 +117,7 @@ const Auth_SignUp = (props) => {
   }, [authSelector.status]);
 
   const signUp = () => {
-    const signUpObj = { ...basicInfo, ...details };
+    const signUpObj = { ...basicInfo, ...details, email:basicInfo.email?.toLowerCase() };
     if (signUpObj.account_type === "Trainee") {
       delete signUpObj.category;
     }
