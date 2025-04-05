@@ -334,31 +334,50 @@ const VideoCallUI = ({
 
   const mergeCanvases = (croppedCanvas, drawingCanvasRef) => {
     try {
-      // Get references to both canvases
-      const drawingCanvas = drawingCanvasRef.current;
+        const drawingCanvas = drawingCanvasRef.current;
+        
+        if (!croppedCanvas || !drawingCanvas) return null;
 
-      if (!croppedCanvas || !drawingCanvas) return null;
+        // Determine the final dimensions
+        const finalWidth = Math.max(croppedCanvas.width, drawingCanvas.width);
+        const finalHeight = Math.max(croppedCanvas.height, drawingCanvas.height);
 
-      // Create a new canvas to hold the merged result
-      const mergedCanvas = document.createElement('canvas');
-      mergedCanvas.width = croppedCanvas.width;
-      mergedCanvas.height = croppedCanvas.height;
-      const ctx = mergedCanvas.getContext('2d');
+        // Create a new canvas for the cropped image (handling size differences)
+        const adjustedCroppedCanvas = document.createElement('canvas');
+        adjustedCroppedCanvas.width = finalWidth;
+        adjustedCroppedCanvas.height = finalHeight;
+        const adjustedCtx = adjustedCroppedCanvas.getContext('2d');
+        
+        // Fill with white background (or transparent if you prefer)
+        adjustedCtx.fillStyle = 'white';
+        adjustedCtx.fillRect(0, 0, finalWidth, finalHeight);
+        
+        // Center the cropped canvas if it's smaller
+        if (croppedCanvas.width < finalWidth) {
+            const xOffset = (finalWidth - croppedCanvas.width) / 2;
+            adjustedCtx.drawImage(croppedCanvas, xOffset, 0);
+        } else {
+            adjustedCtx.drawImage(croppedCanvas, 0, 0);
+        }
 
-      // First draw the cropped video frame
-      ctx.drawImage(croppedCanvas, 0, 0);
+        // Create the final merged canvas
+        const mergedCanvas = document.createElement('canvas');
+        mergedCanvas.width = finalWidth;
+        mergedCanvas.height = finalHeight;
+        const ctx = mergedCanvas.getContext('2d');
 
-      // Then draw the transparent drawing canvas on top
-      ctx.drawImage(drawingCanvas, 0, 0);
+        // First draw the adjusted cropped frame
+        ctx.drawImage(adjustedCroppedCanvas, 0, 0);
+        
+        // Then draw the drawing canvas on top
+        ctx.drawImage(drawingCanvas, 0, 0);
 
-      // Return the merged image as base64
-
-      return mergedCanvas
+        return mergedCanvas;
     } catch (error) {
-      console.log("error", error)
+        console.error("Error in mergeCanvases:", error);
+        return null;
     }
-
-  };
+};
 
   const takeScreenshot = async () => {
 
