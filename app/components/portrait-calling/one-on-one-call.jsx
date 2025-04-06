@@ -11,7 +11,7 @@ const OneOnOneCall = ({
   timeRemaining,
   selectedUser,
   setSelectedUser,
-  videoRef,
+  localVideoRef,
   remoteVideoRef,
   toUser,
   fromUser,
@@ -67,7 +67,7 @@ const OneOnOneCall = ({
           selected={selectedUser === toUser._id}
           selectedUser={selectedUser}
           notSelected={selectedUser}
-          videoRef={videoRef}
+          videoRef={localVideoRef}
           user={fromUser}
           stream={localStream}
           isStreamOff={isLocalStreamOff}

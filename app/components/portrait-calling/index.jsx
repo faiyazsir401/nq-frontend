@@ -618,8 +618,8 @@ const takeScreenshot = async () => {
         show: true,
         msg: `Waiting for ${toUser?.fullname} to join...`,
       });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
       }
 
       // Handle socket disconnect or errors after initial connection
@@ -738,8 +738,8 @@ const takeScreenshot = async () => {
   }, [remoteStream]);
 
   const connectToPeer = (peer, peerId) => {
-    if (!(videoRef && videoRef?.current)) return;
-    const call = peer.call(peerId, videoRef?.current?.srcObject);
+    if (!(localVideoRef && localVideoRef?.current)) return;
+    const call = peer.call(peerId, localVideoRef?.current?.srcObject);
     call?.on("stream", (remoteStream) => {
       // console.log(`setting remoteStream for 2nd user here ---- `);
       setDisplayMsg({ show: false, msg: "" });
@@ -848,7 +848,7 @@ const takeScreenshot = async () => {
       });
     }
     let videorefSrc = localVideoRef.current;
-    if (videoRef && videorefSrc && videorefSrc.srcObject) {
+    if (localVideoRef && videorefSrc && videorefSrc.srcObject) {
       videorefSrc.srcObject.getTracks().forEach((t) => {
         t.stop();
       });
@@ -939,8 +939,8 @@ const takeScreenshot = async () => {
     }
   }, [startMeeting, accountType]);
 
-  console.log("refs", videoRef, remoteVideoRef, remoteStream);
-
+  console.log("refs", localVideoRef, remoteVideoRef, remoteStream);
+  console.log("videoRef",videoRef)
   return (
     <div
       className="video-call-container"
@@ -983,7 +983,7 @@ const takeScreenshot = async () => {
           timeRemaining={session_end_time}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
-          videoRef={videoRef}
+          localVideoRef={localVideoRef}
           remoteVideoRef={remoteVideoRef}
           toUser={toUser}
           fromUser={fromUser}
