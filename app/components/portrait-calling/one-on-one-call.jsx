@@ -92,7 +92,7 @@ const OneOnOneCall = ({
             id={selectedUser === toUser._id ? fromUser._id : toUser._id}
             onClick={handleUserClick}
             selected={false}
-            videoRef={selectedUser === toUser._id ? remoteVideoRef : videoRef}
+            videoRef={selectedUser === toUser._id ? remoteVideoRef : localVideoRef}
             stream={selectedUser === toUser._id ? remoteStream : localStream}
             user={selectedUser === toUser._id ? toUser : fromUser}
             isStreamOff={
