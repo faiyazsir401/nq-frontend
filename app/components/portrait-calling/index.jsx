@@ -918,7 +918,7 @@ const takeScreenshot = async () => {
     };
   }, []);
 
-  const width1200 = useMediaQuery("max-width:1200px")
+  const width1200 = useMediaQuery("(max-width:1200px)")
 
   useEffect(() => {
     if (fromUser && toUser && startMeeting?.iceServers && accountType) {
