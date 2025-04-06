@@ -483,7 +483,13 @@ const VideoContainer = ({
           ref={canvasRef}
           id="drawing-canvas"
           className="canvas"
-          style={{ display: drawingMode ? "block" : "none" }}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%', display: drawingMode ? "block" : "none"
+          }}
         />
         {drawingMode && accountType === AccountType.TRAINER && (
           <div
@@ -555,9 +561,9 @@ const ClipModeCall = ({
   const { accountType } = useAppSelector(authState);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(()=>{
+  useEffect(() => {
     setShowScreenshotButton(true)
-  },[])
+  }, [])
 
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
@@ -580,9 +586,9 @@ const ClipModeCall = ({
   function handleUserClick(id) {
     if (accountType === AccountType.TRAINER) {
       setSelectedUser(id);
-      if(id){
+      if (id) {
         setShowScreenshotButton(false)
-      }else{
+      } else {
         setShowScreenshotButton(true)
       }
       emitVideoSelectEvent("swap", id);
