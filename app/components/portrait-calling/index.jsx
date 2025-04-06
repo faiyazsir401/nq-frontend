@@ -141,7 +141,7 @@ const VideoCallUI = ({
   const [userAlreadyInCall, setUserAlreadyInCall] = useState(false)
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
-  const [showScreenshotButton,setShowScreenshotButton] = useState(false)
+  const [showScreenshotButton, setShowScreenshotButton] = useState(false)
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -334,50 +334,50 @@ const VideoCallUI = ({
 
   const mergeCanvases = (croppedCanvas, drawingCanvasRef) => {
     try {
-        const drawingCanvas = drawingCanvasRef.current;
-        
-        if (!croppedCanvas || !drawingCanvas) return null;
+      const drawingCanvas = drawingCanvasRef.current;
 
-        // Determine the final dimensions
-        const finalWidth = Math.max(croppedCanvas.width, drawingCanvas.width);
-        const finalHeight = Math.max(croppedCanvas.height, drawingCanvas.height);
+      if (!croppedCanvas || !drawingCanvas) return null;
 
-        // Create a new canvas for the cropped image (handling size differences)
-        const adjustedCroppedCanvas = document.createElement('canvas');
-        adjustedCroppedCanvas.width = finalWidth;
-        adjustedCroppedCanvas.height = finalHeight;
-        const adjustedCtx = adjustedCroppedCanvas.getContext('2d');
-        
-        // Fill with white background (or transparent if you prefer)
-        adjustedCtx.fillStyle = 'white';
-        adjustedCtx.fillRect(0, 0, finalWidth, finalHeight);
-        
-        // Center the cropped canvas if it's smaller
-        if (croppedCanvas.width < finalWidth) {
-            const xOffset = (finalWidth - croppedCanvas.width) / 2;
-            adjustedCtx.drawImage(croppedCanvas, xOffset, 0);
-        } else {
-            adjustedCtx.drawImage(croppedCanvas, 0, 0);
-        }
+      // Determine the final dimensions
+      const finalWidth = Math.max(croppedCanvas.width, drawingCanvas.width);
+      const finalHeight = Math.max(croppedCanvas.height, drawingCanvas.height);
 
-        // Create the final merged canvas
-        const mergedCanvas = document.createElement('canvas');
-        mergedCanvas.width = finalWidth;
-        mergedCanvas.height = finalHeight;
-        const ctx = mergedCanvas.getContext('2d');
+      // Create a new canvas for the cropped image (handling size differences)
+      const adjustedCroppedCanvas = document.createElement('canvas');
+      adjustedCroppedCanvas.width = finalWidth;
+      adjustedCroppedCanvas.height = finalHeight;
+      const adjustedCtx = adjustedCroppedCanvas.getContext('2d');
 
-        // First draw the adjusted cropped frame
-        ctx.drawImage(adjustedCroppedCanvas, 0, 0);
-        
-        // Then draw the drawing canvas on top
-        ctx.drawImage(drawingCanvas, 0, 0);
+      // Fill with white background (or transparent if you prefer)
+      adjustedCtx.fillStyle = 'white';
+      adjustedCtx.fillRect(0, 0, finalWidth, finalHeight);
 
-        return mergedCanvas;
+      // Center the cropped canvas if it's smaller
+      if (croppedCanvas.width < finalWidth) {
+        const xOffset = (finalWidth - croppedCanvas.width) / 2;
+        adjustedCtx.drawImage(croppedCanvas, xOffset, 0);
+      } else {
+        adjustedCtx.drawImage(croppedCanvas, 0, 0);
+      }
+
+      // Create the final merged canvas
+      const mergedCanvas = document.createElement('canvas');
+      mergedCanvas.width = finalWidth;
+      mergedCanvas.height = finalHeight;
+      const ctx = mergedCanvas.getContext('2d');
+
+      // First draw the adjusted cropped frame
+      ctx.drawImage(adjustedCroppedCanvas, 0, 0);
+
+      // Then draw the drawing canvas on top
+      ctx.drawImage(drawingCanvas, 0, 0);
+
+      return mergedCanvas;
     } catch (error) {
-        console.error("Error in mergeCanvases:", error);
-        return null;
+      console.error("Error in mergeCanvases:", error);
+      return null;
     }
-};
+  };
 
   const takeScreenshot = async () => {
 
@@ -387,7 +387,7 @@ const VideoCallUI = ({
       setIsScreenShotModelOpen(false);
 
       // Ensure video posters are shown before taking the screenshot
-      const videos = document.querySelectorAll("video");
+      const videos = document.querySelectorAll("#video-container video");
       videos.forEach(video => {
         // Ensure each video is briefly played to trigger poster image rendering
         if (!video.paused) return;  // Skip if video is already playing
@@ -402,7 +402,6 @@ const VideoCallUI = ({
         if (!targetElement) {
           targetElement = document.body;
         }
-        targetElement.scale = 5;
         // Select only elements with the class "hide-in-screenshot"
         const elementsToHide = Array.from(
           targetElement.getElementsByClassName("hide-in-screenshot")
@@ -413,38 +412,49 @@ const VideoCallUI = ({
 
         // Restore visibility after the screenshot is taken
         elementsToHide.forEach((el) => (el.style.visibility = "visible"));
+
         const croppedCanvas1 = extractCroppedFrame(videoRef, videoContainerRef, canvasRef);
-        const croppedCanvas2 = extractCroppedFrame(videoRef2, videoContainerRef2, canvasRef2);
+        const croppedCanvas2 = videoRef2 && videoContainerRef2 && canvasRef2
+          ? extractCroppedFrame(videoRef2, videoContainerRef2, canvasRef2)
+          : null;
         console.log("croppedCanvas1", croppedCanvas1)
         console.log("croppedCanvas2", croppedCanvas2)
 
-        if (!croppedCanvas1 || !croppedCanvas2) {
-          console.error("Could not create one or both cropped frames");
+        if (!croppedCanvas1) {
+          console.error("Could not create the cropped frame");
           return null;
+        }
+
+        let finalCanvas;
+
+        if (croppedCanvas2) {
+          // Create final canvas (vertical stack) when both videos exist
+          finalCanvas = document.createElement('canvas');
+          const finalWidth = Math.max(croppedCanvas1.width, croppedCanvas2.width);
+          const finalHeight = croppedCanvas1.height + croppedCanvas2.height;
+          finalCanvas.width = finalWidth;
+          finalCanvas.height = finalHeight;
+
+          const ctx = finalCanvas.getContext('2d');
+
+          // Draw first canvas (centered horizontally)
+          ctx.drawImage(
+            croppedCanvas1,
+            (finalWidth - croppedCanvas1.width) / 2, 0
+          );
+
+          // Draw second canvas below first one (centered horizontally)
+          ctx.drawImage(
+            croppedCanvas2,
+            (finalWidth - croppedCanvas2.width) / 2, croppedCanvas1.height
+          );
+        } else {
+          // Use only the first canvas if second video doesn't exist
+          finalCanvas = croppedCanvas1;
         }
 
 
 
-        // Create final canvas (vertical stack)
-        const finalCanvas = document.createElement('canvas');
-        const finalWidth = Math.max(croppedCanvas1.width, croppedCanvas2.width);
-        const finalHeight = croppedCanvas1.height + croppedCanvas2.height;
-        finalCanvas.width = finalWidth;
-        finalCanvas.height = finalHeight;
-
-        const ctx = finalCanvas.getContext('2d');
-
-        // Draw first canvas (centered horizontally)
-        ctx.drawImage(
-          croppedCanvas1,
-          (finalWidth - croppedCanvas1.width) / 2, 0
-        );
-
-        // Draw second canvas below first one (centered horizontally)
-        ctx.drawImage(
-          croppedCanvas2,
-          (finalWidth - croppedCanvas2.width) / 2, croppedCanvas1.height
-        );
         // console.log("finalCanvas", finalCanvas.toDataURL("image/png"))
         const dataUrl = finalCanvas.toDataURL("image/png");
         console.log("dataUrl", dataUrl);
