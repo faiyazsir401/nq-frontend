@@ -318,7 +318,7 @@ const VideoCallUI = ({
       const ctx = canvas.getContext("2d");
 
       // Fill background (white or transparent)
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = 'gray';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Calculate position relative to container
@@ -399,124 +399,152 @@ const VideoCallUI = ({
     }
 };
 
-  const takeScreenshot = async () => {
+const takeScreenshot = async () => {
+  try {
+    setIsLoading(true);
+    setCurrentScreenshot("");
+    setIsScreenShotModelOpen(false);
 
-    try {
-      setIsLoading(true)
-      setCurrentScreenshot("")
-      setIsScreenShotModelOpen(false);
+    // Ensure video posters are shown before taking the screenshot
+    const videos = document.querySelectorAll("#video-container video");
+    videos.forEach(video => {
+      // Ensure each video is briefly played to trigger poster image rendering
+      if (!video.paused) return;  // Skip if video is already playing
+      video.play();
+      video.pause();
+    });
 
-      // Ensure video posters are shown before taking the screenshot
-      const videos = document.querySelectorAll("#video-container video");
-      videos.forEach(video => {
-        // Ensure each video is briefly played to trigger poster image rendering
-        if (!video.paused) return;  // Skip if video is already playing
-        video.play();
-        video.pause();
-      });
+    setTimeout(async () => {
+      let targetElement = document.getElementById("clip-container");
+      if (!targetElement) {
+        targetElement = document.body;
+      }
+      // Select only elements with the class "hide-in-screenshot"
+      const elementsToHide = Array.from(
+        targetElement.getElementsByClassName("hide-in-screenshot")
+      );
 
-      setTimeout(async () => {
+      // Hide selected elements
+      elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
 
+      const croppedCanvas1 = extractCroppedFrame(videoRef, videoContainerRef, canvasRef);
+      const croppedCanvas2 = videoRef2 && videoContainerRef2 && canvasRef2
+        ? extractCroppedFrame(videoRef2, videoContainerRef2, canvasRef2)
+        : null;
 
-        let targetElement = document.getElementById("clip-container");
-        if (!targetElement) {
-          targetElement = document.body;
-        }
-        // Select only elements with the class "hide-in-screenshot"
-        const elementsToHide = Array.from(
-          targetElement.getElementsByClassName("hide-in-screenshot")
+      if (!croppedCanvas1) {
+        console.error("Could not create the cropped frame");
+        return null;
+      }
+
+      let finalCanvas;
+
+      if (croppedCanvas2) {
+        // Create final canvas (vertical stack) when both videos exist
+        finalCanvas = document.createElement('canvas');
+        const finalWidth = Math.max(croppedCanvas1.width, croppedCanvas2.width);
+        const finalHeight = croppedCanvas1.height + croppedCanvas2.height;
+        finalCanvas.width = finalWidth;
+        finalCanvas.height = finalHeight;
+
+        const ctx = finalCanvas.getContext('2d');
+
+        // Draw first canvas (centered horizontally)
+        ctx.drawImage(
+          croppedCanvas1,
+          (finalWidth - croppedCanvas1.width) / 2, 0
         );
 
-        // Hide selected elements
-        elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
+        // Draw second canvas below first one (centered horizontally)
+        ctx.drawImage(
+          croppedCanvas2,
+          (finalWidth - croppedCanvas2.width) / 2, croppedCanvas1.height
+        );
+      } else {
+        // Use only the first canvas if second video doesn't exist
+        finalCanvas = croppedCanvas1;
+      }
 
-        // Restore visibility after the screenshot is taken
-        elementsToHide.forEach((el) => (el.style.visibility = "visible"));
+      // Create a new canvas to add watermark and copyright
+      const watermarkedCanvas = document.createElement('canvas');
+      watermarkedCanvas.width = finalCanvas.width;
+      watermarkedCanvas.height = finalCanvas.height;
+      const watermarkedCtx = watermarkedCanvas.getContext('2d');
 
-        const croppedCanvas1 = extractCroppedFrame(videoRef, videoContainerRef, canvasRef);
-        const croppedCanvas2 = videoRef2 && videoContainerRef2 && canvasRef2
-          ? extractCroppedFrame(videoRef2, videoContainerRef2, canvasRef2)
-          : null;
-        console.log("croppedCanvas1", croppedCanvas1)
-        console.log("croppedCanvas2", croppedCanvas2)
+      // Draw the original content first
+      watermarkedCtx.drawImage(finalCanvas, 0, 0);
 
-        if (!croppedCanvas1) {
-          console.error("Could not create the cropped frame");
-          return null;
-        }
+      // Add NetQuix logo at top left
+      const logoImg = new Image();
+      logoImg.src = "/assets/images/netquix_logo_beta.png";
+      await new Promise((resolve) => {
+        logoImg.onload = resolve;
+      });
+      
+      const logoWidth = 100; // Scale based on canvas width
+      const logoHeight = 35 ; // Scale based on canvas height
+      const logoPadding = 5;
+      
+      watermarkedCtx.drawImage(
+        logoImg,
+        logoPadding+5,
+        logoPadding,
+        logoWidth,
+        logoHeight
+      );
 
-        let finalCanvas;
+      // Add copyright text at bottom right
+      watermarkedCtx.font = `16px Arial`;
+      watermarkedCtx.fillStyle = "white";
+      watermarkedCtx.textAlign = "right";
+      
+      const copyrightText = "©NetQwix.com";
+      const textPadding = 10 ;
+      const textY = watermarkedCanvas.height - 10;
+      
+      watermarkedCtx.fillText(
+        copyrightText,
+        watermarkedCanvas.width - textPadding,
+        textY
+      );
 
-        if (croppedCanvas2) {
-          // Create final canvas (vertical stack) when both videos exist
-          finalCanvas = document.createElement('canvas');
-          const finalWidth = Math.max(croppedCanvas1.width, croppedCanvas2.width);
-          const finalHeight = croppedCanvas1.height + croppedCanvas2.height;
-          finalCanvas.width = finalWidth;
-          finalCanvas.height = finalHeight;
+      const dataUrl = watermarkedCanvas.toDataURL("image/png");
+      console.log("dataUrl",dataUrl)
+      // Restore visibility of hidden elements
+      elementsToHide.forEach((el) => (el.style.visibility = "visible"));
 
-          const ctx = finalCanvas.getContext('2d');
+      var res = await screenShotTake({
+        sessions: id,
+        trainer: fromUser?._id,
+        trainee: toUser?._id,
+      });
 
-          // Draw first canvas (centered horizontally)
-          ctx.drawImage(
-            croppedCanvas1,
-            (finalWidth - croppedCanvas1.width) / 2, 0
-          );
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
 
-          // Draw second canvas below first one (centered horizontally)
-          ctx.drawImage(
-            croppedCanvas2,
-            (finalWidth - croppedCanvas2.width) / 2, croppedCanvas1.height
-          );
-        } else {
-          // Use only the first canvas if second video doesn't exist
-          finalCanvas = croppedCanvas1;
-        }
+      if (!blob) {
+        return toast.error("Unable to take Screen Shot");
+      }
 
-
-
-        // console.log("finalCanvas", finalCanvas.toDataURL("image/png"))
-        const dataUrl = finalCanvas.toDataURL("image/png");
-        console.log("dataUrl", dataUrl);
-
-        var res = await screenShotTake({
-          sessions: id,
-          trainer: fromUser?._id,
-          trainee: toUser?._id,
+      if (res?.data?.url) {
+        setIsScreenShotModelOpen(true);
+        await pushProfilePhotoToS3(
+          res?.data?.url,
+          blob,
+          null,
+          afterSucessUploadImageOnS3
+        );
+        toast.success("The screenshot taken successfully.", {
+          type: "success",
         });
-
-        const response = await fetch(dataUrl);
-        const blob = await response.blob();
-
-        // Handling Error if SS is not generate image
-
-        if (!blob) {
-          return toast.error("Unable to take Screen Shot");
-        }
-        console.log("res?.data?.url", res?.data?.url);
-        if (res?.data?.url) {
-          setIsScreenShotModelOpen(true);
-          await pushProfilePhotoToS3(
-            res?.data?.url,
-            blob,
-            null,
-            afterSucessUploadImageOnS3
-          );
-          toast.success("The screenshot taken successfully.", {
-            type: "success",
-          });
-        }
-
-      }, 1000)
-
-
-    } catch (error) {
-      console.log("error: Take Screenshot: ", error)
-    } finally {
-      setIsLoading(false)
-    }
-
-  };
+      }
+    }, 1000);
+  } catch (error) {
+    console.log("error: Take Screenshot: ", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
   console.log("TimeOut", timeoutId)
