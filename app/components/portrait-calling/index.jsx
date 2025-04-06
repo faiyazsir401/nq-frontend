@@ -309,28 +309,38 @@ const VideoCallUI = ({
       const sourceY = (visibleY - videoRect.top) * videoScaleY;
       const sourceWidth = visibleWidth * videoScaleX;
       const sourceHeight = visibleHeight * videoScaleY;
+
+      // Create canvas matching the container size
       const canvas = document.createElement('canvas');
-      // Set canvas to the exact visible size
-      canvas.width = visibleWidth;
-      canvas.height = visibleHeight;
+      canvas.width = containerRect.width;
+      canvas.height = containerRect.height;
 
       const ctx = canvas.getContext("2d");
 
-      // Draw the precise portion
+      // Fill background (white or transparent)
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Calculate position relative to container
+      const destX = visibleX - containerRect.left;
+      const destY = visibleY - containerRect.top;
+
+      // Draw the video portion at its original position in the container
       ctx.drawImage(
         video,
         sourceX, sourceY,           // Source coordinates (in video pixels)
         sourceWidth, sourceHeight,  // Source dimensions (in video pixels)
-        0, 0,                       // Destination coordinates
+        destX, destY,               // Destination coordinates (relative to container)
         visibleWidth, visibleHeight // Destination dimensions (matches screen visible area)
       );
 
-      return mergeCanvases(canvas, drawingCanvasRef)
-
+      return mergeCanvases(canvas, drawingCanvasRef);
+      
     } catch (error) {
-      console.log("error", error)
+      console.log("error", error);
+      return null;
     }
-  };
+};
 
   const mergeCanvases = (croppedCanvas, drawingCanvasRef) => {
     try {
@@ -338,7 +348,7 @@ const VideoCallUI = ({
 
       if (!croppedCanvas || !drawingCanvas) return null;
 
-      // Determine the final dimensions
+      // Determine the final dimensions (use the larger of each dimension)
       const finalWidth = Math.max(croppedCanvas.width, drawingCanvas.width);
       const finalHeight = Math.max(croppedCanvas.height, drawingCanvas.height);
 
@@ -352,13 +362,23 @@ const VideoCallUI = ({
       adjustedCtx.fillStyle = 'white';
       adjustedCtx.fillRect(0, 0, finalWidth, finalHeight);
 
-      // Center the cropped canvas if it's smaller
-      if (croppedCanvas.width < finalWidth) {
-        const xOffset = (finalWidth - croppedCanvas.width) / 2;
-        adjustedCtx.drawImage(croppedCanvas, xOffset, 0);
-      } else {
-        adjustedCtx.drawImage(croppedCanvas, 0, 0);
-      }
+      // Calculate offsets for centering the cropped canvas if it's smaller
+      const xOffset = croppedCanvas.width < finalWidth 
+        ? (finalWidth - croppedCanvas.width) / 2 
+        : 0;
+      
+      const yOffset = croppedCanvas.height < finalHeight 
+        ? (finalHeight - croppedCanvas.height) / 2 
+        : 0;
+
+      // Draw the cropped canvas centered if smaller than final dimensions
+      adjustedCtx.drawImage(
+        croppedCanvas, 
+        xOffset, 
+        yOffset,
+        croppedCanvas.width,
+        croppedCanvas.height
+      );
 
       // Create the final merged canvas
       const mergedCanvas = document.createElement('canvas');
@@ -377,7 +397,7 @@ const VideoCallUI = ({
       console.error("Error in mergeCanvases:", error);
       return null;
     }
-  };
+};
 
   const takeScreenshot = async () => {
 
