@@ -56,7 +56,7 @@ const ReportForm = ({
     dispatch(
       userConcernAsync({
         name: values?.name || userInfo?.fullname,
-        email: values?.email || userInfo?.email,
+        email: values?.email?.toLowerCase() || userInfo?.email?.toLowerCase(),
         phone_number: values?.phone || userInfo?.mobile_no,
         reason: values?.reason,
         subject: values?.subject,

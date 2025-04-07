@@ -310,6 +310,8 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       setParams({ search: selectedTrainerInfo?.selected_category });
   }, [selectedTrainerInfo?.selected_category]);
 
+
+console.log("getParams1",getParams)
   const [bookSessionPayload, setBookSessionPayload] = useState({});
   const toggle = () => setInstantScheduleMeeting(!isOpenInstantScheduleMeeting);
 
@@ -325,6 +327,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   };
 
   useEffect(() => {
+    console.log("getParams",getParams)
     if (getParams.search) {
       dispatch(getTraineeWithSlotsAsync(getParams));
     }
@@ -417,7 +420,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         selected_category: null,
       }));
       setSelectedTrainer({...selectedOnlineUser});
-      setParams({ search: selectedOnlineUser?.fullname });
+      setParams({ search: selectedOnlineUser?.fullName });
     }
   }, [selectedOnlineUser]);
 
@@ -899,7 +902,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                               selected_category: null,
                             }));
                             setSelectedTrainer(data.trainer_info);
-                            setParams({ search: data.trainer_info?.fullname });
+                            setParams({ search: data.trainer_info?.fullName });
                           }}
                           
                         />

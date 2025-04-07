@@ -53,7 +53,7 @@ const EmailsPopup = ({ props }) => {
   // Confirm selection of emails
   const confirmEmails = () => {
     toggle(); // Close the modal
-    props.setSelectedEmails([email]); // Pass emails to the parent component if needed
+    props.setSelectedEmails([email.toLowerCase()]); // Pass emails to the parent component if needed
   };
 
   // Validate email format (basic validation)

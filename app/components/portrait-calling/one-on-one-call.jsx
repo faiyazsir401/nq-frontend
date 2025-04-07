@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { EVENTS } from "../../../helpers/events";
 import { AccountType } from "../../common/constants";
 import { useAppSelector } from "../../store";
@@ -11,7 +11,7 @@ const OneOnOneCall = ({
   timeRemaining,
   selectedUser,
   setSelectedUser,
-  videoRef,
+  localVideoRef,
   remoteVideoRef,
   toUser,
   fromUser,
@@ -21,12 +21,17 @@ const OneOnOneCall = ({
   setIsLocalStreamOff,
   isRemoteStreamOff,
   isLandscape,
+  setShowScreenshotButton
 }) => {
   const socket = useContext(SocketContext);
   const { accountType } = useAppSelector(authState);
   console.log("selectedUser", selectedUser);
   console.log("toUser", toUser._id);
   console.log("fromUser", fromUser._id);
+
+  useEffect(()=>{
+    setShowScreenshotButton(false)
+  },[])
 
   const handleUserClick = (id) => {
     if (accountType === AccountType.TRAINER) {
@@ -62,7 +67,7 @@ const OneOnOneCall = ({
           selected={selectedUser === toUser._id}
           selectedUser={selectedUser}
           notSelected={selectedUser}
-          videoRef={videoRef}
+          videoRef={localVideoRef}
           user={fromUser}
           stream={localStream}
           isStreamOff={isLocalStreamOff}
@@ -87,7 +92,7 @@ const OneOnOneCall = ({
             id={selectedUser === toUser._id ? fromUser._id : toUser._id}
             onClick={handleUserClick}
             selected={false}
-            videoRef={selectedUser === toUser._id ? remoteVideoRef : videoRef}
+            videoRef={selectedUser === toUser._id ? remoteVideoRef : localVideoRef}
             stream={selectedUser === toUser._id ? remoteStream : localStream}
             user={selectedUser === toUser._id ? toUser : fromUser}
             isStreamOff={

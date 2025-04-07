@@ -47,6 +47,8 @@ import { getTraineeClips } from "../NavHomePage/navHomePage.api";
 import PermissionModal from "../video/PermissionModal";
 import ReactStrapModal from "../../common/modal";
 import Ratings from "../bookings/ratings";
+import TraineeRatings from "../bookings/ratings/trainee";
+import { useMediaQuery } from "usehooks-ts";
 
 
 let Peer;
@@ -92,7 +94,14 @@ const VideoCallUI = ({
 
   const socket = useContext(SocketContext);
   const peerRef = useRef(null);
+  const localVideoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const canvasRef2 = useRef(null);
   const videoRef = useRef(null);
+  const videoRef2 = useRef(null);
+  const videoContainerRef = useRef(null);
+  const videoContainerRef2 = useRef(null);
+
   const intervalRef = useRef(null); // useRef for interval
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
@@ -131,6 +140,8 @@ const VideoCallUI = ({
   const [errorMessageForPermission, setErrorMessageForPermission] = useState("Kindly allow us access to your camera and microphone.")
   const [userAlreadyInCall, setUserAlreadyInCall] = useState(false)
   const [isModelOpen, setIsModelOpen] = useState(false);
+  const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
+  const [showScreenshotButton, setShowScreenshotButton] = useState(false)
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -264,86 +275,276 @@ const VideoCallUI = ({
   }
   const [isLoading, setIsLoading] = useState(false)
 
-  const takeScreenshot = async () => {
-
+  const extractCroppedFrame = (videoRef, videoContainerRef, drawingCanvasRef) => {
     try {
-      setIsLoading(true)
-      setCurrentScreenshot("")
-      setIsScreenShotModelOpen(false);
+      const video = videoRef.current;
+      const videoContainer = videoContainerRef.current;
 
-      // Ensure video posters are shown before taking the screenshot
-      const videos = document.querySelectorAll("video");
-      videos.forEach(video => {
-        // Ensure each video is briefly played to trigger poster image rendering
-        if (!video.paused) return;  // Skip if video is already playing
-        video.play();
-        video.pause();
-      });
+      if (!video || !videoContainer) return;
 
-      setTimeout(() => {
+      // Get dimensions
+      const containerRect = videoContainer.getBoundingClientRect();
+      const videoRect = video.getBoundingClientRect();
 
+      // Calculate visible portion in screen coordinates
+      const visibleX = Math.max(containerRect.left, videoRect.left);
+      const visibleY = Math.max(containerRect.top, videoRect.top);
+      const visibleRight = Math.min(containerRect.right, videoRect.right);
+      const visibleBottom = Math.min(containerRect.bottom, videoRect.bottom);
 
-        let targetElement = document.getElementById("clip-container");
-        if (!targetElement) {
-          targetElement = document.body;
-        }
+      const visibleWidth = visibleRight - visibleX;
+      const visibleHeight = visibleBottom - visibleY;
 
-        // Select only elements with the class "hide-in-screenshot"
-        const elementsToHide = Array.from(
-          targetElement.getElementsByClassName("hide-in-screenshot")
+      if (visibleWidth <= 0 || visibleHeight <= 0) {
+        console.log("No visible portion");
+        return;
+      }
+
+      // Calculate scaling factors (video might be scaled to fit its container)
+      const videoScaleX = video.videoWidth / videoRect.width;
+      const videoScaleY = video.videoHeight / videoRect.height;
+
+      // Convert screen coordinates to video coordinates
+      const sourceX = (visibleX - videoRect.left) * videoScaleX;
+      const sourceY = (visibleY - videoRect.top) * videoScaleY;
+      const sourceWidth = visibleWidth * videoScaleX;
+      const sourceHeight = visibleHeight * videoScaleY;
+
+      // Create canvas matching the container size
+      const canvas = document.createElement('canvas');
+      canvas.width = containerRect.width;
+      canvas.height = containerRect.height;
+
+      const ctx = canvas.getContext("2d");
+
+      // Fill background (white or transparent)
+      ctx.fillStyle = 'gray';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Calculate position relative to container
+      const destX = visibleX - containerRect.left;
+      const destY = visibleY - containerRect.top;
+
+      // Draw the video portion at its original position in the container
+      ctx.drawImage(
+        video,
+        sourceX, sourceY,           // Source coordinates (in video pixels)
+        sourceWidth, sourceHeight,  // Source dimensions (in video pixels)
+        destX, destY,               // Destination coordinates (relative to container)
+        visibleWidth, visibleHeight // Destination dimensions (matches screen visible area)
+      );
+
+      return mergeCanvases(canvas, drawingCanvasRef);
+      
+    } catch (error) {
+      console.log("error", error);
+      return null;
+    }
+};
+
+  const mergeCanvases = (croppedCanvas, drawingCanvasRef) => {
+    try {
+      const drawingCanvas = drawingCanvasRef.current;
+
+      if (!croppedCanvas || !drawingCanvas) return null;
+
+      // Determine the final dimensions (use the larger of each dimension)
+      const finalWidth = Math.max(croppedCanvas.width, drawingCanvas.width);
+      const finalHeight = Math.max(croppedCanvas.height, drawingCanvas.height);
+
+      // Create a new canvas for the cropped image (handling size differences)
+      const adjustedCroppedCanvas = document.createElement('canvas');
+      adjustedCroppedCanvas.width = finalWidth;
+      adjustedCroppedCanvas.height = finalHeight;
+      const adjustedCtx = adjustedCroppedCanvas.getContext('2d');
+
+      // Fill with white background (or transparent if you prefer)
+      adjustedCtx.fillStyle = 'white';
+      adjustedCtx.fillRect(0, 0, finalWidth, finalHeight);
+
+      // Calculate offsets for centering the cropped canvas if it's smaller
+      const xOffset = croppedCanvas.width < finalWidth 
+        ? (finalWidth - croppedCanvas.width) / 2 
+        : 0;
+      
+      const yOffset = croppedCanvas.height < finalHeight 
+        ? (finalHeight - croppedCanvas.height) / 2 
+        : 0;
+
+      // Draw the cropped canvas centered if smaller than final dimensions
+      adjustedCtx.drawImage(
+        croppedCanvas, 
+        xOffset, 
+        yOffset,
+        croppedCanvas.width,
+        croppedCanvas.height
+      );
+
+      // Create the final merged canvas
+      const mergedCanvas = document.createElement('canvas');
+      mergedCanvas.width = finalWidth;
+      mergedCanvas.height = finalHeight;
+      const ctx = mergedCanvas.getContext('2d');
+
+      // First draw the adjusted cropped frame
+      ctx.drawImage(adjustedCroppedCanvas, 0, 0);
+
+      // Then draw the drawing canvas on top
+      ctx.drawImage(drawingCanvas, 0, 0);
+
+      return mergedCanvas;
+    } catch (error) {
+      console.error("Error in mergeCanvases:", error);
+      return null;
+    }
+};
+
+const takeScreenshot = async () => {
+  try {
+    setIsLoading(true);
+    setCurrentScreenshot("");
+    setIsScreenShotModelOpen(false);
+
+    // Ensure video posters are shown before taking the screenshot
+    const videos = document.querySelectorAll("#video-container video");
+    videos.forEach(video => {
+      // Ensure each video is briefly played to trigger poster image rendering
+      if (!video.paused) return;  // Skip if video is already playing
+      video.play();
+      video.pause();
+    });
+
+    setTimeout(async () => {
+      let targetElement = document.getElementById("clip-container");
+      if (!targetElement) {
+        targetElement = document.body;
+      }
+      // Select only elements with the class "hide-in-screenshot"
+      const elementsToHide = Array.from(
+        targetElement.getElementsByClassName("hide-in-screenshot")
+      );
+
+      // Hide selected elements
+      elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
+
+      const croppedCanvas1 = extractCroppedFrame(videoRef, videoContainerRef, canvasRef);
+      const croppedCanvas2 = videoRef2 && videoContainerRef2 && canvasRef2
+        ? extractCroppedFrame(videoRef2, videoContainerRef2, canvasRef2)
+        : null;
+
+      if (!croppedCanvas1) {
+        console.error("Could not create the cropped frame");
+        return null;
+      }
+
+      let finalCanvas;
+
+      if (croppedCanvas2) {
+        // Create final canvas (vertical stack) when both videos exist
+        finalCanvas = document.createElement('canvas');
+        const finalWidth = Math.max(croppedCanvas1.width, croppedCanvas2.width);
+        const finalHeight = croppedCanvas1.height + croppedCanvas2.height;
+        finalCanvas.width = finalWidth;
+        finalCanvas.height = finalHeight;
+
+        const ctx = finalCanvas.getContext('2d');
+
+        // Draw first canvas (centered horizontally)
+        ctx.drawImage(
+          croppedCanvas1,
+          (finalWidth - croppedCanvas1.width) / 2, 0
         );
 
-        // Hide selected elements
-        elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
-        html2canvas(targetElement, {
-          type: "png",
-          allowTaint: true,
-          useCORS: true,
-          scale: window.devicePixelRatio
-        }).then(async (canvas) => {
-          // Restore visibility after the screenshot is taken
-          elementsToHide.forEach((el) => (el.style.visibility = "visible"));
-          const dataUrl = canvas.toDataURL("image/png");
-          console.log("dataUrl", dataUrl);
+        // Draw second canvas below first one (centered horizontally)
+        ctx.drawImage(
+          croppedCanvas2,
+          (finalWidth - croppedCanvas2.width) / 2, croppedCanvas1.height
+        );
+      } else {
+        // Use only the first canvas if second video doesn't exist
+        finalCanvas = croppedCanvas1;
+      }
 
-          var res = await screenShotTake({
-            sessions: id,
-            trainer: fromUser?._id,
-            trainee: toUser?._id,
-          });
+      // Create a new canvas to add watermark and copyright
+      const watermarkedCanvas = document.createElement('canvas');
+      watermarkedCanvas.width = finalCanvas.width;
+      watermarkedCanvas.height = finalCanvas.height;
+      const watermarkedCtx = watermarkedCanvas.getContext('2d');
 
-          const response = await fetch(dataUrl);
-          const blob = await response.blob();
+      // Draw the original content first
+      watermarkedCtx.drawImage(finalCanvas, 0, 0);
 
-          // Handling Error if SS is not generate image
+      // Add NetQuix logo at top left
+      const logoImg = new Image();
+      logoImg.src = "/assets/images/netquix_logo_beta.png";
+      await new Promise((resolve) => {
+        logoImg.onload = resolve;
+      });
+      
+      const logoWidth = 100; // Scale based on canvas width
+      const logoHeight = 35 ; // Scale based on canvas height
+      const logoPadding = 5;
+      
+      watermarkedCtx.drawImage(
+        logoImg,
+        logoPadding+5,
+        logoPadding,
+        logoWidth,
+        logoHeight
+      );
 
-          if (!blob) {
-            return toast.error("Unable to take Screen Shot");
-          }
-          console.log("res?.data?.url", res?.data?.url);
-          if (res?.data?.url) {
-            setIsScreenShotModelOpen(true);
-            await pushProfilePhotoToS3(
-              res?.data?.url,
-              blob,
-              null,
-              afterSucessUploadImageOnS3
-            );
-            toast.success("The screenshot taken successfully.", {
-              type: "success",
-            });
-          }
+      // Add copyright text at bottom right
+      watermarkedCtx.font = `16px Arial`;
+      watermarkedCtx.fillStyle = "white";
+      watermarkedCtx.textAlign = "right";
+      
+      const copyrightText = "©NetQwix.com";
+      const textPadding = 10 ;
+      const textY = watermarkedCanvas.height - 10;
+      
+      watermarkedCtx.fillText(
+        copyrightText,
+        watermarkedCanvas.width - textPadding,
+        textY
+      );
+
+      const dataUrl = watermarkedCanvas.toDataURL("image/png");
+      console.log("dataUrl",dataUrl)
+      // Restore visibility of hidden elements
+      elementsToHide.forEach((el) => (el.style.visibility = "visible"));
+
+      var res = await screenShotTake({
+        sessions: id,
+        trainer: fromUser?._id,
+        trainee: toUser?._id,
+      });
+
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+
+      if (!blob) {
+        return toast.error("Unable to take Screen Shot");
+      }
+
+      if (res?.data?.url) {
+        setIsScreenShotModelOpen(true);
+        await pushProfilePhotoToS3(
+          res?.data?.url,
+          blob,
+          null,
+          afterSucessUploadImageOnS3
+        );
+        toast.success("The screenshot taken successfully.", {
+          type: "success",
         });
-      }, 1000)
-
-
-    } catch (error) {
-      console.log("error: Take Screenshot: ", error)
-    } finally {
-      setIsLoading(false)
-    }
-
-  };
+      }
+    }, 1000);
+  } catch (error) {
+    console.log("error: Take Screenshot: ", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
   console.log("TimeOut", timeoutId)
@@ -417,8 +618,8 @@ const VideoCallUI = ({
         show: true,
         msg: `Waiting for ${toUser?.fullname} to join...`,
       });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
       }
 
       // Handle socket disconnect or errors after initial connection
@@ -537,8 +738,8 @@ const VideoCallUI = ({
   }, [remoteStream]);
 
   const connectToPeer = (peer, peerId) => {
-    if (!(videoRef && videoRef?.current)) return;
-    const call = peer.call(peerId, videoRef?.current?.srcObject);
+    if (!(localVideoRef && localVideoRef?.current)) return;
+    const call = peer.call(peerId, localVideoRef?.current?.srcObject);
     call?.on("stream", (remoteStream) => {
       // console.log(`setting remoteStream for 2nd user here ---- `);
       setDisplayMsg({ show: false, msg: "" });
@@ -646,8 +847,8 @@ const VideoCallUI = ({
         track.stop();
       });
     }
-    let videorefSrc = videoRef.current || localVideoRef;
-    if (videoRef && videorefSrc && videorefSrc.srcObject) {
+    let videorefSrc = localVideoRef.current;
+    if (localVideoRef && videorefSrc && videorefSrc.srcObject) {
       videorefSrc.srcObject.getTracks().forEach((t) => {
         t.stop();
       });
@@ -717,7 +918,7 @@ const VideoCallUI = ({
     };
   }, []);
 
-
+  const width1200 = useMediaQuery("(max-width:1200px)")
 
   useEffect(() => {
     if (fromUser && toUser && startMeeting?.iceServers && accountType) {
@@ -738,8 +939,8 @@ const VideoCallUI = ({
     }
   }, [startMeeting, accountType]);
 
-  console.log("refs", videoRef, remoteVideoRef, remoteStream);
-
+  console.log("refs", localVideoRef, remoteVideoRef, remoteStream);
+  console.log("videoRef",videoRef)
   return (
     <div
       className="video-call-container"
@@ -758,7 +959,7 @@ const VideoCallUI = ({
           selectedClips={selectedClips}
           setSelectedClips={setSelectedClips}
           isLock={isLockMode}
-          localVideoRef={videoRef}
+          localVideoRef={localVideoRef}
           remoteVideoRef={remoteVideoRef}
           toUser={toUser}
           fromUser={fromUser}
@@ -769,13 +970,20 @@ const VideoCallUI = ({
           takeScreenshot={takeScreenshot}
           setIsLock={setIsLockMode}
           isLandscape={isLandscape}
+          canvasRef={canvasRef}
+          canvasRef2={canvasRef2}
+          videoRef={videoRef}
+          videoRef2={videoRef2}
+          videoContainerRef={videoContainerRef}
+          videoContainerRef2={videoContainerRef2}
+          setShowScreenshotButton={setShowScreenshotButton}
         />
       ) : (
         <OneOnOneCall
           timeRemaining={session_end_time}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
-          videoRef={videoRef}
+          localVideoRef={localVideoRef}
           remoteVideoRef={remoteVideoRef}
           toUser={toUser}
           fromUser={fromUser}
@@ -786,6 +994,7 @@ const VideoCallUI = ({
           isRemoteStreamOff={isRemoteStreamOff}
           setIsRemoteStreamOff={setIsRemoteStreamOff}
           isLandscape={isLandscape}
+          setShowScreenshotButton={setShowScreenshotButton}
         />
       )}
       {!isMaximized && (
@@ -810,6 +1019,8 @@ const VideoCallUI = ({
           selectedClips={selectedClips}
           setIsOpenReport={setIsOpenReport}
           cutCall={cutCall}
+          setIsConfirmModelOpen={setIsConfirmModelOpen}
+          showScreenshotButton={showScreenshotButton}
         />
       )}
 
@@ -895,8 +1106,10 @@ const VideoCallUI = ({
                       My Videos
                     </NavLink>
                   </NavItem>
-                  <NavItem className="mb-2" style={{
-                    width: "100%"
+                  <NavItem className="mb-2 " style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center"
                   }}>
                     <NavLink
                       className={`button-effect ${videoActiveTab === "trainee" ? "active" : ""
@@ -911,7 +1124,9 @@ const VideoCallUI = ({
                     </NavLink>
                   </NavItem>
                   <NavItem className="mb-2" style={{
-                    width: "100%"
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "end"
                   }}>
                     <NavLink
                       className={`button-effect ${videoActiveTab === "docs" ? "active" : ""
@@ -965,7 +1180,7 @@ const VideoCallUI = ({
                                   return (
                                     <div
                                       key={index}
-                                      className={`col-3 p-1`}
+                                      className={`${width1200 ? "col-3" : "col-2"} p-1`}
                                       style={{ borderRadius: 5 }}
                                       onClick={() => {
                                         if (!sld && selectClips?.length < 2) {
@@ -1306,7 +1521,7 @@ const VideoCallUI = ({
         <ReactStrapModal
           allowFullWidth={true}
           element={
-            <Ratings
+            <TraineeRatings
               accountType={accountType}
               booking_id={id}
               key={id}
@@ -1323,6 +1538,42 @@ const VideoCallUI = ({
         />}
 
       <PermissionModal isOpen={permissionModal} errorMessage={errorMessageForPermission} />
+
+      <Modal isOpen={isConfirmModelOpen}>
+        <ModalHeader>
+          <h5
+            style={{
+              fontSize: "22px !important"
+            }}
+          >{`Are you sure you want to exit the session?`}</h5>
+        </ModalHeader>
+        <ModalBody>
+          <div className="row"
+            style={{
+              justifyContent: "space-between"
+            }}
+          >
+            <Button
+              className="mx-3"
+              color="primary"
+              onClick={() => {
+                setIsConfirmModelOpen(false)
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="mx-3"
+              color="danger"
+              onClick={() => {
+                cutCall();
+              }}
+            >
+              Yes
+            </Button>
+          </div>
+        </ModalBody>
+      </Modal>
     </div>
   );
 };

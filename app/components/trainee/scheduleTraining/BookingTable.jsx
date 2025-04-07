@@ -662,7 +662,7 @@ const BookingTable = ({
                   setShowCommonBookingOption(false);
                 }}
               >
-                Book Lesson Now
+                Book Instant Lesson Now
               </button>
             </div>
             <div style={{ margin: "5px auto" }}>

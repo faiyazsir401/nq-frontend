@@ -50,10 +50,10 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
           .required(validationMessage.rating.recommandRating);
       return Yup.number().nullable().optional();
     }),
-    title: Yup.string().nullable().required(validationMessage.rating.title),
-    remarksInfo: Yup.string()
-      .nullable()
-      .required(validationMessage.rating.remarksInfo),
+    title: !isFromCall ?Yup.string().nullable().required(validationMessage.rating.title):Yup.string().optional(),
+    remarksInfo:!isFromCall ? Yup.string()
+      .nullable().required(validationMessage.rating.addRemark): Yup.string()
+      .optional()
   });
 
   const isMobileScreen = useMediaQuery("(max-width:1000px)")
@@ -130,11 +130,12 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                 </div>
               </div>
             </div>
+            {isFromCall &&
             <div style={{
               display: "flex"
             }}>
               <img
-                alt={trainer.fullname}
+                alt={trainer?.fullname}
                 style={{
                   width: "100%",
                   maxHeight: isMobileScreen ? 150 : 250,
@@ -144,12 +145,12 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                   margin: "auto"
                 }}
                 src={
-                  trainer.profile_picture
-                    ? getImageUrl(trainer.profile_picture)
+                  trainer?.profile_picture
+                    ? getImageUrl(trainer?.profile_picture)
                     : "/assets/images/demoUser.png"
                 }
               />
-            </div>
+            </div>}
 
             <h3 className="fs-1 p-3 mb-2 rounded" style={{textAlign:"center"}}>
               {isFromCall ? "Thank you for taking a session with " + trainer?.fullname : Message.successMessage.rating}
@@ -230,6 +231,8 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                   </div>
                 </>
               )}
+              {!isFromCall && 
+              <>
               <div className="row">
                 <div className="col">
                   <div className="form-group">
@@ -252,6 +255,7 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                   isTouched={touched.title && errors.title ? true : false}
                 />
               </div>
+              </>}
               <div className="row mt-2">
                 <div className="col">
                   <div className="form-group">
@@ -261,7 +265,7 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                         setValues({ ...values, remarksInfo: value });
                       }}
                       value={values.remarksInfo}
-                      placeholder="Add remarks"
+                      placeholder={isFromCall?"leave a review":"Add Remarks"}
                       onBlur={handleBlur}
                       className="form-control mt-1"
                       name=""

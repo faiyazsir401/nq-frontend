@@ -9,13 +9,13 @@ export const URL_MAX_LENGTH = {
 export const LIST_OF_ACCOUNT_TYPE = [
   {
     id: 1,
-    label: "Trainee",
-    value: 1,
+    label: "Enthusiast",
+    value: "Trainee",
   },
   {
     id: 2,
-    label: "Trainer",
-    value: 2,
+    label: "Expert",
+    value: "Trainer",
   },
 ];
 

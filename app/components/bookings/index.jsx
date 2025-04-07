@@ -59,6 +59,7 @@ import Header from "../Header";
 import TrainerInfo from "./trainerInfo";
 import RecentUsers from "../recent-users";
 import { set } from "lodash";
+import TraineeRatings from "./ratings/trainee";
 const { isMobileFriendly, isSidebarToggleEnabled } = bookingsAction;
 
 const Bookings = ({ accountType = null }) => {
@@ -953,11 +954,28 @@ const Bookings = ({ accountType = null }) => {
       );
     });
 
-  const renderRating = () => {
+  const renderRating = (trainer_info) => {
+    console.log("trainer_info",trainer_info)
     return (
       <ReactStrapModal
         allowFullWidth={true}
         element={
+          accountType === AccountType.TRAINEE?
+          <TraineeRatings
+            accountType={accountType}
+            booking_id={addRatingModel._id}
+            key={addRatingModel._id}
+            trainer={trainer_info}
+            onClose={() => {
+              const payload = {
+                _id: null,
+                isOpen: false,
+              };
+              handleAddRatingModelState(payload);
+            }}
+            tabBook={tabBook}
+          />
+          :
           <Ratings
             accountType={accountType}
             booking_id={addRatingModel._id}
@@ -1256,7 +1274,7 @@ const Bookings = ({ accountType = null }) => {
             }`
           }`}
         >
-          {addRatingModel.isOpen ? renderRating() : null}
+          {addRatingModel.isOpen ? renderRating(startMeeting.trainerInfo) : null}
           <div>
             {accountType === AccountType.TRAINER ? (
               <React.Fragment>

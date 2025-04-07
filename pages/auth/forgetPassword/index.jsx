@@ -16,7 +16,7 @@ const ForgetPassword = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const payload = {
-      email: forgetPassword,
+      email: forgetPassword.toLowerCase(),
     };
     dispatch(forgetPasswordAsync(payload));
   };

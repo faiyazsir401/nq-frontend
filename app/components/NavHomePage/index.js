@@ -342,7 +342,7 @@ const NavHomePage = () => {
         activeTrainer?.length ? (
         <div className="banner">
           <h1>
-            Coaches online <span>Now!</span>
+            Coaches Online <span>Now!</span>
           </h1>
 
           <div className="banner_Slider">

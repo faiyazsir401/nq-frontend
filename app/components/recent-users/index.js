@@ -16,6 +16,7 @@ import './index.js';
 import { useMediaQuery } from "../../hook/useMediaQuery.js";
 import BookingTable from "../trainee/scheduleTraining/BookingTable.jsx";
 import { TrainerDetails } from "../trainer/trainerDetails.jsx";
+import { getTraineeWithSlotsAsync } from "../trainee/trainee.slice.js";
 
 // const placeholderImageUrl = '/assets/images/avtar/user.png'; // Placeholder image path
 const placeholderImageUrl = "/assets/images/demoUser.png"; // Placeholder image path
@@ -94,6 +95,7 @@ const RecentUsers = () => {
     selected_category: null,
   });
   const [categoryList, setCategoryList] = useState([]);
+  const dispatch = useAppDispatch()
 
   return (
 
@@ -268,7 +270,9 @@ const RecentUsers = () => {
                         trainer_id: item?.id,
                         data: trainer,
                       });
-                      setParams({ search: item?.fullName });
+                      console.log("item",item)
+                      dispatch(getTraineeWithSlotsAsync({ search: item?.fullname }));
+                      
                       setIsModalOpen(true);
                     }}
                     onError={(e) => {

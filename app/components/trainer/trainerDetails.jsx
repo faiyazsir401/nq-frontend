@@ -623,7 +623,7 @@ const TrainerSessionInfo = ({
           })
           : Message.notFound}
       </div>
-      <div className=" col-lg-6 px-5">
+      <div className=" col-lg-6">
         {/* <h2 className="ml-n1 tag-name booking-text">Book session</h2>
         <div className="mt-3">{element}</div> */}
         {/* {hasRatings && (
@@ -648,9 +648,9 @@ const TrainerSessionInfo = ({
         )}
 
         {hasRatings && (
-          <div>
+          <div className="mt-3">
             <h2 className="mb-3 booking-text  tag-name">Reviews</h2>
-            <div className="ml-lg-n4">
+            <div className="">
               <ReviewCard trainer={trainer} />
             </div>
           </div>

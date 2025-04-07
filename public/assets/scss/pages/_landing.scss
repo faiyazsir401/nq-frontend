@@ -1914,17 +1914,15 @@ footer {
 .image-container {
   margin-left: auto;
   margin-right: auto;
-  width: 500px;
-  height: 300px;
+
   @media (max-width: 575px) {
-    width: 300px !important;
+   
   }
 }
 .video-container {
   margin-left: auto;
   margin-right: auto;
-  width: 500px;
-  height: 300px;
+
   object-fit: cover !important;
 }
 

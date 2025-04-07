@@ -610,9 +610,6 @@ slick-slider .slick-list,
   }
 }
 
-.image-gallery-content .image-gallery-slide .image-gallery-image {
-  max-height: 40vh !important;
-}
 
 .image-gallery-left-nav .image-gallery-svg,
 .image-gallery-right-nav .image-gallery-svg {
@@ -632,7 +629,7 @@ slick-slider .slick-list,
   position: absolute !important;
   left: 20% !important;
   top: 60% !important;
-  min-height: 24% !important;
+  min-height: 34% !important;
   text-align: center !important;
   color: white !important;
 }
@@ -940,13 +937,7 @@ slick-slider .slick-list,
 
 // trainer-profile-review card
 
-.reviews {
-  min-height: 26vh !important;
 
-  @media (max-width: 576px) {
-    min-height: 32vh !important;
-  }
-}
 
 // profile-picture
 .profile_picture {

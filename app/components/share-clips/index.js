@@ -40,7 +40,7 @@ const ShareClipsCard = () => {
     else
       if (!selectedClips?.length) setErr({ email: false, video: true });
       else {
-        var res = await shareClips({ user_email: userEmail, clips: selectedClips })
+        var res = await shareClips({ user_email: userEmail.toLowerCase(), clips: selectedClips })
         toast?.success("Email sent successfully.", { type: "success" })
         setErr({ email: false, video: false })
         setIsModalOpen(false)
