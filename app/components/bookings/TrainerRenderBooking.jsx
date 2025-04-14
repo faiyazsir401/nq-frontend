@@ -233,18 +233,18 @@ const TrainerRenderBooking = ({
                 type="button"
                 style={{
                   cursor:
-                    status === BookedSession.canceled || isStartButtonEnabled
+                    status === BookedSession.canceled 
                       ? "not-allowed"
                       : "pointer",
                 }}
                 disabled={
-                  status === BookedSession.canceled || isStartButtonEnabled
+                  status === BookedSession.canceled
                 }
                 onClick={() => {
                   if (
-                    !isStartButtonEnabled &&
-                    (status === BookedSession?.booked ||
-                      status === BookedSession?.confirmed)
+                   
+                    status === BookedSession?.booked ||
+                      status === BookedSession?.confirmed
                   ) {
                     setBookedSession({
                       ...bookedSession,
