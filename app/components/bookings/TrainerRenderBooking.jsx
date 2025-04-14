@@ -238,7 +238,7 @@ const TrainerRenderBooking = ({
                       : "pointer",
                 }}
                 disabled={
-                  status === BookedSession.canceled || isStartButtonEnabled
+                  status === BookedSession.canceled
                 }
                 onClick={() => {
                   if (
