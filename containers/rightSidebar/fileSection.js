@@ -279,7 +279,7 @@ const FileSection = (props) => {
                   onClick={() => setActiveTab("trainee")}
                   style={{ width: '100%' }}
                 >
-                  Trainee
+                  Enthusiast
                 </NavLink>
               </NavItem>}
             </div>
@@ -790,7 +790,7 @@ const FileSection = (props) => {
                             </dd>
                           </div>
                           <div className="ml-3" style={{ fontSize: "10px" }}>
-                            <dd>{index + 1}. {accountType === "Trainer" ? "Trainee" : "Trainer"} : <strong>{clp?.[accountType === "Trainer" ? "trainee" : "trainer"]?.fullname}</strong></dd>
+                            <dd>{index + 1}. {accountType === "Trainer" ? "Enthusiast" : "Expert"} : <strong>{clp?.[accountType === "Trainer" ? "trainee" : "trainer"]?.fullname}</strong></dd>
                           </div>
                         </div>
                       </div>

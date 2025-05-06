@@ -1120,7 +1120,7 @@ const takeScreenshot = async () => {
                       }}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
-                      Trainee
+                      Enthusiast
                     </NavLink>
                   </NavItem>
                   <NavItem className="mb-2" style={{

@@ -39,7 +39,7 @@ const SessionCard = ({ bookingInfo, booking_index }) => {
           <div className="row">
             <div className="col">
               <dl className="row">
-                <dd className="ml-3">Trainer :</dd>
+                <dd className="ml-3">Expert :</dd>
                 <dt className="ml-1">{trainer_info.fullname}</dt>
               </dl>
             </div>
@@ -52,7 +52,7 @@ const SessionCard = ({ bookingInfo, booking_index }) => {
             <div className="w-100"></div>
             <div className="col">
               <dl className="row">
-                <dd className="ml-3">Trainee :</dd>
+                <dd className="ml-3">Enthusiast :</dd>
                 <dt className="ml-1">{trainee_info.fullname}</dt>
               </dl>
             </div>

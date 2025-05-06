@@ -730,7 +730,7 @@ export const CanvasMenuBar = ({
                         } select-clip-width`}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
-                      Trainee
+                      Enthusiast
                     </NavLink>
                   </NavItem>
                   <NavItem className="ml-5px  mt-2">

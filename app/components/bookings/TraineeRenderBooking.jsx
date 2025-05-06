@@ -153,7 +153,7 @@ const TraineeRenderBooking = ({
             sendNotifications({
               title: notificiationTitles.feedBackReceived,
               description:
-                "Your trainee has submitted a new rating for your session.",
+                "Your enthusiasts has submitted a new rating for your session.",
               senderId: trainee_info?._id,
               receiverId: trainer_info?._id,
               bookingInfo: bookingInfo,

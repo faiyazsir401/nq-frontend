@@ -63,7 +63,7 @@ function Transaction(props) {
                 End Time
               </th>
               <th>
-                {accountType === AccountType.TRAINER ? "Trainee" : "Trainer"}
+                {accountType === AccountType.TRAINER ? "Trainee" : "Expert"}
               </th>
               <th>
                 Amount

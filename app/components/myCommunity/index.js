@@ -88,7 +88,7 @@ const MyCommunity = (props) => {
     try {
       let res = await getTraineeClips({ trainer_id: id });
       setRecentStudentClips(res?.data);
-      console.log("Trainee Clips:", res);
+      console.log("Enthusiast Clips:", res);
     } catch (error) {
       console.log(error);
     }

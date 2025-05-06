@@ -2159,7 +2159,7 @@ export default function PracticeLiveExperience({
                 <Notes
                   isOpen={userVideo1Note}
                   onClose={setUserVideo1Note}
-                  title={"Trainee Video"}
+                  title={"Enthusiast Video"}
                   desc={
                     "This screen showcases the video feed of the trainee."
                   }
@@ -2324,7 +2324,7 @@ export default function PracticeLiveExperience({
                 <Notes
                   isOpen={userVideo2Note}
                   onClose={setUserVideo2Note}
-                  title={"Trainer Video"}
+                  title={"Expert Video"}
                   desc={
                     "This screen showcases the video feed of the trainer."
                   }

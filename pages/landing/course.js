@@ -129,7 +129,7 @@ const Course = (masterRecords) => {
             <div className="dot-btn dot-success mt-4"></div>
             <h3 className="ml-1  text-uppercase mb-1 ">
               {" "}
-              Recently Online Trainers{" "}
+              Recently Online Experts{" "}
             </h3>
           </div>
 

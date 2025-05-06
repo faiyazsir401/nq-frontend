@@ -465,7 +465,7 @@ const reportModal = ({
                       }}
                     >
                       <div style={{ textAlign: "left", marginRight: "20px" }}>
-                        <h2 style={{ color: "black" }}>Trainer</h2>
+                        <h2 style={{ color: "black" }}>Expert</h2>
                         <p
                           style={{
                             color: "black",
@@ -540,7 +540,7 @@ const reportModal = ({
                         }
                         sendNotifications({
                           title: notificiationTitles.gamePlanReport,
-                          description: `Trainer shared the gameplan. Check it in the gameplan tab`,
+                          description: `Expert shared the gameplan. Check it in the gameplan tab`,
                           senderId: currentReportData?.trainer,
                           receiverId: currentReportData?.trainee,
                           bookingInfo: null,

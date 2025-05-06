@@ -612,16 +612,16 @@ export const WHY_CHOOSE_US = [
   {
     id: 1,
     icon: "🚀",
-    title: "Seamless Trainer Booking",
+    title: "Seamless Expert Booking",
     content:
-      "NetQwix serves as host to a diverse community of experienced trainers in many walks of life. Search profiles, read reviews, and select the perfect trainer to help you achieve your goals.",
+      "NetQwix serves as host to a diverse community of experienced experts in many walks of life. Search profiles, read reviews, and select the perfect trainer to help you achieve your goals.",
   },
   {
     id: 2,
     icon: "🎯",
     title: "Tailored Learning Plans",
     content:
-      "Say goodbye to one-size-fits-all approaches. Our Expert Trainers create personalized learning plans that cater to your unique needs and aspirations.",
+      "Say goodbye to one-size-fits-all approaches. Our Expert Experts create personalized learning plans that cater to your unique needs and aspirations.",
   },
   {
     id: 3,

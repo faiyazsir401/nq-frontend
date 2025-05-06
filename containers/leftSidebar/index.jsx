@@ -528,7 +528,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
 
                   </NavLink>
 
-                  <p className="menu-name px-2">Book Trainer</p>
+                  <p className="menu-name px-2">Book Expert</p>
                 </li>}
                 <li onClick={() => ToggleTab("file")}>
 
