@@ -594,13 +594,13 @@ const UploadClipCard = (props) => {
             <div key={index} className="mb-3 p-2 border rounded">
               <div className="d-flex justify-content-between align-items-center">
                 <span>{file.name}</span>
-                <button
-                  className="btn btn-sm btn-danger"
+                <div
+                  className="icon-btn btn-sm btn-outline-light close-apps pointer"
                   onClick={() => removeFile(index)}
                   disabled={isUploading}
                 >
                   <X size={16} />
-                </button>
+                </div>
               </div>
 
               <div className="form-group mt-2">
