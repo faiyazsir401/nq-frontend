@@ -59,6 +59,9 @@ $canvas-z-index: 8;
   //   .rating{
   //     justify-content: start !important;
   //   }
+  html.style6 .container-sm, html.style6 .container, html.style5 .container-sm, html.style5 .container, html.style4 .container-sm, html.style4 .container, html.style3 .container-sm, html.style3 .container, html.style2 .container-sm, html.style2 .container, html.style1 .container-sm, html.style1 .container, .container-sm, .container{
+    max-width:100%
+  }
 
 }
 

@@ -22,6 +22,7 @@ import Notes from "../practiceLiveExperience/Notes";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
 import "./reportModal.css";
+import { useMediaQuery } from "usehooks-ts";
 
 const reportModal = ({
   currentReportData,
@@ -54,7 +55,8 @@ const reportModal = ({
 
   const demoProfilePic = useRef(null);
   const profilePic = useRef(null);
-
+  const width600 = useMediaQuery('(max-width:600px)')
+  console.log("width600",width600)
   const loadImageFromUrl = async (imageUrl) => {
     // console.log("===========>?", imageUrl)
     try {
@@ -425,8 +427,8 @@ const reportModal = ({
                     {reportArr?.map((sst, i) => {
                       return (
                         <>
-                          <div className="d-flex flex-row  align-items-center ss-data">
-                            <div className="text-center w-100 w-md-50">
+                          <div className={`d-flex align-items-center ss-data ${width600?"flex-column":"flex-row"}`}>
+                            <div className="text-center w-100 w-md-50 pb-3">
                               <img
                                 className="h-100 w-100"
                                 src={sst?.imageUrl}
@@ -437,7 +439,7 @@ const reportModal = ({
                                 }}
                               />
                             </div>
-                            <div className="text-center text-md-left w-100 w-md-50">
+                            <div className=" text-md-left w-100 w-md-50">
                               {/* <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p> */}
                               <p
                                 style={{
