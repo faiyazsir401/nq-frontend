@@ -156,7 +156,7 @@ const NavHomePage = () => {
 
   // Filter sessions that are confirmed and within the current time range
   const filteredSessions = scheduledMeetingDetails.filter((session) => {
-    const { start_time, end_time, status } = session;
+    const { start_time, end_time, ratings } = session;
 
     const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
 
@@ -180,7 +180,7 @@ const NavHomePage = () => {
       isDateSame &&
       currentTimeOnly >= startTimeOnly &&
       currentTimeOnly <= endTimeOnly;
-    return isWithinTimeFrame;
+    return isWithinTimeFrame && !ratings;
   });
 
   const addTraineeClipInBookedSession = async (selectedClips) => {
