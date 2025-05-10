@@ -236,6 +236,13 @@ const VideoCallUI = ({
     }
   });
 
+  socket.on(EVENTS.CALL_END,() => {
+    if(accountType === AccountType.TRAINEE){
+      cutCall();
+      setIsOpenRating(true)
+    }
+  });
+
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
   const emitVideoSelectEvent = (type, videos) => {
     socket.emit(EVENTS.ON_VIDEO_SELECT, {
@@ -1567,6 +1574,12 @@ const takeScreenshot = async () => {
               color="danger"
               onClick={() => {
                 cutCall();
+                if(accountType === AccountType.TRAINER){
+                  socket.emit(EVENTS.CALL_END, {
+                    userInfo: { from_user: fromUser._id, to_user: toUser._id }
+                  });
+                }
+             
               }}
             >
               Yes

@@ -209,6 +209,9 @@ export const validationMessage = {
     stronglyWouldYouLikeRecommend: "This field is required",
     title: "This field is required",
     addRemark: "This field is required",
+    recommandRating: "This field is required",
+    audioVideoRating: "This field is required",
+    sessionRating: "This field is required",
   },
   edit_trainer_profile: {
     about: "This field is required ",

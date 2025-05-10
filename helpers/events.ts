@@ -1,5 +1,6 @@
 export const EVENTS = {
     ON_DISCONNECT: "disconnecting",
+    CALL_END:"CALL_END",
     JOIN_ROOM: "JOIN_ROOM",
     DRAW: "DRAW",
     STOP_DRAWING: "STOP_DRAWING",
