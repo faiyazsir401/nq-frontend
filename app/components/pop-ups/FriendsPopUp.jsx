@@ -15,15 +15,15 @@ import "./common.css";
 import { useMediaQuery } from "usehooks-ts";
 
 const FriendsPopup = ({ props }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [selectedFriends, setSelectedFriends] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  // const [selectedFriends, setSelectedFriends] = useState([]);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(false);
   const width500 = useMediaQuery("(max-width:500px)")
   const toggle = () => setIsOpen((prev) => !prev);
 
   const handleSelectFriend = (id) => {
-    setSelectedFriends((prev) =>
+    props.setSelectedFriends((prev) =>
       prev.includes(id)
         ? prev.filter((friendId) => friendId !== id)
         : [...prev, id]
@@ -46,10 +46,14 @@ const FriendsPopup = ({ props }) => {
   useEffect(() => {
     fetchFriends();
   }, []);
+  
 
   useEffect(() => {
-    props.setSelectedFriends(selectedFriends);
-  }, [selectedFriends]);
+    props.setSelectedFriends(props.selectedFriends);
+    if(!props.isFromCommunity){
+      setIsOpen(true)
+    }
+  }, [props]);
 
   return (
     <div className="d-flex flex-direction-column my-2">
@@ -115,7 +119,7 @@ const FriendsPopup = ({ props }) => {
                     key={friend._id}
                     style={{
                       width: "150px",
-                      border: selectedFriends.includes(friend._id) ? "2px solid green" : "1px solid gray",
+                      border: props.selectedFriends.includes(friend._id) ? "2px solid green" : "1px solid gray",
                       cursor: "pointer",
                       height: "fit-content"
                     }}
@@ -134,7 +138,7 @@ const FriendsPopup = ({ props }) => {
                     <input
                       className="position-absolute"
                       type="checkbox"
-                      checked={selectedFriends.includes(friend._id)}
+                      checked={props.selectedFriends.includes(friend._id)}
                       onChange={() => handleSelectFriend(friend._id)}
                       style={{ marginTop: "5px", right: "5px" }}
                     />

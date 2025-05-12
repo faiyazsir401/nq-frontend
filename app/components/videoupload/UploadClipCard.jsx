@@ -63,11 +63,18 @@ const UploadClipCard = (props) => {
   const [shareWith, setShareWith] = useState(shareWithConstants.myClips)
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedEmails, setSelectedEmails] = useState([]);
-
+  const {isFromCommunity} = props; 
   useEffect(() => {
     const result = parser.getResult();
     setDeviceInfo(result);
   }, []);
+
+  useEffect(()=>{
+    if(isFromCommunity){
+      setShareWith(shareWithConstants.myFriends)
+      setSelectedFriends([isFromCommunity])
+    }
+  },[props])
 
   useEffect(() => {
     const loadFFmpeg = async () => {
@@ -328,15 +335,24 @@ const UploadClipCard = (props) => {
     }
   }, [isOpen]);
 
+  const removeFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setVideos(prev => prev.filter((_, i) => i !== index));
+    setThumbnails(prev => prev.filter((_, i) => i !== index));
+    setTitles(prev => prev.filter((_, i) => i !== index));
+    setLoading(prev => prev.filter((_, i) => i !== index));
+    setProgress(prev => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div
       className="d-flex flex-column align-items-center justify-content-center"
       style={{ minHeight: props.minHeight ?? "" }}
     >
-      <h2>Upload Clip</h2>
+      {!isFromCommunity && <h2>Upload Clip</h2>}
       <div className="form-group" style={{ color: "black" }}>
         {
-          userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER &&
+          !isFromCommunity && userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER &&
           <>
             <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
               Choose Category
@@ -359,6 +375,7 @@ const UploadClipCard = (props) => {
             </select>
           </>
         }
+        {!isFromCommunity &&
         <>
           <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
             Upload To
@@ -378,11 +395,11 @@ const UploadClipCard = (props) => {
               </option>
             ))}
           </select>
-        </>
+        </>}
         {
-          shareWith === shareWithConstants.myFriends &&
+          !isFromCommunity && shareWith === shareWithConstants.myFriends &&
           <div className="d-flex flex-column align-items-center">
-            <FriendsPopup props={{ buttonLabel: "Select Friends", setSelectedFriends }} />
+            <FriendsPopup props={{ buttonLabel: "Select Friends", setSelectedFriends,selectedFriends,isFromCommunity }} />
             <div>Total Friends Selected {selectedFriends.length}</div>
           </div>
         }

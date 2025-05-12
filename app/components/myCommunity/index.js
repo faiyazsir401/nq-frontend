@@ -29,6 +29,7 @@ import { SocketContext } from "../socket";
 import { notificiationTitles } from "../../../utils/constant";
 import ConfirmModal from "../locker/my-clips/confirmModal";
 import { set } from "lodash";
+import UploadClipCard from "../videoupload/UploadClipCard";
 const MyCommunity = (props) => {
   const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
@@ -41,6 +42,7 @@ const MyCommunity = (props) => {
   const [recentStudentClips, setRecentStudentClips] = useState([]);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
+
   const getFriendsApi = async () => {
     try {
       let res = await getFriends();
@@ -259,7 +261,7 @@ const MyCommunity = (props) => {
           </div>
         </form>
       </div>
-
+     
       <VideoUpload />
       <div className="theme-tab">
         <Nav tabs>
@@ -728,7 +730,9 @@ const MyCommunity = (props) => {
                       margin: isMobileScreen && "auto",
                     }}
                   />
+                  
                 </div>
+                
                 <div className="media-body media-body text-right" style={{ flex: isMobileScreen ? "none" : "auto" }}>
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
