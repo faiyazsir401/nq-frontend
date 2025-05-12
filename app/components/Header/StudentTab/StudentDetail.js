@@ -30,6 +30,7 @@ const StudentDetail = ({ videoClips, data }) => {
         flexWrap:"wrap",
         gap:"15px"
       }}>
+        <div >
         <div className="card rounded trainer-profile-card" style={{
           width: "250px",
           maxHeight: "260px",
@@ -64,7 +65,7 @@ const StudentDetail = ({ videoClips, data }) => {
           </div>
         </div>
 
-        <div className="card rounded trainer-profile-card" style={{
+        <div className="card rounded trainer-profile-card mt-2" style={{
           width: "250px",
          
           border: "2px solid rgb(0, 0, 128)",
@@ -75,7 +76,7 @@ const StudentDetail = ({ videoClips, data }) => {
             <UploadClipCard progress={progress} setProgress={setProgress} isFromCommunity={data?._id}/>
           </div>
         </div>
-
+</div>
         <div className="card rounded trainer-profile-card" style={{
           // maxWidth: "60%",
           width: `calc(100% - 300px)`,
