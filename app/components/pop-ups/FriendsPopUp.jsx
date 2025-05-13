@@ -15,7 +15,7 @@ import "./common.css";
 import { useMediaQuery } from "usehooks-ts";
 
 const FriendsPopup = ({ props }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   // const [selectedFriends, setSelectedFriends] = useState([]);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -50,9 +50,6 @@ const FriendsPopup = ({ props }) => {
 
   useEffect(() => {
     props.setSelectedFriends(props.selectedFriends);
-    if(!props.isFromCommunity){
-      setIsOpen(true)
-    }
   }, [props]);
 
   return (
