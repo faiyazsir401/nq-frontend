@@ -363,6 +363,33 @@ const VideoContainer = ({
       };
     }
   }, [videoRef]);
+  
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (!canvasRef.current || !videoContainerRef.current) return;
+      
+      const canvas = canvasRef.current;
+      const container = videoContainerRef.current;
+      
+      // Get actual displayed size
+      const { width, height } = container.getBoundingClientRect();
+      
+      // Set internal resolution to match display size
+      canvas.width = width;
+      canvas.height = height;
+      
+      console.log('Canvas dimensions updated:', width, height);
+    };
+  
+    // Initial setup
+    updateCanvasSize();
+  
+    // Handle window resizing
+    const resizeObserver = new ResizeObserver(updateCanvasSize);
+    resizeObserver.observe(videoContainerRef.current);
+  
+    return () => resizeObserver.disconnect();
+  }, [canvasRef, videoContainerRef]);
 
   return (
     <>
@@ -483,12 +510,14 @@ const VideoContainer = ({
           ref={canvasRef}
           id="drawing-canvas"
           className="canvas"
+        
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             width: '100%',
-            height: '100%', display: drawingMode ? "block" : "none"
+            height: '100%', 
+            display: drawingMode ? "block" : "none"
           }}
         />
         {drawingMode && accountType === AccountType.TRAINER && (
@@ -963,15 +992,6 @@ const ClipModeCall = ({
 
     const canvas1 = canvasRef?.current;
     const canvas2 = canvasRef2?.current;
-
-    if (canvas1) {
-      canvas1.width = video1.clientWidth;
-      canvas1.height = video1.clientHeight;
-    }
-    if (canvas2) {
-      canvas2.width = video2.clientWidth;
-      canvas2.height = video2.clientHeight;
-    }
 
     const context1 = canvas1?.getContext("2d");
     const context2 = canvas2?.getContext("2d");
