@@ -199,35 +199,25 @@ const UploadClipCard = (props) => {
 
   const handleUpload = async () => {
     if (shareWith === shareWithConstants.newUsers && selectedEmails.length <= 0) {
-      toast.error("Please Add Emails to Share Clips With.",{
-        autoClose:false
-      });
+      toast.error("Please Add Emails to Share Clips With.");
       return;
     } else if (shareWith === shareWithConstants.myFriends && selectedFriends.length <= 0) {
-      toast.error("Please Add Friends to Share Clips With.",{
-        autoClose:false
-      });
+      toast.error("Please Add Friends to Share Clips With.");
       return;
     }
 
     if (selectedFiles.length === 0) {
-      toast.error("Please select at least one video file.",{
-        autoClose:false
-      });
+      toast.error("Please select at least one video file.");
       return;
     }
 
     for (let i = 0; i < selectedFiles.length; i++) {
       if (!thumbnails[i]?.fileType) {
-        toast.error(`Please wait for thumbnail to generate for video ${i + 1}`,{
-        autoClose:false
-      });
+        toast.error(`Please wait for thumbnail to generate for video ${i + 1}`);
         return;
       }
       if (!titles[i] || titles[i].trim() === "") {
-        toast.error(`Please enter a title for video ${i + 1}`,{
-        autoClose:false
-      });
+        toast.error(`Please enter a title for video ${i + 1}`);
         return;
       }
     }
@@ -280,9 +270,7 @@ const UploadClipCard = (props) => {
       }
     } catch (error) {
       console.error("Error during bulk upload:", error);
-      toast.error("Error during upload",{
-        autoClose:false
-      });
+      toast.error("Error during upload");
     } finally {
       setIsUploading(false);
     }

@@ -22,7 +22,7 @@ const StudentDetail = ({ videoClips, data }) => {
 
   return (
     <div>
-      <h3 style={{ textAlign: 'center' }}>{addSuffix(data?.fullname)} clips</h3>
+      <h3 style={{ textAlign: 'center' }}>{addSuffix(data?.fullname)} Clips</h3>
       <div style={{
         display: 'flex',
         justifyContent: 'space-around',
