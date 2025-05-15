@@ -199,25 +199,35 @@ const UploadClipCard = (props) => {
 
   const handleUpload = async () => {
     if (shareWith === shareWithConstants.newUsers && selectedEmails.length <= 0) {
-      toast.error("Please Add Emails to Share Clips With.");
+      toast.error("Please Add Emails to Share Clips With.",{
+        autoClose:false
+      });
       return;
     } else if (shareWith === shareWithConstants.myFriends && selectedFriends.length <= 0) {
-      toast.error("Please Add Friends to Share Clips With.");
+      toast.error("Please Add Friends to Share Clips With.",{
+        autoClose:false
+      });
       return;
     }
 
     if (selectedFiles.length === 0) {
-      toast.error("Please select at least one video file.");
+      toast.error("Please select at least one video file.",{
+        autoClose:false
+      });
       return;
     }
 
     for (let i = 0; i < selectedFiles.length; i++) {
       if (!thumbnails[i]?.fileType) {
-        toast.error(`Please wait for thumbnail to generate for video ${i + 1}`);
+        toast.error(`Please wait for thumbnail to generate for video ${i + 1}`,{
+        autoClose:false
+      });
         return;
       }
       if (!titles[i] || titles[i].trim() === "") {
-        toast.error(`Please enter a title for video ${i + 1}`);
+        toast.error(`Please enter a title for video ${i + 1}`,{
+        autoClose:false
+      });
         return;
       }
     }
@@ -257,16 +267,22 @@ const UploadClipCard = (props) => {
 
         const results = await Promise.all(uploadPromises);
         if (results.every(r => r)) {
-          toast.success("All clips uploaded successfully!");
+          toast.success("All clips uploaded successfully!",{
+            autoClose:false
+          });
           resetForm();
           dispatch(getClipsAsync({}));
         } else {
-          toast.error("Some clips failed to upload.");
+          toast.error("Some clips failed to upload.",{
+            autoClose:false
+          });
         }
       }
     } catch (error) {
       console.error("Error during bulk upload:", error);
-      toast.error("Error during upload");
+      toast.error("Error during upload",{
+        autoClose:false
+      });
     } finally {
       setIsUploading(false);
     }
