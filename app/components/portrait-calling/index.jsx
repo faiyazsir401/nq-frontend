@@ -325,7 +325,7 @@ const VideoCallUI = ({
       const ctx = canvas.getContext("2d");
 
       // Fill background (white or transparent)
-      ctx.fillStyle = 'gray';
+      ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Calculate position relative to container
@@ -502,7 +502,7 @@ const takeScreenshot = async () => {
 
       // Add copyright text at bottom right
       watermarkedCtx.font = `16px Arial`;
-      watermarkedCtx.fillStyle = "white";
+      watermarkedCtx.fillStyle = "gray";
       watermarkedCtx.textAlign = "right";
       
       const copyrightText = "©NetQwix.com";

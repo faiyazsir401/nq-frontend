@@ -88,6 +88,7 @@ const VideoContainer = ({
   isLandscape,
   videoContainerRef
 }) => {
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   // const videoContainerRef = useRef(null);
@@ -300,6 +301,61 @@ const VideoContainer = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
     };
   }, [socket, clip?._id, videoRef]);
+  console.log("IsVideoLoaded",isVideoLoaded)
+  useEffect(() => {
+    const video = videoRef?.current;
+    if (!video) return;
+  
+    // More comprehensive video readiness check
+    const checkReadiness = () => {
+      // Check if enough data is loaded to likely play through without buffering
+      if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+        setIsVideoLoaded(true);
+        video.removeEventListener('canplay', checkReadiness);
+        video.removeEventListener('canplaythrough', checkReadiness);
+      }
+    };
+  
+    const handleError = () => {
+      console.error("Video failed to load");
+      setIsVideoLoaded(false);
+    };
+  
+    const handleStalled = () => {
+      console.log("Video playback stalled");
+      setIsVideoLoaded(false);
+    };
+  
+    const handleWaiting = () => {
+      console.log("Video waiting for data");
+      setIsVideoLoaded(false);
+    };
+  
+    // Multiple events to detect readiness
+    video.addEventListener('canplay', checkReadiness);
+    video.addEventListener('canplaythrough', checkReadiness);
+    video.addEventListener('loadeddata', checkReadiness);
+    video.addEventListener('error', handleError);
+    video.addEventListener('stalled', handleStalled);
+    video.addEventListener('waiting', handleWaiting);
+  
+    // Additional check for cases where video might already be ready
+    if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+      setIsVideoLoaded(true);
+    }
+  
+    // Set preload for better loading behavior
+    video.preload = "auto";
+  
+    return () => {
+      video.removeEventListener('canplay', checkReadiness);
+      video.removeEventListener('canplaythrough', checkReadiness);
+      video.removeEventListener('loadeddata', checkReadiness);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('stalled', handleStalled);
+      video.removeEventListener('waiting', handleWaiting);
+    };
+  }, [videoRef]);
 
   console.log("sky.zoom", scale);
   console.log("sky.pan", translate);
@@ -393,6 +449,7 @@ const VideoContainer = ({
 
   return (
     <>
+    
       <div
         id="video-container"
         ref={videoContainerRef}
@@ -413,10 +470,15 @@ const VideoContainer = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          background: "gray",
+          background: "white",
           position: "relative",
         }}
       >
+        {!isVideoLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-800 z-10">
+            <div className="text-white">Loading video...</div>
+          </div>
+        )}
         {drawingMode && accountType === AccountType.TRAINER && (
           <div
             className="absolute hide-in-screenshot"
