@@ -615,23 +615,23 @@ export const WHY_CHOOSE_US = [
   {
     id: 1,
     icon: "🚀",
-    title: "Seamless Expert Booking",
+    title: "Search for an Expert",
     content:
-      "NetQwix serves as host to a diverse community of experienced experts in many walks of life. Search profiles, read reviews, and select the perfect trainer to help you achieve your goals.",
+      "NetQwix serves as host to a diverse community of Experts in many walks of life. Search profiles, read reviews, and select the Expert that is right for you."
   },
-  {
-    id: 2,
-    icon: "🎯",
-    title: "Tailored Learning Plans",
-    content:
-      "Say goodbye to one-size-fits-all approaches. Our Expert Experts create personalized learning plans that cater to your unique needs and aspirations.",
-  },
+  // {
+  //   id: 2,
+  //   icon: "🎯",
+  //   title: "Tailored Learning Plans",
+  //   content:
+  //     "Say goodbye to one-size-fits-all approaches. Our Expert Trainers create personalized learning plans that cater to your unique needs and aspirations.",
+  // },
   {
     id: 3,
     icon: "📅",
     title: "Flexible Scheduling",
     content:
-      "Life can be hectic, but learning shouldn't be. Choose session times that fit your schedule, whether it's early morning or late at night.",
+      "Life can be hectic, but learning shouldn't be. Choose session times that fit your schedule - or see if your favorite Expert is available now for an instant session.",
   },
   {
     id: 4,
@@ -652,7 +652,7 @@ export const WHY_CHOOSE_US = [
     icon: "🌐",
     title: "Connect from Anywhere",
     content:
-      "Whether you're at home, in the office, or on the go, NetQwix’s LIVE Lesson pplication allows you to connect with your trainer seamlessly, anytime, anywhere on any device.",
+      "Whether you're at home, in the office, or on the go, NetQwix’s LIVE session application allows you to connect with your trainer seamlessly, anytime, anywhere on any device.",
   },
 ];
 
