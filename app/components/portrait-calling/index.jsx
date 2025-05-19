@@ -1301,7 +1301,7 @@ const takeScreenshot = async () => {
                                   return (
                                     <div
                                       key={index}
-                                      className={`col-3 p-1`}
+                                      className={`${width1200 ? "col-3" : "col-2"} p-1`}
                                       style={{ borderRadius: 5 }}
                                       onClick={() => {
                                         if (!sld && selectClips?.length < 2) {
@@ -1402,7 +1402,7 @@ const takeScreenshot = async () => {
                               return clp?.file_name ? (
                                 <div
                                   key={index}
-                                  className={`col-3 p-1`}
+                                  className={`${width1200 ? "col-3" : "col-2"} p-1`}
                                   style={{ borderRadius: 5 }}
                                   onClick={() => {
                                     if (!sld && selectClips?.length < 2) {
@@ -1522,6 +1522,7 @@ const takeScreenshot = async () => {
         isClose={isClose}
         isTraineeJoined={isTraineeJoined}
         isCallEnded={isCallEnded}
+        isFromCalling={true}
       />
 
       {accountType === AccountType.TRAINEE &&

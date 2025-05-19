@@ -166,7 +166,7 @@ export const CanvasMenuBar = ({
             <div
               className="icon-btn  button-effect btn-sm"
               onClick={() => {
-                setDisplayColorPicker(true);
+                setDisplayColorPicker((prevVal)=>!prevVal);
               }}
               style={{
                 height: "24px",

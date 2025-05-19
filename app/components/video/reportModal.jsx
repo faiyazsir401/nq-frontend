@@ -37,6 +37,7 @@ const reportModal = ({
   isCallEnded,
   gamePlanModalNote,
   setGamePlanModalClose,
+  isFromCalling
 }) => {
   const [isOpenCrop, setIsOpenCrop] = useState(false);
   const [preview, setPreview] = useState(false);
@@ -50,7 +51,6 @@ const reportModal = ({
   const [loading, setLoading] = useState(false);
   const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
   const [showSaveBeforeCloseModal, setShowSaveBeforeCloseModal] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
 
   const demoProfilePic = useRef(null);
   const profilePic = useRef(null);
@@ -97,7 +97,6 @@ const reportModal = ({
   const resetState = () => {
     setScreenShots([]);
     setReportObj({ title: "", topic: "" });
-    setHasChanges(false);
   };
 
   const updateCurrentDate = () => {
@@ -160,7 +159,7 @@ const reportModal = ({
     if (res?.data?.url) await pushProfilePhotoToS3(res?.data?.url, blob);
     getReportData();
     setIsOpenCrop(false);
-    setHasChanges(true);
+    
   };
 
   async function pushProfilePhotoToS3(presignedUrl, uploadPhoto) {
@@ -180,7 +179,7 @@ const reportModal = ({
     setScreenShots(res?.data?.reportData);
     setReportObj({ title: res?.data?.title, topic: res?.data?.description });
     fetchAndSetScreenShortReport(res?.data?.reportData);
-    setHasChanges(false);
+    ;
   };
 
   const handleRemoveImage = async (filename) => {
@@ -191,7 +190,7 @@ const reportModal = ({
       filename: filename,
     });
     getReportData();
-    setHasChanges(true);
+    
   };
 
   const generatePDF = async (content) => {
@@ -268,7 +267,6 @@ const reportModal = ({
       topic: reportObj?.topic,
       reportData: [...screenShots],
     });
-    setHasChanges(false);
   };
 
   const sendNotifications = (data) => {
@@ -276,7 +274,7 @@ const reportModal = ({
   };
 
   const handleCloseReport = () => {
-    if (hasChanges) {
+    if (isFromCalling) {
       setShowUnsavedChangesModal(true);
     } else {
       closeReport();
@@ -302,7 +300,7 @@ const reportModal = ({
       reportObj[field] = e.target.value;
       setReportObj({ ...reportObj });
     }
-    setHasChanges(true);
+    
   };
 
   return (
@@ -416,7 +414,7 @@ const reportModal = ({
                           <div className={`d-flex align-items-center ss-data ${width600 ? "flex-column" : "flex-row"}`}>
                             <div className="text-center w-100 w-md-50 pb-3">
                               <img
-                                className="h-100 w-100"
+                              
                                 src={sst?.imageUrl}
                                 alt="image"
                                 style={{
@@ -661,7 +659,7 @@ const reportModal = ({
                 Unsaved Changes
               </ModalHeader>
               <ModalBody className="text-center">
-                <p>You have unsaved changes. Please save or preview your changes before closing.</p>
+                <p>You have unsaved changes. Please preview and save your changes before closing.</p>
               </ModalBody>
               <ModalFooter className="justify-content-center">
                 <Button
