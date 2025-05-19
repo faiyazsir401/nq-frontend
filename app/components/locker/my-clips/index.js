@@ -217,7 +217,6 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         style={{
                           margin: "auto",
                           textAlign: "center",
-                          maxHeight: "220px",
                           width:"fit-content"
                         }}
                         className="hover-video"

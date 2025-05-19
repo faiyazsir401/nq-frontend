@@ -16,18 +16,14 @@ import { useMediaQuery } from "usehooks-ts";
 
 const FriendsPopup = ({ props }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedFriends, setSelectedFriends] = useState([]);
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(false);
-  const width500 = useMediaQuery("(max-width:500px)")
+  const width500 = useMediaQuery("(max-width:500px)");
   const toggle = () => setIsOpen((prev) => !prev);
 
   const handleSelectFriend = (id) => {
-    setSelectedFriends((prev) =>
-      prev.includes(id)
-        ? prev.filter((friendId) => friendId !== id)
-        : [...prev, id]
-    );
+    // Only allow one friend to be selected at a time
+    props.setSelectedFriends(prev => prev.includes(id) ? [] : [id]);
   };
 
   const fetchFriends = async () => {
@@ -46,10 +42,10 @@ const FriendsPopup = ({ props }) => {
   useEffect(() => {
     fetchFriends();
   }, []);
-
+  
   useEffect(() => {
-    props.setSelectedFriends(selectedFriends);
-  }, [selectedFriends]);
+    props.setSelectedFriends(props.selectedFriends);
+  }, [props]);
 
   return (
     <div className="d-flex flex-direction-column my-2">
@@ -81,7 +77,7 @@ const FriendsPopup = ({ props }) => {
             flexGrow: 1,
             overflowY: 'auto',
             paddingBottom: '60px', // Space for the select button
-            justifyContent:width500?"flex-start":"center"
+            justifyContent: width500 ? "flex-start" : "center"
           }}
         >
           {loading ? (
@@ -95,14 +91,12 @@ const FriendsPopup = ({ props }) => {
               style={{
                 display: "flex",
                 justifyContent: "center",
-      
-               flexWrap: "wrap",
+                flexWrap: "wrap",
                 gap: "15px",
                 padding: "15px",
-                maxHeight:"80dvh",
-                // height:"100%",
+                maxHeight: "80dvh",
                 overflowY: 'auto',
-                marginTop:"20px"
+                marginTop: "20px"
               }}
             >
               {friends.map((friend) => {
@@ -115,7 +109,7 @@ const FriendsPopup = ({ props }) => {
                     key={friend._id}
                     style={{
                       width: "150px",
-                      border: selectedFriends.includes(friend._id) ? "2px solid green" : "1px solid gray",
+                      border: props.selectedFriends.includes(friend._id) ? "2px solid green" : "1px solid gray",
                       cursor: "pointer",
                       height: "fit-content"
                     }}
@@ -133,8 +127,9 @@ const FriendsPopup = ({ props }) => {
                     </CardTitle>
                     <input
                       className="position-absolute"
-                      type="checkbox"
-                      checked={selectedFriends.includes(friend._id)}
+                      type="radio"  // Changed from checkbox to radio
+                      name="friendSelection"  // Added name attribute for radio group
+                      checked={props.selectedFriends.includes(friend._id)}
                       onChange={() => handleSelectFriend(friend._id)}
                       style={{ marginTop: "5px", right: "5px" }}
                     />
@@ -143,9 +138,7 @@ const FriendsPopup = ({ props }) => {
               })}
             </div>
           )}
-          <div
-            className="w-100 d-flex justify-content-center p-2"
-          >
+          <div className="w-100 d-flex justify-content-center p-2">
             <Button
               className="m-auto"
               style={{ backgroundColor: "rgb(83 233 89)" }}
@@ -155,8 +148,6 @@ const FriendsPopup = ({ props }) => {
             </Button>
           </div>
         </ModalBody>
-
-
       </Modal>
     </div>
   );

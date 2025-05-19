@@ -128,7 +128,7 @@ const SearchableDropdown = ({
                               alignItems: "center",
                             }}
                           >
-                            <b> Trainer </b>{" "}
+                            <b> Expert </b>{" "}
                             {activeTrainer &&
                               (() => {
                                 const trainerId =

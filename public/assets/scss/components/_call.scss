@@ -51,13 +51,9 @@
 }
 }
 .modal {
-    z-index: 1075;
+    z-index: 1075 !important;
 }
-body.modal-open {
-    > div[tabindex="-1"] {
-        z-index: 99999 !important;
-    }
-}
+
 .viddiolog{
     &.fade{
         &.modal-dialog{

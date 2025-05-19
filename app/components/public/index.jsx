@@ -280,7 +280,7 @@ const TrainersDetails = ({
       <React.Fragment>
         <h3>
           {" "}
-          Trainer: {bookSessionPayload?.trainer_info.fullname} (Price per hour $
+          Expert: {bookSessionPayload?.trainer_info.fullname} (Price per hour $
           {TRAINER_AMOUNT_USD}){" "}
         </h3>
         <h4 className="mt-3 mb-3">
@@ -511,7 +511,7 @@ const TrainersDetails = ({
           </>
         ) : (
           <tr key={"no-data"} className="no-data">
-            <td colSpan="6">No trainers available.</td>
+            <td colSpan="6">No experts available.</td>
           </tr>
         )}
       </table>

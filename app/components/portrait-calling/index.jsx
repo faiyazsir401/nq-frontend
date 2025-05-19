@@ -236,6 +236,13 @@ const VideoCallUI = ({
     }
   });
 
+  socket.on(EVENTS.CALL_END,() => {
+    if(accountType === AccountType.TRAINEE){
+      cutCall();
+      setIsOpenRating(true)
+    }
+  });
+
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
   const emitVideoSelectEvent = (type, videos) => {
     socket.emit(EVENTS.ON_VIDEO_SELECT, {
@@ -318,7 +325,7 @@ const VideoCallUI = ({
       const ctx = canvas.getContext("2d");
 
       // Fill background (white or transparent)
-      ctx.fillStyle = 'gray';
+      ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Calculate position relative to container
@@ -495,7 +502,7 @@ const takeScreenshot = async () => {
 
       // Add copyright text at bottom right
       watermarkedCtx.font = `16px Arial`;
-      watermarkedCtx.fillStyle = "white";
+      watermarkedCtx.fillStyle = "gray";
       watermarkedCtx.textAlign = "right";
       
       const copyrightText = "©NetQwix.com";
@@ -1120,7 +1127,7 @@ const takeScreenshot = async () => {
                       }}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
-                      Trainee
+                      Enthusiast
                     </NavLink>
                   </NavItem>
                   <NavItem className="mb-2" style={{
@@ -1294,7 +1301,7 @@ const takeScreenshot = async () => {
                                   return (
                                     <div
                                       key={index}
-                                      className={`col-3 p-1`}
+                                      className={`${width1200 ? "col-3" : "col-2"} p-1`}
                                       style={{ borderRadius: 5 }}
                                       onClick={() => {
                                         if (!sld && selectClips?.length < 2) {
@@ -1395,7 +1402,7 @@ const takeScreenshot = async () => {
                               return clp?.file_name ? (
                                 <div
                                   key={index}
-                                  className={`col-3 p-1`}
+                                  className={`${width1200 ? "col-3" : "col-2"} p-1`}
                                   style={{ borderRadius: 5 }}
                                   onClick={() => {
                                     if (!sld && selectClips?.length < 2) {
@@ -1515,6 +1522,7 @@ const takeScreenshot = async () => {
         isClose={isClose}
         isTraineeJoined={isTraineeJoined}
         isCallEnded={isCallEnded}
+        isFromCalling={true}
       />
 
       {accountType === AccountType.TRAINEE &&
@@ -1567,6 +1575,12 @@ const takeScreenshot = async () => {
               color="danger"
               onClick={() => {
                 cutCall();
+                if(accountType === AccountType.TRAINER){
+                  socket.emit(EVENTS.CALL_END, {
+                    userInfo: { from_user: fromUser._id, to_user: toUser._id }
+                  });
+                }
+             
               }}
             >
               Yes

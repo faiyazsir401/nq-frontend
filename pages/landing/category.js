@@ -230,7 +230,7 @@ const Category = (masterRecords) => {
           <div className={`row ${isMobileScreen ?"mb-2 mt-3":"my-5"}`}>
             <div className={`col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12`}>
               <SearchableDropdown
-                placeholder="Search Trainers..."
+                placeholder="Search Experts..."
                 options={[...listOfTrainers, ...categoryList]}
                 label="name"
                 id="id"

@@ -209,6 +209,9 @@ export const validationMessage = {
     stronglyWouldYouLikeRecommend: "This field is required",
     title: "This field is required",
     addRemark: "This field is required",
+    recommandRating: "This field is required",
+    audioVideoRating: "This field is required",
+    sessionRating: "This field is required",
   },
   edit_trainer_profile: {
     about: "This field is required ",
@@ -614,7 +617,7 @@ export const WHY_CHOOSE_US = [
     icon: "🚀",
     title: "Search for an Expert",
     content:
-      "NetQwix serves as host to a diverse community of Experts in many walks of life. Search profiles, read reviews, and select the Expert that is right for you.",
+      "NetQwix serves as host to a diverse community of Experts in many walks of life. Search profiles, read reviews, and select the Expert that is right for you."
   },
   // {
   //   id: 2,

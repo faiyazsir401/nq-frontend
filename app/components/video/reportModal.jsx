@@ -8,9 +8,8 @@ import {
 import CropImage from "./cropimage";
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import jsPDF from "jspdf";
-import Modal from "../../common/modal";
+import CustomModal from "../../common/modal";
 import { Crop, Trash2, X } from "react-feather";
-import { Button } from "reactstrap";
 import html2canvas from "html2canvas";
 import { getS3SignPdfUrl } from "./video.api";
 import { useAppSelector, useAppDispatch } from "../../store";
@@ -22,6 +21,8 @@ import Notes from "../practiceLiveExperience/Notes";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
 import "./reportModal.css";
+import { useMediaQuery } from "usehooks-ts";
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
 const reportModal = ({
   currentReportData,
@@ -36,27 +37,26 @@ const reportModal = ({
   isCallEnded,
   gamePlanModalNote,
   setGamePlanModalClose,
+  isFromCalling
 }) => {
   const [isOpenCrop, setIsOpenCrop] = useState(false);
   const [preview, setPreview] = useState(false);
   const [selectImage, setSelectImage] = useState("");
   const [reportArr, setReportArr] = useState([]);
-  // const [reportObj, setReportObj] = useState({ title: "", topic: "" });
-  // const [screenShots, setScreenShots] = useState([]);
   const [currentDate, setCurrentDate] = useState("");
   const { userInfo } = useAppSelector(authState);
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [pdfFileCurrent, setPdfFileCurrent] = useState();
   const socket = useContext(SocketContext);
   const [loading, setLoading] = useState(false);
-  // const [demoProfilePic, setDemoProfilePic] = useState();
-  // const [profilePic, setProfilePic] = useState();
+  const [showUnsavedChangesModal, setShowUnsavedChangesModal] = useState(false);
+  const [showSaveBeforeCloseModal, setShowSaveBeforeCloseModal] = useState(false);
 
   const demoProfilePic = useRef(null);
   const profilePic = useRef(null);
+  const width600 = useMediaQuery('(max-width:600px)')
 
   const loadImageFromUrl = async (imageUrl) => {
-    // console.log("===========>?", imageUrl)
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();
@@ -74,8 +74,6 @@ const reportModal = ({
     }
   };
 
-  // const getImageBase64 = async (url) => await loadImageFromUrl(url);
-
   const getImageBase64 = useMemo(
     () => async (url) => await loadImageFromUrl(url),
     []
@@ -83,21 +81,16 @@ const reportModal = ({
 
   const setImagebase64 = async () => {
     const dpp = await getImageBase64("/assets/images/demoUser.png");
-    // setDemoProfilePic(dpp)
     demoProfilePic.current = dpp;
 
     const pp = await getImageBase64(
       Utils?.getImageUrlOfS3(userInfo?.profile_picture)
     );
-    // setProfilePic(pp);
-
     profilePic.current = pp;
   };
 
   useEffect(() => {
-    // Set the current date when the component mounts
     updateCurrentDate();
-
     setImagebase64();
   }, []);
 
@@ -109,13 +102,12 @@ const reportModal = ({
   const updateCurrentDate = () => {
     const today = new Date();
     const day = today.getDate();
-    const month = today.getMonth() + 1; // Months are zero-based, so add 1
+    const month = today.getMonth() + 1;
     const year = today.getFullYear();
-
-    // Format the date as "month/day/year"
     const formattedDate = `${month}/${day}/${year}`;
     setCurrentDate(formattedDate);
   };
+
   useEffect(() => {
     if (currentReportData?.session && isOpenReport) {
       getReportData();
@@ -167,6 +159,7 @@ const reportModal = ({
     if (res?.data?.url) await pushProfilePhotoToS3(res?.data?.url, blob);
     getReportData();
     setIsOpenCrop(false);
+    
   };
 
   async function pushProfilePhotoToS3(presignedUrl, uploadPhoto) {
@@ -183,11 +176,10 @@ const reportModal = ({
       trainer: currentReportData?.trainer,
       trainee: currentReportData?.trainee,
     });
-
-    console.log(res?.data?.reportData, "screenshots");
     setScreenShots(res?.data?.reportData);
     setReportObj({ title: res?.data?.title, topic: res?.data?.description });
     fetchAndSetScreenShortReport(res?.data?.reportData);
+    ;
   };
 
   const handleRemoveImage = async (filename) => {
@@ -198,43 +190,25 @@ const reportModal = ({
       filename: filename,
     });
     getReportData();
+    
   };
 
-  var pdf = new jsPDF();
-
   const generatePDF = async (content) => {
-    console.log("content", content);
-    // content.style.removeProperty("display");
-
-    // Use html2canvas with proxy settings for cross-origin images
     html2canvas(content, {
-      proxy: "*", // Replace with your proxy URL if available
-      useCORS: true, // Enable CORS support
-      allowTaint: true, // Allow images from different origins
+      proxy: "*",
+      useCORS: true,
+      allowTaint: true,
     }).then(async (canvas) => {
       const imgData = canvas.toDataURL("image/png");
-
-      // Calculate the width of the page
       const pdf = new jsPDF();
       var pageWidth = pdf.internal.pageSize.width;
-
-      // Calculate the aspect ratio of the canvas
       var aspectRatio = canvas.width / canvas.height;
-
-      // Calculate the height to maintain the aspect ratio
       var imgHeight = pageWidth / aspectRatio;
 
       pdf.internal.pageSize.height = imgHeight;
-
       updateCurrentDate();
-
-      // Add the canvas as an image to the PDF
       pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-
-      // Get the data URL of the PDF
       const generatedPdfDataUrl = pdf.output("dataurlstring");
-
-      // Convert data URL to Blob
       const byteCharacters = atob(generatedPdfDataUrl.split(",")[1]);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
@@ -243,12 +217,9 @@ const reportModal = ({
       const pdfBlob = new Blob([new Uint8Array(byteNumbers)], {
         type: "application/pdf",
       });
-
-      // Create a File from the Blob
       const pdfFile = new File([pdfBlob], "generated_pdf.pdf", {
         type: "application/pdf",
       });
-
       var link = await createUploadLink();
       if (link) pushProfilePDFToS3(link, pdfFile);
     });
@@ -256,7 +227,6 @@ const reportModal = ({
 
   useEffect(() => {
     const content = document.getElementById("report-pdf");
-    console.log("content", content);
     if (preview && content) {
       generatePDF(content);
     }
@@ -265,7 +235,6 @@ const reportModal = ({
   const createUploadLink = async () => {
     var payload = { session_id: currentReportData?.session };
     const data = await getS3SignPdfUrl(payload);
-    console.log("=======245====?data", data);
     if (data?.url) return data?.url;
     else return "";
   };
@@ -284,17 +253,12 @@ const reportModal = ({
           setUploadPercentage(progress === 100 ? 0 : progress);
         },
       });
-      console.log("pdf pushed in S3");
-      // setIsOpenReport(false)
     } catch (e) {
       console.error(e);
     }
   };
 
-  async function createOrUpdateReport() {
-    // var link = await createUploadLink();
-    // if (link) pushProfilePDFToS3(link, pdfFile);
-
+  const createOrUpdateReport = async () => {
     await createReport({
       sessions: currentReportData?.session,
       trainer: currentReportData?.trainer,
@@ -303,15 +267,45 @@ const reportModal = ({
       topic: reportObj?.topic,
       reportData: [...screenShots],
     });
-  }
+  };
 
   const sendNotifications = (data) => {
     socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
   };
 
+  const handleCloseReport = () => {
+    if (isFromCalling) {
+      setShowUnsavedChangesModal(true);
+    } else {
+      closeReport();
+    }
+  };
+
+  const closeReport = () => {
+    setIsOpenReport(false);
+    setPreview(false);
+    resetState();
+    if (isTraineeJoined && isCallEnded) {
+      isClose();
+    }
+  };
+
+  const handleInputChange = (e, field, index = null) => {
+    if (index !== null) {
+      // For screenshot fields
+      screenShots[index][field] = e.target.value;
+      setScreenShots([...screenShots]);
+    } else {
+      // For reportObj fields
+      reportObj[field] = e.target.value;
+      setReportObj({ ...reportObj });
+    }
+    
+  };
+
   return (
     <>
-      <Modal
+      <CustomModal
         isOpen={isOpenReport}
         allowFullWidth={true}
         element={
@@ -324,15 +318,7 @@ const reportModal = ({
                 <div className="media-body media-body text-right">
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
-                    onClick={() => {
-                      setIsOpenReport(false);
-                      setPreview(false);
-                      // hidePreview();
-                      resetState();
-                      if (isTraineeJoined && isCallEnded) {
-                        isClose();
-                      }
-                    }}
+                    onClick={handleCloseReport}
                   >
                     <X />
                   </div>
@@ -425,10 +411,10 @@ const reportModal = ({
                     {reportArr?.map((sst, i) => {
                       return (
                         <>
-                          <div className="d-flex flex-row  align-items-center ss-data">
-                            <div className="text-center w-100 w-md-50">
+                          <div className={`d-flex align-items-center ss-data ${width600 ? "flex-column" : "flex-row"}`}>
+                            <div className="text-center w-100 w-md-50 pb-3">
                               <img
-                                className="h-100 w-100"
+                              
                                 src={sst?.imageUrl}
                                 alt="image"
                                 style={{
@@ -437,7 +423,7 @@ const reportModal = ({
                                 }}
                               />
                             </div>
-                            <div className="text-center text-md-left w-100 w-md-50">
+                            <div className=" text-md-left w-100 w-md-50">
                               {/* <p style={{ fontSize: '30px', fontWeight: 'normal' }}>{screenShots[i]?.title}</p> */}
                               <p
                                 style={{
@@ -465,7 +451,7 @@ const reportModal = ({
                       }}
                     >
                       <div style={{ textAlign: "left", marginRight: "20px" }}>
-                        <h2 style={{ color: "black" }}>Trainer</h2>
+                        <h2 style={{ color: "black" }}>Expert</h2>
                         <p
                           style={{
                             color: "black",
@@ -506,7 +492,6 @@ const reportModal = ({
                       </div>
                     </div>
                   </div>
-
                   <div
                     style={{
                       display: "flex",
@@ -520,7 +505,6 @@ const reportModal = ({
                       color="primary"
                       onClick={() => {
                         setPreview(false);
-                        // hidePreview();
                       }}
                     >
                       Back
@@ -531,16 +515,10 @@ const reportModal = ({
                       disabled={uploadPercentage}
                       onClick={() => {
                         createOrUpdateReport();
-                        setIsOpenReport(false);
-                        // hidePreview();
-                        setPreview(false);
-                        resetState();
-                        if (isTraineeJoined && isCallEnded) {
-                          isClose();
-                        }
+                        closeReport();
                         sendNotifications({
                           title: notificiationTitles.gamePlanReport,
-                          description: `Trainer shared the gameplan. Check it in the gameplan tab`,
+                          description: `Expert shared the gameplan. Check it in the gameplan tab`,
                           senderId: currentReportData?.trainer,
                           receiverId: currentReportData?.trainee,
                           bookingInfo: null,
@@ -555,7 +533,6 @@ const reportModal = ({
                 <div className="theme-tab">
                   <div className="row">
                     <div className="col-12 d-flex flex-wrap">
-                      {/* main title for the report */}
                       <div className="p-2 flex-grow-1">
                         <div className="form-group">
                           <label className="col-form-label">Title</label>
@@ -564,15 +541,11 @@ const reportModal = ({
                             type="text"
                             name="title"
                             placeholder="Title"
-                            onChange={(e) => {
-                              reportObj.title = e.target.value;
-                              setReportObj({ ...reportObj });
-                            }}
+                            onChange={(e) => handleInputChange(e, 'title')}
                             value={reportObj?.title}
                           />
                         </div>
                       </div>
-                      {/* main description for the report */}
                       <div className="p-2 flex-grow-1">
                         <div className="form-group">
                           <label className="col-form-label">Description</label>
@@ -581,10 +554,7 @@ const reportModal = ({
                             type="text"
                             name="topic"
                             placeholder="Topic"
-                            onChange={(e) => {
-                              reportObj.topic = e.target.value;
-                              setReportObj({ ...reportObj });
-                            }}
+                            onChange={(e) => handleInputChange(e, 'topic')}
                             value={reportObj?.topic}
                           />
                         </div>
@@ -592,8 +562,6 @@ const reportModal = ({
                     </div>
 
                     {screenShots?.map((sst, i) => {
-                      console.log(sst, "resport sst");
-                      console.log("ggg", `${awsS3Url}${sst?.imageUrl}`);
                       return (
                         <div className="col-12 d-flex flex-column flex-sm-row flex-wrap p-4 mb-4 shadow-sm border rounded">
                           <div
@@ -628,26 +596,12 @@ const reportModal = ({
                                 className="icon-btn btn-sm btn-outline-light close-apps pointer"
                                 onClick={() => {
                                   handleRemoveImage(sst?.imageUrl);
-                                  // var temp = screenShots.filter((st, index) => index !== i)
-                                  // setScreenShots([...temp])
                                 }}
                               >
                                 <Trash2 />
                               </div>
                             </div>
                             <div className="form-group m-0">
-                              {/* <label className="col-form-label">Title</label>
-                            <input
-                              className="form-control"
-                              type="text"
-                              name="title"
-                              placeholder="Title"
-                              onChange={(e) => {
-                                screenShots[i].title = e.target.value;
-                                setScreenShots([...screenShots])
-                              }}
-                              value={screenShots[i]?.title}
-                            /> */}
                               <label className="col-form-label">
                                 Description
                               </label>
@@ -657,10 +611,7 @@ const reportModal = ({
                                 type="text"
                                 name="description"
                                 placeholder="Description"
-                                onChange={(e) => {
-                                  screenShots[i].description = e.target.value;
-                                  setScreenShots([...screenShots]);
-                                }}
+                                onChange={(e) => handleInputChange(e, 'description', i)}
                                 value={screenShots[i]?.description}
                               />
                             </div>
@@ -688,7 +639,6 @@ const reportModal = ({
                       onClick={() => {
                         setPreview(true);
                       }}
-                      // onClick={() => { getReportData().then((res) => generatePDF()) }}
                     >
                       {uploadPercentage ? "Loading" : "Preview"}
                     </Button>
@@ -696,6 +646,81 @@ const reportModal = ({
                 </div>
               )}
             </div>
+
+            {/* Unsaved Changes Modal */}
+            <Modal
+              isOpen={showUnsavedChangesModal}
+              toggle={() => setShowUnsavedChangesModal(false)}
+            >
+              <ModalHeader
+                toggle={() => setShowUnsavedChangesModal(false)}
+                close={() => <></>}
+              >
+                Unsaved Changes
+              </ModalHeader>
+              <ModalBody className="text-center">
+                <p>You have unsaved changes. Please preview and save your changes before closing.</p>
+              </ModalBody>
+              <ModalFooter className="justify-content-center">
+                <Button
+                  color="primary"
+                  className="mx-2"
+                  onClick={() => {
+                    setShowUnsavedChangesModal(false);
+                    setPreview(true);
+                  }}
+                >
+                  Preview
+                </Button>
+                <Button
+                  color="primary"
+                  className="mx-2"
+                  onClick={() => {
+                    createOrUpdateReport();
+                    setShowUnsavedChangesModal(false);
+                    closeReport();
+                  }}
+                >
+                  Save & Close
+                </Button>
+              </ModalFooter>
+            </Modal>
+
+            {/* Save Before Close Modal */}
+            <Modal
+              isOpen={showSaveBeforeCloseModal}
+              toggle={() => setShowSaveBeforeCloseModal(false)}
+            >
+              <ModalHeader
+                toggle={() => setShowSaveBeforeCloseModal(false)}
+                close={() => <></>}
+              >
+                Save Changes
+              </ModalHeader>
+              <ModalBody className="text-center">
+                <p>You need to save your changes before closing the report.</p>
+              </ModalBody>
+              <ModalFooter className="justify-content-center">
+                <Button
+                  color="secondary"
+                  className="mx-2"
+                  onClick={() => setShowSaveBeforeCloseModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color="primary"
+                  className="mx-2"
+                  onClick={() => {
+                    createOrUpdateReport();
+                    setShowSaveBeforeCloseModal(false);
+                    closeReport();
+                  }}
+                >
+                  Save
+                </Button>
+              </ModalFooter>
+            </Modal>
 
             {gamePlanModalNote && (
               <Notes

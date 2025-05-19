@@ -6,7 +6,7 @@ const teamMembers = [
   {
     id: 1,
     name: 'John Doe',
-    role: 'Lead Trainer',
+    role: 'Lead Expert',
     image: 'https://randomuser.me/api/portraits/men/80.jpg',
     bio: 'John has over 10 years of experience in training and development. He specializes in leadership and management training.',
   },
@@ -15,7 +15,7 @@ const teamMembers = [
     name: 'Jane Smith',
     role: 'Senior Trainee',
     image: 'https://randomuser.me/api/portraits/men/27.jpg',
-    bio: 'Jane is a dedicated trainee with a passion for continuous learning and professional growth. She excels in project management.',
+    bio: 'Jane is a dedicated enthusiasts with a passion for continuous learning and professional growth. She excels in project management.',
   },
   {
     id: 3,

@@ -165,7 +165,7 @@ const RecentUsers = () => {
         className="Recent-Heading"
         style={{ textAlign: "center", fontSize: "20px" }}
       >
-        Recent {accountType === AccountType?.TRAINER ? "Students" : "Trainers"}
+        Recent {accountType === AccountType?.TRAINER ? "Students" : "Experts"}
       </h2>
       <div
         className="card-body Recent"
@@ -220,7 +220,7 @@ const RecentUsers = () => {
                       Utils?.getImageUrlOfS3(item?.profile_picture) ||
                       "/assets/images/demoUser.png"
                     }
-                    alt={`Recent Trainee ${index + 1}`}
+                    alt={`Recent Enthusiast ${index + 1}`}
                     onError={(e) => {
                       e.target.src = "/assets/images/demoUser.png"; // Set default image on error
                     }}
@@ -278,7 +278,7 @@ const RecentUsers = () => {
                     onError={(e) => {
                       e.target.src = "/assets/images/demoUser.png"; // Set default image on error
                     }}
-                    alt={`Recent Trainee ${index + 1}`}
+                    alt={`Recent Enthusiast ${index + 1}`}
 
                   />
                   <h5 class="d-inline-block " style={{ maxWidth: "80px", marginBottom: "5px" }}>

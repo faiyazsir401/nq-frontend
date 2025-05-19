@@ -23,33 +23,45 @@ export async function GET(req) {
         console.log("iceServers", iceServers)
 
         const formattedIceServers = [
-            { urls: iceServers.urls[0] },
-            { urls: iceServers.urls[1] },
             {
-                urls: iceServers.urls[2], username: iceServers.username,
+                "urls": "stun:stun.cloudflare.com:3478"
+            },
+            {
+                "urls": "stun:stun.cloudflare.com:53"
+            },
+            {
+                "urls": "turn:turn.cloudflare.com:3478?transport=udp",
+                username: iceServers.username,
                 credential: iceServers.credential,
             },
             {
-                urls: iceServers.urls[3], username: iceServers.username,
+                "urls": "turn:turn.cloudflare.com:53?transport=udp",
+                username: iceServers.username,
                 credential: iceServers.credential,
             },
             {
-                urls: iceServers.urls[4], username: iceServers.username,
+                "urls": "turn:turn.cloudflare.com:3478?transport=tcp",
+                username: iceServers.username,
                 credential: iceServers.credential,
             },
             {
-                urls: iceServers.urls[5], username: iceServers.username,
+                "urls": "turn:turn.cloudflare.com:80?transport=tcp",
+                username: iceServers.username,
                 credential: iceServers.credential,
             },
             {
-                urls: iceServers.urls[6], username: iceServers.username,
+                "urls": "turns:turn.cloudflare.com:5349?transport=tcp",
+                username: iceServers.username,
                 credential: iceServers.credential,
             },
             {
-                urls: iceServers.urls[7], username: iceServers.username,
+                "urls": "turns:turn.cloudflare.com:443?transport=tcp",
+                username: iceServers.username,
                 credential: iceServers.credential,
             }
-        ];
+        ]
+
+
         // Return the iceServers in the response
         return NextResponse.json({ formattedIceServers });
 

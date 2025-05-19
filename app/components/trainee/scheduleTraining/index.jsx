@@ -779,7 +779,7 @@ console.log("getParams1",getParams)
         style={{ marginTop: "5%", marginBottom: "2%" }}
       >
         <SearchableDropdown
-          placeholder="Search Trainers..."
+          placeholder="Search Experts..."
           options={[...listOfTrainers, ...categoryList]}
           label="name"
           id="id"
@@ -866,7 +866,7 @@ console.log("getParams1",getParams)
       </div>
 
       <div className="text-center">
-        <h2>Online Trainers</h2>
+        <h2>Online Experts</h2>
         <div
           className="Recommended"
           style={{ display: "flex", flexDirection: "row",justifyContent:"center" }}
@@ -913,7 +913,7 @@ console.log("getParams1",getParams)
               </>
             
           ) : (
-            <h3>There are no Active Trainers</h3>
+            <h3>There are no Active Experts</h3>
           )}
           {/* <div
             className="card trainer-profile-card Home-main-Cont"

@@ -117,13 +117,13 @@ const ReportForm = ({
               >
                 <div className="col">
                   <dl className="row ml-1 mb-0">
-                    <dd>Trainer :</dd>
+                    <dd>Expert :</dd>
                     <dt className="ml-1">{bookingInfo?.trainer}</dt>
                   </dl>
                 </div>
                 <div className="col">
                   <dl className="row mb-0">
-                    <dd className="ml-3">Trainee :</dd>
+                    <dd className="ml-3">Enthusiast :</dd>
                     <dt className="ml-1">{bookingInfo?.trainee}</dt>
                   </dl>
                 </div>

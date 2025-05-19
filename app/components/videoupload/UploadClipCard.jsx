@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from "react";
 import { videouploadState, videouploadAction } from "./videoupload.slice";
 import { useAppSelector, useAppDispatch } from "../../store";
@@ -42,7 +43,7 @@ const shareWithConstants = {
 
 const UploadClipCard = (props) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
-  const [titles, setTitles] = useState([""]);
+  const [titles, setTitles] = useState([]);
   const [category, setCategory] = useState({});
   const [categoryList, setCategoryList] = useState([]);
   const ref = useRef();
@@ -62,11 +63,18 @@ const UploadClipCard = (props) => {
   const [shareWith, setShareWith] = useState(shareWithConstants.myClips)
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [selectedEmails, setSelectedEmails] = useState([]);
-
+  const {isFromCommunity} = props; 
   useEffect(() => {
     const result = parser.getResult();
     setDeviceInfo(result);
   }, []);
+
+  useEffect(()=>{
+    if(isFromCommunity){
+      setShareWith(shareWithConstants.myFriends)
+      setSelectedFriends([isFromCommunity])
+    }
+  },[props])
 
   useEffect(() => {
     const loadFFmpeg = async () => {
@@ -84,126 +92,13 @@ const UploadClipCard = (props) => {
     loadFFmpeg();
   }, []);
 
-  const trimVideo = async (video, index) => {
-    if (!video) return;
-
-    setLoading(prev => {
-      const newLoading = [...prev];
-      newLoading[index] = true;
-      return newLoading;
-    });
-
-    const inputFileName = 'input.mp4';
-    const outputFileName = 'output.mp4';
-
-    try {
-      const ffmpeg = ffmpegRef.current;
-      await ffmpeg.writeFile(inputFileName, await fetchFile(video));
-
-      await ffmpeg.exec([
-        '-i', inputFileName,
-        '-ss', '0',
-        '-to', '2',
-        '-c', 'copy',
-        outputFileName
-      ]);
-
-      const data = await ffmpeg.readFile(outputFileName);
-      const trimmedVideoBlob = new Blob([data.buffer], { type: 'video/mp4' });
-
-      const formData = new FormData();
-      formData.append('video', trimmedVideoBlob);
-
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/common/generate-thumbnail`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to generate thumbnail');
-        }
-
-        const blob = await response.blob();
-        const thumbnailUrl = URL.createObjectURL(blob);
-
-        setThumbnails(prev => {
-          const newThumbnails = [...prev];
-          newThumbnails[index] = {
-            thumbnailFile: blob,
-            dataUrl: thumbnailUrl,
-            fileType: blob.type
-          };
-          return newThumbnails;
-        });
-
-      } catch (error) {
-        console.error('Error generating thumbnail:', error);
-        alert('Error generating thumbnail');
-      }
-    } catch (error) {
-      console.error('Error trimming video:', error);
-    } finally {
-      setLoading(prev => {
-        const newLoading = [...prev];
-        newLoading[index] = false;
-        return newLoading;
-      });
-    }
-  };
-
-  function dataURLtoFile(dataurl, filename) {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
-  }
-
-  const generateThumbnailFormWindowsOSAndMacChrome = (index) => {
-    const video = videoRefs.current[index];
-    const canvas = canvasRefs.current[index];
-    const context = canvas.getContext('2d');
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    const seekTime = Math.min(1, video.duration * 0.25);
-    video.currentTime = seekTime;
-
-    video.onseeked = () => {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageFormat = 'image/jpeg';
-      const quality = 0.8;
-      const dataUrl = canvas.toDataURL(imageFormat, quality);
-      const fileType = dataUrl.split(';')[0].split(':')[1];
-      const thumbnailFile = dataURLtoFile(dataUrl, `thumbnail.${fileType.split('/')[1]}`);
-
-      setThumbnails(prev => {
-        const newThumbnails = [...prev];
-        newThumbnails[index] = {
-          thumbnailFile: thumbnailFile,
-          dataUrl: dataUrl,
-          fileType: fileType
-        };
-        return newThumbnails;
-      });
-    };
-
-    setLoading(prev => {
-      const newLoading = [...prev];
-      newLoading[index] = false;
-      return newLoading;
+  const handleTitleChange = (index, value) => {
+    setTitles(prev => {
+      const newTitles = [...prev];
+      newTitles[index] = value;
+      return newTitles;
     });
   };
-
 
   const generateThumbnail = async (index) => {
     setLoading(prev => {
@@ -217,32 +112,23 @@ const UploadClipCard = (props) => {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
 
-      // Wait for video metadata to load
       await new Promise((resolve) => {
         video.onloadedmetadata = resolve;
-        if (video.readyState >= 1) resolve(); // If already loaded
+        if (video.readyState >= 1) resolve();
       });
 
-      // Set canvas dimensions
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-
-      // Seek to a good position for thumbnail (25% of duration or 1 second)
       const seekTime = Math.min(1, video.duration * 0.25);
       video.currentTime = seekTime;
 
-      // Wait for seek to complete
       await new Promise((resolve) => {
         video.onseeked = resolve;
       });
 
-      // Wait a bit more to ensure frame is ready (especially for H.264 videos)
       await new Promise(resolve => setTimeout(resolve, 200));
-
-      // Draw the frame
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      // Convert to blob
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       const blob = await fetch(dataUrl).then(res => res.blob());
 
@@ -257,7 +143,6 @@ const UploadClipCard = (props) => {
       });
     } catch (error) {
       console.error('Error generating thumbnail:', error);
-      // Fallback to server-side thumbnail generation if client-side fails
       await generateThumbnailOnServer(index);
     } finally {
       setLoading(prev => {
@@ -268,52 +153,16 @@ const UploadClipCard = (props) => {
     }
   };
 
-  const generateThumbnailOnServer = async (index) => {
-    try {
-      const formData = new FormData();
-      formData.append('video', videos[index]);
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/common/generate-thumbnail`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Failed to generate thumbnail');
-
-      const blob = await response.blob();
-      const thumbnailUrl = URL.createObjectURL(blob);
-
-      setThumbnails(prev => {
-        const newThumbnails = [...prev];
-        newThumbnails[index] = {
-          thumbnailFile: blob,
-          dataUrl: thumbnailUrl,
-          fileType: blob.type
-        };
-        return newThumbnails;
-      });
-    } catch (error) {
-      console.error('Server-side thumbnail generation failed:', error);
-      toast.error(`Failed to generate thumbnail for ${selectedFiles[index]?.name}`);
-    }
-  };
-
   const handleFileChange = async (e) => {
     if (e.target.files.length) {
       const newFiles = Array.from(e.target.files);
-
-      // Check file sizes
       const invalidFiles = newFiles.filter(file => (file.size / 1024 / 1024) > 150);
+      
       if (invalidFiles.length > 0) {
         alert("Some files exceed 150 MiB and will not be uploaded");
       }
 
       const validFiles = newFiles.filter(file => (file.size / 1024 / 1024) <= 150);
-
-      // Initialize state arrays for new files
       const newVideos = [...videos];
       const newThumbnails = [...thumbnails];
       const newTitles = [...titles];
@@ -322,17 +171,13 @@ const UploadClipCard = (props) => {
 
       for (const file of validFiles) {
         const videoIndex = videos.length + newFiles.indexOf(file);
-
-        // Create video element
         const video = document.createElement('video');
         video.playsInline = true;
-        video.muted = true; // Important for autoplay in some browsers
+        video.muted = true;
         video.preload = 'metadata';
-
         const videoUrl = URL.createObjectURL(file);
         video.src = videoUrl;
 
-        // Store references
         videoRefs.current[videoIndex] = video;
         newVideos[videoIndex] = file;
         newThumbnails[videoIndex] = null;
@@ -340,7 +185,6 @@ const UploadClipCard = (props) => {
         newLoading[videoIndex] = true;
         newProgress[videoIndex] = 0;
 
-        // Generate thumbnail after slight delay to ensure video is ready
         setTimeout(() => generateThumbnail(videoIndex), 100);
       }
 
@@ -351,24 +195,6 @@ const UploadClipCard = (props) => {
       setLoading(newLoading);
       setProgress(newProgress);
     }
-  };
-
-
-  const handleTitleChange = (index, value) => {
-    setTitles(prev => {
-      const newTitles = [...prev];
-      newTitles[index] = value;
-      return newTitles;
-    });
-  };
-
-  const removeFile = (index) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    setVideos(prev => prev.filter((_, i) => i !== index));
-    setThumbnails(prev => prev.filter((_, i) => i !== index));
-    setTitles(prev => prev.filter((_, i) => i !== index));
-    setLoading(prev => prev.filter((_, i) => i !== index));
-    setProgress(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleUpload = async () => {
@@ -397,67 +223,78 @@ const UploadClipCard = (props) => {
     }
 
     setIsUploading(true);
-    const uploadPromises = selectedFiles.map(async (file, index) => {
-      let IsTrainer = userInfo.account_type === AccountType.TRAINER;
-
-      var payload = {
-        filename: file?.name,
-        fileType: file?.type,
-        thumbnail: thumbnails[index]?.fileType,
-        title: titles[index],
-        category: IsTrainer ? userInfo.category : category,
+    
+    try {
+      const IsTrainer = userInfo.account_type === AccountType.TRAINER;
+      const bulkPayload = {
+        clips: selectedFiles.map((file, index) => ({
+          filename: file?.name,
+          fileType: file?.type,
+          thumbnail: thumbnails[index]?.fileType,
+          title: titles[index],
+          category: IsTrainer ? userInfo.category : category,
+        })),
+        shareOptions: {
+          type: shareWith,
+          friends: shareWith === shareWithConstants.myFriends ? selectedFriends : undefined,
+          emails: shareWith === shareWithConstants.newUsers ? selectedEmails : undefined
+        }
       };
 
-      if (shareWith === shareWithConstants.myFriends) {
-        payload.user_id = selectedFriends;
-      } else if (shareWith === shareWithConstants.newUsers) {
-        payload.invites = selectedEmails;
-      }
+      const data = await getS3SignUrl(bulkPayload);
+      console.log("datasky",data)
+      if (data?.results) {
+        const uploadPromises = data.results.map(async (urlData, index) => {
+          try {
+            await pushToS3(urlData.url, videos[index], index);
+            await pushToS3(urlData.thumbnailURL, thumbnails[index].thumbnailFile, index);
+            return true;
+          } catch (error) {
+            console.error(`Error uploading file ${index}:`, error);
+            return false;
+          }
+        });
 
-      try {
-        const data = await getS3SignUrl(payload);
-        if (data?.url) {
-          await pushProfilePhotoToS3(data.url, file, index);
-          await pushProfilePhotoToS3(data.thumbnailURL, thumbnails[index].thumbnailFile, index);
-          return true;
+        const results = await Promise.all(uploadPromises);
+        if (results.every(r => r)) {
+          toast.success("All clips uploaded successfully!",{
+            autoClose:false
+          });
+          resetForm();
+          dispatch(getClipsAsync({}));
+        } else {
+          toast.error("Some clips failed to upload.",{
+            autoClose:false
+          });
         }
-        return false;
-      } catch (error) {
-        console.error(`Error uploading file ${index}:`, error);
-        return false;
-      }
-    });
-
-    try {
-      const results = await Promise.all(uploadPromises);
-      if (results.every(r => r)) {
-        toast.success("All clips uploaded successfully.");
-        setSelectedFiles([]);
-        setVideos([]);
-        setThumbnails([]);
-        setTitles([""]);
-        setLoading([]);
-        setProgress([]);
-        dispatch(getClipsAsync({}));
-      } else {
-        toast.error("Some clips failed to upload.");
       }
     } catch (error) {
-      console.error("Error during upload:", error);
+      console.error("Error during bulk upload:", error);
       toast.error("Error during upload");
     } finally {
       setIsUploading(false);
     }
   };
 
-  async function pushProfilePhotoToS3(presignedUrl, uploadPhoto, index) {
-    try {
-      const myHeaders = new Headers({
-        "Content-Type": uploadPhoto.type,
-        "Content-Disposition": "inline",
-      });
+  const resetForm = () => {
+    setSelectedFiles([]);
+    setVideos([]);
+    setThumbnails([]);
+    setTitles([]);
+    setLoading([]);
+    setProgress([]);
+    setSelectedFriends([]);
+    setSelectedEmails([]);
+  };
 
-      const response = await axios.put(presignedUrl, uploadPhoto, {
+  async function pushToS3(presignedUrl, file, index) {
+    try {
+      const myHeaders = {
+        "Content-Type": file.type,
+        "Content-Disposition": "inline",
+      };
+
+      const response = await axios.put(presignedUrl, file, {
         headers: myHeaders,
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
@@ -471,13 +308,11 @@ const UploadClipCard = (props) => {
       });
       return response;
     } catch (error) {
-      console.error("Error:", error);
-      if (error.response) {
-        console.error("Response data:", error.response.data);
-      }
+      console.error("Error uploading to S3:", error);
       throw error;
     }
   }
+
 
   const getCategoryData = async () => {
     var res = await getMasterData();
@@ -504,15 +339,24 @@ const UploadClipCard = (props) => {
     }
   }, [isOpen]);
 
+  const removeFile = (index) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setVideos(prev => prev.filter((_, i) => i !== index));
+    setThumbnails(prev => prev.filter((_, i) => i !== index));
+    setTitles(prev => prev.filter((_, i) => i !== index));
+    setLoading(prev => prev.filter((_, i) => i !== index));
+    setProgress(prev => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <div
       className="d-flex flex-column align-items-center justify-content-center"
       style={{ minHeight: props.minHeight ?? "" }}
     >
-      <h2>Upload Clip</h2>
+      {!isFromCommunity && <h2>Upload Clip</h2>}
       <div className="form-group" style={{ color: "black" }}>
         {
-          userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER &&
+          !isFromCommunity && userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER &&
           <>
             <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
               Choose Category
@@ -535,6 +379,7 @@ const UploadClipCard = (props) => {
             </select>
           </>
         }
+        {!isFromCommunity &&
         <>
           <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
             Upload To
@@ -554,11 +399,11 @@ const UploadClipCard = (props) => {
               </option>
             ))}
           </select>
-        </>
+        </>}
         {
-          shareWith === shareWithConstants.myFriends &&
+          !isFromCommunity && shareWith === shareWithConstants.myFriends &&
           <div className="d-flex flex-column align-items-center">
-            <FriendsPopup props={{ buttonLabel: "Select Friends", setSelectedFriends }} />
+            <FriendsPopup props={{ buttonLabel: "Select Friends", setSelectedFriends,selectedFriends,isFromCommunity }} />
             <div>Total Friends Selected {selectedFriends.length}</div>
           </div>
         }
@@ -594,13 +439,13 @@ const UploadClipCard = (props) => {
             <div key={index} className="mb-3 p-2 border rounded">
               <div className="d-flex justify-content-between align-items-center">
                 <span>{file.name}</span>
-                <button
-                  className="btn btn-sm btn-danger"
+                <div
+                  className="icon-btn btn-sm btn-outline-light close-apps pointer"
                   onClick={() => removeFile(index)}
                   disabled={isUploading}
                 >
                   <X size={16} />
-                </button>
+                </div>
               </div>
 
               <div className="form-group mt-2">

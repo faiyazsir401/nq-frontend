@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Utils } from "../../../../utils/utils";
 import NavStudentRecord from "./NavStudentRecord";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
+import UploadClipCard from "../../videoupload/UploadClipCard";
 
 const StudentDetail = ({ videoClips, data }) => {
   // useEffect(() => {
   //   console.log("Received Data in StudentDetail:", data);
   // }, [data]);
+  const [progress,setProgress] = useState(0)
   const width600 = useMediaQuery(700);
 
   const trainee_id = data?._id;
@@ -20,7 +22,7 @@ const StudentDetail = ({ videoClips, data }) => {
 
   return (
     <div>
-      <h3 style={{ textAlign: 'center' }}>{addSuffix(data?.fullname)} clips</h3>
+      <h3 style={{ textAlign: 'center' }}>{addSuffix(data?.fullname)} Clips</h3>
       <div style={{
         display: 'flex',
         justifyContent: 'space-around',
@@ -28,6 +30,7 @@ const StudentDetail = ({ videoClips, data }) => {
         flexWrap:"wrap",
         gap:"15px"
       }}>
+        <div >
         <div className="card rounded trainer-profile-card" style={{
           width: "250px",
           maxHeight: "260px",
@@ -57,9 +60,23 @@ const StudentDetail = ({ videoClips, data }) => {
                 <h3>{data?.fullname}</h3>
               </div>
             </div>
+
+         
           </div>
         </div>
 
+        <div className="card rounded trainer-profile-card mt-2" style={{
+          width: "250px",
+         
+          border: "2px solid rgb(0, 0, 128)",
+          borderRadius: "5px"
+        }}>
+          <div className="card-body">
+
+            <UploadClipCard progress={progress} setProgress={setProgress} isFromCommunity={data?._id}/>
+          </div>
+        </div>
+</div>
         <div className="card rounded trainer-profile-card" style={{
           // maxWidth: "60%",
           width: `calc(100% - 300px)`,

@@ -123,7 +123,7 @@ const NotificationPopup = () => {
                   navigateToMeeting(newBooking?._id)
                   sendNotifications({
                     title: notificiationTitles.sessionStrated,
-                    description: `Trainer has Confirmed and started the session. Join the session via the upcoming sessions tab in My Locker.`,
+                    description: `Expert has Confirmed and started the session. Join the session via the upcoming sessions tab in My Locker.`,
                     senderId: userInfo._id,
                     receiverId: newBooking.trainee_info._id,
                     bookingInfo: newBooking,

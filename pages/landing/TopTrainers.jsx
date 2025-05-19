@@ -78,7 +78,7 @@ const TopTrainers = (props) => {
   return (
     <Container>
       <div className="text-center mb-5 d-flex flex-column">
-        <h2 className="mb-3">Top Trainers</h2>
+        <h2 className="mb-3">Top Experts</h2>
         <h3 className="text-secondary">
           Discover the best trainers across various specialties
         </h3>

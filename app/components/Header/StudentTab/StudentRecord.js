@@ -52,7 +52,7 @@ const StudentRecord = (props) => {  // Pass props to the component
     try {
       let res = await getRecentTrainers();
       setRecentStudent(res?.data);  // Store trainers in the same state variable
-      console.log("Recent Trainers:", res);
+      console.log("Recent Experts:", res);
     } catch (error) {
       console.log(error);
     }
@@ -62,7 +62,7 @@ const StudentRecord = (props) => {  // Pass props to the component
     try {
       let res = await getTraineeClips({ trainer_id: id });
       setRecentStudentClips(res?.data);
-      console.log("Trainee Clips:", res);
+      console.log("Enthusiast Clips:", res);
     } catch (error) {
       console.log(error);
     }
@@ -72,7 +72,7 @@ const StudentRecord = (props) => {  // Pass props to the component
     <div>
       <div className="col-11 ml-2">
         <div className="dot-btn dot-success mt-4"></div>
-        <h3 className="ml-1 text-uppercase mb-1"> {props.friends ? 'Trainers' : 'Students'} </h3>
+        <h3 className="ml-1 text-uppercase mb-1"> {props.friends ? 'Experts' : 'Students'} </h3>
       </div>
 
       <div className={`col-12`} style={{ display: "flex", flexWrap: "wrap" }}>

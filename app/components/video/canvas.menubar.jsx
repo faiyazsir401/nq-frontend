@@ -166,7 +166,7 @@ export const CanvasMenuBar = ({
             <div
               className="icon-btn  button-effect btn-sm"
               onClick={() => {
-                setDisplayColorPicker(true);
+                setDisplayColorPicker((prevVal)=>!prevVal);
               }}
               style={{
                 height: "24px",
@@ -730,7 +730,7 @@ export const CanvasMenuBar = ({
                         } select-clip-width`}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
-                      Trainee
+                      Enthusiast
                     </NavLink>
                   </NavItem>
                   <NavItem className="ml-5px  mt-2">

@@ -563,7 +563,7 @@ const BookingTable = ({
                   </>
                 ) : (
                   <div className="mt-1 ml-3" style={{ fontSize: "13px" }}>
-                    <span>Trainer is not available.</span>
+                    <span>Expert is not available.</span>
                   </div>
                 )}
               </div>

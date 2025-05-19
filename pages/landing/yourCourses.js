@@ -8,7 +8,7 @@ const YourCourses = () => {
       <div className="container">
         <div className="row">
           <div className="col-11">
-            {/* <h5 className="mt-2 text-uppercase mb-2">. Trending Trainers</h5> */}
+            {/* <h5 className="mt-2 text-uppercase mb-2">. Trending Experts</h5> */}
           </div>
           <span
             className="badge badge-light lg d-block text-center bg-gray mt-4"

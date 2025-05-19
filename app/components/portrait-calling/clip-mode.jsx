@@ -88,6 +88,7 @@ const VideoContainer = ({
   isLandscape,
   videoContainerRef
 }) => {
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   // const videoContainerRef = useRef(null);
@@ -300,6 +301,61 @@ const VideoContainer = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
     };
   }, [socket, clip?._id, videoRef]);
+  console.log("IsVideoLoaded",isVideoLoaded)
+  useEffect(() => {
+    const video = videoRef?.current;
+    if (!video) return;
+  
+    // More comprehensive video readiness check
+    const checkReadiness = () => {
+      // Check if enough data is loaded to likely play through without buffering
+      if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+        setIsVideoLoaded(true);
+        video.removeEventListener('canplay', checkReadiness);
+        video.removeEventListener('canplaythrough', checkReadiness);
+      }
+    };
+  
+    const handleError = () => {
+      console.error("Video failed to load");
+      setIsVideoLoaded(false);
+    };
+  
+    const handleStalled = () => {
+      console.log("Video playback stalled");
+      setIsVideoLoaded(false);
+    };
+  
+    const handleWaiting = () => {
+      console.log("Video waiting for data");
+      setIsVideoLoaded(false);
+    };
+  
+    // Multiple events to detect readiness
+    video.addEventListener('canplay', checkReadiness);
+    video.addEventListener('canplaythrough', checkReadiness);
+    video.addEventListener('loadeddata', checkReadiness);
+    video.addEventListener('error', handleError);
+    video.addEventListener('stalled', handleStalled);
+    video.addEventListener('waiting', handleWaiting);
+  
+    // Additional check for cases where video might already be ready
+    if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+      setIsVideoLoaded(true);
+    }
+  
+    // Set preload for better loading behavior
+    video.preload = "auto";
+  
+    return () => {
+      video.removeEventListener('canplay', checkReadiness);
+      video.removeEventListener('canplaythrough', checkReadiness);
+      video.removeEventListener('loadeddata', checkReadiness);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('stalled', handleStalled);
+      video.removeEventListener('waiting', handleWaiting);
+    };
+  }, [videoRef]);
 
   console.log("sky.zoom", scale);
   console.log("sky.pan", translate);
@@ -363,9 +419,37 @@ const VideoContainer = ({
       };
     }
   }, [videoRef]);
+  
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      if (!canvasRef.current || !videoContainerRef.current) return;
+      
+      const canvas = canvasRef.current;
+      const container = videoContainerRef.current;
+      
+      // Get actual displayed size
+      const { width, height } = container.getBoundingClientRect();
+      
+      // Set internal resolution to match display size
+      canvas.width = width;
+      canvas.height = height;
+      
+      console.log('Canvas dimensions updated:', width, height);
+    };
+  
+    // Initial setup
+    updateCanvasSize();
+  
+    // Handle window resizing
+    const resizeObserver = new ResizeObserver(updateCanvasSize);
+    resizeObserver.observe(videoContainerRef.current);
+  
+    return () => resizeObserver.disconnect();
+  }, [canvasRef, videoContainerRef]);
 
   return (
     <>
+    
       <div
         id="video-container"
         ref={videoContainerRef}
@@ -386,10 +470,15 @@ const VideoContainer = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          background: "gray",
+          background: "white",
           position: "relative",
         }}
       >
+        {!isVideoLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-800 z-10">
+            <div className="text-white">Loading video...</div>
+          </div>
+        )}
         {drawingMode && accountType === AccountType.TRAINER && (
           <div
             className="absolute hide-in-screenshot"
@@ -483,12 +572,14 @@ const VideoContainer = ({
           ref={canvasRef}
           id="drawing-canvas"
           className="canvas"
+        
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             width: '100%',
-            height: '100%', display: drawingMode ? "block" : "none"
+            height: '100%', 
+            display: drawingMode ? "block" : "none"
           }}
         />
         {drawingMode && accountType === AccountType.TRAINER && (
@@ -963,15 +1054,6 @@ const ClipModeCall = ({
 
     const canvas1 = canvasRef?.current;
     const canvas2 = canvasRef2?.current;
-
-    if (canvas1) {
-      canvas1.width = video1.clientWidth;
-      canvas1.height = video1.clientHeight;
-    }
-    if (canvas2) {
-      canvas2.width = video2.clientWidth;
-      canvas2.height = video2.clientHeight;
-    }
 
     const context1 = canvas1?.getContext("2d");
     const context2 = canvas2?.getContext("2d");

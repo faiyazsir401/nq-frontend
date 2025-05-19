@@ -28,7 +28,7 @@ const PopupContent = ({ onClose, userInfo, Logout }) => (
             </div>
           </div>
           {userInfo.is_kyc_completed && userInfo.status === "approved" && <div className="col-12 text-center">
-            <h5 style={{ color: 'green', padding: "5px" }}>Verified Trainer</h5>
+            <h5 style={{ color: 'green', padding: "5px" }}>Verified Expert</h5>
           </div>}
           <div className="col-12 text-center mt-3">
             <h3>{userInfo?.fullname}
