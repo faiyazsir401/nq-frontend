@@ -7,13 +7,13 @@ const faqs = [
     question: "Who are the Experts at NetQwix?",
     answer: (
       <>
-        NetQwix Experts are professionals are highly qualified in their subject
-        areas, passionate about their field of expertise, and carefully vetted
-        by NetQwix community. Experts have extensive experience and credentials
-        as displayed by their profiles. But there is nothing like direct
-        feedback from community members who have taken sessions. Each coach is
-        categorically rated so it is easier to select the expert that is best
-        for you.
+        NetQwix Experts are highly qualified professionals in their subject
+        areas. They are passionate about their field of expertise and carefully
+        vetted by the NetQwix community. Experts’ extensive experience and
+        credentials are available by reading their profile. But there is nothing
+        like direct feedback from community members who have enjoyed learning
+        sessions on NetQwix. Each coach is categorically rated so it is easier
+        to select the expert that is best for you.
       </>
     ),
   },
@@ -207,14 +207,14 @@ export default function FAQ() {
   return (
     <Section title="FAQ" subtitle="Frequently asked questions">
       <div className="container my-5">
-        <ol style={{ padding: isMobileScreen ? 0 : "auto" }}>
+        <ul style={{ padding: isMobileScreen ? 0 : "auto" }}>
           {faqs.map((faq, idx) => (
             <li eventKey={String(idx)} key={idx}>
               <h5 className="mb-1">{faq.question}</h5>
               <p style={{ fontWeight: 400 }}>{faq.answer}</p>
             </li>
           ))}
-        </ol>
+        </ul>
       </div>
       <h4 className="text-center text-muted">
         Still have questions? Email us at{" "}
