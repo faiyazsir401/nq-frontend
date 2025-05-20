@@ -56,6 +56,7 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
       trainerInfo={meetingDetails.trainer_info}
       session_end_time={meetingDetails.session_end_time}
       session_start_time={meetingDetails.session_start_time}
+      extended_session_end_time={meetingDetails.extended_session_end_time}
       isClose={() => {
         MeetingSetter({
           id: null,

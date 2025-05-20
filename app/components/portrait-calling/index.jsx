@@ -49,6 +49,7 @@ import ReactStrapModal from "../../common/modal";
 import Ratings from "../bookings/ratings";
 import TraineeRatings from "../bookings/ratings/trainee";
 import { useMediaQuery } from "usehooks-ts";
+import { updateExtendedSessionTime } from "../../common/common.api";
 
 
 let Peer;
@@ -84,6 +85,8 @@ const VideoCallUI = ({
   traineeInfo,
   trainerInfo,
   session_end_time,
+  session_start_time,
+  extended_session_end_time,
   bIndex,
   isLandscape,
 }) => {
@@ -142,6 +145,8 @@ const VideoCallUI = ({
   const [isModelOpen, setIsModelOpen] = useState(false);
   const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
   const [showScreenshotButton, setShowScreenshotButton] = useState(false)
+  const [isSessionExtended, setIsSessionExtended] = useState(false);
+  const [sessionEndTime,setSessionEndTime] = useState(session_end_time)
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -171,9 +176,70 @@ const VideoCallUI = ({
     }
   }, [isOpen]);
 
+  useEffect(()=>{
+    setSessionEndTime(session_end_time)
+  },[session_end_time])
+
+  // Add this function to extend the session time
+  const extendSessionTime = async() => {
+    try {
+      // Parse session start time
+      const [startHours, startMinutes] = session_start_time.split(':').map(Number);
+  
+      // Create Date object for session_start_time
+      const now = new Date();
+      const startTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        startHours,
+        startMinutes
+      );
+  
+      // Create Date object for current time
+      const currentTime = new Date();
+  
+      // Calculate difference between current time and session start time
+      const timeElapsed = currentTime - startTime;
+  
+      if (timeElapsed < 0) {
+        console.warn("Current time is before the session start time. Cannot extend.");
+        return;
+      }
+  
+      // Parse session end time
+      const [endHours, endMinutes] = session_end_time.split(':').map(Number);
+      const endTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        endHours,
+        endMinutes
+      );
+  
+      // Add the time elapsed to session end time
+      const newEndTime = new Date(endTime.getTime() + timeElapsed);
+  
+      // Format new end time to HH:MM
+      const newEndHours = String(newEndTime.getHours()).padStart(2, '0');
+      const newEndMinutes = String(newEndTime.getMinutes()).padStart(2, '0');
+      const newEndTimeStr = `${newEndHours}:${newEndMinutes}`;
+  
+      // Update the session_end_time
+      console.log("newEndTimeStr",id, newEndTimeStr);
+      setSessionEndTime(newEndTimeStr);
+      
+      await updateExtendedSessionTime({ sessionId:id, extendedEndTime:newEndTimeStr });
+      console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
+    } catch (error) {
+      console.error("Error extending session time:", error);
+    }
+  };
+
+
   useEffect(() => {
     const checkStatus = () => {
-      const isEndCall = getTimeDifferenceStatus(session_end_time);
+      const isEndCall = getTimeDifferenceStatus(sessionEndTime);
 
       if (isEndCall) {
         cutCall()
@@ -188,7 +254,7 @@ const VideoCallUI = ({
 
     // Cleanup on unmount
     return () => clearInterval(intervalId);
-  }, [session_end_time]);
+  }, [sessionEndTime]);
 
   const getMyClips = async () => {
     var res = await myClips({});
@@ -946,6 +1012,19 @@ const takeScreenshot = async () => {
     }
   }, [startMeeting, accountType]);
 
+  // Add this useEffect to handle session extension when both parties join
+  useEffect(() => {
+    if(extended_session_end_time){
+      setSessionEndTime(extended_session_end_time)
+    }else{
+      if (isTraineeJoined) {
+        extendSessionTime();
+        setIsSessionExtended(true);
+      }
+    }
+    
+  }, [isTraineeJoined]);
+
   console.log("refs", localVideoRef, remoteVideoRef, remoteStream);
   console.log("videoRef",videoRef)
   return (
@@ -960,7 +1039,7 @@ const takeScreenshot = async () => {
       {displayMsg?.show ? <div style={{ textAlign: "center" }}>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
-          timeRemaining={session_end_time}
+          timeRemaining={sessionEndTime}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
           selectedClips={selectedClips}
@@ -987,7 +1066,7 @@ const takeScreenshot = async () => {
         />
       ) : (
         <OneOnOneCall
-          timeRemaining={session_end_time}
+          timeRemaining={sessionEndTime}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
           localVideoRef={localVideoRef}
