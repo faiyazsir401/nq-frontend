@@ -57,7 +57,7 @@ const OneOnOneCall = ({
   return (
     <>
       <div className="d-flex w-100 justify-content-end mr-5 mt-2">
-        <TimeRemaining timeRemaining={timeRemaining} />
+      {timeRemaining && <TimeRemaining timeRemaining={timeRemaining} />}
       </div>
 
       <div className="video-section">

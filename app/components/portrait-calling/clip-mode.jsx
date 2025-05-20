@@ -1599,10 +1599,10 @@ const ClipModeCall = ({
           </div>
         )}
 
-        {drawingMode && accountType === AccountType.TRAINER ? (
+        {drawingMode && accountType === AccountType.TRAINER  ? (
           <></>
         ) : (
-          <TimeRemaining timeRemaining={timeRemaining} />
+          timeRemaining &&  <TimeRemaining timeRemaining={timeRemaining} />
         )}
       </div>
       <div

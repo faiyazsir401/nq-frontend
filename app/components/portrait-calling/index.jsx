@@ -55,27 +55,7 @@ import { updateExtendedSessionTime } from "../../common/common.api";
 let Peer;
 let timeoutId;
 
-const getTimeDifferenceStatus = (session_end_time) => {
-  const now = new Date();
 
-  if (typeof session_end_time === "string" && session_end_time.includes(":")) {
-    const [endHours, endMinutes] = session_end_time.split(":").map(Number);
-    const endTime = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      endHours,
-      endMinutes
-    );
-
-    const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
-
-    return timeDiff <= -5; // Returns true if timeDiff is -5 or less
-  } else {
-    console.error("Invalid session_end_time:", session_end_time);
-    return false; // Handle invalid input
-  }
-};
 
 
 const VideoCallUI = ({
@@ -146,7 +126,11 @@ const VideoCallUI = ({
   const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
   const [showScreenshotButton, setShowScreenshotButton] = useState(false)
   const [isSessionExtended, setIsSessionExtended] = useState(false);
-  const [sessionEndTime,setSessionEndTime] = useState(session_end_time)
+  const [sessionEndTime, setSessionEndTime] = useState(null)
+  const [showGracePeriodModal, setShowGracePeriodModal] = useState(false);
+  const [showSessionEndedModal, setShowSessionEndedModal] = useState(false);
+  const [countdownMessage, setCountdownMessage] = useState("");
+  const [gracePeriodModalDismissed, setGracePeriodModalDismissed] = useState(false);
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -176,16 +160,46 @@ const VideoCallUI = ({
     }
   }, [isOpen]);
 
-  useEffect(()=>{
-    setSessionEndTime(session_end_time)
-  },[session_end_time])
+  function getTimeDifferenceStatus(session_end_time) {
+    const now = new Date();
+
+    if (typeof session_end_time === "string" && session_end_time.includes(":")) {
+      const [endHours, endMinutes] = session_end_time.split(":").map(Number);
+      const endTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        endHours,
+        endMinutes
+      );
+
+      const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
+      // Show grace period modal at -4 minutes
+      if (timeDiff <= -4 && timeDiff > -5 && !gracePeriodModalDismissed) {
+        setShowGracePeriodModal(true);
+        setCountdownMessage("1 minute");
+      }
+
+      // Show session ended modal at -5 minutes
+      if (timeDiff <= -5) {
+        setShowGracePeriodModal(false);
+        setShowSessionEndedModal(true);
+        return true; // Returns true to trigger call end
+      }
+
+      return false;
+    } else {
+      console.error("Invalid session_end_time:", session_end_time);
+      return false; // Handle invalid input
+    }
+  };
 
   // Add this function to extend the session time
-  const extendSessionTime = async() => {
+  const extendSessionTime = async () => {
     try {
       // Parse session start time
       const [startHours, startMinutes] = session_start_time.split(':').map(Number);
-  
+
       // Create Date object for session_start_time
       const now = new Date();
       const startTime = new Date(
@@ -195,18 +209,18 @@ const VideoCallUI = ({
         startHours,
         startMinutes
       );
-  
+
       // Create Date object for current time
       const currentTime = new Date();
-  
+
       // Calculate difference between current time and session start time
       const timeElapsed = currentTime - startTime;
-  
+
       if (timeElapsed < 0) {
         console.warn("Current time is before the session start time. Cannot extend.");
         return;
       }
-  
+
       // Parse session end time
       const [endHours, endMinutes] = session_end_time.split(':').map(Number);
       const endTime = new Date(
@@ -216,20 +230,20 @@ const VideoCallUI = ({
         endHours,
         endMinutes
       );
-  
+
       // Add the time elapsed to session end time
       const newEndTime = new Date(endTime.getTime() + timeElapsed);
-  
+
       // Format new end time to HH:MM
       const newEndHours = String(newEndTime.getHours()).padStart(2, '0');
       const newEndMinutes = String(newEndTime.getMinutes()).padStart(2, '0');
       const newEndTimeStr = `${newEndHours}:${newEndMinutes}`;
-  
+
       // Update the session_end_time
-      console.log("newEndTimeStr",id, newEndTimeStr);
+      console.log("newEndTimeStr", id, newEndTimeStr);
       setSessionEndTime(newEndTimeStr);
-      
-      await updateExtendedSessionTime({ sessionId:id, extendedEndTime:newEndTimeStr });
+
+      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: newEndTimeStr });
       console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
     } catch (error) {
       console.error("Error extending session time:", error);
@@ -239,7 +253,7 @@ const VideoCallUI = ({
 
   useEffect(() => {
     const checkStatus = () => {
-      const isEndCall = getTimeDifferenceStatus(sessionEndTime);
+      const isEndCall = getTimeDifferenceStatus(sessionEndTime ??session_end_time);
 
       if (isEndCall) {
         cutCall()
@@ -302,8 +316,8 @@ const VideoCallUI = ({
     }
   });
 
-  socket.on(EVENTS.CALL_END,() => {
-    if(accountType === AccountType.TRAINEE){
+  socket.on(EVENTS.CALL_END, () => {
+    if (accountType === AccountType.TRAINEE) {
       cutCall();
       setIsOpenRating(true)
     }
@@ -408,12 +422,12 @@ const VideoCallUI = ({
       );
 
       return mergeCanvases(canvas, drawingCanvasRef);
-      
+
     } catch (error) {
       console.log("error", error);
       return null;
     }
-};
+  };
 
   const mergeCanvases = (croppedCanvas, drawingCanvasRef) => {
     try {
@@ -436,18 +450,18 @@ const VideoCallUI = ({
       adjustedCtx.fillRect(0, 0, finalWidth, finalHeight);
 
       // Calculate offsets for centering the cropped canvas if it's smaller
-      const xOffset = croppedCanvas.width < finalWidth 
-        ? (finalWidth - croppedCanvas.width) / 2 
+      const xOffset = croppedCanvas.width < finalWidth
+        ? (finalWidth - croppedCanvas.width) / 2
         : 0;
-      
-      const yOffset = croppedCanvas.height < finalHeight 
-        ? (finalHeight - croppedCanvas.height) / 2 
+
+      const yOffset = croppedCanvas.height < finalHeight
+        ? (finalHeight - croppedCanvas.height) / 2
         : 0;
 
       // Draw the cropped canvas centered if smaller than final dimensions
       adjustedCtx.drawImage(
-        croppedCanvas, 
-        xOffset, 
+        croppedCanvas,
+        xOffset,
         yOffset,
         croppedCanvas.width,
         croppedCanvas.height
@@ -470,154 +484,154 @@ const VideoCallUI = ({
       console.error("Error in mergeCanvases:", error);
       return null;
     }
-};
+  };
 
-const takeScreenshot = async () => {
-  try {
-    setIsLoading(true);
-    setCurrentScreenshot("");
-    setIsScreenShotModelOpen(false);
+  const takeScreenshot = async () => {
+    try {
+      setIsLoading(true);
+      setCurrentScreenshot("");
+      setIsScreenShotModelOpen(false);
 
-    // Ensure video posters are shown before taking the screenshot
-    const videos = document.querySelectorAll("#video-container video");
-    videos.forEach(video => {
-      // Ensure each video is briefly played to trigger poster image rendering
-      if (!video.paused) return;  // Skip if video is already playing
-      video.play();
-      video.pause();
-    });
-
-    setTimeout(async () => {
-      let targetElement = document.getElementById("clip-container");
-      if (!targetElement) {
-        targetElement = document.body;
-      }
-      // Select only elements with the class "hide-in-screenshot"
-      const elementsToHide = Array.from(
-        targetElement.getElementsByClassName("hide-in-screenshot")
-      );
-
-      // Hide selected elements
-      elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
-
-      const croppedCanvas1 = extractCroppedFrame(videoRef, videoContainerRef, canvasRef);
-      const croppedCanvas2 = videoRef2 && videoContainerRef2 && canvasRef2
-        ? extractCroppedFrame(videoRef2, videoContainerRef2, canvasRef2)
-        : null;
-
-      if (!croppedCanvas1) {
-        console.error("Could not create the cropped frame");
-        return null;
-      }
-
-      let finalCanvas;
-
-      if (croppedCanvas2) {
-        // Create final canvas (vertical stack) when both videos exist
-        finalCanvas = document.createElement('canvas');
-        const finalWidth = Math.max(croppedCanvas1.width, croppedCanvas2.width);
-        const finalHeight = croppedCanvas1.height + croppedCanvas2.height;
-        finalCanvas.width = finalWidth;
-        finalCanvas.height = finalHeight;
-
-        const ctx = finalCanvas.getContext('2d');
-
-        // Draw first canvas (centered horizontally)
-        ctx.drawImage(
-          croppedCanvas1,
-          (finalWidth - croppedCanvas1.width) / 2, 0
-        );
-
-        // Draw second canvas below first one (centered horizontally)
-        ctx.drawImage(
-          croppedCanvas2,
-          (finalWidth - croppedCanvas2.width) / 2, croppedCanvas1.height
-        );
-      } else {
-        // Use only the first canvas if second video doesn't exist
-        finalCanvas = croppedCanvas1;
-      }
-
-      // Create a new canvas to add watermark and copyright
-      const watermarkedCanvas = document.createElement('canvas');
-      watermarkedCanvas.width = finalCanvas.width;
-      watermarkedCanvas.height = finalCanvas.height;
-      const watermarkedCtx = watermarkedCanvas.getContext('2d');
-
-      // Draw the original content first
-      watermarkedCtx.drawImage(finalCanvas, 0, 0);
-
-      // Add NetQuix logo at top left
-      const logoImg = new Image();
-      logoImg.src = "/assets/images/netquix_logo_beta.png";
-      await new Promise((resolve) => {
-        logoImg.onload = resolve;
-      });
-      
-      const logoWidth = 100; // Scale based on canvas width
-      const logoHeight = 35 ; // Scale based on canvas height
-      const logoPadding = 5;
-      
-      watermarkedCtx.drawImage(
-        logoImg,
-        logoPadding+5,
-        logoPadding,
-        logoWidth,
-        logoHeight
-      );
-
-      // Add copyright text at bottom right
-      watermarkedCtx.font = `16px Arial`;
-      watermarkedCtx.fillStyle = "gray";
-      watermarkedCtx.textAlign = "right";
-      
-      const copyrightText = "©NetQwix.com";
-      const textPadding = 10 ;
-      const textY = watermarkedCanvas.height - 10;
-      
-      watermarkedCtx.fillText(
-        copyrightText,
-        watermarkedCanvas.width - textPadding,
-        textY
-      );
-
-      const dataUrl = watermarkedCanvas.toDataURL("image/png");
-      console.log("dataUrl",dataUrl)
-      // Restore visibility of hidden elements
-      elementsToHide.forEach((el) => (el.style.visibility = "visible"));
-
-      var res = await screenShotTake({
-        sessions: id,
-        trainer: fromUser?._id,
-        trainee: toUser?._id,
+      // Ensure video posters are shown before taking the screenshot
+      const videos = document.querySelectorAll("#video-container video");
+      videos.forEach(video => {
+        // Ensure each video is briefly played to trigger poster image rendering
+        if (!video.paused) return;  // Skip if video is already playing
+        video.play();
+        video.pause();
       });
 
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-
-      if (!blob) {
-        return toast.error("Unable to take Screen Shot");
-      }
-
-      if (res?.data?.url) {
-        setIsScreenShotModelOpen(true);
-        await pushProfilePhotoToS3(
-          res?.data?.url,
-          blob,
-          null,
-          afterSucessUploadImageOnS3
+      setTimeout(async () => {
+        let targetElement = document.getElementById("clip-container");
+        if (!targetElement) {
+          targetElement = document.body;
+        }
+        // Select only elements with the class "hide-in-screenshot"
+        const elementsToHide = Array.from(
+          targetElement.getElementsByClassName("hide-in-screenshot")
         );
-        toast.success("The screenshot taken successfully.", {
-          type: "success",
+
+        // Hide selected elements
+        elementsToHide.forEach((el) => (el.style.visibility = "hidden"));
+
+        const croppedCanvas1 = extractCroppedFrame(videoRef, videoContainerRef, canvasRef);
+        const croppedCanvas2 = videoRef2 && videoContainerRef2 && canvasRef2
+          ? extractCroppedFrame(videoRef2, videoContainerRef2, canvasRef2)
+          : null;
+
+        if (!croppedCanvas1) {
+          console.error("Could not create the cropped frame");
+          return null;
+        }
+
+        let finalCanvas;
+
+        if (croppedCanvas2) {
+          // Create final canvas (vertical stack) when both videos exist
+          finalCanvas = document.createElement('canvas');
+          const finalWidth = Math.max(croppedCanvas1.width, croppedCanvas2.width);
+          const finalHeight = croppedCanvas1.height + croppedCanvas2.height;
+          finalCanvas.width = finalWidth;
+          finalCanvas.height = finalHeight;
+
+          const ctx = finalCanvas.getContext('2d');
+
+          // Draw first canvas (centered horizontally)
+          ctx.drawImage(
+            croppedCanvas1,
+            (finalWidth - croppedCanvas1.width) / 2, 0
+          );
+
+          // Draw second canvas below first one (centered horizontally)
+          ctx.drawImage(
+            croppedCanvas2,
+            (finalWidth - croppedCanvas2.width) / 2, croppedCanvas1.height
+          );
+        } else {
+          // Use only the first canvas if second video doesn't exist
+          finalCanvas = croppedCanvas1;
+        }
+
+        // Create a new canvas to add watermark and copyright
+        const watermarkedCanvas = document.createElement('canvas');
+        watermarkedCanvas.width = finalCanvas.width;
+        watermarkedCanvas.height = finalCanvas.height;
+        const watermarkedCtx = watermarkedCanvas.getContext('2d');
+
+        // Draw the original content first
+        watermarkedCtx.drawImage(finalCanvas, 0, 0);
+
+        // Add NetQuix logo at top left
+        const logoImg = new Image();
+        logoImg.src = "/assets/images/netquix_logo_beta.png";
+        await new Promise((resolve) => {
+          logoImg.onload = resolve;
         });
-      }
-    }, 1000);
-  } catch (error) {
-    console.log("error: Take Screenshot: ", error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+        const logoWidth = 100; // Scale based on canvas width
+        const logoHeight = 35; // Scale based on canvas height
+        const logoPadding = 5;
+
+        watermarkedCtx.drawImage(
+          logoImg,
+          logoPadding + 5,
+          logoPadding,
+          logoWidth,
+          logoHeight
+        );
+
+        // Add copyright text at bottom right
+        watermarkedCtx.font = `16px Arial`;
+        watermarkedCtx.fillStyle = "gray";
+        watermarkedCtx.textAlign = "right";
+
+        const copyrightText = "©NetQwix.com";
+        const textPadding = 10;
+        const textY = watermarkedCanvas.height - 10;
+
+        watermarkedCtx.fillText(
+          copyrightText,
+          watermarkedCanvas.width - textPadding,
+          textY
+        );
+
+        const dataUrl = watermarkedCanvas.toDataURL("image/png");
+        console.log("dataUrl", dataUrl)
+        // Restore visibility of hidden elements
+        elementsToHide.forEach((el) => (el.style.visibility = "visible"));
+
+        var res = await screenShotTake({
+          sessions: id,
+          trainer: fromUser?._id,
+          trainee: toUser?._id,
+        });
+
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+
+        if (!blob) {
+          return toast.error("Unable to take Screen Shot");
+        }
+
+        if (res?.data?.url) {
+          setIsScreenShotModelOpen(true);
+          await pushProfilePhotoToS3(
+            res?.data?.url,
+            blob,
+            null,
+            afterSucessUploadImageOnS3
+          );
+          toast.success("The screenshot taken successfully.", {
+            type: "success",
+          });
+        }
+      }, 1000);
+    } catch (error) {
+      console.log("error: Take Screenshot: ", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
   console.log("TimeOut", timeoutId)
@@ -953,14 +967,21 @@ const takeScreenshot = async () => {
 
   const cutCall = () => {
     if (!userAlreadyInCall) {
-      socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, { userInfo: { from_user: fromUser._id, to_user: toUser._id } });
+      socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, {
+        userInfo: { from_user: fromUser._id, to_user: toUser._id }
+      });
     }
-    cleanupFunction();
-    if (isTraineeJoined && AccountType.TRAINER === accountType) {
-      setIsOpenReport(true);
+
+    // Show session ended modal if not already shown
+    if (!showSessionEndedModal) {
+      setShowSessionEndedModal(true);
     } else {
-      // isClose();
-      setIsOpenRating(true)
+      cleanupFunction();
+      if (isTraineeJoined && AccountType.TRAINER === accountType) {
+        setIsOpenReport(true);
+      } else if (accountType === AccountType.TRAINEE) {
+        setIsOpenRating(true);
+      }
     }
   };
 
@@ -1014,19 +1035,19 @@ const takeScreenshot = async () => {
 
   // Add this useEffect to handle session extension when both parties join
   useEffect(() => {
-    if(extended_session_end_time){
+    if (extended_session_end_time) {
       setSessionEndTime(extended_session_end_time)
-    }else{
+    } else {
       if (isTraineeJoined) {
         extendSessionTime();
         setIsSessionExtended(true);
       }
     }
-    
+
   }, [isTraineeJoined]);
 
   console.log("refs", localVideoRef, remoteVideoRef, remoteStream);
-  console.log("videoRef",videoRef)
+  console.log("videoRef", videoRef)
   return (
     <div
       className="video-call-container"
@@ -1654,18 +1675,68 @@ const takeScreenshot = async () => {
               color="danger"
               onClick={() => {
                 cutCall();
-                if(accountType === AccountType.TRAINER){
+                if (accountType === AccountType.TRAINER) {
                   socket.emit(EVENTS.CALL_END, {
                     userInfo: { from_user: fromUser._id, to_user: toUser._id }
                   });
                 }
-             
+
               }}
             >
               Yes
             </Button>
           </div>
         </ModalBody>
+      </Modal>
+
+      {/* Grace Period Modal (-4 minutes) */}
+      <Modal isOpen={showGracePeriodModal} centered>
+        <ModalHeader>Thank you for using NetQwix!</ModalHeader>
+        <ModalBody>
+          <p>
+            We give our community a 5 minute grace period after each session to say good bye
+            and discuss the game plan moving forward.
+          </p>
+          <p>
+            The session will automatically close in {countdownMessage}.
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={() =>{ setShowGracePeriodModal(false);setGracePeriodModalDismissed(true);}}>
+            OK
+          </Button>
+        </ModalFooter>
+      </Modal>
+
+      {/* Session Ended Modal (-5 minutes) */}
+      <Modal isOpen={showSessionEndedModal} centered>
+        <ModalHeader>Your session has now ended.</ModalHeader>
+        <ModalBody>
+          <p>
+            Please make sure to rate your experience momentarily.
+          </p>
+          <p>
+            Visit your locker shortly to view your game plan.
+          </p>
+          <p>
+            Thank you for using NetQwix.
+          </p>
+          <p>
+            See you soon!
+          </p>
+        </ModalBody>
+        <ModalFooter>
+          <Button color="primary" onClick={() => {
+            setShowSessionEndedModal(false);
+            if (accountType === AccountType.TRAINEE) {
+              setIsOpenRating(true);
+            }else{
+              setIsOpenReport(true)
+            }
+          }}>
+            OK
+          </Button>
+        </ModalFooter>
       </Modal>
     </div>
   );
