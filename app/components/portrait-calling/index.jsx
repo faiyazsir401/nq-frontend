@@ -965,7 +965,7 @@ const VideoCallUI = ({
 
   console.log("displayMessage", displayMsg)
 
-  const cutCall = () => {
+  const cutCall = (manually) => {
     if (!userAlreadyInCall) {
       socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id }
@@ -973,7 +973,7 @@ const VideoCallUI = ({
     }
 
     // Show session ended modal if not already shown
-    if (!showSessionEndedModal) {
+    if (!showSessionEndedModal && !manually) {
       setShowSessionEndedModal(true);
     } else {
       cleanupFunction();
@@ -1674,7 +1674,7 @@ const VideoCallUI = ({
               className="mx-3"
               color="danger"
               onClick={() => {
-                cutCall();
+                cutCall(true);
                 if (accountType === AccountType.TRAINER) {
                   socket.emit(EVENTS.CALL_END, {
                     userInfo: { from_user: fromUser._id, to_user: toUser._id }
