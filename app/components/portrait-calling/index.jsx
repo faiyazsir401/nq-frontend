@@ -178,13 +178,13 @@ const VideoCallUI = ({
       const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
       // Show grace period modal at -4 minutes
       console.log("gracePeriodModalDismissed",gracePeriodModalDismissedRef.current)
-      if (timeDiff <= -1 && timeDiff > -10 && !gracePeriodModalDismissedRef.current) {
+      if (timeDiff <= -4 && timeDiff > -5 && !gracePeriodModalDismissedRef.current) {
         setShowGracePeriodModal(true);
         setCountdownMessage("1 minute");
       }
 
       // Show session ended modal at -5 minutes
-      if (timeDiff <= -10 &&!sessionEndedModalDismissedRef.current) {
+      if (timeDiff <= -5 &&!sessionEndedModalDismissedRef.current) {
         setShowGracePeriodModal(false);
         setShowSessionEndedModal(true);
         return true; // Returns true to trigger call end
@@ -245,7 +245,10 @@ const VideoCallUI = ({
       // Update the session_end_time
       console.log("newEndTimeStr", id, newEndTimeStr);
       setSessionEndTime(newEndTimeStr);
-
+      socket.emit("ON_BOTH_JOIN", {
+        userInfo: { from_user: fromUser._id, to_user: toUser._id },
+        newEndTimeStr
+      });
       await updateExtendedSessionTime({ sessionId: id, extendedEndTime: newEndTimeStr });
       console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
     } catch (error) {
@@ -847,6 +850,13 @@ const VideoCallUI = ({
   };
   console.log("isTraineeJoined", isTraineeJoined);
 
+  socket.on("ON_BOTH_JOIN", (data) => {
+    console.log("newEndTimeStr",data.socketReq.newEndTimeStr)
+    if(accountType === AccountType.TRAINEE){
+      setSessionEndTime(data.socketReq.newEndTimeStr)
+    }
+  });
+
   const listenSocketEvents = () => {
 
     socket.on("ON_CALL_JOIN", ({ userInfo }) => {
@@ -854,6 +864,8 @@ const VideoCallUI = ({
       if (!(peerRef && peerRef.current)) return;
       connectToPeer(peerRef.current, from_user);
     });
+
+
 
     // Handle signaling events from the signaling server
     socket.on(EVENTS.VIDEO_CALL.ON_OFFER, (offer) => {
@@ -1035,13 +1047,14 @@ const VideoCallUI = ({
       };
     }
   }, [startMeeting, accountType]);
-
+  console.log("SessionEndTime",sessionEndTime)
   // Add this useEffect to handle session extension when both parties join
   useEffect(() => {
     if (extended_session_end_time) {
+      console.log("extended_session_end_time",extended_session_end_time)
       setSessionEndTime(extended_session_end_time)
     } else {
-      if (isTraineeJoined) {
+      if (isTraineeJoined && accountType === AccountType.TRAINER) {
         extendSessionTime();
         setIsSessionExtended(true);
       }
