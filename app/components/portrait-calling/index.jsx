@@ -130,7 +130,9 @@ const VideoCallUI = ({
   const [showGracePeriodModal, setShowGracePeriodModal] = useState(false);
   const [showSessionEndedModal, setShowSessionEndedModal] = useState(false);
   const [countdownMessage, setCountdownMessage] = useState("");
-  const [gracePeriodModalDismissed, setGracePeriodModalDismissed] = useState(false);
+  const gracePeriodModalDismissedRef = useRef(false);
+  const sessionEndedModalDismissedRef = useRef(false);
+
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -175,13 +177,14 @@ const VideoCallUI = ({
 
       const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
       // Show grace period modal at -4 minutes
-      if (timeDiff <= -4 && timeDiff > -5 && !gracePeriodModalDismissed) {
+      console.log("gracePeriodModalDismissed",gracePeriodModalDismissedRef.current)
+      if (timeDiff <= -1 && timeDiff > -10 && !gracePeriodModalDismissedRef.current) {
         setShowGracePeriodModal(true);
         setCountdownMessage("1 minute");
       }
 
       // Show session ended modal at -5 minutes
-      if (timeDiff <= -5) {
+      if (timeDiff <= -10 &&!sessionEndedModalDismissedRef.current) {
         setShowGracePeriodModal(false);
         setShowSessionEndedModal(true);
         return true; // Returns true to trigger call end
@@ -253,10 +256,10 @@ const VideoCallUI = ({
 
   useEffect(() => {
     const checkStatus = () => {
-      const isEndCall = getTimeDifferenceStatus(sessionEndTime ??session_end_time);
-
+      const isEndCall = getTimeDifferenceStatus(sessionEndTime);
+      
       if (isEndCall) {
-        cutCall()
+        cutCall(true)
       }
     };
 
@@ -973,11 +976,11 @@ const VideoCallUI = ({
     }
 
     // Show session ended modal if not already shown
-    if (!showSessionEndedModal && !manually) {
+    if (!showSessionEndedModal && manually) {
       setShowSessionEndedModal(true);
     } else {
       cleanupFunction();
-      if (isTraineeJoined && AccountType.TRAINER === accountType) {
+      if (AccountType.TRAINER === accountType) {
         setIsOpenReport(true);
       } else if (accountType === AccountType.TRAINEE) {
         setIsOpenRating(true);
@@ -1674,7 +1677,7 @@ const VideoCallUI = ({
               className="mx-3"
               color="danger"
               onClick={() => {
-                cutCall(true);
+                cutCall();
                 if (accountType === AccountType.TRAINER) {
                   socket.emit(EVENTS.CALL_END, {
                     userInfo: { from_user: fromUser._id, to_user: toUser._id }
@@ -1690,7 +1693,7 @@ const VideoCallUI = ({
       </Modal>
 
       {/* Grace Period Modal (-4 minutes) */}
-      <Modal isOpen={showGracePeriodModal} centered>
+      <Modal isOpen={showGracePeriodModal} centered >
         <ModalHeader>Thank you for using NetQwix!</ModalHeader>
         <ModalBody>
           <p>
@@ -1702,7 +1705,7 @@ const VideoCallUI = ({
           </p>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={() =>{ setShowGracePeriodModal(false);setGracePeriodModalDismissed(true);}}>
+          <Button color="primary" onClick={() =>{gracePeriodModalDismissedRef.current = true; setShowGracePeriodModal(false);}}>
             OK
           </Button>
         </ModalFooter>
@@ -1727,6 +1730,7 @@ const VideoCallUI = ({
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={() => {
+            sessionEndedModalDismissedRef.current = true;
             setShowSessionEndedModal(false);
             if (accountType === AccountType.TRAINEE) {
               setIsOpenRating(true);
