@@ -499,6 +499,7 @@ slick-slider .slick-list,
 // }
 .react-tiny-popover-container {
   z-index: $canvas-z-index + 999 !important;
+  transform: translate(15px, 60px) !important;
 }
 
 .rotate-90 {

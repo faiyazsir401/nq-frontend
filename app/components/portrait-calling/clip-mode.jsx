@@ -1696,7 +1696,7 @@ const ClipModeCall = ({
             zIndex: 10,
             bottom: 40,
             right: 5,
-            color: "white",
+            color: "black",
           }}
         >
           &copy; NetQwix.com
