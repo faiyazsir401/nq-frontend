@@ -1599,10 +1599,10 @@ const ClipModeCall = ({
           </div>
         )}
 
-        {drawingMode && accountType === AccountType.TRAINER ? (
+        {drawingMode && accountType === AccountType.TRAINER  ? (
           <></>
         ) : (
-          <TimeRemaining timeRemaining={timeRemaining} />
+          timeRemaining &&  <TimeRemaining timeRemaining={timeRemaining} />
         )}
       </div>
       <div
@@ -1696,7 +1696,7 @@ const ClipModeCall = ({
             zIndex: 10,
             bottom: 40,
             right: 5,
-            color: "white",
+            color: "black",
           }}
         >
           &copy; NetQwix.com

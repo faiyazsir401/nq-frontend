@@ -237,7 +237,7 @@ const TraineeRatings = ({ onClose, booking_id, accountType, tabBook, isFromCall,
                                                 setValues({ ...values, remarksInfo: value });
                                             }}
                                             value={values.remarksInfo}
-                                            placeholder={"leave a review"}
+                                            placeholder={"Leave a review"}
                                             onBlur={handleBlur}
                                             className="form-control mt-1"
                                             name=""

@@ -240,5 +240,27 @@ export const updateNotificationSettings = async (payload) => {
   }
 };
 
+export const updateExtendedSessionTime = async (payload) => {
+  try {
+    const response = await axiosInstance({
+      url: `/common/extend-session-end-time`,
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        Authorization: `Bearer ${Utils.getToken(
+          LOCAL_STORAGE_KEYS.ACCESS_TOKEN
+        )}`,
+      },
+      data: payload,
+    });
+    console.log("response", response.data);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+
 
 

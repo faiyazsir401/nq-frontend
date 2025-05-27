@@ -285,7 +285,7 @@ const reportModal = ({
     setIsOpenReport(false);
     setPreview(false);
     resetState();
-    if (isTraineeJoined && isCallEnded) {
+    if (isCallEnded) {
       isClose();
     }
   };

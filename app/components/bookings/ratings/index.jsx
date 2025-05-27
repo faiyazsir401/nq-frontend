@@ -265,7 +265,7 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                         setValues({ ...values, remarksInfo: value });
                       }}
                       value={values.remarksInfo}
-                      placeholder={isFromCall?"leave a review":"Add Remarks"}
+                      placeholder={isFromCall?"Leave a review":"Add Remarks"}
                       onBlur={handleBlur}
                       className="form-control mt-1"
                       name=""
