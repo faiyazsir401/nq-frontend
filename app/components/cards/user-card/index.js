@@ -20,6 +20,7 @@ import {
 import { useMediaQuery } from "../../../hook/useMediaQuery";
 import CropImage from "./crop-modal";
 import { getS3SignUrlForProfile, pushProfilePhotoToS3 } from "../../common/common.api";
+import { updateProfileAsync } from "../../trainer/trainer.slice";
 
 const ASPECT_RATIO = 1;
 const MIN_DIMENSION = 150;
@@ -76,7 +77,7 @@ const UserInfoCard = () => {
 
   const handleSaveClick = (e) => {
     setIsEditing(false);
-    dispatch(updateTraineeProfileAsync(profile));
+    dispatch(updateProfileAsync({extraInfo:profile.extraInfo}));
   };
 
   const handleRateChange = (e) => {
