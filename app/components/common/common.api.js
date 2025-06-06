@@ -216,7 +216,7 @@ export const getS3SignUrlForProfile = async (payload) => {
   try {
     const response = await axiosInstance({
       method: "PUT",
-      url: `/common`,
+      url: `/common/update-profile-picture`,
       data: payload,
       headers: {
         "Content-Type": "application/json",
