@@ -1064,6 +1064,12 @@ export const convertTimesForDataArray = (dataArray) => {
       false  // Assuming we always want conversion unless noConversion is set to true
     );
 
+    const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(
+      item.extended_end_time, 
+      item.time_zone, 
+      false  // Assuming we always want conversion unless noConversion is set to true
+    );
+
     // Convert end time
     const convertedBookDate = CovertTimeAccordingToTimeZone(
       item.booked_date, 
@@ -1074,17 +1080,19 @@ export const convertTimesForDataArray = (dataArray) => {
     // Format the converted times to HH:mm format (without date)
     const formattedStartTime = formatToHHMM(convertedStartTime);
     const formattedEndTime = formatToHHMM(convertedEndTime);
-
+    const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
     // Return a new object with converted times
     return {
       ...item,
       start_time: convertedStartTime,
       end_time: convertedEndTime,
+      extended_end_time:item.extended_end_time ?convertedExtendedEndTime:item.extended_end_time,
       booked_date:convertedBookDate,
       session_start_time: formattedStartTime,
-      session_end_time: formattedEndTime
+      session_end_time: formattedEndTime,
+      extended_session_end_time:item.extended_session_end_time ?convertedExtendedEndTime:item.extended_session_end_time
     };
-  });
+  })
 
   
 };
