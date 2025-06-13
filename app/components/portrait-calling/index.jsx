@@ -126,7 +126,7 @@ const VideoCallUI = ({
   const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
   const [showScreenshotButton, setShowScreenshotButton] = useState(false)
   const [isSessionExtended, setIsSessionExtended] = useState(false);
-  // const [sessionEndTime, setSessionEndTime] = useState(null)
+  const [sessionEndTime, setSessionEndTime] = useState(null)
   const [showGracePeriodModal, setShowGracePeriodModal] = useState(false);
   const [showSessionEndedModal, setShowSessionEndedModal] = useState(false);
   const [countdownMessage, setCountdownMessage] = useState("");
@@ -244,7 +244,7 @@ const VideoCallUI = ({
 
       // Update the session_end_time
       console.log("newEndTimeStr", id, newEndTimeStr);
-      // setSessionEndTime(newEndTimeStr);
+      setSessionEndTime(newEndTimeStr);
       socket.emit("ON_BOTH_JOIN", {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
         newEndTimeStr
@@ -259,7 +259,7 @@ const VideoCallUI = ({
 
   useEffect(() => {
     const checkStatus = () => {
-      const isEndCall = getTimeDifferenceStatus(session_end_time);
+      const isEndCall = getTimeDifferenceStatus(sessionEndTime);
       
       if (isEndCall) {
         cutCall(true)
@@ -274,7 +274,7 @@ const VideoCallUI = ({
 
     // Cleanup on unmount
     return () => clearInterval(intervalId);
-  }, [session_end_time]);
+  }, [sessionEndTime]);
 
   const getMyClips = async () => {
     var res = await myClips({});
@@ -850,12 +850,12 @@ const VideoCallUI = ({
   };
   console.log("isTraineeJoined", isTraineeJoined);
 
-  // socket.on("ON_BOTH_JOIN", (data) => {
-  //   console.log("newEndTimeStr",data.socketReq.newEndTimeStr)
-  //   if(accountType === AccountType.TRAINEE){
-  //     setSessionEndTime(data.socketReq.newEndTimeStr)
-  //   }
-  // });
+  socket.on("ON_BOTH_JOIN", (data) => {
+    console.log("newEndTimeStr",data.socketReq.newEndTimeStr)
+    if(accountType === AccountType.TRAINEE){
+      setSessionEndTime(data.socketReq.newEndTimeStr)
+    }
+  });
 
   const listenSocketEvents = () => {
 
@@ -1047,20 +1047,20 @@ const VideoCallUI = ({
       };
     }
   }, [startMeeting, accountType]);
-  // console.log("SessionEndTime",sessionEndTime)
+  console.log("SessionEndTime",sessionEndTime)
   // Add this useEffect to handle session extension when both parties join
-  // useEffect(() => {
-  //   if (extended_session_end_time) {
-  //     console.log("extended_session_end_time",extended_session_end_time)
-  //     setSessionEndTime(extended_session_end_time)
-  //   } else {
-  //     if (isTraineeJoined && accountType === AccountType.TRAINER) {
-  //       // extendSessionTime();
-  //       // setIsSessionExtended(true);
-  //     }
-  //   }
+  useEffect(() => {
+    if (extended_session_end_time) {
+      console.log("extended_session_end_time",extended_session_end_time)
+      setSessionEndTime(extended_session_end_time)
+    } else {
+      if (isTraineeJoined && accountType === AccountType.TRAINER) {
+        extendSessionTime();
+        setIsSessionExtended(true);
+      }
+    }
 
-  // }, [isTraineeJoined]);
+  }, [isTraineeJoined]);
 
   console.log("refs", localVideoRef, remoteVideoRef, remoteStream);
   console.log("videoRef", videoRef)
@@ -1076,7 +1076,7 @@ const VideoCallUI = ({
       {displayMsg?.show ? <div style={{ textAlign: "center" }}>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
-          timeRemaining={session_end_time}
+          timeRemaining={sessionEndTime}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
           selectedClips={selectedClips}
@@ -1103,7 +1103,7 @@ const VideoCallUI = ({
         />
       ) : (
         <OneOnOneCall
-          timeRemaining={session_end_time}
+          timeRemaining={sessionEndTime}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
           localVideoRef={localVideoRef}
