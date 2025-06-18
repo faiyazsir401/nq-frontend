@@ -996,7 +996,7 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
 
 export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
   const localTimeZone = getLocalTimeZone()
-  console.log("time_zones",timeZone)
+  console.log("time_zones",timeZone,localTimeZone)
   if(localTimeZone === timeZone ||!timeZone){
     return time
   }
