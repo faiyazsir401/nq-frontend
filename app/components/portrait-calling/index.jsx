@@ -50,6 +50,7 @@ import Ratings from "../bookings/ratings";
 import TraineeRatings from "../bookings/ratings/trainee";
 import { useMediaQuery } from "usehooks-ts";
 import { updateExtendedSessionTime } from "../../common/common.api";
+import { DateTime } from "luxon";
 
 
 let Peer;
@@ -245,25 +246,23 @@ const VideoCallUI = ({
 
       const [hours, minutes] = newEndTimeStr.split(":").map(Number);
 
-      // Create a new Date object in local time with the given hours and minutes
-      const newTestEndTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        hours,
-        minutes
-      );
 
+
+      const newTestEndTime =DateTime.fromJSDate(newEndTime)
+      
+      const testEndTime = newTestEndTime.toISO({
+        suppressMilliseconds: false,
+        includeOffset: false,
+      }) + "Z";
       // Update the session_end_time
-      console.log("newEndTimeStr", id, newEndHours,newTestEndTime,newEndTime);
-
+      console.log("newEndTimeStr", id, testEndTime,newEndTime);
       setSessionEndTime(newEndTimeStr);
       socket.emit("ON_BOTH_JOIN", {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
         newEndTimeStr,
-        newEndTime
+        newEndTime:testEndTime
       });
-      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: newTestEndTime, extended_session_end_time: newEndTimeStr });
+      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: testEndTime, extended_session_end_time: newEndTimeStr });
       console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
     } catch (error) {
       console.error("Error extending session time:", error);
