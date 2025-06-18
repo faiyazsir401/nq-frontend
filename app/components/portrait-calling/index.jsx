@@ -855,7 +855,7 @@ const VideoCallUI = ({
 
   socket.on("ON_BOTH_JOIN", (data) => {
     console.log("newEndTimeStr", data.socketReq.newEndTimeStr)
-    if (accountType === AccountType.TRAINEE) {
+    if (accountType === AccountType.TRAINER) {
       setSessionEndTime(data.socketReq.newEndTimeStr)
     }
   });
@@ -1057,7 +1057,7 @@ const VideoCallUI = ({
       console.log("extended_session_end_time", extended_session_end_time)
       setSessionEndTime(extended_session_end_time)
     } else {
-      if (isTraineeJoined && accountType === AccountType.TRAINER) {
+      if (isTraineeJoined && accountType === AccountType.TRAINEE) {
         extendSessionTime();
         setIsSessionExtended(true);
       }
