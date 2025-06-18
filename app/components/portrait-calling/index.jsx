@@ -243,16 +243,27 @@ const VideoCallUI = ({
       const newEndMinutes = String(newEndTime.getMinutes()).padStart(2, '0');
       const newEndTimeStr = `${newEndHours}:${newEndMinutes}`;
 
+      const [hours, minutes] = newEndTimeStr.split(":").map(Number);
+
+      // Create a new Date object in local time with the given hours and minutes
+      const newTestEndTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hours,
+        minutes
+      );
+
       // Update the session_end_time
-      console.log("newEndTimeStr", id, newEndTimeStr);
-     
+      console.log("newEndTimeStr", id, newEndHours,newTestEndTime,newEndTime);
+
       setSessionEndTime(newEndTimeStr);
       socket.emit("ON_BOTH_JOIN", {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
         newEndTimeStr,
         newEndTime
       });
-      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: newEndTime, extended_session_end_time: newEndTimeStr });
+      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: newTestEndTime, extended_session_end_time: newEndTimeStr });
       console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
     } catch (error) {
       console.error("Error extending session time:", error);
@@ -859,7 +870,7 @@ const VideoCallUI = ({
   socket.on("ON_BOTH_JOIN", (data) => {
     console.log("newEndTimeStr", data.socketReq.newEndTimeStr)
     if (accountType === AccountType.TRAINER) {
-      const convertedExtendedEndTime  = CovertTimeAccordingToTimeZone(data.socketReq.newEndTime,time_zone,false);
+      const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(data.socketReq.newEndTime, time_zone, false);
       const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
       setSessionEndTime(formattedExtendedEndTime)
     }
