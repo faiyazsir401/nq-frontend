@@ -1038,7 +1038,7 @@ export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
 
 
 // Function to format a JavaScript Date to HH:mm (local time)
-const formatToHHMM = (isoDate) => {
+export const formatToHHMM = (isoDate) => {
   const date = new Date(isoDate); // Parse ISO date string into a Date object
   const hours = date.getUTCHours().toString().padStart(2, '0'); // Use UTC hours
   const minutes = date.getUTCMinutes().toString().padStart(2, '0'); // Use UTC minutes

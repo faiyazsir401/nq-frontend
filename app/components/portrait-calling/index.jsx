@@ -33,7 +33,7 @@ import {
   TabContent,
   TabPane,
 } from "reactstrap";
-import { Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, formatToHHMM, Utils } from "../../../utils/utils";
 import {
   myClips,
   traineeClips,
@@ -69,6 +69,7 @@ const VideoCallUI = ({
   extended_session_end_time,
   bIndex,
   isLandscape,
+  time_zone
 }) => {
   const fromUser =
     accountType === AccountType.TRAINEE ? traineeInfo : trainerInfo;
@@ -244,10 +245,12 @@ const VideoCallUI = ({
 
       // Update the session_end_time
       console.log("newEndTimeStr", id, newEndTimeStr);
+     
       setSessionEndTime(newEndTimeStr);
       socket.emit("ON_BOTH_JOIN", {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
-        newEndTimeStr
+        newEndTimeStr,
+        newEndTime
       });
       await updateExtendedSessionTime({ sessionId: id, extendedEndTime: newEndTime, extended_session_end_time: newEndTimeStr });
       console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
@@ -856,7 +859,9 @@ const VideoCallUI = ({
   socket.on("ON_BOTH_JOIN", (data) => {
     console.log("newEndTimeStr", data.socketReq.newEndTimeStr)
     if (accountType === AccountType.TRAINER) {
-      setSessionEndTime(data.socketReq.newEndTimeStr)
+      const convertedExtendedEndTime  = CovertTimeAccordingToTimeZone(data.socketReq.newEndTime,time_zone,false);
+      const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
+      setSessionEndTime(formattedExtendedEndTime)
     }
   });
 
