@@ -1050,7 +1050,7 @@ const formatToHHMM = (isoDate) => {
 export const convertTimesForDataArray = (dataArray) => {
   return dataArray.map((item) => {
     // Convert start time
-    console.log("item.start_time",item.start_time)
+    console.log("item.start_time",item)
     const convertedStartTime = CovertTimeAccordingToTimeZone(
       item.start_time, 
       item.time_zone, 
@@ -1069,6 +1069,7 @@ export const convertTimesForDataArray = (dataArray) => {
       item.time_zone, 
       false  // Assuming we always want conversion unless noConversion is set to true
     );
+    console.log("convertedExtendedEndTime",item.extended_end_time,convertedExtendedEndTime)
 
     // Convert end time
     const convertedBookDate = CovertTimeAccordingToTimeZone(
@@ -1090,7 +1091,7 @@ export const convertTimesForDataArray = (dataArray) => {
       booked_date:convertedBookDate,
       session_start_time: formattedStartTime,
       session_end_time: formattedEndTime,
-      extended_session_end_time:item.extended_session_end_time ?convertedExtendedEndTime:item.extended_session_end_time
+      extended_session_end_time:item.extended_session_end_time ?formattedExtendedEndTime:item.extended_session_end_time
     };
   })
 
