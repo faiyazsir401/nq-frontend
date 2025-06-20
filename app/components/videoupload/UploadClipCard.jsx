@@ -334,7 +334,7 @@ const UploadClipCard = (props) => {
   useEffect(() => {
     if (!isOpen) {
       setTitles([""]);
-      setCategory({});
+      setCategory("");
       setSelectedFiles([]);
     }
   }, [isOpen]);
