@@ -996,7 +996,7 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
 
 export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
   const localTimeZone = getLocalTimeZone()
-  console.log("time_zones",timeZone)
+  console.log("time_zones",timeZone,localTimeZone)
   if(localTimeZone === timeZone ||!timeZone){
     return time
   }
@@ -1038,7 +1038,7 @@ export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
 
 
 // Function to format a JavaScript Date to HH:mm (local time)
-const formatToHHMM = (isoDate) => {
+export const formatToHHMM = (isoDate) => {
   const date = new Date(isoDate); // Parse ISO date string into a Date object
   const hours = date.getUTCHours().toString().padStart(2, '0'); // Use UTC hours
   const minutes = date.getUTCMinutes().toString().padStart(2, '0'); // Use UTC minutes
@@ -1050,7 +1050,7 @@ const formatToHHMM = (isoDate) => {
 export const convertTimesForDataArray = (dataArray) => {
   return dataArray.map((item) => {
     // Convert start time
-    console.log("item.start_time",item.start_time)
+    console.log("item.start_time",item)
     const convertedStartTime = CovertTimeAccordingToTimeZone(
       item.start_time, 
       item.time_zone, 
@@ -1064,6 +1064,13 @@ export const convertTimesForDataArray = (dataArray) => {
       false  // Assuming we always want conversion unless noConversion is set to true
     );
 
+    const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(
+      item.extended_end_time, 
+      item.time_zone, 
+      false  // Assuming we always want conversion unless noConversion is set to true
+    );
+    console.log("convertedExtendedEndTime",item.extended_end_time,convertedExtendedEndTime)
+
     // Convert end time
     const convertedBookDate = CovertTimeAccordingToTimeZone(
       item.booked_date, 
@@ -1074,17 +1081,19 @@ export const convertTimesForDataArray = (dataArray) => {
     // Format the converted times to HH:mm format (without date)
     const formattedStartTime = formatToHHMM(convertedStartTime);
     const formattedEndTime = formatToHHMM(convertedEndTime);
-
+    const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
     // Return a new object with converted times
     return {
       ...item,
       start_time: convertedStartTime,
       end_time: convertedEndTime,
+      extended_end_time:item.extended_end_time ?convertedExtendedEndTime:item.extended_end_time,
       booked_date:convertedBookDate,
       session_start_time: formattedStartTime,
-      session_end_time: formattedEndTime
+      session_end_time: formattedEndTime,
+      extended_session_end_time:item.extended_session_end_time ?formattedExtendedEndTime:item.extended_session_end_time
     };
-  });
+  })
 
   
 };

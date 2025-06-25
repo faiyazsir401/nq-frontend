@@ -33,7 +33,7 @@ import {
   TabContent,
   TabPane,
 } from "reactstrap";
-import { Utils } from "../../../utils/utils";
+import { CovertTimeAccordingToTimeZone, formatToHHMM, Utils } from "../../../utils/utils";
 import {
   myClips,
   traineeClips,
@@ -50,6 +50,7 @@ import Ratings from "../bookings/ratings";
 import TraineeRatings from "../bookings/ratings/trainee";
 import { useMediaQuery } from "usehooks-ts";
 import { updateExtendedSessionTime } from "../../common/common.api";
+import { DateTime } from "luxon";
 
 
 let Peer;
@@ -69,6 +70,7 @@ const VideoCallUI = ({
   extended_session_end_time,
   bIndex,
   isLandscape,
+  time_zone
 }) => {
   const fromUser =
     accountType === AccountType.TRAINEE ? traineeInfo : trainerInfo;
@@ -126,7 +128,7 @@ const VideoCallUI = ({
   const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
   const [showScreenshotButton, setShowScreenshotButton] = useState(false)
   const [isSessionExtended, setIsSessionExtended] = useState(false);
-  // const [sessionEndTime, setSessionEndTime] = useState(null)
+  const [sessionEndTime, setSessionEndTime] = useState(null)
   const [showGracePeriodModal, setShowGracePeriodModal] = useState(false);
   const [showSessionEndedModal, setShowSessionEndedModal] = useState(false);
   const [countdownMessage, setCountdownMessage] = useState("");
@@ -177,14 +179,14 @@ const VideoCallUI = ({
 
       const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
       // Show grace period modal at -4 minutes
-      console.log("gracePeriodModalDismissed",gracePeriodModalDismissedRef.current)
+      console.log("gracePeriodModalDismissed", gracePeriodModalDismissedRef.current)
       if (timeDiff <= -4 && timeDiff > -5 && !gracePeriodModalDismissedRef.current) {
         setShowGracePeriodModal(true);
         setCountdownMessage("1 minute");
       }
 
       // Show session ended modal at -5 minutes
-      if (timeDiff <= -5 &&!sessionEndedModalDismissedRef.current) {
+      if (timeDiff <= -5 && !sessionEndedModalDismissedRef.current) {
         setShowGracePeriodModal(false);
         setShowSessionEndedModal(true);
         return true; // Returns true to trigger call end
@@ -242,14 +244,25 @@ const VideoCallUI = ({
       const newEndMinutes = String(newEndTime.getMinutes()).padStart(2, '0');
       const newEndTimeStr = `${newEndHours}:${newEndMinutes}`;
 
+      const [hours, minutes] = newEndTimeStr.split(":").map(Number);
+
+
+
+      const newTestEndTime =DateTime.fromJSDate(newEndTime)
+      
+      const testEndTime = newTestEndTime.toISO({
+        suppressMilliseconds: false,
+        includeOffset: false,
+      }) + "Z";
       // Update the session_end_time
-      console.log("newEndTimeStr", id, newEndTimeStr);
-      // setSessionEndTime(newEndTimeStr);
+      console.log("newEndTimeStr", id, testEndTime,newEndTime);
+      setSessionEndTime(newEndTimeStr);
       socket.emit("ON_BOTH_JOIN", {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
-        newEndTimeStr
+        newEndTimeStr,
+        newEndTime:testEndTime
       });
-      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: newEndTimeStr });
+      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: testEndTime, extended_session_end_time: newEndTimeStr });
       console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
     } catch (error) {
       console.error("Error extending session time:", error);
@@ -259,22 +272,25 @@ const VideoCallUI = ({
 
   useEffect(() => {
     const checkStatus = () => {
-      const isEndCall = getTimeDifferenceStatus(session_end_time);
-      
+      const isEndCall = getTimeDifferenceStatus(sessionEndTime);
+
       if (isEndCall) {
         cutCall(true)
       }
     };
+    if (sessionEndTime) {
+      // Initial check
+      checkStatus();
 
-    // Initial check
-    checkStatus();
 
-    // Check every second
-    const intervalId = setInterval(checkStatus, 1000);
 
-    // Cleanup on unmount
-    return () => clearInterval(intervalId);
-  }, [session_end_time]);
+      // Check every second
+      const intervalId = setInterval(checkStatus, 1000);
+
+      // Cleanup on unmount
+      return () => clearInterval(intervalId);
+    }
+  }, [sessionEndTime]);
 
   const getMyClips = async () => {
     var res = await myClips({});
@@ -850,12 +866,14 @@ const VideoCallUI = ({
   };
   console.log("isTraineeJoined", isTraineeJoined);
 
-  // socket.on("ON_BOTH_JOIN", (data) => {
-  //   console.log("newEndTimeStr",data.socketReq.newEndTimeStr)
-  //   if(accountType === AccountType.TRAINEE){
-  //     setSessionEndTime(data.socketReq.newEndTimeStr)
-  //   }
-  // });
+  socket.on("ON_BOTH_JOIN", (data) => {
+    console.log("newEndTimeStr", data.socketReq.newEndTimeStr)
+    if (accountType === AccountType.TRAINER) {
+      const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(data.socketReq.newEndTime, time_zone, false);
+      const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
+      setSessionEndTime(formattedExtendedEndTime)
+    }
+  });
 
   const listenSocketEvents = () => {
 
@@ -1047,20 +1065,20 @@ const VideoCallUI = ({
       };
     }
   }, [startMeeting, accountType]);
-  // console.log("SessionEndTime",sessionEndTime)
+  console.log("SessionEndTime", sessionEndTime)
   // Add this useEffect to handle session extension when both parties join
-  // useEffect(() => {
-  //   if (extended_session_end_time) {
-  //     console.log("extended_session_end_time",extended_session_end_time)
-  //     setSessionEndTime(extended_session_end_time)
-  //   } else {
-  //     if (isTraineeJoined && accountType === AccountType.TRAINER) {
-  //       // extendSessionTime();
-  //       // setIsSessionExtended(true);
-  //     }
-  //   }
+  useEffect(() => {
+    if (extended_session_end_time) {
+      console.log("extended_session_end_time", extended_session_end_time)
+      setSessionEndTime(extended_session_end_time)
+    } else {
+      if (isTraineeJoined && accountType === AccountType.TRAINEE) {
+        extendSessionTime();
+        setIsSessionExtended(true);
+      }
+    }
 
-  // }, [isTraineeJoined]);
+  }, [isTraineeJoined]);
 
   console.log("refs", localVideoRef, remoteVideoRef, remoteStream);
   console.log("videoRef", videoRef)
@@ -1076,7 +1094,7 @@ const VideoCallUI = ({
       {displayMsg?.show ? <div style={{ textAlign: "center" }}>{displayMsg?.msg}</div> : null}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
-          timeRemaining={session_end_time}
+          timeRemaining={sessionEndTime}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
           selectedClips={selectedClips}
@@ -1103,7 +1121,7 @@ const VideoCallUI = ({
         />
       ) : (
         <OneOnOneCall
-          timeRemaining={session_end_time}
+          timeRemaining={sessionEndTime}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
           localVideoRef={localVideoRef}
@@ -1718,7 +1736,7 @@ const VideoCallUI = ({
           </p>
         </ModalBody>
         <ModalFooter>
-          <Button color="primary" onClick={() =>{gracePeriodModalDismissedRef.current = true; setShowGracePeriodModal(false);}}>
+          <Button color="primary" onClick={() => { gracePeriodModalDismissedRef.current = true; setShowGracePeriodModal(false); }}>
             OK
           </Button>
         </ModalFooter>
@@ -1747,7 +1765,7 @@ const VideoCallUI = ({
             setShowSessionEndedModal(false);
             if (accountType === AccountType.TRAINEE) {
               setIsOpenRating(true);
-            }else{
+            } else {
               setIsOpenReport(true)
             }
           }}>

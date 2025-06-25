@@ -44,7 +44,7 @@ const shareWithConstants = {
 const UploadClipCard = (props) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [titles, setTitles] = useState([]);
-  const [category, setCategory] = useState({});
+  const [category, setCategory] = useState("");
   const [categoryList, setCategoryList] = useState([]);
   const ref = useRef();
   const dispatch = useAppDispatch();
@@ -334,7 +334,7 @@ const UploadClipCard = (props) => {
   useEffect(() => {
     if (!isOpen) {
       setTitles([""]);
-      setCategory({});
+      setCategory("");
       setSelectedFiles([]);
     }
   }, [isOpen]);
