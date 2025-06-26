@@ -97,7 +97,7 @@ const NotificationPopup = () => {
           (async () => {
             try {
               setIsLoading(true)
-              tempObj.cta.title = "Confirming..";
+              tempObj.cta.title = "Confirming...";
               const bookingdata = await getUpcomingBookings();
 
               // Access the updated state after fetching

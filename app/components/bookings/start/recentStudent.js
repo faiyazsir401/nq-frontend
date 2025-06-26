@@ -7,7 +7,7 @@ const recentStudent = ()=>{
         <div className="card rounded trainer-profile-card Select Recent Student" style={{ width: '25%', marginTop: '32px', boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px' }}>
           <div className="card-body">
             <div style={{ justifyContent: 'center' }}>
-              <h2 className="Recent-Heading" style={{ textAlign: 'center' }}>Recent Students</h2>
+              <h2 className="Recent-Heading" style={{ textAlign: 'center' }}>Recent Enthusiasts</h2>
             </div>
             <div className="row" style={{ justifyContent: 'center', paddingTop: '15px' }}>
               <div className="image-gallery" style={{ display: 'flex', flexWrap: 'wrap', paddingTop: '15px', width: '85%', justifyContent: 'space-between', overflowY: 'auto', maxHeight: '75vh' }}>

@@ -73,7 +73,7 @@ export default function MyAppComponent({ Component, pageProps }) {
           <link rel="icon" href="/favicon.png" />
           <link rel="shortcut icon" href="/favicon.png" />
           <link rel="stylesheet" href="path/to/custom.css" />
-          <title>NetQwix | WHY WAIT</title>
+          <title>Qwick Lessons Over the Net</title>
         </Head>
         <Provider store={store}>
           <AuthGuard>
