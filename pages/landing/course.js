@@ -65,10 +65,11 @@ const Course = (masterRecords) => {
   }, []);
 
   const getAllLatestActiveTrainer = async () => {
-    const response = await fetchAllLatestOnlineUsers();
-
-    if (response.code === 200) {
-      setActiveTrainer(response.result);
+    try {
+      const res = await fetchAllLatestOnlineUsers();
+      setActiveTrainer(res?.data);
+    } catch (error) {
+      // Error handling without console.log
     }
   };
 
@@ -79,7 +80,6 @@ const Course = (masterRecords) => {
   }, [getParams]);
 
   const showRatings = (ratings, extraClasses = "") => {
-    console.log(ratings, "ratings");
     const { ratingRatio, totalRating } = Utils.getRatings(ratings);
     return (
       <>
@@ -91,8 +91,6 @@ const Course = (masterRecords) => {
       </>
     );
   };
-
-  console.log("getAllLatestActiveTrainer =====> activeTrainer", activeTrainer);
 
   const sliderRef = useRef(null);
 

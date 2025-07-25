@@ -11,7 +11,9 @@ export const userConcernAsync = createAsyncThunk("userConcern/post", async (payl
     const response = await userConcern(payload);
     return response;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });
@@ -23,7 +25,9 @@ export const writeUsAsync = createAsyncThunk("writeUs/post", async (payload) => 
     console.log(response, "response");
     return response;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });

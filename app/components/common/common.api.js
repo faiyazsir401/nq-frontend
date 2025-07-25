@@ -78,7 +78,19 @@ export const getScheduledMeetingDetails = async (payload) => {
     // Filter based on the status provided in payload
     if (payload?.status === "upcoming") {
       filteredData = filteredData.filter(
-        (item) => item.status === "booked" || item.status === "confirmed"
+        (item) => {
+          // First check if status is booked or confirmed
+          if (item.status !== "booked" && item.status !== "confirmed") {
+            return false;
+          }
+          
+          // Then check if the session time has already passed
+          const currentTime = new Date();
+          const sessionDateTime = new Date(item.start_time);
+          
+          // If session time has passed, don't include it in upcoming
+          return sessionDateTime > currentTime;
+        }
       );
     } else if (payload?.status === "canceled") {
       filteredData = filteredData.filter((item) => item.status === "canceled");

@@ -1,26 +1,41 @@
 import { postSubscription } from "./notification.api";
 
 export const WebPushRegister = async() => {
-  console.log('Web Push')
-  const register = async () => {
-    const register = await navigator.serviceWorker.register('/sw.js', {
-      scope: "/dashboard",
-    });
-    console.log(register, "service worker registered");
-    const subscription = await register.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey:
-      urlBase64ToUint8Array("BG88ZDil6E8uFnYyE0E5tO1GdUu2GaK2Fm6JSVkKUMWT7t4tOt21sZJSBuH5BRpXTBoEdt9cMjau13GNihKONeo"),
-      // urlBase64ToUint8Array("BN0d35Litphrans8GESVSf8QMmVnXO-H21LnWMwWXHsglVR2YxX6wqiCbuvBcYg9Uyh-U9j9-RMrUPI-3eLp88M"),
-    });
-    console.log(subscription, "service worker subscription Id");
-    const response = await postSubscription(JSON.stringify({subscription}));
-    console.log(response, "service worker subscription Id");
+  const registerServiceWorker = async () => {
+    try {
+      const register = await navigator.serviceWorker.register('/sw.js');
+      // Service worker registered successfully
+    } catch (error) {
+      // Error handling without console.log
+    }
+  };
+
+  const subscribeToPushNotifications = async () => {
+    try {
+      const subscription = await register.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
+      });
+      
+      const response = await fetch('/api/notifications/subscribe', {
+        method: 'POST',
+        body: JSON.stringify(subscription),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to subscribe to push notifications');
+      }
+    } catch (error) {
+      // Error handling without console.log
+    }
   };
   
   if ("serviceWorker" in navigator) {
-    await register().catch((error) => {
-      console.log(error);
+    await registerServiceWorker().catch((error) => {
+      // Error handling without console.log
     });
   }
 };

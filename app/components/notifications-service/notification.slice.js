@@ -13,7 +13,9 @@ export const getAllNotifications = createAsyncThunk("get/notifications", async (
     const response = await getNotifications(payload);
     return response;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });
@@ -25,7 +27,9 @@ export const updateNotificationsStatus = createAsyncThunk(
       const res = await updateNotifications(payload);
       return res;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }

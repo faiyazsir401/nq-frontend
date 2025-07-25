@@ -46,7 +46,6 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
     });
   },[meetingDetails])
 
-  console.log("meetingDetails", meetingDetails, accountType);
   return (
     // height > width && !isRotatedInitally ?
     <VideoCallUI
@@ -121,7 +120,12 @@ const MeetingRoom = () => {
     dispatch(authAction?.setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE)))
   }, [dispatch]);
 
-  console.log("meetingDetails", meetingDetails, accountType);
+  useEffect(() => {
+    if (meetingDetails && accountType) {
+      // ... existing code ...
+    }
+  }, [meetingDetails, accountType]);
+
   return (
     <SocketContext.Provider value={getSocket()}>
       {loading ||

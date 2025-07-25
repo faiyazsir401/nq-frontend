@@ -314,7 +314,6 @@ const SettingSection = (props) => {
       toast.success(result?.msg);
     } catch (error) {
       toast.error("updateAccountPrivacy -> error");
-      console.log("updateAccountPrivacy -> error", error);
     }
   }
 
@@ -1098,7 +1097,6 @@ const SettingSection = (props) => {
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={(value) => {
-                  console.log(value);
                   const payload = {
                     ...userInfo?.extraInfo,
                     social_media_links: value,
@@ -1116,9 +1114,6 @@ const SettingSection = (props) => {
                   isValid,
                 }) => (
                   <Form onSubmit={handleSubmit}>
-                    {console.log("Form Errors:", errors)}
-                    {console.log("Form Values:", values)}
-                    {console.log("Form is Valid:", isValid)}
                     <ul className="integratin">
                       <li>
                         <div className="media">

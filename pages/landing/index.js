@@ -45,23 +45,19 @@ const Landing = () => {
   }, [masterRecords]);
 
   useEffect(() => {
-    console.log(socket , 'socket')
-    if(socket){
+    if (socket) {
+      socket.on('userStatus', (data) => {
+        dispatch(authAction.updateOnlineUsers(data?.user))
+      });
 
-    socket.on('userStatus', (data) => {
-      dispatch(authAction.updateOnlineUsers(data?.user))
-    });
-
-    socket.on('onlineUser', (data) => {
-      console.log(data , 'onlineUser')
-      dispatch(authAction.updateOnlineUsers(data?.user))
-    });
-    
+      socket.on('onlineUser', (data) => {
+        dispatch(authAction.updateOnlineUsers(data?.user))
+      });
+    }
     return () => {
       socket?.off('userStatus');
       socket?.off('onlineUser');
     };
-  }
   }, [socket]);
 
   return (

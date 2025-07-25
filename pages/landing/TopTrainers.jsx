@@ -70,11 +70,10 @@ const TopTrainers = (props) => {
         const response = await getAllTrainers();
         Indexer(response.data, categories);
       } catch (error) {
-        console.log("error while fetching the trainers", error);
+        // Error handling without console.log
       }
     })();
   }, []);
-  console.log("trainerInfo?.userInfo",trainerInfo?.userInfo)
   return (
     <Container>
       <div className="text-center mb-5 d-flex flex-column">
@@ -268,7 +267,6 @@ const TrainerCard = ({ trainer, setter }) => {
           className="text-white py-2 px-3 rounded width-fit btn-primary"
           style={{ cursor: "pointer", fontSize: isMobileScreen?10:14 }}
           onClick={() => {
-            console.log("setter.setTrainerInfo",trainer)
             setter.setTrainerInfo((prev) => ({
               ...prev,
               userInfo: trainer,

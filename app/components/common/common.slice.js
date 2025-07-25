@@ -41,7 +41,9 @@ export const addRatingAsync = createAsyncThunk(
       return res;
     } catch (err) {
       console.log(`rre `, err);
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -60,7 +62,9 @@ export const updateBookedSessionScheduledMeetingAsync = createAsyncThunk(
       //TODO:update redux state not calling get api
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -74,7 +78,9 @@ export const addTraineeClipInBookedSessionAsync = createAsyncThunk(
       const response = await addTraineeClipInBookedSession(payload);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -87,7 +93,9 @@ export const getScheduledMeetingDetailsAsync = createAsyncThunk(
       const response = await getScheduledMeetingDetails(payload);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -100,7 +108,9 @@ export const uploadProfilePictureAsync = createAsyncThunk(
       const response = await uploadProfilePicture(payload);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }

@@ -122,8 +122,6 @@ const CheckoutForm = ({clientSecret, handlePaymentSuccess, extraContent = <></>}
     });
   }, [stripe, elements]);
 
-  console.log("paymentRequest=======>", paymentRequest)
-
   return (
     <form onSubmit={handleSubmit}>
       {extraContent}
@@ -264,72 +262,110 @@ export default StripeCard;
 //   //   amount: amount * 100,
 //   // };
 
-//   const options = {
-//     // payment_method_types: ['card', 'alipay', 'klarna', 'amazon_pay', 'cashapp', 'link', 'wechat_pay'],
-//     payment_method_types: ['card', 'amazon_pay','cashapp', 'link'],
-    
-//     // payment_method_types: 'card,alipay,klarna,amazon_pay,acss_debit,cashapp,link,wechat_pay',
-//     // payment_method_types: ['card', 'afterpay', 'alipay', 'jcb', 'unionpay', 'google_pay', 'apple_pay', 'microsoft_pay'],
-//     // payment_method_types:  ["card", "alipay", "klarna", "amazon_pay", "acss_debit", "cashapp", "link", "wechat_pay"],
-//     // payment_method_types:  ['card', 'alipay', 'klarna', "amazon_pay","acss_debit","cashapp","link", "wechat_pay", "eps", "giropay", "p24"],
-//     // payment_method_types: [
-//     //   "amazon_pay", 
-//     //   "alipay", 
-//     //   "alma", 
-//     //   "affirm", 
-//     //   "afterpay_clearpay", 
-//     //   "au_becs_debit", 
-//     //   "acss_debit", 
-//     //   "bacs_debit", 
-//     //   "bancontact", 
-//     //   "blik", 
-//     //   "boleto", 
-//     //   "card", 
-//     //   "cashapp", 
-//     //   "crypto", 
-//     //   // "customer_balance", 
-//     //   "eps", 
-//     //   "fpx", 
-//     //   "giropay", 
-//     //   "grabpay", 
-//     //   "ideal", 
-//     //   "klarna", 
-//     //   "konbini", 
-//     //   "mobilepay", 
-//     //   "multibanco", 
-//     //   "ng_market", 
-//     //   "nz_bank_account", 
-//     //   "oxxo", 
-//     //   "p24", 
-//     //   "pay_by_bank", 
-//     //   "paypal", 
-//     //   "payto", 
-//     //   "rechnung", 
-//     //   "sepa_debit", 
-//     //   "sofort", 
-//     //   "south_korea_market", 
-//     //   "kr_market", 
-//     //   "swish", 
-//     //   "three_d_secure", 
-//     //   "twint", 
-//     //   "upi", 
-//     //   "us_bank_account", 
-//     //   "wechat_pay", 
-//     //   "paynow", 
-//     //   "pix", 
-//     //   "promptpay", 
-//     //   "revolut_pay", 
-//     //   "netbanking", // Wrap in quotes
-//     //   "id_bank_transfer", 
-//     //   "link", 
-//     //   "demo_pay"
-//     // ],
-//     name: 'netquix',
-//     description: 'netquix trainer payment',
-//     mode: 'payment',
-//     currency: 'usd',
-//     amount: amount * 100,
-//   };
+//   // const options = {
+//   //   payment_method_types: ['card', 'alipay', 'klarna', 'amazon_pay', 'cashapp', 'link', 'wechat_pay'],
+//   //   name: 'netquix',
+//   //   description: 'netquix trainer payment',
+//   //   mode: 'payment',
+//   //   currency: 'usd',
+//   //   amount: amount * 100,
+//   // };
+
+//   // const options = {
+//   //   payment_method_types: 'card,alipay,klarna,amazon_pay,acss_debit,cashapp,link,wechat_pay',
+//   //   name: 'netquix',
+//   //   description: 'netquix trainer payment',
+//   //   mode: 'payment',
+//   //   currency: 'usd',
+//   //   amount: amount * 100,
+//   // };
+
+//   // const options = {
+//   //   payment_method_types: ['card', 'afterpay', 'alipay', 'jcb', 'unionpay', 'google_pay', 'apple_pay', 'microsoft_pay'],
+//   //   name: 'netquix',
+//   //   description: 'netquix trainer payment',
+//   //   mode: 'payment',
+//   //   currency: 'usd',
+//   //   amount: amount * 100,
+//   // };
+
+//   // const options = {
+//   //   payment_method_types:  ["card", "alipay", "klarna", "amazon_pay", "acss_debit", "cashapp", "link", "wechat_pay"],
+//   //   name: 'netquix',
+//   //   description: 'netquix trainer payment',
+//   //   mode: 'payment',
+//   //   currency: 'usd',
+//   //   amount: amount * 100,
+//   // };
+
+//   // const options = {
+//   //   payment_method_types:  ['card', 'alipay', 'klarna', "amazon_pay","acss_debit","cashapp","link", "wechat_pay", "eps", "giropay", "p24"],
+//   //   name: 'netquix',
+//   //   description: 'netquix trainer payment',
+//   //   mode: 'payment',
+//   //   currency: 'usd',
+//   //   amount: amount * 100,
+//   // };
+
+//   // const options = {
+//   //   payment_method_types: [
+//   //     "amazon_pay", 
+//   //     "alipay", 
+//   //     "alma", 
+//   //     "affirm", 
+//   //     "afterpay_clearpay", 
+//   //     "au_becs_debit", 
+//   //     "acss_debit", 
+//   //     "bacs_debit", 
+//   //     "bancontact", 
+//   //     "blik", 
+//   //     "boleto", 
+//   //     "card", 
+//   //     "cashapp", 
+//   //     "crypto", 
+//   //     // "customer_balance", 
+//   //     "eps", 
+//   //     "fpx", 
+//   //     "giropay", 
+//   //     "grabpay", 
+//   //     "ideal", 
+//   //     "klarna", 
+//   //     "konbini", 
+//   //     "mobilepay", 
+//   //     "multibanco", 
+//   //     "ng_market", 
+//   //     "nz_bank_account", 
+//   //     "oxxo", 
+//   //     "p24", 
+//   //     "pay_by_bank", 
+//   //     "paypal", 
+//   //     "payto", 
+//   //     "rechnung", 
+//   //     "sepa_debit", 
+//   //     "sofort", 
+//   //     "south_korea_market", 
+//   //     "kr_market", 
+//   //     "swish", 
+//   //     "three_d_secure", 
+//   //     "twint", 
+//   //     "upi", 
+//   //     "us_bank_account", 
+//   //     "wechat_pay", 
+//   //     "paynow", 
+//   //     "pix", 
+//   //     "promptpay", 
+//   //     "revolut_pay", 
+//   //     "netbanking", // Wrap in quotes
+//   //     "id_bank_transfer", 
+//   //     "link", 
+//   //     "demo_pay"
+//   //   ],
+//   //   name: 'netquix',
+//   //   description: 'netquix trainer payment',
+//   //   mode: 'payment',
+//   //   currency: 'usd',
+//   //   amount: amount * 100,
+//   // };
 
 //   return (
 //     <Elements stripe={stripePromise} options={options}>

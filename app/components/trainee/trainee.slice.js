@@ -24,7 +24,9 @@ export const getTraineeWithSlotsAsync = createAsyncThunk(
       const response = await fetchTraineeWithSlots(params);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -37,7 +39,9 @@ export const bookSessionAsync = createAsyncThunk(
       const response = await bookSession(payload);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -52,7 +56,9 @@ export const updateTraineeProfileAsync = createAsyncThunk(
       dispatch(getMeAsync());
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -67,7 +73,9 @@ export const createPaymentIntentAsync = createAsyncThunk(
       return response;
     } catch (err) {
       console.log("createPaymentIntentAsyncError",err)
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }

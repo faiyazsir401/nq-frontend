@@ -44,7 +44,6 @@ const CustomChat = (props) => {
   };
 
   const profileSideBarToggle = (toggle) => {
-    console.log("call toggle");
     if (toggle) {
       document.body.className = `sidebar-active main-page menu-active ${localStorage.getItem("layout_mode")}`;
       // document

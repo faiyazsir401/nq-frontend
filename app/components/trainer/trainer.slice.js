@@ -16,7 +16,9 @@ export const updateDrawingAsync = createAsyncThunk(
       const response = await updateDrawing(payload);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -31,7 +33,9 @@ export const updateProfileAsync = createAsyncThunk(
       dispatch(getMeAsync());
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -42,7 +46,9 @@ export const getTrainersAsync = createAsyncThunk("get/trainers", async () => {
     const response = await getTrainers();
     return response;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });

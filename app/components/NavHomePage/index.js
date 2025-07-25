@@ -113,13 +113,14 @@ const NavHomePage = () => {
 
   var settings = {
     autoplay: true,
-    infinite: false,
+    infinite: true,
     speed: 2000,
     slidesToShow: 2,
     slidesToScroll: 1,
     swipeToSlide: true,
-    autoplaySpeed: 1000,
+    autoplaySpeed: 3000,
     arrows: true,
+    dots: false,
     responsive: [
       {
         breakpoint: 1366,
@@ -127,6 +128,7 @@ const NavHomePage = () => {
           autoplay: true,
           slidesToShow: 3,
           slidesToScroll: 1,
+          infinite: true,
         },
       },
       {
@@ -134,6 +136,7 @@ const NavHomePage = () => {
         settings: {
           autoplay: true,
           slidesToShow: 2,
+          infinite: true,
         },
       },
       {
@@ -141,6 +144,7 @@ const NavHomePage = () => {
         settings: {
           autoplay: true,
           slidesToShow: 2,
+          infinite: true,
         },
       },
       {
@@ -148,6 +152,7 @@ const NavHomePage = () => {
         settings: {
           autoplay: true,
           slidesToShow: 1,
+          infinite: true,
         },
       },
     ],
@@ -531,9 +536,9 @@ const NavHomePage = () => {
                 ? "col-sm-12"
                 : width1200
                   ? "col-sm-6"
-                  : width2000
-                    ? "col-sm-12"
-                    : ""
+                : width2000
+                  ? "col-sm-12"
+                  : ""
                 }  ${!width1200 ? "my-3" : ""}`}
               style={{
                 height: width1200 ? "100%" : "calc(100% - 400px)",
