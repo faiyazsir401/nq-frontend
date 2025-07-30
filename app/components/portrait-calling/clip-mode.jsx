@@ -89,6 +89,8 @@ const VideoContainer = ({
   videoContainerRef
 }) => {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [videoProgress, setVideoProgress] = useState(0);
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
   // const videoContainerRef = useRef(null);
@@ -326,18 +328,50 @@ const VideoContainer = ({
       setIsVideoLoaded(false);
     };
   
-    const handleWaiting = () => {
+        const handleWaiting = () => {
       console.log("Video waiting for data");
       setIsVideoLoaded(false);
     };
-  
+
+    const handleVideoLoadStart = () => {
+      setIsVideoLoading(true);
+      setVideoProgress(0);
+    };
+
+    const handleVideoProgress = (event) => {
+      const video = event.target;
+      if (video.buffered.length > 0) {
+        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+        const duration = video.duration;
+        const progress = (bufferedEnd / duration) * 100;
+        setVideoProgress(Math.round(progress));
+      }
+    };
+
+    const handleVideoCanPlay = () => {
+      setIsVideoLoading(false);
+      setVideoProgress(100);
+      setIsVideoLoaded(true);
+    };
+
+    const handleVideoError = () => {
+      setIsVideoLoading(false);
+      setVideoProgress(0);
+      toast.error("Failed to load video");
+    };
+
     // Multiple events to detect readiness
     video.addEventListener('canplay', checkReadiness);
     video.addEventListener('canplaythrough', checkReadiness);
     video.addEventListener('loadeddata', checkReadiness);
-    video.addEventListener('error', handleError);
     video.addEventListener('stalled', handleStalled);
     video.addEventListener('waiting', handleWaiting);
+    
+    // Add loading progress events
+    video.addEventListener('loadstart', handleVideoLoadStart);
+    video.addEventListener('progress', handleVideoProgress);
+    video.addEventListener('canplay', handleVideoCanPlay);
+    video.addEventListener('error', handleVideoError);
   
     // Additional check for cases where video might already be ready
     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
@@ -351,9 +385,14 @@ const VideoContainer = ({
       video.removeEventListener('canplay', checkReadiness);
       video.removeEventListener('canplaythrough', checkReadiness);
       video.removeEventListener('loadeddata', checkReadiness);
-      video.removeEventListener('error', handleError);
       video.removeEventListener('stalled', handleStalled);
       video.removeEventListener('waiting', handleWaiting);
+      
+      // Remove loading progress events
+      video.removeEventListener('loadstart', handleVideoLoadStart);
+      video.removeEventListener('progress', handleVideoProgress);
+      video.removeEventListener('canplay', handleVideoCanPlay);
+      video.removeEventListener('error', handleVideoError);
     };
   }, [videoRef]);
 
@@ -543,29 +582,58 @@ const VideoContainer = ({
               overflow: "hidden"
             }}
           >
-            <video
-              controls={false}
-              ref={videoRef}
-              playsInline
-              webkit-playsinline="true"
-              style={{
-                touchAction: "manipulation",
-                maxWidth: "100%",
-                width: "auto",
-                height: `${100}%`,
-                // maxHeight:"100%",
-                aspectRatio: aspectRatio, // Force a correct aspect ratio
-                objectFit: "contain", // Prevent stretching
-              }}
-              id={clip?.id}
-              muted={true}
-              poster={Utils?.generateThumbnailURL(clip)}
-              preload="metadata"
-              crossOrigin="anonymous"
-            >
-              <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+              <video
+                controls={false}
+                ref={videoRef}
+                playsInline
+                webkit-playsinline="true"
+                style={{
+                  touchAction: "manipulation",
+                  maxWidth: "100%",
+                  width: "auto",
+                  height: `${100}%`,
+                  // maxHeight:"100%",
+                  aspectRatio: aspectRatio, // Force a correct aspect ratio
+                  objectFit: "contain", // Prevent stretching
+                  opacity: isVideoLoading ? 0.6 : 1,
+                  pointerEvents: isVideoLoading ? "none" : "auto",
+                }}
+                id={clip?.id}
+                muted={true}
+                poster={Utils?.generateThumbnailURL(clip)}
+                preload="metadata"
+                crossOrigin="anonymous"
+              >
+                <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              
+              {isVideoLoading && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "rgba(0, 0, 0, 0.7)",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    color: "white",
+                    textAlign: "center",
+                    minWidth: "80px",
+                    zIndex: 10,
+                  }}
+                >
+                  <div className="spinner-border spinner-border-sm" role="status">
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                  <div style={{ fontSize: "12px", marginTop: "4px" }}>
+                    {videoProgress}%
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <canvas
