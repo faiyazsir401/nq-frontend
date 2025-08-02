@@ -77,6 +77,9 @@ export const getScheduledMeetingDetails = async (payload) => {
 
     // Filter based on the status provided in payload
     if (payload?.status === "upcoming") {
+      // Import DateTime from luxon for consistent timezone handling
+      const { DateTime } = require('luxon');
+      
       filteredData = filteredData.filter(
         (item) => {
           // First check if status is booked or confirmed
@@ -84,12 +87,21 @@ export const getScheduledMeetingDetails = async (payload) => {
             return false;
           }
           
-          // Then check if the session time has already passed
-          const currentTime = new Date();
-          const sessionDateTime = new Date(item.start_time);
+          // Use the same DateTime approach as Active Sessions
+          const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
+          const sessionStartTime = DateTime.fromISO(item.start_time, { zone: "utc" });
           
-          // If session time has passed, don't include it in upcoming
-          return sessionDateTime > currentTime;
+          // Ensure both dates are valid
+          if (!sessionStartTime.isValid) {
+            return false;
+          }
+          
+          // For upcoming sessions, we want sessions that start in the future
+          // Add a small buffer (5 minutes) to account for timezone differences
+          const bufferTime = DateTime.now().plus({ minutes: 5 });
+          
+          // If session start time is in the future (including buffer), include it in upcoming
+          return sessionStartTime > bufferTime;
         }
       );
     } else if (payload?.status === "canceled") {

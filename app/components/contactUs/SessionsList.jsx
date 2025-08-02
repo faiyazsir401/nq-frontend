@@ -8,7 +8,7 @@ const SessionsList = ({onClose}) => {
     const dispatch = useAppDispatch()
     const { scheduledMeetingDetails } = useAppSelector(bookingsState);
     useEffect(()=>{
-        dispatch(getScheduledMeetingDetailsAsync());
+        dispatch(getScheduledMeetingDetailsAsync({ status: "upcoming" }));
     }, [])
   return (
     <>

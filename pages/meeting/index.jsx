@@ -116,7 +116,7 @@ const MeetingRoom = () => {
   );
   
   useEffect(() => {
-    dispatch(getScheduledMeetingDetailsAsync());
+    dispatch(getScheduledMeetingDetailsAsync({ status: "upcoming" }));
     dispatch(authAction?.setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE)))
   }, [dispatch]);
 
