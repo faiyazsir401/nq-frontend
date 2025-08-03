@@ -58,6 +58,7 @@ export default function MyAppComponent({ Component, pageProps }) {
     };
   }, [currentUser]);
 
+
   return (
     <Fragment>
        <Script

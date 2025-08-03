@@ -35,6 +35,13 @@ import { EVENTS } from "../../helpers/events";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
 import NotificationPopup from "../../app/components/notification-popup";
 
+import Tracker from '@openreplay/tracker';
+
+const tracker = new Tracker({
+  projectKey: "Z4i45QZp973IIi1FAdB9",
+  ingestPoint: "https://analytics.netqwix.com/ingest",
+});
+
 const Dashboard = () => {
   const socket = useContext(SocketContext);
   const dispatch = useAppDispatch();
@@ -49,6 +56,11 @@ const Dashboard = () => {
     dispatch(getAllNotifications({page : 1, limit : 10})) ;
   }, []);
 
+  useEffect(() => { 
+    tracker.start()
+    tracker.setUserID(localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID))
+    tracker.setMetadata(localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID),localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
+  }, []);
 
   const getDashboard = () => {
     switch (accountType) {

@@ -17,6 +17,7 @@
     "@fullcalendar/interaction": "^6.1.10",
     "@fullcalendar/moment-timezone": "^6.1.10",
     "@fullcalendar/react": "^6.1.10",
+    "@openreplay/tracker": "^16.4.7",
     "@react-oauth/google": "^0.11.0",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
