@@ -21,6 +21,7 @@ import OrientationModal from "../modalComponent/OrientationModal";
 import { notificiationTitles } from "../../../utils/constant";
 import { EVENTS } from "../../../helpers/events";
 import { SocketContext } from "../socket";
+import { DateTime } from "luxon";
 
 const UpcomingSession = ({ accountType = null }) => {
   const dispatch = useAppDispatch();
@@ -70,6 +71,35 @@ const UpcomingSession = ({ accountType = null }) => {
       })
     );
   }, [newBookingData]);
+
+  // Filter sessions that are confirmed and within the current time range (same as active sessions)
+  const filteredSessions = scheduledMeetingDetails.filter((session) => {
+    const { start_time, end_time, ratings } = session;
+
+    const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
+
+    // Parse the start_time and end_time in UTC
+    const startTime = DateTime.fromISO(start_time, { zone: "utc" });
+    const endTime = DateTime.fromISO(end_time, { zone: "utc" });
+
+    // Extract date and time components
+    const currentDate = currentTime.toFormat("yyyy-MM-dd"); // YYYY-MM-DD format
+    const currentTimeOnly = currentTime.toFormat("HH:mm"); // HH:mm format
+
+    const startDate = startTime.toFormat("yyyy-MM-dd");
+    const startTimeOnly = startTime.toFormat("HH:mm");
+
+    const endDate = endTime.toFormat("yyyy-MM-dd");
+    const endTimeOnly = endTime.toFormat("HH:mm");
+
+    // Compare the current date and time (date + hour:minute) with start and end time
+    const isDateSame = currentDate === startDate && currentDate === endDate;
+    const isWithinTimeFrame =
+      isDateSame &&
+      currentTimeOnly >= startTimeOnly &&
+      currentTimeOnly <= endTimeOnly;
+    return isWithinTimeFrame && !ratings;
+  });
 
   const trainer = scheduledMeetingDetails?.filter((booking) => {
     return (
@@ -163,8 +193,8 @@ const UpcomingSession = ({ accountType = null }) => {
               <TabContent activeTab={activeTabs}>
                 {
                   Array(bookingButton.length).fill().map((_, index) => <TabPane tabId={bookingButton[index]}>
-                  {activeTabs && scheduledMeetingDetails.length > 0 ? (
-                    <BookingList key={`${activeTabs}_${index}`} bookings={scheduledMeetingDetails} activeTabs={activeTabs}/>
+                  {activeTabs && filteredSessions.length > 0 ? (
+                    <BookingList key={`${activeTabs}_${index}`} bookings={filteredSessions} activeTabs={activeTabs}/>
                   ) : (
                     <div
                       style={{
