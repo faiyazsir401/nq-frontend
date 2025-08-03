@@ -15,6 +15,7 @@ import AuthGuard, {
 import { SocketContext, getSocket } from "../app/components/socket";
 import { LOCAL_STORAGE_KEYS, routingPaths } from "../app/common/constants";
 import { bookingsAction } from "../app/components/common/common.slice";
+import Script from "next/script"
 
 
 export default function MyAppComponent({ Component, pageProps }) {
@@ -59,6 +60,18 @@ export default function MyAppComponent({ Component, pageProps }) {
 
   return (
     <Fragment>
+       <Script
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/sfxnljmqst";
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "sfxnljmqst");
+          `,
+        }}
+      />
       <GoogleOAuthProvider clientId={process?.env?.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
         <Head>
           <meta httpEquiv="content-type" content="text/html; charset=UTF-8" />
