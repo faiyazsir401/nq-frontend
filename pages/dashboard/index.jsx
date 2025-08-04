@@ -72,7 +72,7 @@ const Dashboard = () => {
       console.log("Initializing OpenReplay tracker with userInfo:", userInfo);
       console.log("OpenReplay project key:", process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY);
       newTracker.start();
-      newTracker.setUserID(userInfo._id);
+      newTracker.setUserID(userInfo.email);
       newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
       console.log("OpenReplay tracker initialized successfully with userInfo:", userInfo._id);
     } else {
