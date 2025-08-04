@@ -35,7 +35,7 @@ import { EVENTS } from "../../helpers/events";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
 import NotificationPopup from "../../app/components/notification-popup";
 import { getMeAsync } from "../../app/components/auth/auth.slice";
-import { trackerAssist } from '@openreplay/tracker';
+import  trackerAssist  from '@openreplay/tracker-assist';
 import Tracker from '@openreplay/tracker';
 
 const newTracker = new Tracker({
