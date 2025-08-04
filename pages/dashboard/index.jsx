@@ -34,33 +34,57 @@ import { getAllNotifications, notificationAction } from "../../app/components/no
 import { EVENTS } from "../../helpers/events";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
 import NotificationPopup from "../../app/components/notification-popup";
+import { getMeAsync } from "../../app/components/auth/auth.slice";
 
 import Tracker from '@openreplay/tracker';
 
-const tracker = new Tracker({
-  projectKey: "Z4i45QZp973IIi1FAdB9",
+const newTracker = new Tracker({
+  projectKey: process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY,
   ingestPoint: "https://analytics.netqwix.com/ingest",
 });
+
 
 const Dashboard = () => {
   const socket = useContext(SocketContext);
   const dispatch = useAppDispatch();
-  const { sidebarActiveTab, topNavbarActiveTab } = useAppSelector(authState);
+  const { sidebarActiveTab, topNavbarActiveTab, userInfo } = useAppSelector(authState);
   const [accountType, setAccountType] = useState("");
-  const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
+  const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true);
+  
   useEffect(() => {
     WebPushRegister()
-    setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
+    // Use userInfo.account_type from Redux if available, otherwise fallback to localStorage
+    const accountTypeFromUser = userInfo?.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE);
+    setAccountType(accountTypeFromUser);
     // fetching master data, TODO: stop over calling API calls.
     dispatch(getMasterDataAsync());
     dispatch(getAllNotifications({page : 1, limit : 10})) ;
-  }, []);
+    
+    // Get user info if not already loaded and user is logged in
+    if ((!userInfo || !userInfo._id)) {
+      dispatch(getMeAsync());
+    }
+  }, [userInfo, dispatch]);
 
-  useEffect(() => { 
-    tracker.start()
-    tracker.setUserID(localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID))
-    tracker.setMetadata(localStorage.getItem(LOCAL_STORAGE_KEYS.USER_ID),localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
-  }, []);
+  // Initialize tracker only when userInfo is available
+  useEffect(() => {
+    if (userInfo && userInfo._id ) {
+      console.log("Initializing OpenReplay tracker with userInfo:", userInfo);
+      console.log("OpenReplay project key:", process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY);
+      newTracker.start();
+      newTracker.setUserID(userInfo._id);
+      newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
+      console.log("OpenReplay tracker initialized successfully with userInfo:", userInfo._id);
+    } else {
+      console.log("Tracker not initialized - waiting for userInfo. Current state:", {
+        hasUserInfo: !!userInfo,
+        hasUserId: !!(userInfo && userInfo._id),
+        userInfo
+      });
+    }
+  }, [userInfo]);
+
+
 
   const getDashboard = () => {
     switch (accountType) {
