@@ -35,7 +35,7 @@ import { EVENTS } from "../../helpers/events";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
 import NotificationPopup from "../../app/components/notification-popup";
 import { getMeAsync } from "../../app/components/auth/auth.slice";
-
+import { trackerAssist } from '@openreplay/tracker';
 import Tracker from '@openreplay/tracker';
 
 const newTracker = new Tracker({
@@ -71,6 +71,7 @@ const Dashboard = () => {
     if (userInfo && userInfo._id ) {
       console.log("Initializing OpenReplay tracker with userInfo:", userInfo);
       console.log("OpenReplay project key:", process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY);
+      newTracker.use(trackerAssist());
       newTracker.start();
       newTracker.setUserID(userInfo.email);
       newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
