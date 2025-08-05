@@ -24,7 +24,7 @@ import {
   getScheduledMeetingDetailsAsync,
 } from "../common/common.slice";
 
-import { formatTimeInLocalZone, Utils } from "../../../utils/utils";
+import { convertTimesForDataArray, CovertTimeAccordingToTimeZone, formatTimeInLocalZone, Utils } from "../../../utils/utils";
 import { Button } from "reactstrap";
 import { DateTime } from "luxon";
 import { traineeAction } from "../trainee/trainee.slice";
@@ -163,12 +163,18 @@ const NavHomePage = () => {
   const filteredSessions = scheduledMeetingDetails.filter((session) => {
     const { start_time, end_time, ratings } = session;
 
+    console.log("session", session);
+   const  startTimeUpdated = CovertTimeAccordingToTimeZone(start_time, session.time_zone, false);
+   const  endTimeUpdated = CovertTimeAccordingToTimeZone(end_time, session.time_zone, false);
+   console.log("startTimeUpdated", startTimeUpdated);
+   console.log("endTimeUpdated", endTimeUpdated);
     const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
 
     // Parse the start_time and end_time in UTC
-    const startTime = DateTime.fromISO(start_time, { zone: "utc" });
-    const endTime = DateTime.fromISO(end_time, { zone: "utc" });
-
+    const startTime = DateTime.fromISO(startTimeUpdated, { zone: "utc" });
+    const endTime = DateTime.fromISO(endTimeUpdated, { zone: "utc" });
+    console.log("startTime", startTime);
+    console.log("endTime", endTime);
     // Extract date and time components
     const currentDate = currentTime.toFormat("yyyy-MM-dd"); // YYYY-MM-DD format
     const currentTimeOnly = currentTime.toFormat("HH:mm"); // HH:mm format
