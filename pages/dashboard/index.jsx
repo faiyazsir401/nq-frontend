@@ -35,13 +35,6 @@ import { EVENTS } from "../../helpers/events";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
 import NotificationPopup from "../../app/components/notification-popup";
 import { getMeAsync } from "../../app/components/auth/auth.slice";
-import  trackerAssist  from '@openreplay/tracker-assist';
-import Tracker from '@openreplay/tracker';
-
-const newTracker = new Tracker({
-  projectKey: process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY,
-  ingestPoint: "https://analytics.netqwix.com/ingest",
-});
 
 
 const Dashboard = () => {
@@ -66,24 +59,7 @@ const Dashboard = () => {
     }
   }, [userInfo, dispatch]);
 
-  // Initialize tracker only when userInfo is available
-  useEffect(() => {
-    if (userInfo && userInfo._id ) {
-      console.log("Initializing OpenReplay tracker with userInfo:", userInfo);
-      console.log("OpenReplay project key:", process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY);
-      newTracker.use(trackerAssist());
-      newTracker.start();
-      newTracker.setUserID(userInfo.email);
-      newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
-      console.log("OpenReplay tracker initialized successfully with userInfo:", userInfo._id);
-    } else {
-      console.log("Tracker not initialized - waiting for userInfo. Current state:", {
-        hasUserInfo: !!userInfo,
-        hasUserId: !!(userInfo && userInfo._id),
-        userInfo
-      });
-    }
-  }, [userInfo]);
+
 
 
 
