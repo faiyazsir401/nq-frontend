@@ -142,10 +142,11 @@ const Bookings = ({ accountType = null }) => {
         const payload = {
           status: tabBook,
         };
-        dispatch(getScheduledMeetingDetailsAsync(payload));
+        // dispatch(getScheduledMeetingDetailsAsync(payload));
+        dispatch(getScheduledMeetingDetailsAsync());
       }
     } else {
-      dispatch(getScheduledMeetingDetailsAsync({ status: "upcoming" }));
+      dispatch(getScheduledMeetingDetailsAsync());
     }
   }, [tabBook]);
 

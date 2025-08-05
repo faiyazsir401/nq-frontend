@@ -132,34 +132,6 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     }
   }, [tabBook,activeCenterContainerTab]);
 
-  // Filter sessions that are confirmed and within the current time range (same as active sessions)
-  const filteredSessions = scheduledMeetingDetails.filter((session) => {
-    const { start_time, end_time, ratings } = session;
-
-    const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
-
-    // Parse the start_time and end_time in UTC
-    const startTime = DateTime.fromISO(start_time, { zone: "utc" });
-    const endTime = DateTime.fromISO(end_time, { zone: "utc" });
-
-    // Extract date and time components
-    const currentDate = currentTime.toFormat("yyyy-MM-dd"); // YYYY-MM-DD format
-    const currentTimeOnly = currentTime.toFormat("HH:mm"); // HH:mm format
-
-    const startDate = startTime.toFormat("yyyy-MM-dd");
-    const startTimeOnly = startTime.toFormat("HH:mm");
-
-    const endDate = endTime.toFormat("yyyy-MM-dd");
-    const endTimeOnly = endTime.toFormat("HH:mm");
-
-    // Compare the current date and time (date + hour:minute) with start and end time
-    const isDateSame = currentDate === startDate && currentDate === endDate;
-    const isWithinTimeFrame =
-      isDateSame &&
-      currentTimeOnly >= startTimeOnly &&
-      currentTimeOnly <= endTimeOnly;
-    return isWithinTimeFrame && !ratings;
-  });
 
   const showRatingLabel = (ratingInfo) => {
     // for trainee we're showing recommends
@@ -570,10 +542,10 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
-  console.log("filteredSessions",filteredSessions)
+  console.log("scheduledMeetingDetails",scheduledMeetingDetails)
   return (
     <div>
-      {!filteredSessions.length ? (
+      {!scheduledMeetingDetails.length ? (
         // Show a message when there are no upcoming sessions
         <div
           style={{
@@ -586,7 +558,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         </div>
       ) : (
         // Render scheduled meetings if there are any
-        filteredSessions?.map((bookingInfo, booking_index) => (
+        scheduledMeetingDetails?.map((bookingInfo, booking_index) => (
           <BookingCard
             bookingInfo={bookingInfo}
             key={booking_index}
