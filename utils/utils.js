@@ -432,7 +432,7 @@ export class Utils {
       //       (new Date(item.start_time) <= end_time_date && end_time_date >= new Date(item?.end_time))
       //   });
 
-      //   console.log("filteredData", start_time, end_time);
+      
 
       //   if (filteredData?.start_time) status = false
 
@@ -844,9 +844,9 @@ export class Utils {
     const currentTime = new Date();
     const currentHours = currentTime.getHours();
     const currentMinutes = currentTime.getMinutes();
-      console.log(currentHours , currentMinutes)
+      
     // Parse the input time string
-   console.log('inputstring' , inputTimeStr)
+   
     let [inputHours, inputMinutes] = inputTimeStr.split(':').map(Number);
   
     // Compare hours first, then minutes if hours are equal
@@ -903,8 +903,8 @@ export function convertTimesToISO(date, time1) {
 export function formatToAMPM(date) {
   let hours = date.getHours(); // Use UTC hours to avoid local timezone
   let minutes = date.getMinutes(); // Use UTC minutes
-  console.log("datehours",date.getHours())
-  console.log("dateminutes",date.getMinutes())
+  
+  
 
   const ampm = hours >= 12 ? 'PM' : 'AM';
 

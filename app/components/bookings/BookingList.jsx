@@ -323,9 +323,6 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     const localStartTime = formatTimeInLocalZone(start_time);
     const localEndTime = formatTimeInLocalZone(end_time);
 
-    // const isMobileScreen = useMediaQuery("(max-width:600px)")
-    
-    console.log("bookingInfo:" + _id, localStartTime); // Displaying the converted start time
     const isMobileScreen = useMediaQuery('(max-width:600px)')
     return (
      <div
@@ -542,7 +539,6 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
-  console.log("scheduledMeetingDetails",scheduledMeetingDetails)
   return (
     <div>
       {!scheduledMeetingDetails.length ? (

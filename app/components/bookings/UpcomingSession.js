@@ -54,7 +54,6 @@ const UpcomingSession = ({ accountType = null }) => {
       setIsOpenID(newBookingData?._id);
       setIsOpen(true);
     }
-    console.log('new booking data' , newBookingData)
   }, [newBookingData]);
 
   const handleChangeBookingTab = async (tab) => {

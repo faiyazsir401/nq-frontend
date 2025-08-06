@@ -50,8 +50,6 @@ const UserInfoCard = () => {
   const [croppedImage, setCroppedImage] = useState(null);
   const [progress, setProgress] = useState(0);
 
-  console.log(displayedImage)
-
   useEffect(() => {
     getMeAsync();
   }, []);

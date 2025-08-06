@@ -21,7 +21,6 @@ const VideoComponent = forwardRef(
         return () => clearTimeout(timer); // Cleanup timer on unmount
       }
     }, []);
-    console.log("showPoster",showPoster)
     return (
       <video
         id={id}

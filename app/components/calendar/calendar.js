@@ -417,7 +417,6 @@ export default function CalendarPage() {
   };
 
 
-  console.log("=====>1", userTimeZone)
 
   const currentDateAndtime = (startDate) => {
     const currentDate = moment(startDate).tz(userTimeZone);
@@ -505,8 +504,6 @@ export default function CalendarPage() {
     const filteredData = availabilityData?.filter(item => {
       return new Date(start_time) <= new Date(item.start_time) && new Date(item?.start_time) <= new Date(end_time)
     });
-    console.log(filteredData , 'filterData');
-    console.log(availabilityData , 'availabilityData')
     setSelectedDateEvent(filteredData)
     setSelectedModalDate(date)
     generateTimeArray(date)

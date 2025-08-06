@@ -354,7 +354,7 @@ const NavHomePageCenterContainer = () => {
             ) : null}
           </>
         )}
-        <div className="theme-tab sub-nav" style={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: 'white',paddingBottom: "10px" }}>
+        <div className="theme-tab sub-nav" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'white',paddingBottom: "10px" }}>
           {!isMobile ? <Nav tabs>
             {allTabs?.map(
               (el) =>

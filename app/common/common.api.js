@@ -17,7 +17,7 @@ export const checkSlot = async (payload) => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -40,7 +40,7 @@ export const getAllUsers = async (payload) => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -64,7 +64,7 @@ export const sendFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -88,7 +88,7 @@ export const acceptFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -112,7 +112,7 @@ export const cancelFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -136,7 +136,7 @@ export const rejectFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -159,7 +159,7 @@ export const getFriendRequests = async () => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -182,7 +182,7 @@ export const getFriends = async () => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -206,7 +206,7 @@ export const removeFriend = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     if (!err.isUnauthorized) {
@@ -231,7 +231,7 @@ export const updateAccountPrivacy = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     throw err;
@@ -253,7 +253,7 @@ export const updateNotificationSettings = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     throw err;
@@ -274,7 +274,7 @@ export const updateExtendedSessionTime = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     throw err;

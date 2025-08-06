@@ -55,7 +55,6 @@ export const signupAsync = createAsyncThunk("signup", async (payload) => {
 export const loginAsync = createAsyncThunk("login", async (payload) => {
   try {
     const response = await login(payload);
-    console.log(response , "response")
     return response;
   } catch (err) {
     if (!err.isUnauthorized) {

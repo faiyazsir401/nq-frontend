@@ -102,7 +102,6 @@ const CustomRangePicker = ({
     return newPosition;
   };
 
-  console.log("availableSlotsavailableSlotsavailableSlotsavailableSlotsavailableSlots", availableSlots)
   return (
     <React.Fragment>
       <div

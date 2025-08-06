@@ -392,7 +392,6 @@ const Bookings = ({ accountType = null }) => {
                       cursor: !isStartButtonEnabled ? "not-allowed" : "pointer",
                     }}
                     onClick={() => {
-                      console.log("Booking index", booking_index);
                       setBIndex(booking_index);
                       setStartMeeting({
                         ...startMeeting,
@@ -805,7 +804,6 @@ const Bookings = ({ accountType = null }) => {
                       cursor: !isStartButtonEnabled ? "not-allowed" : "pointer",
                     }}
                     onClick={() => {
-                      console.log("Booking index", booking_index);
                       setBIndex(booking_index);
                       setStartMeeting({
                         ...startMeeting,
@@ -955,7 +953,6 @@ const Bookings = ({ accountType = null }) => {
     });
 
   const renderRating = (trainer_info) => {
-    console.log("trainer_info",trainer_info)
     return (
       <ReactStrapModal
         allowFullWidth={true}

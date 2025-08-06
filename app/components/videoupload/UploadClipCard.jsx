@@ -242,7 +242,6 @@ const UploadClipCard = (props) => {
       };
 
       const data = await getS3SignUrl(bulkPayload);
-      console.log("datasky",data)
       if (data?.results) {
         const uploadPromises = data.results.map(async (urlData, index) => {
           try {

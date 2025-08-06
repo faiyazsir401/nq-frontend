@@ -3,7 +3,7 @@ import { Link, X } from "react-feather";
 import { Utils } from '../../../../utils/utils';
 
 const PopupContent = ({ onClose, userInfo, Logout }) => (
-  <div className="popup" style={{ position: 'absolute', top: '30px', right: '50px', zIndex: "10" }}>
+  <div className="popup" style={{ position: 'absolute', top: '30px', right: '50px', zIndex: "101" }}>
     <div className="card rounded trainer-profile-card" style={{ width: "350px", height: "auto" }}>
       <div className="card-body">
         <div className="row">

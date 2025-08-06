@@ -87,12 +87,6 @@ const TraineeRenderBooking = ({
     const isDateSame = currentDate === startDate && currentDate === endDate;
     const isWithinTimeFrame  = isDateSame && currentTimeOnly >= startTimeOnly && currentTimeOnly <= endTimeOnly;
     const isCurrentTimeAfterEndTime= currentTime > endTime
-    console.log("currentTime",currentTime)
-    console.log("endTime",endTime)
-    console.log("isCurrentTimeAfterEndTime",isCurrentTimeAfterEndTime)
-
-    console.log('Is the current date the same as start and end date?', isDateSame); 
-    console.log('Is the current time within the time range?', isWithinTimeFrame);
   const canShowRatingButton =
     !isUpcomingSession &&
     !isCurrentDateBefore &&
@@ -118,7 +112,7 @@ const TraineeRenderBooking = ({
           : { updatePayload }),
       };
       dispatch(updateBookedSessionScheduledMeetingAsync(payload));
-      dispatch(getScheduledMeetingDetailsAsync({ status: "upcoming" }));
+      dispatch(getScheduledMeetingDetailsAsync());
     }
   };
 
@@ -133,7 +127,7 @@ const TraineeRenderBooking = ({
   };
 
   const isMobileScreen = useMediaQuery('(max-width:600px)')
-  console.log("ratings_id+",_id,bookingInfo)
+
   return (
     <React.Fragment>
       {status !== BookedSession.canceled &&

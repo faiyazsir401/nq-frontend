@@ -12,7 +12,6 @@ const AuthGuard = ({ children }) => {
   const path = router.asPath;
   const pathName = router.pathname;
   const authSelector = useAppSelector(authState);
-  console.log(userInfo , 'userInfo')
   useEffect(() => {
     if(authSelector.showGoogleRegistrationForm.isFromGoogle) {
       router.push(routingPaths.signUp);
