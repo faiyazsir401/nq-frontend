@@ -114,46 +114,50 @@ const NavHomePage = () => {
 
   var settings = {
     autoplay: true,
-    infinite: true,
+    infinite: true, // Changed to false to prevent duplication
     speed: 2000,
-    slidesToShow: 2,
+    slidesToShow: Math.min(2, activeTrainer?.length || 1), // Dynamic based on available data
     slidesToScroll: 1,
     swipeToSlide: true,
     autoplaySpeed: 3000,
-    arrows: true,
+    arrows: activeTrainer?.length > 1, // Only show arrows if more than 1 item
     dots: false,
     responsive: [
       {
         breakpoint: 1366,
         settings: {
           autoplay: true,
-          slidesToShow: 3,
+          slidesToShow: Math.min(3, activeTrainer?.length || 1),
           slidesToScroll: 1,
-          infinite: true,
+          infinite: false,
+          arrows: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 800,
         settings: {
           autoplay: true,
-          slidesToShow: 2,
+          slidesToShow: Math.min(2, activeTrainer?.length || 1),
           infinite: true,
+          arrows: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 768,
         settings: {
           autoplay: true,
-          slidesToShow: 2,
+          slidesToShow: Math.min(2, activeTrainer?.length || 1),
           infinite: true,
+          arrows: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 700,
         settings: {
           autoplay: true,
-          slidesToShow: 1,
+          slidesToShow: Math.min(1, activeTrainer?.length || 1),
           infinite: true,
+          arrows: activeTrainer?.length > 1,
         },
       },
     ],
