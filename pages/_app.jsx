@@ -45,12 +45,118 @@ export default function MyAppComponent({ Component, pageProps }) {
           const newTracker = new Tracker({
             projectKey: process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY,
             ingestPoint: "https://analytics.netqwix.com/ingest",
+            // Enable comprehensive tracking
+            captureIFrames: true,
+            captureCanvas: true,
+            captureCrossOriginIframes: true,
+            respectDoNotTrack: false,
+            // Network tracking
+            captureNetworkRequests: true,
+            captureNetworkResponses: true,
+            captureNetworkHeaders: true,
+            // Media tracking
+            captureMedia: true,
+            captureVideo: true,
+            captureAudio: true,
+            // DOM tracking
+            captureDOM: true,
+            captureCSS: true,
+            captureStyles: true,
+            // Performance tracking
+            capturePerformance: true,
+            captureMemory: true,
+            captureErrors: true,
+            captureConsole: true,
+            // User interactions
+            captureMouse: true,
+            captureKeyboard: true,
+            captureTouch: true,
+            captureScroll: true,
+            captureFocus: true,
+            captureBlur: true,
+            // File tracking
+            captureFiles: true,
+            captureImages: true,
+            captureFonts: true,
+            // Advanced features
+            captureWebGL: true,
+            captureWebWorkers: true,
+            captureServiceWorkers: true,
+            captureWebSockets: true,
+            captureWebRTC: true,
+            // Privacy and performance
+            maskTextInputs: false,
+            maskAllInputs: false,
+            blockClass: 'openreplay-block',
+            blockSelector: null,
+            ignoreClass: 'openreplay-ignore',
+            // Session recording
+            recordCanvas: true,
+            recordCrossOriginIframes: true,
+            // Custom settings
+            enableStrictMode: false,
+            enableInjection: true,
+            enableCompression: true,
+            enableCache: true,
+            // Timeouts
+            networkTimeout: 10000,
+            sessionTimeout: 3600000, // 1 hour
+            // Sampling
+            sampling: 100, // 100% of sessions
+            // Debug mode
+            debug: process.env.NODE_ENV === 'development',
+
+            network:{
+              capturePayload: true,
+              captureHeaders: true,
+              captureResponseHeaders: true,
+              captureResponsePayload: true,
+              captureRequestHeaders: true,
+              captureRequestPayload: true,
+              captureResponseStatus: true,
+              captureResponseTime: true,
+              captureRequestTime: true,
+              captureRequestStatus: true,
+            }
           });
           
+          // Add comprehensive plugins
           newTracker.use(trackerAssist());
+          
           newTracker.start();
           newTracker.setUserID(userInfo.email);
           newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
+          
+          // Set additional tracking properties
+          newTracker.setSessionData({
+            userAgent: navigator.userAgent,
+            screenResolution: `${screen.width}x${screen.height}`,
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            language: navigator.language,
+            platform: navigator.platform,
+            cookieEnabled: navigator.cookieEnabled,
+            onLine: navigator.onLine,
+            connection: navigator.connection ? {
+              effectiveType: navigator.connection.effectiveType,
+              downlink: navigator.connection.downlink,
+              rtt: navigator.connection.rtt
+            } : null
+          });
+          
+          // Track performance metrics
+          if ('performance' in window) {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+              newTracker.setSessionData({
+                pageLoadTime: perfData.loadEventEnd - perfData.loadEventStart,
+                domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+                firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime,
+                firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime
+              });
+            }
+          }
+          
           console.log("OpenReplay tracker initialized successfully with userInfo:", userInfo._id);
         } else {
           console.log("Tracker not initialized - no user info available");
