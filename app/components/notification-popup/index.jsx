@@ -80,12 +80,19 @@ const NotificationPopup = () => {
   };
 
   const updateBookedStatusApi = async (_id, booked_status) => {
-
-    const updatePayload = {
-      id: _id,
-      booked_status: booked_status,
-    };
-    await dispatch(updateBookedSessionScheduledMeetingAsync({ status: "upcoming", updatePayload })).unwrap();
+    try {
+      const updatePayload = {
+        id: _id,
+        booked_status: booked_status,
+      };
+      await dispatch(updateBookedSessionScheduledMeetingAsync({ status: "upcoming", updatePayload })).unwrap();
+    } catch (error) {
+      if (!error.isUnauthorized) {
+        toast.error(error.response.data.error);
+      }
+      throw error;
+    }
+    
   };
 
   const sendNotifications = (data) => {
