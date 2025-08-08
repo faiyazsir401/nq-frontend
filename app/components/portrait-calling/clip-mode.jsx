@@ -805,7 +805,9 @@ const ClipModeCall = ({
   videoRef2,
   videoContainerRef,
   videoContainerRef2,
-  setShowScreenshotButton
+  setShowScreenshotButton,
+  lockPoint,
+  setLockPoint
 }) => {
   const socket = useContext(SocketContext);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -908,6 +910,7 @@ const ClipModeCall = ({
     socket?.on(EVENTS.TOGGLE_LOCK_MODE, (data) => {
       if (accountType === AccountType.TRAINEE) {
         setIsLock(data.isLockMode);
+       
       }
     });
 
@@ -1673,6 +1676,13 @@ const ClipModeCall = ({
                     isLockMode: !isLock,
                   });
                   setIsLock(!isLock);
+                  const lockPointTemp = !isLock
+                  ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                    ? videoRef.current?.currentTime || 0
+                    : videoRef2.current?.currentTime || 0
+                  : videoRef.current?.currentTime || 0;
+                  console.log("lockPointTemp",lockPointTemp)
+                  setLockPoint(lockPointTemp);
                 }}
               >
                 {isLock ? <FaLock size={16} /> : <FaUnlock size={16} />}
@@ -1934,6 +1944,7 @@ const ClipModeCall = ({
                 setIsPlaying={setIsPlayingBoth}
                 isLock={isLock}
                 setCurrentTime={setCurrentTime}
+                lockPoint={lockPoint}
               />
             )}
           </>

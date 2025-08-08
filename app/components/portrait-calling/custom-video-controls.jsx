@@ -33,6 +33,7 @@ const CustomVideoControls = ({
   isLock,
   currentTime,
   setCurrentTime,
+  lockPoint
 }) => {
   const { accountType } = useAppSelector(authState);
   const [showVolume, setShowVolume] = useState(false);
@@ -59,6 +60,7 @@ const CustomVideoControls = ({
   //     return <FaVolumeUp />;
   //   };
 
+  console.log("lockPoint",lockPoint)
   return (
     <div
       style={{
@@ -138,47 +140,45 @@ const CustomVideoControls = ({
                 </div> */}
 
             {/* Progress Bar */}
-            {/* Progress Bar */}
-            <input
-              type="range"
-              min="0"
-              step="0.01"
-              disabled={accountType === AccountType.TRAINEE}
-              value={
-                isLock
-                  ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
-                    ? videoRef.current?.currentTime || 0
-                    : videoRef2.current?.currentTime || 0
-                  : videoRef.current?.currentTime || 0
-              }
-              max={
-                isLock
-                  ? Math.max(videoRef.current?.duration || 0, videoRef2.current?.duration || 0)
-                  : videoRef.current?.duration || 100
-              }
-              onChange={handleSeek}
-              style={{
-                flex: 1,
-                cursor: "pointer",
-                height: "5px",
-                appearance: "none",
-                background: `linear-gradient(to right, #2566e8 ${((
-                    isLock
-                      ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
-                        ? videoRef.current?.currentTime || 0
-                        : videoRef2.current?.currentTime || 0
-                      : videoRef.current?.currentTime || 0
-                  ) /
-                    (isLock
-                      ? Math.max(videoRef.current?.duration || 0, videoRef2.current?.duration || 0)
-                      : videoRef.current?.duration || 100)) *
-                  100
-                  }%, #ccc 0%)`,
-                borderRadius: "5px",
-                outline: "none",
-                transition: "background 0.3s ease",
-              }}
-            />
+            {(() => {
+              const currentValue = isLock
+                ? Math.max((videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                  ? videoRef.current?.currentTime || 0
+                  : videoRef2.current?.currentTime || 0, lockPoint)
+                : videoRef.current?.currentTime || 0;
+              
+              const maxValue = isLock
+                ? Math.max(videoRef.current?.duration || 0, videoRef2.current?.duration || 0)
+                : videoRef.current?.duration || 100;
+              
+              // Calculate the relative progress for background styling
+              const relativeProgress = isLock 
+                ? ((currentValue - lockPoint) / (maxValue - lockPoint)) * 100
+                : (currentValue / maxValue) * 100;
+              
+              console.log("currentValue", currentValue, "relativeProgress", relativeProgress);
+              return (
+                <input
+                  type="range"
+                  min={isLock ? lockPoint : 0}
+                  step="0.01"
+                  disabled={accountType === AccountType.TRAINEE}
+                  value={currentValue}
+                  max={maxValue}
+                  onChange={handleSeek}
+                  style={{
+                    flex: 1,
+                    cursor: "pointer",
+                    height: "5px",
+                    appearance: "none",
+                    background: `linear-gradient(to right, #2566e8 ${relativeProgress}%, #ccc 0%)`,
+                    borderRadius: "5px",
+                    outline: "none",
+                    transition: "background 0.3s ease",
+                  }}
+                />
+              );
+            })()}
           </motion.div>
         )}
       </AnimatePresence>
