@@ -328,7 +328,7 @@ const VideoContainer = ({
       console.log(`Video ${clip?.id} loaded successfully`);
     };
   
-    const handleError = (error) => {
+    const handleError = (error,isMessage=false) => {
       console.error("Video failed to load:", error);
       
       // Clear the timeout since we're handling the error
@@ -340,7 +340,9 @@ const VideoContainer = ({
       setIsVideoLoading(false);
       setVideoProgress(0);
       setIsVideoLoaded(false);
-      toast.error("Failed to load video");
+      if(isMessage){
+        toast.error("Failed to load video");
+      }
     };
   
     const handleStalled = () => {
@@ -484,11 +486,11 @@ const VideoContainer = ({
       // Only show timeout error if video is still loading and not ready
       if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
         console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
-        // handleError(new Error('Loading timeout'));
+        handleError(new Error('Loading timeout'),true);
       } else if (isVideoLoaded) {
         console.log(`Video ${clip?.id} already loaded, clearing timeout`);
       }
-    }, 10000); // 30 second timeout
+    }, 30000); // 30 second timeout
   
     return () => {
       if (loadTimeout) {
