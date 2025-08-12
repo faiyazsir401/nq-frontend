@@ -309,10 +309,17 @@ const VideoContainer = ({
     if (!video) return;
   
     let isHandlingLoad = false; // Prevent multiple handlers from conflicting
+    let loadTimeout; // Declare timeout variable
   
     const handleVideoLoadComplete = () => {
       if (isHandlingLoad) return;
       isHandlingLoad = true;
+      
+      // Clear the timeout since video loaded successfully
+      if (loadTimeout) {
+        clearTimeout(loadTimeout);
+        loadTimeout = null;
+      }
       
       setIsVideoLoading(false);
       setVideoProgress(100);
@@ -323,6 +330,13 @@ const VideoContainer = ({
   
     const handleError = (error) => {
       console.error("Video failed to load:", error);
+      
+      // Clear the timeout since we're handling the error
+      if (loadTimeout) {
+        clearTimeout(loadTimeout);
+        loadTimeout = null;
+      }
+      
       setIsVideoLoading(false);
       setVideoProgress(0);
       setIsVideoLoaded(false);
@@ -331,14 +345,12 @@ const VideoContainer = ({
   
     const handleStalled = () => {
       console.log("Video playback stalled");
-      setIsVideoLoading(true);
-      setIsVideoLoaded(false);
+      // Don't reset loading state on stall, just log it
     };
   
     const handleWaiting = () => {
       console.log("Video waiting for data");
-      setIsVideoLoading(true);
-      setIsVideoLoaded(false);
+      // Don't reset loading state on waiting, just log it
     };
 
     const handleVideoLoadStart = () => {
@@ -467,16 +479,22 @@ const VideoContainer = ({
     // Set preload for better loading behavior
     video.preload = "auto";
   
-    // Add timeout to prevent infinite loading
-    const loadTimeout = setTimeout(() => {
-      if (!isVideoLoaded) {
-        console.warn(`Video ${clip?.id} loading timeout`);
-        handleError(new Error('Loading timeout'));
+    // Add timeout to prevent infinite loading - but only if video hasn't loaded
+    loadTimeout = setTimeout(() => {
+      // Only show timeout error if video is still loading and not ready
+      if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
+        console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
+        // handleError(new Error('Loading timeout'));
+      } else if (isVideoLoaded) {
+        console.log(`Video ${clip?.id} already loaded, clearing timeout`);
       }
-    }, 30000); // 30 second timeout
+    }, 10000); // 30 second timeout
   
     return () => {
-      clearTimeout(loadTimeout);
+      if (loadTimeout) {
+        clearTimeout(loadTimeout);
+        loadTimeout = null;
+      }
       clearInterval(progressInterval);
       video.removeEventListener('loadstart', handleVideoLoadStart);
       video.removeEventListener('progress', handleVideoProgress);
