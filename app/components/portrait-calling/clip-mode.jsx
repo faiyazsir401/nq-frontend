@@ -543,6 +543,7 @@ const VideoContainer = ({
     // Safari iOS specific: Don't start loading until user interaction
     let safariTouchHandler;
     let safariLoadTimeout;
+    let handleSafariCanPlay;
     if (isSafariIOS()) {
       // For Safari iOS, don't start loading automatically - wait for user interaction
       console.log(`Video ${clip?.id} Safari iOS detected - waiting for user interaction`);
@@ -550,6 +551,17 @@ const VideoContainer = ({
       // For Safari iOS, don't show loading state initially - wait for user interaction
       setIsVideoLoading(false);
       setVideoProgress(0);
+      
+      // Safari iOS specific: Listen for when video becomes playable
+      handleSafariCanPlay = () => {
+        if (isSafariIOS() && !isVideoLoaded) {
+          console.log(`Video ${clip?.id} Safari iOS can play - completing loading`);
+          setVideoProgress(100);
+          handleVideoLoadComplete();
+        }
+      };
+      
+      video.addEventListener('canplay', handleSafariCanPlay);
       
       // Safari iOS: Add touch event to start video loading
       safariTouchHandler = () => {
@@ -571,6 +583,8 @@ const VideoContainer = ({
         // Start Safari iOS specific progress monitoring after user interaction
         const safariProgressInterval = setInterval(() => {
           if (video && !isVideoLoaded) {
+            let shouldComplete = false;
+            
             // Check buffered ranges for Safari iOS
             if (video.buffered.length > 0 && video.duration) {
               const bufferedEnd = video.buffered.end(video.buffered.length - 1);
@@ -581,6 +595,11 @@ const VideoContainer = ({
                 setVideoProgress(Math.round(bufferedProgress));
                 console.log(`Video ${clip?.id} Safari iOS progress: ${Math.round(bufferedProgress)}%`);
               }
+              
+              // If we have 100% buffered, we're ready
+              if (bufferedProgress >= 100) {
+                shouldComplete = true;
+              }
             }
             
             // Check readyState for Safari iOS
@@ -590,8 +609,17 @@ const VideoContainer = ({
               console.log(`Video ${clip?.id} Safari iOS readyState progress: ${Math.round(readyStateProgress)}%`);
             }
             
-            // If video is ready, complete loading
-            if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA && videoProgress >= 85) {
+            // If video is ready or we have 100% buffered, complete loading
+            if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA || shouldComplete) {
+              console.log(`Video ${clip?.id} Safari iOS ready to complete - readyState: ${video.readyState}, buffered: ${shouldComplete}`);
+              clearInterval(safariProgressInterval);
+              setVideoProgress(100); // Ensure we show 100%
+              setTimeout(() => handleVideoLoadComplete(), 200);
+            }
+            
+            // Additional check: if we're at 100% progress but haven't completed, force completion
+            if (videoProgress >= 100 && !isVideoLoaded) {
+              console.log(`Video ${clip?.id} Safari iOS at 100% - forcing completion`);
               clearInterval(safariProgressInterval);
               setTimeout(() => handleVideoLoadComplete(), 200);
             }
@@ -603,15 +631,44 @@ const VideoContainer = ({
           if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
             console.log(`Video ${clip?.id} Safari iOS loaded successfully after user interaction`);
             clearInterval(safariProgressInterval);
+            setVideoProgress(100); // Ensure we show 100%
             handleVideoLoadComplete();
           } else if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
             // If we have metadata, check again in a bit
+            setTimeout(checkSafariLoad, 500);
+          } else if (video.buffered.length > 0 && video.duration) {
+            // Check if we have enough buffered data
+            const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+            const duration = video.duration;
+            const bufferedProgress = (bufferedEnd / duration) * 100;
+            
+            if (bufferedProgress >= 90) { // If we have 90%+ buffered, we're good
+              console.log(`Video ${clip?.id} Safari iOS has sufficient buffered data: ${bufferedProgress}%`);
+              clearInterval(safariProgressInterval);
+              setVideoProgress(100);
+              handleVideoLoadComplete();
+            } else {
+              // Check again in a bit
+              setTimeout(checkSafariLoad, 500);
+            }
+          } else {
+            // Check again in a bit
             setTimeout(checkSafariLoad, 500);
           }
         };
         
         // Start checking after a short delay
         setTimeout(checkSafariLoad, 1000);
+        
+        // Fallback completion for Safari iOS - if we reach 100% progress but don't complete
+        setTimeout(() => {
+          if (!isVideoLoaded && videoProgress >= 95) {
+            console.log(`Video ${clip?.id} Safari iOS fallback completion - forcing completion`);
+            clearInterval(safariProgressInterval);
+            setVideoProgress(100);
+            handleVideoLoadComplete();
+          }
+        }, 5000); // 5 second fallback
       };
       
       video.addEventListener('touchstart', safariTouchHandler, { once: true });
@@ -663,6 +720,7 @@ const VideoContainer = ({
       if (safariTouchHandler) {
         video.removeEventListener('touchstart', safariTouchHandler);
         video.removeEventListener('click', safariTouchHandler);
+        video.removeEventListener('canplay', handleSafariCanPlay);
       }
     };
   }, [videoRef, clip?.id, isVideoLoaded]);
