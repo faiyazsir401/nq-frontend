@@ -381,20 +381,14 @@ const VideoContainer = ({
     const handleVideoLoadedMetadata = () => {
       console.log(`Video ${clip?.id} loaded metadata`);
       if (isSafariIOS()) {
-        // For Safari iOS, consider metadata loaded as sufficient for basic playback
+        // For Safari iOS, show progress but don't auto-complete
         if (videoProgress < 30) {
           setVideoProgress(30);
           console.log(`Video ${clip?.id} Safari iOS metadata progress: 30%`);
         }
         
-        // Safari iOS: If we have metadata, we can consider the video ready for basic playback
-        if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
-          setTimeout(() => {
-            if (!isVideoLoaded && videoProgress >= 30) {
-              handleVideoLoadComplete();
-            }
-          }, 500);
-        }
+        // Safari iOS: Don't auto-complete - wait for actual video data
+        // This prevents the "fake" completion that was causing issues
       }
     };
 
@@ -507,25 +501,53 @@ const VideoContainer = ({
       }
     }
 
-    // Safari iOS specific: Force load start if video doesn't start loading
+    // Safari iOS specific: Don't start loading until user interaction
     let safariTouchHandler;
+    let safariLoadTimeout;
     if (isSafariIOS()) {
-      setTimeout(() => {
-        if (video.readyState === 0 && !isVideoLoading) {
-          console.log(`Video ${clip?.id} Safari iOS fallback - forcing load start`);
-          video.load();
-        }
-      }, 1000);
+      // For Safari iOS, don't start loading automatically - wait for user interaction
+      console.log(`Video ${clip?.id} Safari iOS detected - waiting for user interaction`);
+      
+      // Show a message that user needs to tap to load video
+      if (videoProgress === 0) {
+        setVideoProgress(0);
+        setIsVideoLoading(true);
+      }
       
       // Safari iOS: Add touch event to start video loading
       safariTouchHandler = () => {
-        if (video.readyState === 0) {
-          console.log(`Video ${clip?.id} Safari iOS touch start - loading video`);
-          video.load();
-        }
+        console.log(`Video ${clip?.id} Safari iOS touch start - starting video load`);
+        setIsVideoLoading(true);
+        setVideoProgress(10);
+        
+        // Now that user has interacted, we can load the video
+        video.load();
+        
+        // Start a shorter timeout for Safari iOS after user interaction
+        safariLoadTimeout = setTimeout(() => {
+          if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_METADATA) {
+            console.warn(`Video ${clip?.id} Safari iOS loading timeout after user interaction`);
+            handleError(new Error('Safari iOS loading timeout'), true);
+          }
+        }, 10000); // 10 second timeout after user interaction
+        
+        // Also check if video loads successfully after user interaction
+        const checkSafariLoad = () => {
+          if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+            console.log(`Video ${clip?.id} Safari iOS loaded successfully after user interaction`);
+            handleVideoLoadComplete();
+          } else if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+            // If we have metadata, check again in a bit
+            setTimeout(checkSafariLoad, 500);
+          }
+        };
+        
+        // Start checking after a short delay
+        setTimeout(checkSafariLoad, 1000);
       };
       
       video.addEventListener('touchstart', safariTouchHandler, { once: true });
+      video.addEventListener('click', safariTouchHandler, { once: true });
     }
   
     // Set preload for Safari iOS compatibility
@@ -536,21 +558,27 @@ const VideoContainer = ({
     }
   
     // Add timeout to prevent infinite loading - but only if video hasn't loaded
-    const timeoutDuration = isSafariIOS() ? 15000 : 30000;
-    loadTimeout = setTimeout(() => {
-      // Only show timeout error if video is still loading and not ready
-      if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
-        console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
-        handleError(new Error('Loading timeout'),true);
-      } else if (isVideoLoaded) {
-        console.log(`Video ${clip?.id} already loaded, clearing timeout`);
-      }
-    }, timeoutDuration); // Shorter timeout for Safari iOS
+    if (!isSafariIOS()) {
+      // For non-Safari iOS browsers, use normal timeout
+      loadTimeout = setTimeout(() => {
+        if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
+          console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
+          handleError(new Error('Loading timeout'), true);
+        } else if (isVideoLoaded) {
+          console.log(`Video ${clip?.id} already loaded, clearing timeout`);
+        }
+      }, 30000); // 30 second timeout for other browsers
+    }
+    // Safari iOS timeout is handled separately after user interaction
   
     return () => {
       if (loadTimeout) {
         clearTimeout(loadTimeout);
         loadTimeout = null;
+      }
+      if (safariLoadTimeout) {
+        clearTimeout(safariLoadTimeout);
+        safariLoadTimeout = null;
       }
       clearInterval(progressInterval);
       video.removeEventListener('loadstart', handleVideoLoadStart);
@@ -563,9 +591,10 @@ const VideoContainer = ({
       video.removeEventListener('waiting', handleWaiting);
       video.removeEventListener('error', handleError);
       
-      // Clean up Safari iOS touch handler
+      // Clean up Safari iOS touch handlers
       if (safariTouchHandler) {
         video.removeEventListener('touchstart', safariTouchHandler);
+        video.removeEventListener('click', safariTouchHandler);
       }
     };
   }, [videoRef, clip?.id, isVideoLoaded]);
@@ -689,7 +718,9 @@ const VideoContainer = ({
       >
         {!isVideoLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-800 z-10">
-            <div className="text-white">Loading video...</div>
+            <div className="text-white">
+              {isSafariIOS() ? "Tap to load video" : "Loading video..."}
+            </div>
           </div>
         )}
         {drawingMode && accountType === AccountType.TRAINER && (
@@ -800,12 +831,20 @@ const VideoContainer = ({
                     zIndex: 10,
                   }}
                 >
-                  <div className="spinner-border spinner-border-sm" role="status">
-                    <span className="sr-only">Loading...</span>
-                  </div>
-                  <div style={{ fontSize: "12px", marginTop: "4px" }}>
-                    {videoProgress}%
-                  </div>
+                  {isSafariIOS() && videoProgress === 0 ? (
+                    <div style={{ fontSize: "12px" }}>
+                      Tap to load video
+                    </div>
+                  ) : (
+                    <>
+                      <div className="spinner-border spinner-border-sm" role="status">
+                        <span className="sr-only">Loading...</span>
+                      </div>
+                      <div style={{ fontSize: "12px", marginTop: "4px" }}>
+                        {videoProgress}%
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
