@@ -31,8 +31,6 @@ import html2canvas from "html2canvas";
 import { FaLock, FaUndo, FaUnlock } from "react-icons/fa";
 import NextImage from "next/image";
 
-
-
 let isDrawing = false;
 let savedPos = { canvas1: null, canvas2: null };
 let startPos = { canvas1: null, canvas2: null };
@@ -372,73 +370,92 @@ const VideoContainer = ({
       }, 200);
     };
 
-    const handleVideoLoadedMetadata = () => {
-      console.log(`Video ${clip?.id} loaded metadata`);
-      // Don't set progress here - let the interval handle it
-    };
-
     const handleVideoProgress = (event) => {
-      // Let the interval handle progress updates to avoid conflicts
-      console.log(`Video ${clip?.id} progress event - buffered data available`);
+      const video = event.target;
+      if (video.buffered.length > 0 && video.duration) {
+        const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+        const duration = video.duration;
+        const progress = (bufferedEnd / duration) * 100;
+        setVideoProgress(Math.round(progress));
+        console.log(`Video ${clip?.id} progress: ${Math.round(progress)}%`);
+      }
     };
 
-    // Simple progress tracking - only update when we have actual buffered data
+    // Add a more frequent progress check using setInterval
     const progressInterval = setInterval(() => {
       if (video && !isVideoLoaded) {
-        // Only track buffered progress, not readyState (which can fluctuate)
+        let newProgress = videoProgress;
+        
+        // Check buffered ranges
         if (video.buffered.length > 0 && video.duration) {
           const bufferedEnd = video.buffered.end(video.buffered.length - 1);
           const duration = video.duration;
           const bufferedProgress = (bufferedEnd / duration) * 100;
           
-          // Only update if progress is higher (never go backwards)
-          if (bufferedProgress > videoProgress) {
-            setVideoProgress(Math.round(bufferedProgress));
-            console.log(`Video ${clip?.id} buffered progress: ${Math.round(bufferedProgress)}%`);
+          if (bufferedProgress > newProgress) {
+            newProgress = Math.round(bufferedProgress);
           }
         }
         
-        // Check if video is ready to complete
-        if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA && videoProgress >= 90) {
-          console.log(`Video ${clip?.id} ready to complete - readyState: ${video.readyState}, progress: ${videoProgress}%`);
-          clearInterval(progressInterval);
-          setVideoProgress(100);
+        // Also check readyState for more granular progress
+        const readyStateProgress = (video.readyState / 4) * 100; // readyState goes from 0 to 4
+        if (readyStateProgress > newProgress) {
+          newProgress = Math.round(readyStateProgress);
+        }
+        
+        // Ensure progress doesn't go backwards and has minimum increments
+        if (newProgress > videoProgress && newProgress <= 100) {
+          // Ensure minimum progress increment to show movement
+          const minIncrement = Math.max(1, Math.floor((100 - videoProgress) / 10));
+          const finalProgress = Math.max(videoProgress + minIncrement, newProgress);
+          
+          setVideoProgress(Math.min(finalProgress, 100));
+          console.log(`Video ${clip?.id} interval progress: ${Math.min(finalProgress, 100)}%`);
+        }
+        
+        // If video is ready but we haven't completed, force completion
+        if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA && videoProgress >= 85) {
           setTimeout(() => handleVideoLoadComplete(), 200);
         }
       }
-    }, 200); // Check every 200ms
+    }, 150); // Check every 150ms for smoother progress updates
 
     const handleVideoCanPlay = () => {
       console.log(`Video ${clip?.id} can play`);
       if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-        // Complete loading immediately when video can play
-        clearInterval(progressInterval);
-        setVideoProgress(100);
+        // Ensure we show some progress before completing
+        if (videoProgress < 90) {
+          setVideoProgress(90);
+          console.log(`Video ${clip?.id} final progress: 90%`);
+        }
         setTimeout(() => handleVideoLoadComplete(), 100);
       }
     };
 
     const handleVideoCanPlayThrough = () => {
       console.log(`Video ${clip?.id} can play through`);
-      // Complete loading immediately when video can play through
-      clearInterval(progressInterval);
-      setVideoProgress(100);
+      // Ensure we show some progress before completing
+      if (videoProgress < 95) {
+        setVideoProgress(95);
+        console.log(`Video ${clip?.id} final progress: 95%`);
+      }
       setTimeout(() => handleVideoLoadComplete(), 100);
     };
 
     const handleVideoLoadedData = () => {
       console.log(`Video ${clip?.id} loaded data`);
       if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-        // Complete loading immediately when data is loaded
-        clearInterval(progressInterval);
-        setVideoProgress(100);
+        // Ensure we show some progress before completing
+        if (videoProgress < 85) {
+          setVideoProgress(85);
+          console.log(`Video ${clip?.id} loaded data progress: 85%`);
+        }
         setTimeout(() => handleVideoLoadComplete(), 100);
       }
     };
 
     // Add loading progress events
     video.addEventListener('loadstart', handleVideoLoadStart);
-    video.addEventListener('loadedmetadata', handleVideoLoadedMetadata);
     video.addEventListener('progress', handleVideoProgress);
     video.addEventListener('canplay', handleVideoCanPlay);
     video.addEventListener('canplaythrough', handleVideoCanPlayThrough);
@@ -449,40 +466,27 @@ const VideoContainer = ({
   
     // Additional check for cases where video might already be ready
     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-      // If video is already ready, complete immediately
-      console.log(`Video ${clip?.id} already ready - completing immediately`);
-      setVideoProgress(100);
-      handleVideoLoadComplete();
-    }
-
-    // Simple approach: Wait for video to be playable, show loader until then
-    console.log(`Video ${clip?.id} - waiting for video to be playable`);
-    
-    // Start loading immediately for all browsers
-    setIsVideoLoading(true);
-    setVideoProgress(0);
-    
-    // Load the video
-    video.load();
-    
-    // Fallback completion - if video doesn't complete within 15 seconds, force completion
-    setTimeout(() => {
-      if (!isVideoLoaded && videoProgress > 0) {
-        console.log(`Video ${clip?.id} fallback completion - forcing completion after timeout`);
-        clearInterval(progressInterval);
-        setVideoProgress(100);
+      // If video is already ready, show some progress before completing
+      if (videoProgress === 0) {
+        setVideoProgress(50);
+        setTimeout(() => {
+          setVideoProgress(100);
+          setTimeout(() => handleVideoLoadComplete(), 100);
+        }, 100);
+      } else {
         handleVideoLoadComplete();
       }
-    }, 15000);
+    }
   
-    // Set preload for all browsers since we're loading immediately
+    // Set preload for better loading behavior
     video.preload = "auto";
   
-    // Add timeout to prevent infinite loading
+    // Add timeout to prevent infinite loading - but only if video hasn't loaded
     loadTimeout = setTimeout(() => {
+      // Only show timeout error if video is still loading and not ready
       if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
         console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
-        handleError(new Error('Loading timeout'), true);
+        handleError(new Error('Loading timeout'),true);
       } else if (isVideoLoaded) {
         console.log(`Video ${clip?.id} already loaded, clearing timeout`);
       }
@@ -495,7 +499,6 @@ const VideoContainer = ({
       }
       clearInterval(progressInterval);
       video.removeEventListener('loadstart', handleVideoLoadStart);
-      video.removeEventListener('loadedmetadata', handleVideoLoadedMetadata);
       video.removeEventListener('progress', handleVideoProgress);
       video.removeEventListener('canplay', handleVideoCanPlay);
       video.removeEventListener('canplaythrough', handleVideoCanPlayThrough);
@@ -697,8 +700,7 @@ const VideoContainer = ({
                 controls={false}
                 ref={videoRef}
                 playsInline
-                webkit-playsinline
-                x-webkit-airplay="allow"
+                webkit-playsinline="true"
                 style={{
                   touchAction: "manipulation",
                   maxWidth: "100%",
@@ -713,7 +715,7 @@ const VideoContainer = ({
                 id={clip?.id}
                 muted={true}
                 poster={Utils?.generateThumbnailURL(clip)}
-                preload="auto"
+                preload="metadata"
                 crossOrigin="anonymous"
               >
                 <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
