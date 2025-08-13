@@ -31,6 +31,13 @@ import html2canvas from "html2canvas";
 import { FaLock, FaUndo, FaUnlock } from "react-icons/fa";
 import NextImage from "next/image";
 
+// Utility function to detect Safari iOS
+const isSafariIOS = () => {
+  if (typeof navigator === 'undefined') return false;
+  const ua = navigator.userAgent;
+  return /iPad|iPhone|iPod/.test(ua) && /Safari/.test(ua) && !/Chrome/.test(ua);
+};
+
 let isDrawing = false;
 let savedPos = { canvas1: null, canvas2: null };
 let startPos = { canvas1: null, canvas2: null };
@@ -370,6 +377,27 @@ const VideoContainer = ({
       }, 200);
     };
 
+    // Safari iOS specific handler
+    const handleVideoLoadedMetadata = () => {
+      console.log(`Video ${clip?.id} loaded metadata`);
+      if (isSafariIOS()) {
+        // For Safari iOS, consider metadata loaded as sufficient for basic playback
+        if (videoProgress < 30) {
+          setVideoProgress(30);
+          console.log(`Video ${clip?.id} Safari iOS metadata progress: 30%`);
+        }
+        
+        // Safari iOS: If we have metadata, we can consider the video ready for basic playback
+        if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+          setTimeout(() => {
+            if (!isVideoLoaded && videoProgress >= 30) {
+              handleVideoLoadComplete();
+            }
+          }, 500);
+        }
+      }
+    };
+
     const handleVideoProgress = (event) => {
       const video = event.target;
       if (video.buffered.length > 0 && video.duration) {
@@ -456,6 +484,7 @@ const VideoContainer = ({
 
     // Add loading progress events
     video.addEventListener('loadstart', handleVideoLoadStart);
+    video.addEventListener('loadedmetadata', handleVideoLoadedMetadata);
     video.addEventListener('progress', handleVideoProgress);
     video.addEventListener('canplay', handleVideoCanPlay);
     video.addEventListener('canplaythrough', handleVideoCanPlayThrough);
@@ -477,11 +506,37 @@ const VideoContainer = ({
         handleVideoLoadComplete();
       }
     }
+
+    // Safari iOS specific: Force load start if video doesn't start loading
+    let safariTouchHandler;
+    if (isSafariIOS()) {
+      setTimeout(() => {
+        if (video.readyState === 0 && !isVideoLoading) {
+          console.log(`Video ${clip?.id} Safari iOS fallback - forcing load start`);
+          video.load();
+        }
+      }, 1000);
+      
+      // Safari iOS: Add touch event to start video loading
+      safariTouchHandler = () => {
+        if (video.readyState === 0) {
+          console.log(`Video ${clip?.id} Safari iOS touch start - loading video`);
+          video.load();
+        }
+      };
+      
+      video.addEventListener('touchstart', safariTouchHandler, { once: true });
+    }
   
-    // Set preload for better loading behavior
-    video.preload = "auto";
+    // Set preload for Safari iOS compatibility
+    if (isSafariIOS()) {
+      video.preload = "none"; // Safari iOS doesn't support auto preload
+    } else {
+      video.preload = "auto";
+    }
   
     // Add timeout to prevent infinite loading - but only if video hasn't loaded
+    const timeoutDuration = isSafariIOS() ? 15000 : 30000;
     loadTimeout = setTimeout(() => {
       // Only show timeout error if video is still loading and not ready
       if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
@@ -490,7 +545,7 @@ const VideoContainer = ({
       } else if (isVideoLoaded) {
         console.log(`Video ${clip?.id} already loaded, clearing timeout`);
       }
-    }, 30000); // 30 second timeout
+    }, timeoutDuration); // Shorter timeout for Safari iOS
   
     return () => {
       if (loadTimeout) {
@@ -499,6 +554,7 @@ const VideoContainer = ({
       }
       clearInterval(progressInterval);
       video.removeEventListener('loadstart', handleVideoLoadStart);
+      video.removeEventListener('loadedmetadata', handleVideoLoadedMetadata);
       video.removeEventListener('progress', handleVideoProgress);
       video.removeEventListener('canplay', handleVideoCanPlay);
       video.removeEventListener('canplaythrough', handleVideoCanPlayThrough);
@@ -506,6 +562,11 @@ const VideoContainer = ({
       video.removeEventListener('stalled', handleStalled);
       video.removeEventListener('waiting', handleWaiting);
       video.removeEventListener('error', handleError);
+      
+      // Clean up Safari iOS touch handler
+      if (safariTouchHandler) {
+        video.removeEventListener('touchstart', safariTouchHandler);
+      }
     };
   }, [videoRef, clip?.id, isVideoLoaded]);
 
@@ -700,7 +761,8 @@ const VideoContainer = ({
                 controls={false}
                 ref={videoRef}
                 playsInline
-                webkit-playsinline="true"
+                webkit-playsinline
+                x-webkit-airplay="allow"
                 style={{
                   touchAction: "manipulation",
                   maxWidth: "100%",
@@ -715,7 +777,7 @@ const VideoContainer = ({
                 id={clip?.id}
                 muted={true}
                 poster={Utils?.generateThumbnailURL(clip)}
-                preload="metadata"
+                preload="none"
                 crossOrigin="anonymous"
               >
                 <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
