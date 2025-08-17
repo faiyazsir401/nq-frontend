@@ -600,6 +600,11 @@ const VideoContainer = ({
     return () => resizeObserver.disconnect();
   }, [canvasRef, videoContainerRef]);
 
+  useEffect(() => {
+    setHasAutopaused(false);
+    setIsVideoLoading(true);
+  }, [clip]);
+
   return (
     <>
     
