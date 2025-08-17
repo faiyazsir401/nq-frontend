@@ -93,6 +93,7 @@ const VideoContainer = ({
   // const [videoProgress, setVideoProgress] = useState(0);
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
+  const [hasAutopaused, setHasAutopaused] = useState(false);
   // const videoContainerRef = useRef(null);
   const movingVideoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -713,13 +714,21 @@ const VideoContainer = ({
                   pointerEvents: isVideoLoading ? "none" : "auto",
                 }}
                 id={clip?.id}
+                autoPlay
                 muted={true}
                 poster={Utils?.generateThumbnailURL(clip)}
-                preload="metadata"
+                preload="auto"
                 crossOrigin="anonymous"
                 onLoadedData={() => setIsVideoLoading(false)}
                 onCanPlayThrough={() => setIsVideoLoading(false)} 
                 onWaiting={() => setIsVideoLoading(true)} 
+                onPlay={(e) => {
+                  if (!hasAutopaused) {
+                    e.currentTarget.pause(); // only pause once (the autoplay)
+                    setHasAutopaused(true);
+                    setIsVideoLoading(false);
+                  }
+                }}
               >
                 <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
                 Your browser does not support the video tag.
