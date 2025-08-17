@@ -717,6 +717,7 @@ const VideoContainer = ({
                 poster={Utils?.generateThumbnailURL(clip)}
                 preload="metadata"
                 crossOrigin="anonymous"
+                onLoadedData={() => setIsVideoLoading(false)}
                 onCanPlayThrough={() => setIsVideoLoading(false)} 
                 onWaiting={() => setIsVideoLoading(true)} 
               >
