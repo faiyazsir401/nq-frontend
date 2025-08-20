@@ -24,7 +24,7 @@ import {
   getScheduledMeetingDetailsAsync,
 } from "../common/common.slice";
 
-import { formatTimeInLocalZone, Utils } from "../../../utils/utils";
+import { convertTimesForDataArray, CovertTimeAccordingToTimeZone, formatTimeInLocalZone, Utils } from "../../../utils/utils";
 import { Button } from "reactstrap";
 import { DateTime } from "luxon";
 import { traineeAction } from "../trainee/trainee.slice";
@@ -56,7 +56,8 @@ const NavHomePage = () => {
   const { isLoading, configs, startMeeting } = useAppSelector(bookingsState);
   const { accountType, onlineUsers } = useAppSelector(authState);
   const [activeTrainer, setActiveTrainer] = useState([]);
-  const [friendRequests, setFriendRequests] = useState([])
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [filteredSessions, setFilteredSessions] = useState([]);
   const getFriendRequestsApi = async () => {
     try {
       let res = await getFriendRequests();
@@ -107,47 +108,56 @@ const NavHomePage = () => {
   const dispatch = useAppDispatch();
   const { scheduledMeetingDetails } = useAppSelector(bookingsState);
   useEffect(() => {
-    dispatch(getScheduledMeetingDetailsAsync({ status: "upcoming" }));
+    dispatch(getScheduledMeetingDetailsAsync());
     getAllLatestActiveTrainer()
   }, []);
 
   var settings = {
     autoplay: true,
-    infinite: false,
+    infinite: true, // Changed to false to prevent duplication
     speed: 2000,
-    slidesToShow: 2,
+    slidesToShow: Math.min(2, activeTrainer?.length || 1), // Dynamic based on available data
     slidesToScroll: 1,
     swipeToSlide: true,
-    autoplaySpeed: 1000,
-    arrows: true,
+    autoplaySpeed: 3000,
+    arrows: activeTrainer?.length > 1, // Only show arrows if more than 1 item
+    dots: false,
     responsive: [
       {
         breakpoint: 1366,
         settings: {
           autoplay: true,
-          slidesToShow: 3,
+          slidesToShow: Math.min(3, activeTrainer?.length || 1),
           slidesToScroll: 1,
+          infinite: false,
+          arrows: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 800,
         settings: {
           autoplay: true,
-          slidesToShow: 2,
+          slidesToShow: Math.min(2, activeTrainer?.length || 1),
+          infinite: true,
+          arrows: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 768,
         settings: {
           autoplay: true,
-          slidesToShow: 2,
+          slidesToShow: Math.min(2, activeTrainer?.length || 1),
+          infinite: true,
+          arrows: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 700,
         settings: {
           autoplay: true,
-          slidesToShow: 1,
+          slidesToShow: Math.min(1, activeTrainer?.length || 1),
+          infinite: true,
+          arrows: activeTrainer?.length > 1,
         },
       },
     ],
@@ -155,33 +165,48 @@ const NavHomePage = () => {
   console.log("scheduledMeetingDetails12", scheduledMeetingDetails);
 
   // Filter sessions that are confirmed and within the current time range
-  const filteredSessions = scheduledMeetingDetails.filter((session) => {
-    const { start_time, end_time, ratings } = session;
+  useEffect(() => {
+    console.log("sessionSky1", scheduledMeetingDetails);
+    if (scheduledMeetingDetails.length > 0) {
+      console.log("sessionSky2", scheduledMeetingDetails);
+      const filtered = scheduledMeetingDetails.filter((session) => {
+       
+        const { start_time, end_time, ratings } = session;
 
-    const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
+        console.log("sessionSky3", session);
+        const startTimeUpdated = CovertTimeAccordingToTimeZone(start_time, session.time_zone, false);
+        const endTimeUpdated = CovertTimeAccordingToTimeZone(end_time, session.time_zone, false);
+        console.log("startTimeUpdated", startTimeUpdated);
+        console.log("endTimeUpdated", endTimeUpdated);
+        const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
 
-    // Parse the start_time and end_time in UTC
-    const startTime = DateTime.fromISO(start_time, { zone: "utc" });
-    const endTime = DateTime.fromISO(end_time, { zone: "utc" });
+        // Parse the start_time and end_time in UTC
+        const startTime = DateTime.fromISO(startTimeUpdated, { zone: "utc" });
+        const endTime = DateTime.fromISO(endTimeUpdated, { zone: "utc" });
+        console.log("startTime", startTime);
+        console.log("endTime", endTime);
+        // Extract date and time components
+        const currentDate = currentTime.toFormat("yyyy-MM-dd"); // YYYY-MM-DD format
+        const currentTimeOnly = currentTime.toFormat("HH:mm"); // HH:mm format
 
-    // Extract date and time components
-    const currentDate = currentTime.toFormat("yyyy-MM-dd"); // YYYY-MM-DD format
-    const currentTimeOnly = currentTime.toFormat("HH:mm"); // HH:mm format
+        const startDate = startTime.toFormat("yyyy-MM-dd");
+        const startTimeOnly = startTime.toFormat("HH:mm");
 
-    const startDate = startTime.toFormat("yyyy-MM-dd");
-    const startTimeOnly = startTime.toFormat("HH:mm");
+        const endDate = endTime.toFormat("yyyy-MM-dd");
+        const endTimeOnly = endTime.toFormat("HH:mm");
 
-    const endDate = endTime.toFormat("yyyy-MM-dd");
-    const endTimeOnly = endTime.toFormat("HH:mm");
-
-    // Compare the current date and time (date + hour:minute) with start and end time
-    const isDateSame = currentDate === startDate && currentDate === endDate;
-    const isWithinTimeFrame =
-      isDateSame &&
-      currentTimeOnly >= startTimeOnly &&
-      currentTimeOnly <= endTimeOnly;
-    return isWithinTimeFrame && !ratings;
-  });
+        // Compare the current date and time (date + hour:minute) with start and end time
+        const isDateSame = currentDate === startDate && currentDate === endDate;
+        const isWithinTimeFrame =
+          isDateSame &&
+          currentTimeOnly >= startTimeOnly &&
+          currentTimeOnly <= endTimeOnly;
+        return isWithinTimeFrame && !ratings;
+      });
+      
+      setFilteredSessions(filtered);
+    }
+  }, [scheduledMeetingDetails]);
 
   const addTraineeClipInBookedSession = async (selectedClips) => {
     const payload = {
@@ -531,9 +556,9 @@ const NavHomePage = () => {
                 ? "col-sm-12"
                 : width1200
                   ? "col-sm-6"
-                  : width2000
-                    ? "col-sm-12"
-                    : ""
+                : width2000
+                  ? "col-sm-12"
+                  : ""
                 }  ${!width1200 ? "my-3" : ""}`}
               style={{
                 height: width1200 ? "100%" : "calc(100% - 400px)",

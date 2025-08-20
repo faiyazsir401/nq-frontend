@@ -39,7 +39,10 @@ const ActionButtons = ({
   cutCall,
   setSelectedUser,
   setIsConfirmModelOpen,
-  showScreenshotButton
+  showScreenshotButton,
+  setLockPoint,
+  videoRef,
+  videoRef2
 }) => {
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
@@ -122,6 +125,13 @@ const ActionButtons = ({
                     isLockMode: !isLockMode,
                   });
                   setIsLockMode(!isLockMode);
+                  const lockPointTemp = !isLockMode
+                  ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                    ? videoRef.current?.currentTime || 0
+                    : videoRef2.current?.currentTime || 0
+                  : videoRef.current?.currentTime || 0;
+                  console.log("lockPointTemp",lockPointTemp)
+                  setLockPoint(lockPointTemp);
                 }}
               >
                 {isLockMode ? <FaLock size={16} /> : <FaUnlock size={16} />}

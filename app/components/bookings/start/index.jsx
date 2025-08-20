@@ -13,7 +13,6 @@ const StartMeeting = ({
   session_end_time,
   bIndex,
 }) => {
-  console.log("StartMeeting -> session_end_time", session_end_time);
   const socket = useContext(SocketContext);
 
   socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {

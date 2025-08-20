@@ -17,9 +17,12 @@ export const checkSlot = async (payload) => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -37,9 +40,12 @@ export const getAllUsers = async (payload) => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -58,10 +64,12 @@ export const sendFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -80,10 +88,12 @@ export const acceptFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -102,10 +112,12 @@ export const cancelFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -124,10 +136,12 @@ export const rejectFriendRequest = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -145,10 +159,12 @@ export const getFriendRequests = async () => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -166,10 +182,12 @@ export const getFriends = async () => {
         )}`,
       },
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -188,10 +206,12 @@ export const removeFriend = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 };
@@ -211,7 +231,7 @@ export const updateAccountPrivacy = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     throw err;
@@ -233,7 +253,7 @@ export const updateNotificationSettings = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     throw err;
@@ -254,7 +274,7 @@ export const updateExtendedSessionTime = async (payload) => {
       },
       data: payload,
     });
-    console.log("response", response.data);
+    
     return response.data;
   } catch (err) {
     throw err;

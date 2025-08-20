@@ -54,7 +54,6 @@ const TrainerRenderBooking = ({
   const dispatch = useAppDispatch();
 
   const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
-  console.log("ratings_id+",_id,bookingInfo)
   // Parse the start_time and end_time in UTC
   const startTime = DateTime.fromISO(bookingInfo.start_time, { zone: 'utc' });
   const endTime = DateTime.fromISO(bookingInfo.end_time, { zone: 'utc' });
@@ -73,8 +72,6 @@ const TrainerRenderBooking = ({
   const isDateSame = currentDate === startDate && currentDate === endDate;
   const isWithinTimeFrame  = isDateSame && currentTimeOnly >= startTimeOnly && currentTimeOnly <= endTimeOnly;
 
-  console.log('Is the current date the same as start and end date?', isDateSame); 
-  console.log('Is the current time within the time range?', isWithinTimeFrame);
 
   const isCurrentTimeAfterEndTime = currentTime > endTime;
 
@@ -210,10 +207,6 @@ const TrainerRenderBooking = ({
                   disabled={!isWithinTimeFrame}
                   onClick={() => {
                     
-                    console.log(
-                      "start meeting set the booking info is ",
-                      bookingInfo
-                    );
                     navigateToMeeting(_id)
                     sendNotifications({
                       title: notificiationTitles.sessionStrated,

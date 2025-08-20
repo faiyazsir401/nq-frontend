@@ -242,7 +242,6 @@ const UploadClipCard = (props) => {
       };
 
       const data = await getS3SignUrl(bulkPayload);
-      console.log("datasky",data)
       if (data?.results) {
         const uploadPromises = data.results.map(async (urlData, index) => {
           try {
@@ -261,7 +260,12 @@ const UploadClipCard = (props) => {
             autoClose:false
           });
           resetForm();
-          dispatch(getClipsAsync({}));
+          // If uploading from community context, refresh the specific user's clips
+          if (isFromCommunity) {
+            dispatch(getClipsAsync({ trainee_id: isFromCommunity }));
+          } else {
+            dispatch(getClipsAsync({}));
+          }
         } else {
           toast.error("Some clips failed to upload.",{
             autoClose:false

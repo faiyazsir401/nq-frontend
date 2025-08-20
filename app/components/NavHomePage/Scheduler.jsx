@@ -131,8 +131,6 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
     setTimes(times.filter((_, i) => i !== index));
   };
 
-  console.log("plesae",timeOptions);
-
   return (
     <div className="day-availability d-flex justify-content-between">
       <h4>{day}</h4>
@@ -208,7 +206,6 @@ const Scheduler = () => {
   const [availability, setAvailability] = useState(
     userInfo.extraInfo?.availabilityInfo?.availability || initialDayValue
   );
-  console.log("userInfo",availability)
   const [timeZone, setTimeZone] = useState(
     userInfo.extraInfo?.availabilityInfo?.timeZone || currentTimeZone()
   );

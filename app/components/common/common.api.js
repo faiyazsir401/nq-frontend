@@ -1,9 +1,9 @@
 import axios from "axios";
 import { axiosInstance } from "../../../config/axios-interceptor";
-import { convertTimesForDataArray, Utils } from "../../../utils/utils";
+import { convertTimesForDataArray, CovertTimeAccordingToTimeZone, Utils } from "../../../utils/utils";
 import { LOCAL_STORAGE_KEYS } from "../../common/constants";
 import store from "../../store";
-
+import { DateTime } from "luxon";
 export const addRating = async (payload) => {
   try {
     const res = await axiosInstance({
@@ -36,7 +36,7 @@ export const getScheduledMeetingDetails = async (payload) => {
       },
       params: payload,
     });
-    console.log("getScheduledMeetingDetails1", response.data);
+    
 
     let filteredData = response.data.data;
 
@@ -78,7 +78,16 @@ export const getScheduledMeetingDetails = async (payload) => {
     // Filter based on the status provided in payload
     if (payload?.status === "upcoming") {
       filteredData = filteredData.filter(
-        (item) => item.status === "booked" || item.status === "confirmed"
+        (item) => {
+
+          // First check if status is booked or confirmed
+          if (item.status !== "booked" && item.status !== "confirmed") {
+            return false;
+          }
+          
+          
+          return true;
+        }
       );
     } else if (payload?.status === "canceled") {
       filteredData = filteredData.filter((item) => item.status === "canceled");
@@ -86,10 +95,10 @@ export const getScheduledMeetingDetails = async (payload) => {
       filteredData = filteredData.filter((item) => item.status === "completed");
     }
 
-    console.log("convertTimesForDataArray", filteredData);
+    
     return { ...response.data, data: filteredData };
   } catch (error) {
-    console.log("getScheduledMeetingDetailsError", error);
+    
     throw error;
   }
 };

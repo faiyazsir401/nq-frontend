@@ -21,6 +21,7 @@ import OrientationModal from "../modalComponent/OrientationModal";
 import { notificiationTitles } from "../../../utils/constant";
 import { EVENTS } from "../../../helpers/events";
 import { SocketContext } from "../socket";
+import { DateTime } from "luxon";
 
 const UpcomingSession = ({ accountType = null }) => {
   const dispatch = useAppDispatch();
@@ -53,7 +54,6 @@ const UpcomingSession = ({ accountType = null }) => {
       setIsOpenID(newBookingData?._id);
       setIsOpen(true);
     }
-    console.log('new booking data' , newBookingData)
   }, [newBookingData]);
 
   const handleChangeBookingTab = async (tab) => {

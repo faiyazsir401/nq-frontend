@@ -744,7 +744,7 @@ const FileSection = (props) => {
                       setReportsData([...temp])
                     }}
                   >
-                    <label className="badge badge-primary sm ml-2" onClick={() => console.log(cl)}>{`${cl?._id?.month}/${cl?._id?.day}/${cl?._id?.year}`}</label>
+                    <label className="badge badge-primary sm ml-2" onClick={() => {}}>{`${cl?._id?.month}/${cl?._id?.day}/${cl?._id?.year}`}</label>
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
                   <div className={`block-content ${!cl?.show ? "d-none" : "d-flex flex-wrap"}`}>

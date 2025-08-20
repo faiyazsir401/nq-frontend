@@ -85,7 +85,6 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
 
   const { notifications, isLoading } = useAppSelector(notificationState)
   const isMobileScreen = useMediaQuery(600)
-  console.log("notifications********>>>>>>>>>>>", notifications[0]?.isRead)
 
 
   useEffect(() => {
@@ -122,7 +121,6 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
   }, []);
 
   useEffect(() => {
-    console.log(`window.innerWidth --- `, window.innerWidth);
     function updateSize() {
       setSize(window.innerWidth);
       setWidth(window.innerWidth);
@@ -130,7 +128,6 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
         // for mobile device
         // dispatch(isMobileFriendly(true));
         dispatch(isMobileFriendly(false));
-        console.log(`size === `, window.innerWidth);
       } else {
         dispatch(isMobileFriendly(false));
       }
@@ -153,7 +150,6 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
     if (bookingState.sidebarTab) {
       TogglTab(bookingState.sidebarTab);
     }
-    console.log("TogglTab", bookingState.sidebarTab);
   }, [bookingState.sidebarTab]);
 
   const CloseAppSidebar = () => {
@@ -169,8 +165,6 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
   }, [topNavbarOptions])
 
   const TogglTab = (value) => {
-    alert(`clicked ${tab}`)
-    console.log('clicked')
     dispatch(authAction.setActiveTab(value));
     // // document.querySelector(".recent-default").classList.remove("active");
     if (
@@ -230,7 +224,6 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
   useEffect(() => {
     const updateIsMobile = (event) => {
       const isMobile = window.matchMedia(`(max-width: 452px)`).matches;
-      console.log('Is mobile changed:', isMobile);
     };
 
     // Add the event listener
@@ -418,7 +411,6 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
 
   const width1000 = useMediaQuery(1000)
 
-  console.log("activeTab", activeTab, topNavbarOptions?.HOME)
   return (
     <Fragment>
       {/* <AppListSection

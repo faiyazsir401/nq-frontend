@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Col,
   Nav,
@@ -10,7 +10,7 @@ import {
 } from "reactstrap";
 import { AccountType, LOCAL_STORAGE_KEYS } from "../../common/constants";
 import { authState } from "../auth/auth.slice";
-import { useAppSelector } from "../../store";
+import { useAppSelector, useAppDispatch } from "../../store";
 import Addworkinghour from "../../../containers/leftSidebar/Addworkinghour";
 import CalendarPage from "../calendar/calendar";
 import MyClips from "../locker/my-clips";
@@ -205,21 +205,49 @@ const allTabs = [
 ];
 
 const NavHomePageCenterContainer = () => {
-
+  const dispatch = useAppDispatch();
   const { accountType, userInfo } = useAppSelector(authState);
-  const [activeTab, setActiveTab] = useState(allTabs[0]?.value);
-
+  const [activeTab, setActiveTab] = useState("myClips");
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollTimeoutRef = useRef(null);
 
   const isMobile = useMediaQuery(599)
 
 
-
   const toggleTab = (tabValue) => {
-
-    if (activeTab !== tabValue) {
+    if (!isScrolling) {
       setActiveTab(tabValue);
     }
   };
+
+  // Handle scroll events to prevent tab switching during scroll
+  const handleScroll = () => {
+    setIsScrolling(true);
+    
+    // Clear existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    // Set a timeout to re-enable tab switching after scroll ends
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+    }, 150); // 150ms delay after scroll ends
+  };
+
+  useEffect(() => {
+    const tabContent = document.querySelector('.file-tab.Nav-Home');
+    if (tabContent) {
+      tabContent.addEventListener('scroll', handleScroll);
+      
+      return () => {
+        tabContent.removeEventListener('scroll', handleScroll);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+      };
+    }
+  }, [activeTab]);
 
   const handleKYCVarification = async (url) => {
 
@@ -326,7 +354,7 @@ const NavHomePageCenterContainer = () => {
             ) : null}
           </>
         )}
-        <div className="theme-tab sub-nav">
+        <div className="theme-tab sub-nav" style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: 'white',paddingBottom: "10px" }}>
           {!isMobile ? <Nav tabs>
             {allTabs?.map(
               (el) =>
@@ -410,7 +438,7 @@ const NavHomePageCenterContainer = () => {
             </div>
           </Nav>}
         </div>
-        <div className="file-tab Nav-Home" style={{ color: "black" }}>
+        <div className="file-tab Nav-Home" style={{ color: "black", overflowY: "auto", maxHeight: "calc(100vh - 200px)" }}>
 
 
           <TabContent activeTab={activeTab}>

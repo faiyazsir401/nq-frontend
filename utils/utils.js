@@ -127,7 +127,6 @@ export class Utils {
   }
 
   static getDateInFormat = (date = "") => {
-    console.log("datetest",date)
     const newDate = date ? DateTime.fromISO(date, { zone: 'utc' }) : DateTime.now();
     return newDate.toFormat("MM-dd-yyyy");
   };
@@ -169,7 +168,6 @@ export class Utils {
     endTime,
     chargingRate = TRAINER_AMOUNT_USD
   ) => {
-    console.log(startTime , endTime , 'start endtime from here')
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
 
@@ -434,7 +432,7 @@ export class Utils {
       //       (new Date(item.start_time) <= end_time_date && end_time_date >= new Date(item?.end_time))
       //   });
 
-      //   console.log("filteredData", start_time, end_time);
+      
 
       //   if (filteredData?.start_time) status = false
 
@@ -846,9 +844,9 @@ export class Utils {
     const currentTime = new Date();
     const currentHours = currentTime.getHours();
     const currentMinutes = currentTime.getMinutes();
-      console.log(currentHours , currentMinutes)
+      
     // Parse the input time string
-   console.log('inputstring' , inputTimeStr)
+   
     let [inputHours, inputMinutes] = inputTimeStr.split(':').map(Number);
   
     // Compare hours first, then minutes if hours are equal
@@ -905,8 +903,8 @@ export function convertTimesToISO(date, time1) {
 export function formatToAMPM(date) {
   let hours = date.getHours(); // Use UTC hours to avoid local timezone
   let minutes = date.getMinutes(); // Use UTC minutes
-  console.log("datehours",date.getHours())
-  console.log("dateminutes",date.getMinutes())
+  
+  
 
   const ampm = hours >= 12 ? 'PM' : 'AM';
 
@@ -939,7 +937,6 @@ export const getTimeZoneOffset = (timeZone) => {
 // Helper function to format time based on the given time zone
 export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
   const localTimeZone = getLocalTimeZone();
-  console.log("timeZone",timeZone,localTimeZone)
   if (!timeZone || timeZone === localTimeZone || noConversion) {
     // If time zone is the same as local, return formatted time as is
     let date;
@@ -950,17 +947,14 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
       date = DateTime.fromJSDate(time, { zone: "utc" });
       return formatToAMPM(date);
     } else {
-      console.log("time1243",time)
       // If it's a string, use fromISO
       date = DateTime.fromISO(time, { zone: "utc" });
-      console.log("date",date)
     const jsDate = date.toJSDate();
     jsDate.setMinutes(date.c.minute)
     jsDate.setHours(date.c.hour)
     jsDate.setDate(date.c.day)
     jsDate.setMonth(date.c.month-1)
     jsDate.setYear(date.c.year)
-    console.log("sametime",jsDate)
     return formatToAMPM(jsDate);
     }
     
@@ -974,9 +968,7 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
   const offsetDifference = toOffset - fromOffset;
 
       // Create a new Date object from the time input
-      console.log("date123",time,timeZone)
       const date = DateTime.fromISO(time, { zone: 'utc' });
-      console.log("date",date)
       const jsDate = date.toJSDate();
       jsDate.setMinutes(date.c.minute)
       jsDate.setHours(date.c.hour)
@@ -984,11 +976,8 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
       jsDate.setMonth(date.c.month-1)
       jsDate.setYear(date.c.year)
 
-      console.log("date1234",jsDate)
       // Apply the offset difference (in minutes)
-      console.log("offsetDifference",jsDate.getMinutes())
       jsDate.setMinutes(jsDate.getMinutes() + offsetDifference);
-      console.log("jsDate123",jsDate)
   // Format the adjusted time using the local time zone
   return formatToAMPM(jsDate);
 };
@@ -996,7 +985,6 @@ export const formatTimeInLocalZone = (time, timeZone,noConversion) => {
 
 export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
   const localTimeZone = getLocalTimeZone()
-  console.log("time_zones",timeZone,localTimeZone)
   if(localTimeZone === timeZone ||!timeZone){
     return time
   }
@@ -1006,9 +994,6 @@ export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
 
   // Calculate the difference in minutes between the time zones
   const offsetDifference = toOffset - fromOffset;
-
-  console.log("Input Time:", time);
-  console.log("Time Zones:", timeZone);
 
 
     let date;
@@ -1022,12 +1007,8 @@ export const CovertTimeAccordingToTimeZone = (time, timeZone) => {
       date = DateTime.fromISO(time, { zone: "utc" });
     }
 
-  console.log("Original DateTime (UTC):", date.toISO());
-
   // Apply the offset difference (in minutes) to the DateTime object
   const adjustedDate = date.plus({ minutes: offsetDifference });
-
-  console.log("Adjusted DateTime:", adjustedDate.toISO());
 
   // Return the adjusted DateTime object
   return adjustedDate.toISO({
@@ -1050,13 +1031,11 @@ export const formatToHHMM = (isoDate) => {
 export const convertTimesForDataArray = (dataArray) => {
   return dataArray.map((item) => {
     // Convert start time
-    console.log("item.start_time",item)
     const convertedStartTime = CovertTimeAccordingToTimeZone(
       item.start_time, 
       item.time_zone, 
       false  // Assuming we always want conversion unless noConversion is set to true
     );
-    console.log("convertedStartTime",convertedStartTime)
     // Convert end time
     const convertedEndTime = CovertTimeAccordingToTimeZone(
       item.end_time, 
@@ -1069,7 +1048,6 @@ export const convertTimesForDataArray = (dataArray) => {
       item.time_zone, 
       false  // Assuming we always want conversion unless noConversion is set to true
     );
-    console.log("convertedExtendedEndTime",item.extended_end_time,convertedExtendedEndTime)
 
     // Convert end time
     const convertedBookDate = CovertTimeAccordingToTimeZone(
@@ -1094,8 +1072,6 @@ export const convertTimesForDataArray = (dataArray) => {
       extended_session_end_time:item.extended_session_end_time ?formattedExtendedEndTime:item.extended_session_end_time
     };
   })
-
-  
 };
 
 export const navigateToMeeting = (_id) => {

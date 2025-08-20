@@ -11,6 +11,12 @@ axiosInstance.interceptors.response.use(
 
   (error) => {
     const { config, response } = error;
+    
+    // Add a custom property to identify 401 errors
+    if (response && response.status === 401) {
+      error.isUnauthorized = true;
+    }
+    
     return Promise.reject(error);
   }
 );

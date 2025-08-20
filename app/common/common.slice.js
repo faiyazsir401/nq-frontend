@@ -18,7 +18,9 @@ export const checkSlotAsync = createAsyncThunk("checkSlot", async (payload) => {
     const response = await checkSlot(payload);
     return response;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });
@@ -31,7 +33,9 @@ export const getClipsAsync = createAsyncThunk(
       const response = await myClips(payload);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -44,7 +48,9 @@ export const getMyClipsAsync = createAsyncThunk(
       const response = await myClips();
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }

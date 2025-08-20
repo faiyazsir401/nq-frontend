@@ -11,7 +11,6 @@ const NotificationSection = (props) => {
     const {sidebarModalActiveTab} = useAppSelector(authState);
     const [page , setPage] = useState(1);
     const {notifications , isLoading} = useAppSelector(notificationState)
-    console.log(notifications , 'notifications')
     
     useEffect(() => {
       const handleScroll = () => {

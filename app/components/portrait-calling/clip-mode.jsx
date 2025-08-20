@@ -88,9 +88,12 @@ const VideoContainer = ({
   isLandscape,
   videoContainerRef
 }) => {
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  // const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
+  // const [videoProgress, setVideoProgress] = useState(0);
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
+  const [hasAutopaused, setHasAutopaused] = useState(false);
   // const videoContainerRef = useRef(null);
   const movingVideoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -301,61 +304,211 @@ const VideoContainer = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
     };
   }, [socket, clip?._id, videoRef]);
-  console.log("IsVideoLoaded",isVideoLoaded)
-  useEffect(() => {
-    const video = videoRef?.current;
-    if (!video) return;
+  // console.log("IsVideoLoaded",isVideoLoaded)
+  // useEffect(() => {
+  //   const video = videoRef?.current;
+  //   if (!video) return;
   
-    // More comprehensive video readiness check
-    const checkReadiness = () => {
-      // Check if enough data is loaded to likely play through without buffering
-      if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-        setIsVideoLoaded(true);
-        video.removeEventListener('canplay', checkReadiness);
-        video.removeEventListener('canplaythrough', checkReadiness);
-      }
-    };
+  //   // let isHandlingLoad = false; // Prevent multiple handlers from conflicting
+  //   // let loadTimeout; // Declare timeout variable
   
-    const handleError = () => {
-      console.error("Video failed to load");
-      setIsVideoLoaded(false);
-    };
+  //   // const handleVideoLoadComplete = () => {
+  //   //   if (isHandlingLoad) return;
+  //   //   isHandlingLoad = true;
+      
+  //   //   // Clear the timeout since video loaded successfully
+  //   //   if (loadTimeout) {
+  //   //     clearTimeout(loadTimeout);
+  //   //     loadTimeout = null;
+  //   //   }
+      
+  //   //   setIsVideoLoading(false);
+  //   //   setVideoProgress(100);
+  //   //   setIsVideoLoaded(true);
+      
+  //   //   console.log(`Video ${clip?.id} loaded successfully`);
+  //   // };
   
-    const handleStalled = () => {
-      console.log("Video playback stalled");
-      setIsVideoLoaded(false);
-    };
+  //   // const handleError = (error,isMessage=true) => {
+  //   //   console.error("Video failed to load:", error);
+      
+  //   //   // Clear the timeout since we're handling the error
+  //   //   if (loadTimeout) {
+  //   //     clearTimeout(loadTimeout);
+  //   //     loadTimeout = null;
+  //   //   }
+      
+  //   //   setIsVideoLoading(false);
+  //   //   setVideoProgress(0);
+  //   //   setIsVideoLoaded(false);
+  //   //   if(isMessage){
+  //   //     toast.error("Failed to load video");
+  //   //   }
+  //   // };
   
-    const handleWaiting = () => {
-      console.log("Video waiting for data");
-      setIsVideoLoaded(false);
-    };
+  //   // const handleStalled = () => {
+  //   //   console.log("Video playback stalled");
+  //   //   // Don't reset loading state on stall, just log it
+  //   // };
   
-    // Multiple events to detect readiness
-    video.addEventListener('canplay', checkReadiness);
-    video.addEventListener('canplaythrough', checkReadiness);
-    video.addEventListener('loadeddata', checkReadiness);
-    video.addEventListener('error', handleError);
-    video.addEventListener('stalled', handleStalled);
-    video.addEventListener('waiting', handleWaiting);
+  //   // const handleWaiting = () => {
+  //   //   console.log("Video waiting for data");
+  //   //   // Don't reset loading state on waiting, just log it
+  //   // };
+
+  //   // const handleVideoLoadStart = () => {
+  //   //   console.log(`Video ${clip?.id} load started`);
+  //   //   setIsVideoLoading(true);
+  //   //   setVideoProgress(0);
+  //   //   setIsVideoLoaded(false);
+      
+  //   //   // Start with a small progress to show loading has begun
+  //   //   setTimeout(() => {
+  //   //     if (!isVideoLoaded && videoProgress === 0) {
+  //   //       setVideoProgress(5);
+  //   //       console.log(`Video ${clip?.id} initial progress: 5%`);
+  //   //     }
+  //   //   }, 200);
+  //   // };
+
+  //   // const handleVideoProgress = (event) => {
+  //   //   const video = event.target;
+  //   //   if (video.buffered.length > 0 && video.duration) {
+  //   //     const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+  //   //     const duration = video.duration;
+  //   //     const progress = (bufferedEnd / duration) * 100;
+  //   //     setVideoProgress(Math.round(progress));
+  //   //     console.log(`Video ${clip?.id} progress: ${Math.round(progress)}%`);
+  //   //   }
+  //   // };
+
+  //   // Add a more frequent progress check using setInterval
+  //   const progressInterval = setInterval(() => {
+  //     if (video && !isVideoLoaded) {
+  //       let newProgress = videoProgress;
+        
+  //       // Check buffered ranges
+  //       if (video.buffered.length > 0 && video.duration) {
+  //         const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+  //         const duration = video.duration;
+  //         const bufferedProgress = (bufferedEnd / duration) * 100;
+          
+  //         if (bufferedProgress > newProgress) {
+  //           newProgress = Math.round(bufferedProgress);
+  //         }
+  //       }
+        
+  //       // Also check readyState for more granular progress
+  //       const readyStateProgress = (video.readyState / 4) * 100; // readyState goes from 0 to 4
+  //       if (readyStateProgress > newProgress) {
+  //         newProgress = Math.round(readyStateProgress);
+  //       }
+        
+  //       // Ensure progress doesn't go backwards and has minimum increments
+  //       if (newProgress > videoProgress && newProgress <= 100) {
+  //         // Ensure minimum progress increment to show movement
+  //         const minIncrement = Math.max(1, Math.floor((100 - videoProgress) / 10));
+  //         const finalProgress = Math.max(videoProgress + minIncrement, newProgress);
+          
+  //         setVideoProgress(Math.min(finalProgress, 100));
+  //         console.log(`Video ${clip?.id} interval progress: ${Math.min(finalProgress, 100)}%`);
+  //       }
+        
+  //       // If video is ready but we haven't completed, force completion
+  //       if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA && videoProgress >= 85) {
+  //         setTimeout(() => handleVideoLoadComplete(), 200);
+  //       }
+  //     }
+  //   }, 150); // Check every 150ms for smoother progress updates
+
+  //   const handleVideoCanPlay = () => {
+  //     console.log(`Video ${clip?.id} can play`);
+  //     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+  //       // Ensure we show some progress before completing
+  //       if (videoProgress < 90) {
+  //         setVideoProgress(90);
+  //         console.log(`Video ${clip?.id} final progress: 90%`);
+  //       }
+  //       setTimeout(() => handleVideoLoadComplete(), 100);
+  //     }
+  //   };
+
+  //   const handleVideoCanPlayThrough = () => {
+  //     console.log(`Video ${clip?.id} can play through`);
+  //     // Ensure we show some progress before completing
+  //     if (videoProgress < 95) {
+  //       setVideoProgress(95);
+  //       console.log(`Video ${clip?.id} final progress: 95%`);
+  //     }
+  //     setTimeout(() => handleVideoLoadComplete(), 100);
+  //   };
+
+  //   const handleVideoLoadedData = () => {
+  //     console.log(`Video ${clip?.id} loaded data`);
+  //     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+  //       // Ensure we show some progress before completing
+  //       if (videoProgress < 85) {
+  //         setVideoProgress(85);
+  //         console.log(`Video ${clip?.id} loaded data progress: 85%`);
+  //       }
+  //       setTimeout(() => handleVideoLoadComplete(), 100);
+  //     }
+  //   };
+
+  //   // Add loading progress events
+  //   video.addEventListener('loadstart', handleVideoLoadStart);
+  //   video.addEventListener('progress', handleVideoProgress);
+  //   video.addEventListener('canplay', handleVideoCanPlay);
+  //   video.addEventListener('canplaythrough', handleVideoCanPlayThrough);
+  //   video.addEventListener('loadeddata', handleVideoLoadedData);
+  //   video.addEventListener('stalled', handleStalled);
+  //   video.addEventListener('waiting', handleWaiting);
+  //   video.addEventListener('error', handleError);
   
-    // Additional check for cases where video might already be ready
-    if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
-      setIsVideoLoaded(true);
-    }
+  //   // Additional check for cases where video might already be ready
+  //   if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+  //     // If video is already ready, show some progress before completing
+  //     if (videoProgress === 0) {
+  //       setVideoProgress(50);
+  //       setTimeout(() => {
+  //         setVideoProgress(100);
+  //         setTimeout(() => handleVideoLoadComplete(), 100);
+  //       }, 100);
+  //     } else {
+  //       handleVideoLoadComplete();
+  //     }
+  //   }
   
-    // Set preload for better loading behavior
-    video.preload = "auto";
+  //   // Set preload for better loading behavior
+  //   video.preload = "auto";
   
-    return () => {
-      video.removeEventListener('canplay', checkReadiness);
-      video.removeEventListener('canplaythrough', checkReadiness);
-      video.removeEventListener('loadeddata', checkReadiness);
-      video.removeEventListener('error', handleError);
-      video.removeEventListener('stalled', handleStalled);
-      video.removeEventListener('waiting', handleWaiting);
-    };
-  }, [videoRef]);
+  //   // Add timeout to prevent infinite loading - but only if video hasn't loaded
+  //   loadTimeout = setTimeout(() => {
+  //     // Only show timeout error if video is still loading and not ready
+  //     if (!isVideoLoaded && video.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA) {
+  //       console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
+  //       handleError(new Error('Loading timeout'),false);
+  //     } else if (isVideoLoaded) {
+  //       console.log(`Video ${clip?.id} already loaded, clearing timeout`);
+  //     }
+  //   }, 15000); // 15 second timeout
+  
+  //   return () => {
+  //     if (loadTimeout) {
+  //       clearTimeout(loadTimeout);
+  //       loadTimeout = null;
+  //     }
+  //     clearInterval(progressInterval);
+  //     video.removeEventListener('loadstart', handleVideoLoadStart);
+  //     video.removeEventListener('progress', handleVideoProgress);
+  //     video.removeEventListener('canplay', handleVideoCanPlay);
+  //     video.removeEventListener('canplaythrough', handleVideoCanPlayThrough);
+  //     video.removeEventListener('loadeddata', handleVideoLoadedData);
+  //     video.removeEventListener('stalled', handleStalled);
+  //     video.removeEventListener('waiting', handleWaiting);
+  //     video.removeEventListener('error', handleError);
+  //   };
+  // }, [videoRef, clip?.id, isVideoLoaded]);
 
   console.log("sky.zoom", scale);
   console.log("sky.pan", translate);
@@ -447,6 +600,11 @@ const VideoContainer = ({
     return () => resizeObserver.disconnect();
   }, [canvasRef, videoContainerRef]);
 
+  useEffect(() => {
+    setHasAutopaused(false);
+    setIsVideoLoading(true);
+  }, [clip]);
+
   return (
     <>
     
@@ -474,7 +632,7 @@ const VideoContainer = ({
           position: "relative",
         }}
       >
-        {!isVideoLoaded && (
+        {isVideoLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-800 z-10">
             <div className="text-white">Loading video...</div>
           </div>
@@ -543,29 +701,69 @@ const VideoContainer = ({
               overflow: "hidden"
             }}
           >
-            <video
-              controls={false}
-              ref={videoRef}
-              playsInline
-              webkit-playsinline="true"
-              style={{
-                touchAction: "manipulation",
-                maxWidth: "100%",
-                width: "auto",
-                height: `${100}%`,
-                // maxHeight:"100%",
-                aspectRatio: aspectRatio, // Force a correct aspect ratio
-                objectFit: "contain", // Prevent stretching
-              }}
-              id={clip?.id}
-              muted={true}
-              poster={Utils?.generateThumbnailURL(clip)}
-              preload="metadata"
-              crossOrigin="anonymous"
-            >
-              <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+              <video
+                controls={false}
+                ref={videoRef}
+                playsInline
+                webkit-playsinline="true"
+                style={{
+                  touchAction: "manipulation",
+                  maxWidth: "100%",
+                  width: "auto",
+                  height: `${100}%`,
+                  // maxHeight:"100%",
+                  aspectRatio: aspectRatio, // Force a correct aspect ratio
+                  objectFit: "contain", // Prevent stretching
+                  opacity: isVideoLoading ? 0.6 : 1,
+                  pointerEvents: isVideoLoading ? "none" : "auto",
+                }}
+                id={clip?.id}
+                autoPlay
+                muted={true}
+                poster={Utils?.generateThumbnailURL(clip)}
+                preload="auto"
+                crossOrigin="anonymous"
+                onLoadedData={() => setIsVideoLoading(false)}
+                onCanPlayThrough={() => setIsVideoLoading(false)} 
+                onWaiting={() => setIsVideoLoading(true)} 
+                onPlay={(e) => {
+                  if (!hasAutopaused) {
+                    e.currentTarget.pause(); // only pause once (the autoplay)
+                    setHasAutopaused(true);
+                    setIsVideoLoading(false);
+                  }
+                }}
+              >
+                <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+              
+              {isVideoLoading && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    background: "rgba(0, 0, 0, 0.7)",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    color: "white",
+                    textAlign: "center",
+                    minWidth: "80px",
+                    zIndex: 10,
+                  }}
+                >
+                  <div className="spinner-border spinner-border-sm" role="status">
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                  {/* <div style={{ fontSize: "12px", marginTop: "4px" }}>
+                    {videoProgress}%
+                  </div> */}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <canvas
@@ -644,7 +842,9 @@ const ClipModeCall = ({
   videoRef2,
   videoContainerRef,
   videoContainerRef2,
-  setShowScreenshotButton
+  setShowScreenshotButton,
+  lockPoint,
+  setLockPoint
 }) => {
   const socket = useContext(SocketContext);
   const [drawingMode, setDrawingMode] = useState(false);
@@ -747,6 +947,7 @@ const ClipModeCall = ({
     socket?.on(EVENTS.TOGGLE_LOCK_MODE, (data) => {
       if (accountType === AccountType.TRAINEE) {
         setIsLock(data.isLockMode);
+       
       }
     });
 
@@ -1468,7 +1669,7 @@ const ClipModeCall = ({
   const isSingle = selectedClips?.length === 1;
 
 
-
+  console.log("selectedClips-sky", selectedClips)
 
   return (
     <>
@@ -1512,6 +1713,13 @@ const ClipModeCall = ({
                     isLockMode: !isLock,
                   });
                   setIsLock(!isLock);
+                  const lockPointTemp = !isLock
+                  ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                    ? videoRef.current?.currentTime || 0
+                    : videoRef2.current?.currentTime || 0
+                  : videoRef.current?.currentTime || 0;
+                  console.log("lockPointTemp",lockPointTemp)
+                  setLockPoint(lockPointTemp);
                 }}
               >
                 {isLock ? <FaLock size={16} /> : <FaUnlock size={16} />}
@@ -1773,6 +1981,7 @@ const ClipModeCall = ({
                 setIsPlaying={setIsPlayingBoth}
                 isLock={isLock}
                 setCurrentTime={setCurrentTime}
+                lockPoint={lockPoint}
               />
             )}
           </>

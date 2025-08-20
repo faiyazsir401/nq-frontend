@@ -21,7 +21,6 @@ const VideoComponent = forwardRef(
         return () => clearTimeout(timer); // Cleanup timer on unmount
       }
     }, []);
-    console.log("showPoster",showPoster)
     return (
       <video
         id={id}
@@ -30,8 +29,10 @@ const VideoComponent = forwardRef(
         onTimeUpdate={onTimeUpdate}
         muted={true}
         poster={showPoster ? poster : undefined}
-        preload="metadata"
+        preload="none"
         playsInline
+        webkit-playsinline
+        x-webkit-airplay="allow"
         {...props}
         crossOrigin="anonymous"
        

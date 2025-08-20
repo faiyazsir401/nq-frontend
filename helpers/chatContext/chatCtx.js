@@ -136,28 +136,19 @@ const ChatProvider = (props) => {
 
   //toggle right sidebar In and Out on cLick
   const OpenAppSidebar = (rside) => {
-    console.log("rside", rside);
     if (rside) {
-      console.log("rside if ....", rside);
       setToggleSmallSide(!rside);
       document.querySelector(".chitchat-main").classList.add("small-sidebar");
       document.querySelector(".app-sidebar").classList.add("active");
-      console.log("localStorage.getItem", localStorage.getItem("layout_mode"));
       document.body.className = `sidebar-active ${localStorage.getItem(
         "layout_mode"
       )}`;
     } else {
-      console.log(
-        "rside else ....",
-        rside,
-        localStorage.getItem("layout_mode")
-      );
       setToggleSmallSide(!rside);
       document
         .querySelector(".chitchat-main")
         .classList.remove("small-sidebar");
       document.querySelector(".app-sidebar").classList.remove("active");
-      console.log("localStorage.getItem", localStorage.getItem("layout_mode"));
       document.body.className = `main-page ${localStorage.getItem(
         "layout_mode"
       )}`;

@@ -134,6 +134,7 @@ const VideoCallUI = ({
   const [countdownMessage, setCountdownMessage] = useState("");
   const gracePeriodModalDismissedRef = useRef(false);
   const sessionEndedModalDismissedRef = useRef(false);
+  const [lockPoint, setLockPoint] = useState(0);
 
   const netquixVideos = [
     {
@@ -1118,6 +1119,8 @@ const VideoCallUI = ({
           videoContainerRef={videoContainerRef}
           videoContainerRef2={videoContainerRef2}
           setShowScreenshotButton={setShowScreenshotButton}
+          lockPoint={lockPoint}
+          setLockPoint={setLockPoint}
         />
       ) : (
         <OneOnOneCall
@@ -1162,6 +1165,9 @@ const VideoCallUI = ({
           cutCall={cutCall}
           setIsConfirmModelOpen={setIsConfirmModelOpen}
           showScreenshotButton={showScreenshotButton}
+          setLockPoint={setLockPoint}
+          videoRef={videoRef}
+          videoRef2={videoRef2}
         />
       )}
 

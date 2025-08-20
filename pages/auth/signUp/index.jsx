@@ -55,12 +55,30 @@ const Auth_SignUp = (props) => {
   };
 
   useEffect(() => {
+    // Always ensure we start at step 0 (Basic Info)
     setActiveStep(0);
+    
+    // Reset signup steps to ensure proper flow
     if (signUpSteps?.length === 3) {
       signUpSteps.pop();
     }
+    
+    // Reset form data
+    setBasicInfo({
+      fullname: "",
+      email: "",
+      password: "",
+      isGoogleRegister: false,
+    });
+    
+    setDetails({
+      mobile_no: "",
+      account_type: "",
+      category: null,
+    });
+    
     dispatch(authAction.updateApiStatus("idle"));
-  }, []);
+  }, []); // Empty dependency array to run only once on mount
   useEffect(() => {
     if (
       authSelector &&
@@ -152,11 +170,33 @@ const Auth_SignUp = (props) => {
   const checkValidation = () => {
     switch (activeStep + 1) {
       case 1:
-        if (basicInfo.email && Utils.isEmailValid(basicInfo.email)) {
-          return true;
-        } else {
+        // Check email validation
+        if (!basicInfo.email || !Utils.isEmailValid(basicInfo.email)) {
           return false;
         }
+        
+        // Check password validation (if not from Google)
+        if (!authSelector.showGoogleRegistrationForm.isFromGoogle) {
+          if (!basicInfo.password || basicInfo.password.length < 6) {
+            return false;
+          }
+          if (!/\d/.test(basicInfo.password)) {
+            return false;
+          }
+          if (!/[a-zA-Z]/.test(basicInfo.password)) {
+            return false;
+          }
+        }
+        
+        // Check name validation
+        if (!basicInfo.fullname || !/^[A-Za-z\s]+$/.test(basicInfo.fullname)) {
+          return false;
+        }
+        if (basicInfo.fullname.includes("@") || basicInfo.fullname.includes(".")) {
+          return false;
+        }
+        
+        return true;
       default:
         break;
     }
@@ -216,7 +256,6 @@ const Auth_SignUp = (props) => {
         return <KYC />;
     }
   };
-  console.log(activeStep, "activeStep");
   return (
     <div className="login-page1">
       <div className="container-fluid p-0">

@@ -34,20 +34,33 @@ import { getAllNotifications, notificationAction } from "../../app/components/no
 import { EVENTS } from "../../helpers/events";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
 import NotificationPopup from "../../app/components/notification-popup";
+import { getMeAsync } from "../../app/components/auth/auth.slice";
+
 
 const Dashboard = () => {
   const socket = useContext(SocketContext);
   const dispatch = useAppDispatch();
-  const { sidebarActiveTab, topNavbarActiveTab } = useAppSelector(authState);
+  const { sidebarActiveTab, topNavbarActiveTab, userInfo } = useAppSelector(authState);
   const [accountType, setAccountType] = useState("");
-  const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true)
+  const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true);
+  
   useEffect(() => {
     WebPushRegister()
-    setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
+    // Use userInfo.account_type from Redux if available, otherwise fallback to localStorage
+    const accountTypeFromUser = userInfo?.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE);
+    setAccountType(accountTypeFromUser);
     // fetching master data, TODO: stop over calling API calls.
     dispatch(getMasterDataAsync());
     dispatch(getAllNotifications({page : 1, limit : 10})) ;
-  }, []);
+    
+    // Get user info if not already loaded and user is logged in
+    if ((!userInfo || !userInfo._id)) {
+      dispatch(getMeAsync());
+    }
+  }, [userInfo, dispatch]);
+
+
+
 
 
   const getDashboard = () => {

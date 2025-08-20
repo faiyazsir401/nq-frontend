@@ -15,6 +15,10 @@ import AuthGuard, {
 import { SocketContext, getSocket } from "../app/components/socket";
 import { LOCAL_STORAGE_KEYS, routingPaths } from "../app/common/constants";
 import { bookingsAction } from "../app/components/common/common.slice";
+import Script from "next/script";
+import { getMe } from "../app/components/auth/auth.api";
+import trackerAssist from '@openreplay/tracker-assist';
+import Tracker from '@openreplay/tracker';
 
 
 export default function MyAppComponent({ Component, pageProps }) {
@@ -26,19 +30,159 @@ export default function MyAppComponent({ Component, pageProps }) {
   let componentMounted = true;
   const { handleLoading } = bookingsAction;
 
+  // Initialize OpenReplay tracker
+  const initializeTracker = async () => {
+    try {
+      const token = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
+      if (token) {
+        const userResponse = await getMe();
+        const userInfo = userResponse.userInfo;
+        
+        if (userInfo && userInfo._id) {
+          console.log("Initializing OpenReplay tracker with userInfo:", userInfo);
+          console.log("OpenReplay project key:", process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY);
+          
+          const newTracker = new Tracker({
+            projectKey: process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY,
+            ingestPoint: "https://analytics.netqwix.com/ingest",
+            // Enable comprehensive tracking
+            captureIFrames: true,
+            captureCanvas: true,
+            captureCrossOriginIframes: true,
+            respectDoNotTrack: false,
+            // Network tracking
+            captureNetworkRequests: true,
+            captureNetworkResponses: true,
+            captureNetworkHeaders: true,
+            // Media tracking
+            captureMedia: true,
+            captureVideo: true,
+            captureAudio: true,
+            // DOM tracking
+            captureDOM: true,
+            captureCSS: true,
+            captureStyles: true,
+            // Performance tracking
+            capturePerformance: true,
+            captureMemory: true,
+            captureErrors: true,
+            captureConsole: true,
+            // User interactions
+            captureMouse: true,
+            captureKeyboard: true,
+            captureTouch: true,
+            captureScroll: true,
+            captureFocus: true,
+            captureBlur: true,
+            // File tracking
+            captureFiles: true,
+            captureImages: true,
+            captureFonts: true,
+            // Advanced features
+            captureWebGL: true,
+            captureWebWorkers: true,
+            captureServiceWorkers: true,
+            captureWebSockets: true,
+            captureWebRTC: true,
+            // Privacy and performance
+            maskTextInputs: false,
+            maskAllInputs: false,
+            blockClass: 'openreplay-block',
+            blockSelector: null,
+            ignoreClass: 'openreplay-ignore',
+            // Session recording
+            recordCanvas: true,
+            recordCrossOriginIframes: true,
+            // Custom settings
+            enableStrictMode: false,
+            enableInjection: true,
+            enableCompression: true,
+            enableCache: true,
+            // Timeouts
+            networkTimeout: 10000,
+            sessionTimeout: 3600000, // 1 hour
+            // Sampling
+            sampling: 100, // 100% of sessions
+            // Debug mode
+            debug: process.env.NODE_ENV === 'development',
+
+            network:{
+              capturePayload: true,
+              captureHeaders: true,
+              captureResponseHeaders: true,
+              captureResponsePayload: true,
+              captureRequestHeaders: true,
+              captureRequestPayload: true,
+              captureResponseStatus: true,
+              captureResponseTime: true,
+              captureRequestTime: true,
+              captureRequestStatus: true,
+            }
+          });
+          
+          // Add comprehensive plugins
+          newTracker.use(trackerAssist());
+          
+          newTracker.start();
+          newTracker.setUserID(userInfo.email);
+          newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
+          
+          // Set additional tracking properties
+          newTracker.setSessionData({
+            userAgent: navigator.userAgent,
+            screenResolution: `${screen.width}x${screen.height}`,
+            viewport: `${window.innerWidth}x${window.innerHeight}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            language: navigator.language,
+            platform: navigator.platform,
+            cookieEnabled: navigator.cookieEnabled,
+            onLine: navigator.onLine,
+            connection: navigator.connection ? {
+              effectiveType: navigator.connection.effectiveType,
+              downlink: navigator.connection.downlink,
+              rtt: navigator.connection.rtt
+            } : null
+          });
+          
+          // Track performance metrics
+          if ('performance' in window) {
+            const perfData = performance.getEntriesByType('navigation')[0];
+            if (perfData) {
+              newTracker.setSessionData({
+                pageLoadTime: perfData.loadEventEnd - perfData.loadEventStart,
+                domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+                firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime,
+                firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime
+              });
+            }
+          }
+          
+          console.log("OpenReplay tracker initialized successfully with userInfo:", userInfo._id);
+        } else {
+          console.log("Tracker not initialized - no user info available");
+        }
+      } else {
+        console.log("Tracker not initialized - no token available");
+      }
+    } catch (error) {
+      console.error("Error initializing tracker:", error);
+    }
+  };
+
   useEffect(() => {
     document.body.classList.add("sidebar-active");
     let localStorageUser = localStorage.getItem("email");
     // get all details about authenticate login users
     if (currentUser === undefined) {
-      
-      console.log(`redirecting >>> `,pathName);
       if(pathName !== "/meeting"){
         handlePublicRoutes(pathName, path, router);
       }
     } else {
       setCurrentUser(localStorageUser);
     }
+
+    // Initialize tracker when component mounts
+    initializeTracker();
 
     // if (currentUser !== null) {
     //   router.push("/"); // you can get login user
@@ -59,8 +203,21 @@ export default function MyAppComponent({ Component, pageProps }) {
     };
   }, [currentUser]);
 
+
   return (
     <Fragment>
+       <Script
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/sfxnljmqst";
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "sfxnljmqst");
+          `,
+        }}
+      />
       <GoogleOAuthProvider clientId={process?.env?.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
         <Head>
           <meta httpEquiv="content-type" content="text/html; charset=UTF-8" />

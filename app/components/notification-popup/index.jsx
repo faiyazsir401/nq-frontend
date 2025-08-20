@@ -38,7 +38,10 @@ const NotificationPopup = () => {
   const [isOpen, SetIsOpen] = useState(false);
   const { startMeeting, scheduledMeetingDetails } = useAppSelector(bookingsState);
   const { userInfo } = useAppSelector(authState);
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasShownPopup, setHasShownPopup] = useState(false);
+  const [lastNotificationId, setLastNotificationId] = useState(null);
+
   useEffect(() => {
     if (socket) {
       socket.on(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE, (notification) => {
@@ -49,6 +52,14 @@ const NotificationPopup = () => {
       console.error("Socket is null or undefined");
     }
   }, [socket, dispatch]);
+
+  // Reset popup state when component unmounts or user changes
+  useEffect(() => {
+    return () => {
+      setHasShownPopup(false);
+      setLastNotificationId(null);
+    };
+  }, [userInfo?._id]);
 
   const getUpcomingBookings = async () => {
     try {
@@ -69,12 +80,19 @@ const NotificationPopup = () => {
   };
 
   const updateBookedStatusApi = async (_id, booked_status) => {
-
-    const updatePayload = {
-      id: _id,
-      booked_status: booked_status,
-    };
-    await dispatch(updateBookedSessionScheduledMeetingAsync({ status: "upcoming", updatePayload })).unwrap();
+    try {
+      const updatePayload = {
+        id: _id,
+        booked_status: booked_status,
+      };
+      await dispatch(updateBookedSessionScheduledMeetingAsync({ status: "upcoming", updatePayload })).unwrap();
+    } catch (error) {
+      if (!error.isUnauthorized) {
+        toast.error(error.response.data.error);
+      }
+      throw error;
+    }
+    
   };
 
   const sendNotifications = (data) => {
@@ -82,6 +100,11 @@ const NotificationPopup = () => {
   };
 
   const notificationHandler = (notification) => {
+    // Prevent showing the same notification multiple times
+    if (hasShownPopup && lastNotificationId === notification._id) {
+      return;
+    }
+
     const tempObj = initialModelValue;
 
     switch (notification.title) {
@@ -127,15 +150,13 @@ const NotificationPopup = () => {
                     senderId: userInfo._id,
                     receiverId: newBooking.trainee_info._id,
                     bookingInfo: newBooking,
-                    type: NotificationType.TRANSCATIONAL
                   });
                   toggle();
-                }
-              } else {
-                console.error("No new booking found.");
+                };
               }
             } catch (error) {
-              console.error("Error during booking confirmation:", error);
+              setIsLoading(false)
+              tempObj.cta.title = ctaTitle.confirmBooking;
             }
           })();
         };
@@ -151,9 +172,6 @@ const NotificationPopup = () => {
       default:
         return;
     }
-
-
-
 
     if (notification.title !== notificiationTitles.newBookingRequest) {
       const MeetingPayload = {
@@ -177,8 +195,12 @@ const NotificationPopup = () => {
     tempObj.title = notification.title;
     tempObj.description = notification.description;
     setModelObj(tempObj);
-    if (!document.getElementById("drawing-canvas")) {
+    
+    // Only show popup if not already shown and no drawing canvas is present
+    if (!document.getElementById("drawing-canvas") && !hasShownPopup) {
       SetIsOpen(true);
+      setHasShownPopup(true);
+      setLastNotificationId(notification._id);
     }
   };
 

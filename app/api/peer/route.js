@@ -20,8 +20,6 @@ export async function GET(req) {
         // Extract the generated ICE servers from the response
         const { iceServers } = response.data;
 
-        console.log("iceServers", iceServers)
-
         const formattedIceServers = [
             {
                 "urls": "stun:stun.cloudflare.com:3478"

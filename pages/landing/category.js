@@ -53,7 +53,6 @@ const Category = (masterRecords) => {
     setCategoryList([]);
     if (masterData && masterData.category && masterData.category.length) {
       const payload = masterData.category.map((category) => {
-        console.log(category , 'category')
         return { id: category, name: category, isCategory: true };
       });
       setCategoryList(payload);
@@ -77,8 +76,6 @@ const Category = (masterRecords) => {
       })
     );
   }, [getTraineeSlots]);
-
-  console.log("listoftrainers",listOfTrainers)
 
   const handleClose = () => {
     setIsTrainerModal(false);
@@ -123,8 +120,6 @@ const Category = (masterRecords) => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  console.log("trainerInfo?.userInfo",trainerInfo?.userInfo)
 
   return (
     <React.Fragment>
@@ -255,7 +250,6 @@ const Category = (masterRecords) => {
                   setParams({ search: value });
                 }}
                 selectedOption={(option) => {
-                  console.log(option , 'option')
                   if (option && option.isCategory) {
                     setTrainerInfo((prev) => ({
                       ...prev,
@@ -316,7 +310,6 @@ const Category = (masterRecords) => {
         searchQuery={query}
         trainerInfo={trainerInfo?.userInfo}
         selectTrainer={(_id, trainer_id, data) => {
-          console.log(_id , 'id')
           if (_id) {
             setSelectedTrainer({
               ...selectedTrainer,

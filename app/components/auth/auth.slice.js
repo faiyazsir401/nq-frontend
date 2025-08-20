@@ -45,7 +45,9 @@ export const signupAsync = createAsyncThunk("signup", async (payload) => {
     const response = await signup(payload);
     return response.data;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });
@@ -53,10 +55,11 @@ export const signupAsync = createAsyncThunk("signup", async (payload) => {
 export const loginAsync = createAsyncThunk("login", async (payload) => {
   try {
     const response = await login(payload);
-    console.log(response , "response")
     return response;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });
@@ -66,7 +69,9 @@ export const getMeAsync = createAsyncThunk("get/me", async () => {
     const response = await getMe();
     return response;
   } catch (err) {
-    toast.error(err.response.data.error);
+    if (!err.isUnauthorized) {
+      toast.error(err.response.data.error);
+    }
     throw err;
   }
 });
@@ -78,7 +83,9 @@ export const googleLoginAsync = createAsyncThunk(
       const response = await googleLogin(payload);
       return response;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -91,7 +98,9 @@ export const forgetPasswordAsync = createAsyncThunk(
       const res = await forgetPassword(payload);
       return res;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }
@@ -104,7 +113,9 @@ export const verifiedForgetPasswordAsync = createAsyncThunk(
       const res = await verifiedForgetPassword(payload);
       return res;
     } catch (err) {
-      toast.error(err.response.data.error);
+      if (!err.isUnauthorized) {
+        toast.error(err.response.data.error);
+      }
       throw err;
     }
   }

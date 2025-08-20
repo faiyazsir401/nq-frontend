@@ -205,7 +205,6 @@ export const HandleVideoCall = ({
   const timeDifference = Timer(session_end_time);
   const errorHandling = (err) => toast.error(err)
   const [globalSliderValue ,setGlobalSliderValue] = useState(0);
-  console.log('start meeting info ' , startMeeting)
 
 
   /**
@@ -655,7 +654,6 @@ useEffect(() => {
       getNavbarTabs.style.marginLeft = '25px';
         getNavbarTabs?.style?.setProperty('width', 'calc(100vw - 25px)');
     }
-    console.log("sidebar",sidebar)
     return ()=>{
       if(sidebar){
         sidebar.style.display="block"
@@ -824,7 +822,6 @@ useEffect(() => {
         strikes.push(savedPos);
         // const mousePos = getMosuePositionOnCanvas(event);
         const mousePos = event.type.includes('touchstart') ? getTouchPos(event) : getMosuePositionOnCanvas(event);
-        console.log('...mousePos...', mousePos)
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
         context.lineCap = "round";
@@ -1058,7 +1055,6 @@ useEffect(() => {
   };
 
   const sendDrawEvent = () => {
-    console.log("sendDrawEvent",canvasRef)
     const canvas = canvasRef.current;
     if (!canvas) return;
     const { width, height } = canvas;
@@ -1394,7 +1390,6 @@ useEffect(() => {
       // console.log("1366=======S3",{canvas})
  
       const dataUrl = canvas.toDataURL("image/png");
-      console.log("dataUrl",dataUrl)
       // console.log("1367=======S3",{dataUrl})
       // screenShots.push({
       //   title: "",
@@ -1656,7 +1651,6 @@ const emitVideoTimeEvent = (clickedTime, number) => {
         selectedVideoRef1.current?.currentTime === selectedVideoRef1.current?.duration &&
         selectedVideoRef2.current?.currentTime === selectedVideoRef2.current?.duration;
 
-        console.log('video ended' , bothVideosEnded)
     // Prevent re-triggering playback if both videos have ended
     if (bothVideosEnded) {
         // Pause both videos if they reached the end
@@ -1724,7 +1718,6 @@ const togglePlay = (num) => {
   }
 
   const updatedPlayingState = { ...isPlaying };
-  console.log('updatedPlayingState')
   const toggleAll = num === "all";
 
   if (toggleAll) {
@@ -2369,7 +2362,6 @@ const togglePlay = (num) => {
     // Get video elements by their IDs
     const video1 = document.getElementById("selected-video-1");
     const video2 = document.getElementById("selected-video-2");
-    console.log('its video' , video1 , video2)
     if (!video1) {
         console.error("Video element 'selected-video-1' not found.");
         return {};

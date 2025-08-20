@@ -6,7 +6,7 @@ const Timer = (session_end_time) => {
   useEffect(() => {
     const now = new Date();
     // Check if session_end_time is a string and includes the colon ":"
-    console.log("session_end_time",session_end_time)
+    
     if (typeof session_end_time === 'string' && session_end_time.includes(":")) {
       const [endHours, endMinutes] = session_end_time.split(":").map(Number);
       const endTime = new Date(
@@ -16,17 +16,17 @@ const Timer = (session_end_time) => {
         endHours,
         endMinutes
       );
-      console.log("session_end_time",endHours,endMinutes)
+      
       const pad = (num) => (num < 10 ? `0${num}` : num);
 
       const updateTimerDifference = () => {
         const now = new Date();
-        console.log("now",now)
-        console.log("endTime",endTime)
+        
+        
         const isBeforeEndTime = now < endTime;
         const timeDiff = Math.abs(endTime - now);
-        console.log("timeDiff",timeDiff)
-        console.log("isBeforeEndTime",isBeforeEndTime)
+        
+        
         const hours = Math.floor(timeDiff / (1000 * 60 * 60));
         const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
@@ -35,7 +35,7 @@ const Timer = (session_end_time) => {
         const paddedMinutes = pad(minutes);
         const paddedSeconds = pad(seconds);
 
-        console.log("formattedTimeDifference",paddedHours,paddedMinutes,paddedSeconds)
+        
 
         let formattedTimeDifference = `${isBeforeEndTime ? "" : "-"}${paddedHours}:${paddedMinutes}:${paddedSeconds}`;
         if (hours === 0) {
