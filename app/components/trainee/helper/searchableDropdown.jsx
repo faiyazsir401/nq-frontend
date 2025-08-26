@@ -48,7 +48,7 @@ const SearchableDropdown = ({
     );
     return result;
   };
-  console.log(onlineUsers, "onlineUsers");
+   
   return (
     <div className={`dropdown ${customClasses.dropdown}`}>
       <div className="d-flex item-center">
@@ -95,7 +95,7 @@ const SearchableDropdown = ({
               className={`options ${isOpen && options.length ? "open" : ""}`}
             >
               {filter(options).map((option, index) => {
-                console.log(option, "optionxdcfvgbh");
+                 
                 return (
                   <div
                     onClick={() => {

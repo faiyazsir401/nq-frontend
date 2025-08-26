@@ -72,12 +72,12 @@ const ImageCropper = ({ image: imgSrc, isModalOpen, setIsModalOpen, setCroppedIm
   const handleCreateBlob = async () => {
     try {
       const dataUrl = previewCanvasRef.current.toDataURL();
-      console.log("dataUrl=====>", dataUrl);
+       
 
       // Convert the dataUrl (base64) to a Blob
       const blob = await createBlobFromDataUrl(dataUrl);
 
-      console.log("Blob:", blob);
+       
 
       handleSavePicture(blob);
 

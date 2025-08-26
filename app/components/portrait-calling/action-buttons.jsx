@@ -76,7 +76,7 @@ const ActionButtons = ({
           className={`button video-toggle ${isVideoOff ? "off" : ""}`}
           onClick={() => {
             if (stream) {
-              // console.log("inside of local stream  statement");
+              //  
               stream.getVideoTracks().forEach((track) => {
                 track.enabled = !track.enabled; // Toggle camera state
               });
@@ -130,7 +130,7 @@ const ActionButtons = ({
                     ? videoRef.current?.currentTime || 0
                     : videoRef2.current?.currentTime || 0
                   : videoRef.current?.currentTime || 0;
-                  console.log("lockPointTemp",lockPointTemp)
+                   
                   setLockPoint(lockPointTemp);
                 }}
               >

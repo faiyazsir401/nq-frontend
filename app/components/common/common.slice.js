@@ -40,7 +40,7 @@ export const addRatingAsync = createAsyncThunk(
       const res = await addRating(payload);
       return res;
     } catch (err) {
-      console.log(`rre `, err);
+       
       if (!err.isUnauthorized) {
         toast.error(err.response.data.error);
       }

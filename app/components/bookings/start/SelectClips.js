@@ -52,8 +52,8 @@ const SelectClips = ({ isOpen, onClose, selectedClips, clips, isTrainer, userInf
                 <div className="row">
                   {cl?.clips?.map((clp, index) => {
                     var sld = selectedClips?.find(val => val?._id === clp?._id)
-                    console.log("clclclclclclclcl", clp?.file_name)
-                    console.log("sldsldsldsld", sld)
+                     
+                     
                     return (
                       <div
                         key={index}

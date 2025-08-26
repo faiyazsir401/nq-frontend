@@ -115,7 +115,7 @@ const StripePaymentContent = ({
                       transaction?.intent?.result?.application_fee_amount / 100,
                   };
                   dispatch(bookSessionAsync(payload));
-                  console.log("newBookingData",payload)
+                   
                   console.log("sendNotifications",{
                     title: notificiationTitles.newBookingRequest,
                     description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,

@@ -95,10 +95,10 @@ const UpcomingSession = ({ accountType = null }) => {
       let width = window.innerWidth;
       let height = window.innerHeight;
       if (width > height == false) {
-        // console.log("=========if block")
+        //  
         setModal(true)
       } else {
-        // console.log("=========else block")
+        //  
         setModal(false)
       }
     };

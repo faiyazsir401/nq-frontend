@@ -74,7 +74,7 @@ const NotificationPopup = () => {
       );
       return response.data;
     } catch (err) {
-      console.log(err)
+       
     }
 
   };
@@ -142,7 +142,7 @@ const NotificationPopup = () => {
                 };
 
                 tempObj.cta.call = () => {
-                  console.log("newBooking", newBooking)
+                   
                   navigateToMeeting(newBooking?._id)
                   sendNotifications({
                     title: notificiationTitles.sessionStrated,
@@ -186,7 +186,7 @@ const NotificationPopup = () => {
       };
 
       tempObj.cta.call = () => {
-        console.log("notification?.bookingInfo", notification?.bookingInfo)
+         
         navigateToMeeting(notification?.bookingInfo?._id)
         toggle();
       };

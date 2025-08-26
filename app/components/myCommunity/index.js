@@ -47,9 +47,9 @@ const MyCommunity = (props) => {
     try {
       let res = await getFriends();
       setFriends(res?.friends);
-      console.log("Friends:", res);
+       
     } catch (error) {
-      console.log(error);
+       
     }
   };
 
@@ -57,9 +57,9 @@ const MyCommunity = (props) => {
     try {
       let res = await getFriendRequests();
       setFriendRequests(res?.friendRequests);
-      console.log("Friend Requests:", res);
+       
     } catch (error) {
-      console.log(error);
+       
     }
   };
 
@@ -90,9 +90,9 @@ const MyCommunity = (props) => {
     try {
       let res = await getTraineeClips({ trainer_id: id });
       setRecentStudentClips(res?.data);
-      console.log("Enthusiast Clips:", res);
+       
     } catch (error) {
-      console.log(error);
+       
     }
   };
 
@@ -136,12 +136,12 @@ const MyCommunity = (props) => {
   const handleCancelFriendRequest = async (requestId) => {
     try {
       await cancelFriendRequest({ receiverId: requestId });
-      console.log("searchData", searchData, requestId);
+       
       setSearchData((prevData) => {
         const data = prevData.map((user) =>
           user._id === requestId ? { ...user, requestSent: false } : user
         );
-        console.log("searchData123", data);
+         
         return data;
       });
       toast.success("Friend request cancelled");
@@ -182,7 +182,7 @@ const MyCommunity = (props) => {
       userInfo._id,
       index,
       searchData[index].friendRequests.some((request) => {
-        console.log("request" + index, request);
+         
       })
     );
     return searchData[index].friendRequests.some(
@@ -217,12 +217,12 @@ const MyCommunity = (props) => {
           className={`form-inline`}
           onSubmit={async (e) => {
             e.preventDefault();
-            console.log("e12", searchTerm);
+             
             const data = await getAllUsers({ search: searchTerm });
             setSearchData(data.result);
 
             setActiveTab("search");
-            console.log("searchTerm", data);
+             
           }}
         >
           <div

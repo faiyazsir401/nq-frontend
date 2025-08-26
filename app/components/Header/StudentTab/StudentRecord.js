@@ -42,9 +42,9 @@ const StudentRecord = (props) => {  // Pass props to the component
     try {
       let res = await getRecentStudent();
       setRecentStudent(res?.data);
-      console.log("Recent Students:", res);
+       
     } catch (error) {
-      console.log(error);
+       
     }
   };
 
@@ -52,9 +52,9 @@ const StudentRecord = (props) => {  // Pass props to the component
     try {
       let res = await getRecentTrainers();
       setRecentStudent(res?.data);  // Store trainers in the same state variable
-      console.log("Recent Experts:", res);
+       
     } catch (error) {
-      console.log(error);
+       
     }
   };
 
@@ -62,9 +62,9 @@ const StudentRecord = (props) => {  // Pass props to the component
     try {
       let res = await getTraineeClips({ trainer_id: id });
       setRecentStudentClips(res?.data);
-      console.log("Enthusiast Clips:", res);
+       
     } catch (error) {
-      console.log(error);
+       
     }
   };
 

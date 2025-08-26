@@ -180,7 +180,7 @@ const VideoCallUI = ({
 
       const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
       // Show grace period modal at -4 minutes
-      console.log("gracePeriodModalDismissed", gracePeriodModalDismissedRef.current)
+       
       if (timeDiff <= -4 && timeDiff > -5 && !gracePeriodModalDismissedRef.current) {
         setShowGracePeriodModal(true);
         setCountdownMessage("1 minute");
@@ -256,7 +256,7 @@ const VideoCallUI = ({
         includeOffset: false,
       }) + "Z";
       // Update the session_end_time
-      console.log("newEndTimeStr", id, testEndTime,newEndTime);
+       
       setSessionEndTime(newEndTimeStr);
       socket.emit("ON_BOTH_JOIN", {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
@@ -264,7 +264,7 @@ const VideoCallUI = ({
         newEndTime:testEndTime
       });
       await updateExtendedSessionTime({ sessionId: id, extendedEndTime: testEndTime, extended_session_end_time: newEndTimeStr });
-      console.log(`Session extended from ${session_end_time} to ${newEndTimeStr}`);
+       
     } catch (error) {
       console.error("Error extending session time:", error);
     }
@@ -302,7 +302,7 @@ const VideoCallUI = ({
     var arr = trainee_clips?.data || [];
     let res3 = await traineeClips({});
     const clipsSharedByTrainee = res3?.data
-    console.log("clipsSharedByTrainee", clipsSharedByTrainee)
+     
     for (let index = 0; index < clipsSharedByTrainee?.length; index++) {
       if (clipsSharedByTrainee[index]._id._id === traineeInfo._id) {
 
@@ -310,7 +310,7 @@ const VideoCallUI = ({
           // Check if the current clip's _id matches the given id
           if (clip._id === id) {
             // Add the extra field 'duringSession' to the clip
-            console.log("clips", clip)
+             
             sharedClips.push(clip.clips._id)
           }
           // return clip; // Return the modified or unmodified clip
@@ -319,7 +319,7 @@ const VideoCallUI = ({
     }
 
 
-    console.log("shared_clips", sharedClips);
+     
 
     arr[0]?.clips?.forEach(item => {
       if (sharedClips.includes(item._id)) {
@@ -328,7 +328,7 @@ const VideoCallUI = ({
         item.duringSession = false; // Optionally, you can set it to false or leave it undefined
       }
     });
-    console.log("trainee_clips", arr)
+     
 
     setTraineeClips(arr);
   };
@@ -372,7 +372,7 @@ const VideoCallUI = ({
     }
   }, [accountType, startMeeting, isTraineeJoined]); // Dependencies to ensure it updates correctly
 
-  console.log("selectedClips", selectedClips, accountType, startMeeting);
+   
 
   async function afterSucessUploadImageOnS3() {
     var result = await getReport({
@@ -406,7 +406,7 @@ const VideoCallUI = ({
       const visibleHeight = visibleBottom - visibleY;
 
       if (visibleWidth <= 0 || visibleHeight <= 0) {
-        console.log("No visible portion");
+         
         return;
       }
 
@@ -447,7 +447,7 @@ const VideoCallUI = ({
       return mergeCanvases(canvas, drawingCanvasRef);
 
     } catch (error) {
-      console.log("error", error);
+       
       return null;
     }
   };
@@ -619,7 +619,7 @@ const VideoCallUI = ({
         );
 
         const dataUrl = watermarkedCanvas.toDataURL("image/png");
-        console.log("dataUrl", dataUrl)
+         
         // Restore visibility of hidden elements
         elementsToHide.forEach((el) => (el.style.visibility = "visible"));
 
@@ -650,14 +650,14 @@ const VideoCallUI = ({
         }
       }, 1000);
     } catch (error) {
-      console.log("error: Take Screenshot: ", error);
+       
     } finally {
       setIsLoading(false);
     }
   };
 
-  console.log("IsScreenShotModelOpen", isScreenShotModelOpen);
-  console.log("TimeOut", timeoutId)
+   
+   
   const handleStartCall = async () => {
     try {
 
@@ -734,7 +734,7 @@ const VideoCallUI = ({
 
       // Handle socket disconnect or errors after initial connection
       socket.on('disconnect', (reason) => {
-        console.log('Socket disconnected due to:', reason);
+         
         toast.error("You have been disconnected from the server. Please reconnect.");
         // Additional logic to handle the disconnect (e.g., retry connection or show UI)
       });
@@ -754,7 +754,7 @@ const VideoCallUI = ({
         toast.error("Reconnection to the server failed. Please check your internet and try again.");
       });
 
-      console.log("startMeeting", startMeeting)
+       
 
       const peer = new Peer(fromUser._id, {
         config: { iceServers: startMeeting.iceServers },
@@ -762,7 +762,7 @@ const VideoCallUI = ({
 
       peer.on("error", (error) => {
         console.error("Peer error:", error);
-        console.log("error", error.type, error.message)
+         
 
         switch (error.type) {
           case 'browser-incompatible':
@@ -815,7 +815,7 @@ const VideoCallUI = ({
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
         });
 
-        console.log("call joined");
+         
       });
 
 
@@ -829,7 +829,7 @@ const VideoCallUI = ({
         });
       });
     } catch (err) {
-      console.log("error", err);
+       
       toast.error("Something Went Wrong.")
     }
   };
@@ -851,13 +851,13 @@ const VideoCallUI = ({
     if (!(localVideoRef && localVideoRef?.current)) return;
     const call = peer.call(peerId, localVideoRef?.current?.srcObject);
     call?.on("stream", (remoteStream) => {
-      // console.log(`setting remoteStream for 2nd user here ---- `);
+      //  
       setDisplayMsg({ show: false, msg: "" });
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
       setIsTraineeJoined(true);
-      console.log("remoteVideoRef", remoteVideoRef?.current);
+       
       if (remoteVideoRef?.current) {
         remoteVideoRef.current.srcObject = remoteStream;
       }
@@ -865,10 +865,10 @@ const VideoCallUI = ({
       accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
     });
   };
-  console.log("isTraineeJoined", isTraineeJoined);
+   
 
   socket.on("ON_BOTH_JOIN", (data) => {
-    console.log("newEndTimeStr", data.socketReq.newEndTimeStr)
+     
     if (accountType === AccountType.TRAINER) {
       const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(data.socketReq.newEndTime, time_zone, false);
       const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
@@ -888,17 +888,17 @@ const VideoCallUI = ({
 
     // Handle signaling events from the signaling server
     socket.on(EVENTS.VIDEO_CALL.ON_OFFER, (offer) => {
-      // console.log(` -- on OFFER --`);
+      //  
       peerRef.current?.signal(offer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ANSWER, (answer) => {
-      // console.log(` -- on answer --`);
+      //  
       peerRef.current?.signal(answer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, (candidate) => {
-      // console.log(` -- on ICE candidate --`);
+      //  
       peerRef.current?.signal(candidate);
     });
 
@@ -997,7 +997,7 @@ const VideoCallUI = ({
     // clearCanvas();
   };
 
-  console.log("displayMessage", displayMsg)
+   
 
   const cutCall = (manually) => {
     if (!userAlreadyInCall) {
@@ -1066,11 +1066,11 @@ const VideoCallUI = ({
       };
     }
   }, [startMeeting, accountType]);
-  console.log("SessionEndTime", sessionEndTime)
+   
   // Add this useEffect to handle session extension when both parties join
   useEffect(() => {
     if (extended_session_end_time) {
-      console.log("extended_session_end_time", extended_session_end_time)
+       
       setSessionEndTime(extended_session_end_time)
     } else {
       if (isTraineeJoined && accountType === AccountType.TRAINEE) {
@@ -1081,8 +1081,8 @@ const VideoCallUI = ({
 
   }, [isTraineeJoined]);
 
-  console.log("refs", localVideoRef, remoteVideoRef, remoteStream);
-  console.log("videoRef", videoRef)
+   
+   
   return (
     <div
       className="video-call-container"

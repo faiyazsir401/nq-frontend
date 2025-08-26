@@ -208,7 +208,7 @@ export default function PracticeLiveExperience({
             toast.error(
               "Please allow media permission to microphone and camera for video call..."
             );
-            console.log(`unable to access video call ---- `, err);
+             
           });
         setLocalStream(stream);
         setRemoteStream(stream);
@@ -235,7 +235,7 @@ export default function PracticeLiveExperience({
 
   useEffect(() => {
     if (toUser) {
-      console.log("toUser", toUser);
+       
       if (typeof navigator !== "undefined") {
         Peer = require("peerjs").default;
       }
@@ -508,7 +508,7 @@ export default function PracticeLiveExperience({
         drawShapes();
         context.stroke();
       } else {
-        console.log(`--- drawing ---- `);
+         
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
         context.lineCap = "round";
@@ -520,7 +520,7 @@ export default function PracticeLiveExperience({
     const stopDrawing = (event) => {
       event.preventDefault();
       if (state.mousedown) {
-        console.log(`--- stop drawing ---- `);
+         
         sendStopDrawingEvent();
         isDrawing = false;
         state.mousedown = false;
@@ -562,11 +562,11 @@ export default function PracticeLiveExperience({
   const getMosuePositionOnCanvas = (event) => {
     const canvas = canvasRef.current;
     var rect = canvas.getBoundingClientRect();
-    console.log(rect, "rect");
+     
     var x = event?.clientX - rect?.left;
     var y = event?.clientY - rect?.top;
 
-    console.log(x, y, "xy");
+     
     return {
       x: x || 0,
       y: y || 0,
@@ -589,7 +589,7 @@ export default function PracticeLiveExperience({
       reader.onload = (event) => {
         if (!(event && event.target)) return;
         const binaryData = event.target.result;
-        console.log(`emit draw event---`);
+         
         // socket.emit(EVENTS.DRAW, {
         // 	userInfo: { from_user: fromUser._id, to_user: toUser._id },
         // 	strikes: binaryData,
@@ -761,7 +761,7 @@ export default function PracticeLiveExperience({
       ctx.clearRect(0, 0, w, h); // clean the canvas
       return true;
     } catch (e) {
-      console.log(e);
+       
     }
   }
 
@@ -783,7 +783,7 @@ export default function PracticeLiveExperience({
       ctx.clearRect(0, 0, w, h); // clean the canvas
       return true;
     } catch (e) {
-      console.log(e);
+       
     }
   }
 
@@ -956,7 +956,7 @@ export default function PracticeLiveExperience({
   const mediaQueryMain = window.matchMedia("(min-width: 992px)");
 
   const renderCallActionButtons = () => {
-    console.log("code:0.0.2" + sessionEndTime);
+     
     return (
       <div
         className="call-action-buttons  my-3 "
@@ -1308,7 +1308,7 @@ export default function PracticeLiveExperience({
 
   // NOTE - separate funtion for emit
   useEffect(() => {
-    console.log(selectedClips?.length , countClipNoteOpen , isGuideTour , 'isGuideTour' )
+     
     if (selectedClips?.length !== 0 && countClipNoteOpen && isGuideTour) {
       setClipsNote(true);
     } else {
@@ -1401,7 +1401,7 @@ export default function PracticeLiveExperience({
   };
 
   const handleTimeUpdate1 = () => {
-    console.log("handleTimeUpdate1");
+     
     if (progressBarRef?.current) {
       progressBarRef.current.value =
         selectedVideoRef1?.current?.currentTime || 0;
@@ -1470,7 +1470,7 @@ export default function PracticeLiveExperience({
 
   const handleProgressBarChange = (e, number) => {
     const clickedTime = e.target.value;
-    console.log(clickedTime, "handleProgressBarChange");
+     
     if (number === "one") {
       selectedVideoRef1.current.currentTime = clickedTime;
     } else {

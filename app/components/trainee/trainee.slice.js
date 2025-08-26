@@ -72,7 +72,7 @@ export const createPaymentIntentAsync = createAsyncThunk(
       const response = await createPaymentIntent(payload);
       return response;
     } catch (err) {
-      console.log("createPaymentIntentAsyncError",err)
+       
       if (!err.isUnauthorized) {
         toast.error(err.response.data.error);
       }
@@ -101,7 +101,7 @@ export const traineeSlice = createSlice({
         state.status = "pending";
       })
       .addCase(getTraineeWithSlotsAsync.fulfilled, (state, action) => {
-        console.log("state, action", state, action);
+         
         state.status = "fulfilled";
         state.getTraineeSlots = action.payload.data;
       })

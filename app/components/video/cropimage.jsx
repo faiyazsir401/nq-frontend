@@ -48,7 +48,7 @@ const CropImage = ({ isOpenCrop, setIsOpenCrop, selectImage, screenShots, setScr
     const [aspect, setAspect] = useState(16 / 9);
 
 
-    console.log("imgSrc", imgSrc);
+     
 
     useEffect(() => {
         setImgSrc("")

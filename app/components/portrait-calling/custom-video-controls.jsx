@@ -60,7 +60,7 @@ const CustomVideoControls = ({
   //     return <FaVolumeUp />;
   //   };
 
-  console.log("lockPoint",lockPoint)
+   
   return (
     <div
       style={{
@@ -156,7 +156,7 @@ const CustomVideoControls = ({
                 ? ((currentValue - lockPoint) / (maxValue - lockPoint)) * 100
                 : (currentValue / maxValue) * 100;
               
-              console.log("currentValue", currentValue, "relativeProgress", relativeProgress);
+               
               return (
                 <input
                   type="range"

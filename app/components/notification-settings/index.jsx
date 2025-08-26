@@ -33,7 +33,7 @@ const NotificationSettings = () => {
 
             setNotifications(updatedNotifications);
         } catch (error) {
-            console.log("error", error);
+             
         }
     };
 

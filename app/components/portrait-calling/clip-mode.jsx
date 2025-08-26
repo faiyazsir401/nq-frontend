@@ -144,7 +144,7 @@ const VideoContainer = ({
 
     // Decrease the scale by 0.5, with a minimum value of 1
     const newScale = Math.max(1, scale - 0.2);
-    console.log("newScale", newScale);
+     
     setScale(newScale);
 
     socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
@@ -217,7 +217,7 @@ const VideoContainer = ({
   // Play/pause video
   const togglePlayPause = () => {
     const video = videoRef?.current;
-    console.log("video hai", video);
+     
     if (video) {
       if (video.paused) {
         video.play();
@@ -237,7 +237,7 @@ const VideoContainer = ({
         });
       }
     } else {
-      console.log("video not loaded yet");
+       
     }
   };
 
@@ -304,7 +304,7 @@ const VideoContainer = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
     };
   }, [socket, clip?._id, videoRef]);
-  // console.log("IsVideoLoaded",isVideoLoaded)
+  //  
   // useEffect(() => {
   //   const video = videoRef?.current;
   //   if (!video) return;
@@ -326,7 +326,7 @@ const VideoContainer = ({
   //   //   setVideoProgress(100);
   //   //   setIsVideoLoaded(true);
       
-  //   //   console.log(`Video ${clip?.id} loaded successfully`);
+  //   //    
   //   // };
   
   //   // const handleError = (error,isMessage=true) => {
@@ -347,17 +347,17 @@ const VideoContainer = ({
   //   // };
   
   //   // const handleStalled = () => {
-  //   //   console.log("Video playback stalled");
+  //   //    
   //   //   // Don't reset loading state on stall, just log it
   //   // };
   
   //   // const handleWaiting = () => {
-  //   //   console.log("Video waiting for data");
+  //   //    
   //   //   // Don't reset loading state on waiting, just log it
   //   // };
 
   //   // const handleVideoLoadStart = () => {
-  //   //   console.log(`Video ${clip?.id} load started`);
+  //   //    
   //   //   setIsVideoLoading(true);
   //   //   setVideoProgress(0);
   //   //   setIsVideoLoaded(false);
@@ -366,7 +366,7 @@ const VideoContainer = ({
   //   //   setTimeout(() => {
   //   //     if (!isVideoLoaded && videoProgress === 0) {
   //   //       setVideoProgress(5);
-  //   //       console.log(`Video ${clip?.id} initial progress: 5%`);
+  //   //        
   //   //     }
   //   //   }, 200);
   //   // };
@@ -378,7 +378,7 @@ const VideoContainer = ({
   //   //     const duration = video.duration;
   //   //     const progress = (bufferedEnd / duration) * 100;
   //   //     setVideoProgress(Math.round(progress));
-  //   //     console.log(`Video ${clip?.id} progress: ${Math.round(progress)}%`);
+  //   //      }%`);
   //   //   }
   //   // };
 
@@ -411,7 +411,7 @@ const VideoContainer = ({
   //         const finalProgress = Math.max(videoProgress + minIncrement, newProgress);
           
   //         setVideoProgress(Math.min(finalProgress, 100));
-  //         console.log(`Video ${clip?.id} interval progress: ${Math.min(finalProgress, 100)}%`);
+  //          }%`);
   //       }
         
   //       // If video is ready but we haven't completed, force completion
@@ -422,34 +422,34 @@ const VideoContainer = ({
   //   }, 150); // Check every 150ms for smoother progress updates
 
   //   const handleVideoCanPlay = () => {
-  //     console.log(`Video ${clip?.id} can play`);
+  //      
   //     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
   //       // Ensure we show some progress before completing
   //       if (videoProgress < 90) {
   //         setVideoProgress(90);
-  //         console.log(`Video ${clip?.id} final progress: 90%`);
+  //          
   //       }
   //       setTimeout(() => handleVideoLoadComplete(), 100);
   //     }
   //   };
 
   //   const handleVideoCanPlayThrough = () => {
-  //     console.log(`Video ${clip?.id} can play through`);
+  //      
   //     // Ensure we show some progress before completing
   //     if (videoProgress < 95) {
   //       setVideoProgress(95);
-  //       console.log(`Video ${clip?.id} final progress: 95%`);
+  //        
   //     }
   //     setTimeout(() => handleVideoLoadComplete(), 100);
   //   };
 
   //   const handleVideoLoadedData = () => {
-  //     console.log(`Video ${clip?.id} loaded data`);
+  //      
   //     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
   //       // Ensure we show some progress before completing
   //       if (videoProgress < 85) {
   //         setVideoProgress(85);
-  //         console.log(`Video ${clip?.id} loaded data progress: 85%`);
+  //          
   //       }
   //       setTimeout(() => handleVideoLoadComplete(), 100);
   //     }
@@ -489,7 +489,7 @@ const VideoContainer = ({
   //       console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
   //       handleError(new Error('Loading timeout'),false);
   //     } else if (isVideoLoaded) {
-  //       console.log(`Video ${clip?.id} already loaded, clearing timeout`);
+  //        
   //     }
   //   }, 15000); // 15 second timeout
   
@@ -510,10 +510,10 @@ const VideoContainer = ({
   //   };
   // }, [videoRef, clip?.id, isVideoLoaded]);
 
-  console.log("sky.zoom", scale);
-  console.log("sky.pan", translate);
-  console.log("sky.dragStart", dragStart);
-  console.log("sky.lastTouch", lastTouch);
+   
+   
+   
+   
 
   // // Handle volume change
   // const changeVolume = (e) => {
@@ -587,7 +587,7 @@ const VideoContainer = ({
       canvas.width = width;
       canvas.height = height;
       
-      console.log('Canvas dimensions updated:', width, height);
+       
     };
   
     // Initial setup
@@ -1055,7 +1055,7 @@ const ClipModeCall = ({
   };
 
   const sendStopDrawingEvent = (canvasIndex = 1) => {
-    console.log("canvassendStopDrawingEvent", canvasIndex);
+     
     if (remoteVideoRef && remoteVideoRef.current) {
       socket.emit(EVENTS.STOP_DRAWING, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
@@ -1065,14 +1065,14 @@ const ClipModeCall = ({
   };
 
   // const [drawingStep, setDrawingStep] = useState("baseline")
-  // console.log("drawingStep", drawingStep)
+  //  
   const stopDrawing = (event, canvasIndex = 1) => {
-    console.log("stopDrawingexcuted")
+     
     event.preventDefault();
 
     if (selectedShape === SHAPES.ANGLE) {
       if (drawingStep === 'baseline' && currPos[`canvas${canvasIndex}`]) {
-        console.log("stop-drawingStep", drawingStep, startPos, currPos)
+         
 
         // If we're in baseline step and we completed it, move to angle drawing step
         lastDrawingStep = "baseline"
@@ -1094,7 +1094,7 @@ const ClipModeCall = ({
   };
 
   const sendDrawEvent = (canvasIndex = 1) => {
-    console.log("canvassendDrawEvent", canvasIndex);
+     
     try {
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
@@ -1116,14 +1116,14 @@ const ClipModeCall = ({
         reader.readAsArrayBuffer(blob);
       });
     } catch (error) {
-      console.log("error", error);
+       
     }
   };
 
   socket.on(
     EVENTS.EMIT_DRAWING_CORDS,
     ({ strikes, canvasSize, canvasIndex }) => {
-      console.log("is sending data");
+       
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
       const context = canvas?.getContext("2d");
@@ -1151,7 +1151,7 @@ const ClipModeCall = ({
     removeLastCoordinate = true,
     canvasIndex = 1
   ) => {
-    console.log("canvasundoDrawing", canvasIndex);
+     
     try {
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
@@ -1196,7 +1196,7 @@ const ClipModeCall = ({
 
       if (strikes[`canvas${canvasIndex}`].length <= 0) return;
       context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
-      console.log("drawingStep", drawingStep, selectedShape, lastDrawingStep)
+       
       if (drawingStep === "baseline" && selectedShape === SHAPES.ANGLE && lastDrawingStep === "angle") {
         context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
       }
@@ -1205,25 +1205,25 @@ const ClipModeCall = ({
         sendEmitUndoEvent(canvasIndex);
       }
     } catch (error) {
-      console.log("error", error);
+       
     }
   };
 
   const calculateAngle = (start, end, angle) => {
-    console.log("start", start, end, angle)
+     
     const dx1 = end.x - start.x;
     const dy1 = end.y - start.y;
     const dx2 = angle.x - end.x;
     const dy2 = angle.y - end.y;
-    console.log("start2", dx1, dy1, dx2, dy2)
+     
     const dotProduct = -(dx1 * dx2 + dy1 * dy2);
-    console.log("start3", dotProduct)
+     
     const magnitude1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
     const magnitude2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-    console.log("start4", magnitude1, magnitude2)
+     
     let angleRad = Math.acos(dotProduct / (magnitude1 * magnitude2));
     let angleDeg = (angleRad * 180) / Math.PI;
-    console.log("start5", angleRad, angleDeg)
+     
 
     return isNaN(angleDeg) ? 0 : angleDeg;
   };
@@ -1274,7 +1274,7 @@ const ClipModeCall = ({
     // Drawing Logic for Canvas 1 and Canvas 2
     const startDrawing = (event, canvasIndex = 1) => {
       try {
-        console.log("canvas", canvasIndex);
+         
         event.preventDefault();
         isDrawing = true;
         const canvas =
@@ -1304,7 +1304,7 @@ const ClipModeCall = ({
         context.moveTo(mousePos.x, mousePos.y);
         state.mousedown[`canvas${canvasIndex}`] = true;
         if (selectedShape === SHAPES.ANGLE) {
-          console.log("drawingStep", drawingStep)
+           
           if (drawingStep === "baseline") {
 
             startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
@@ -1320,7 +1320,7 @@ const ClipModeCall = ({
         }
 
       } catch (error) {
-        console.log("error", error);
+         
       }
     };
 
@@ -1532,7 +1532,7 @@ const ClipModeCall = ({
     };
 
     const draw = (event, canvasIndex = 1) => {
-      console.log("canvasDraw", canvasIndex);
+       
       event.preventDefault();
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
@@ -1544,7 +1544,7 @@ const ClipModeCall = ({
         ? getTouchPos(event, canvas)
         : getMousePositionOnCanvas(event, canvas);
 
-      console.log("selectedShape1", selectedShape);
+       
       if (selectedShape === SHAPES.FREE_HAND) {
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
@@ -1578,7 +1578,7 @@ const ClipModeCall = ({
           const completeComputedAngle = calculateCompleteAngle(startPos[`canvas${canvasIndex}`],
             currPos[`canvas${canvasIndex}`],
             mousePos)
-          console.log("completeComputedAngle", completeComputedAngle)
+           
           // Optionally, display the angle computed (you can use context.fillText)
           context.fillStyle = canvasConfigs.sender.strokeStyle;
           context.font = "16px Arial";
@@ -1592,7 +1592,7 @@ const ClipModeCall = ({
         }
 
       } else {
-        // console.log(`--- drawing ---- `);
+        //  
         currPos[`canvas${canvasIndex}`] = { x: mousePos?.x, y: mousePos.y };
         context.putImageData(savedPos[`canvas${canvasIndex}`], 0, 0);
         context.beginPath();
@@ -1669,7 +1669,7 @@ const ClipModeCall = ({
   const isSingle = selectedClips?.length === 1;
 
 
-  console.log("selectedClips-sky", selectedClips)
+   
 
   return (
     <>
@@ -1718,7 +1718,7 @@ const ClipModeCall = ({
                     ? videoRef.current?.currentTime || 0
                     : videoRef2.current?.currentTime || 0
                   : videoRef.current?.currentTime || 0;
-                  console.log("lockPointTemp",lockPointTemp)
+                   
                   setLockPoint(lockPointTemp);
                 }}
               >
@@ -1775,7 +1775,7 @@ const ClipModeCall = ({
                       canvasConfigs = config;
                     }}
                     drawShapes={(shapeType) => {
-                      console.log("shapeType", shapeType);
+                       
                       selectedShape = shapeType;
                     }}
                     refreshDrawing={() => {

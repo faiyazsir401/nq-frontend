@@ -102,10 +102,10 @@ const UserInfoCard = () => {
   };
 
   const handlePictureChange = (e) => {
-    console.log("errorinevent",e)
+     
     try {
       const file = e.target.files?.[0];
-      console.log("errorinfile",file)
+       
       if (!file) return;
   
       const reader = new FileReader();
@@ -128,7 +128,7 @@ const UserInfoCard = () => {
       reader.readAsDataURL(file);
   
     } catch (error) {
-      console.log("errorincrop",error)
+       
     }
 
   };
@@ -140,7 +140,7 @@ const UserInfoCard = () => {
   };
 
   const handleSavePicture = async (croppedImage) => {
-    console.log("croppedImage",croppedImage)
+     
     if (croppedImage) {
       const newFileObj = Utils?.blobToFile(
         croppedImage,
@@ -152,7 +152,7 @@ const UserInfoCard = () => {
   };
 
   const handelSelectFile = async (selectedImage, bolb) => {
-    console.log("selectedImage",selectedImage)
+     
     if (!selectedImage) {
       toast.error("Please select a Image");
       return;

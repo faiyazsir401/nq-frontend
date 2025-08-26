@@ -47,7 +47,7 @@ const RecentUsers = () => {
       let res = await getRecentStudent();
       setRecentStudent(res?.data);
     } catch (error) {
-      console.log(error);
+       
     }
   };
 
@@ -56,7 +56,7 @@ const RecentUsers = () => {
       let res = await getRecentTrainers();
       setRecentTrainer(res?.data);
     } catch (error) {
-      console.log(error);
+       
     }
   };
   const getTraineeClipsApi = async (id) => {
@@ -64,7 +64,7 @@ const RecentUsers = () => {
       let res = await getTraineeClips({ trainer_id: id });
       setRecentStudentClips(res?.data);
     } catch (error) {
-      console.log(error);
+       
     }
   };
   const handleStudentClick = (id) => {
@@ -270,7 +270,7 @@ const RecentUsers = () => {
                         trainer_id: item?.id,
                         data: trainer,
                       });
-                      console.log("item",item)
+                       
                       dispatch(getTraineeWithSlotsAsync({ search: item?.fullname }));
                       
                       setIsModalOpen(true);

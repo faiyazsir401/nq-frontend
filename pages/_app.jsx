@@ -39,8 +39,8 @@ export default function MyAppComponent({ Component, pageProps }) {
         const userInfo = userResponse.userInfo;
         
         if (userInfo && userInfo._id) {
-          console.log("Initializing OpenReplay tracker with userInfo:", userInfo);
-          console.log("OpenReplay project key:", process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY);
+           
+           
           
           const newTracker = new Tracker({
             projectKey: process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY,
@@ -157,12 +157,12 @@ export default function MyAppComponent({ Component, pageProps }) {
             }
           }
           
-          console.log("OpenReplay tracker initialized successfully with userInfo:", userInfo._id);
+           
         } else {
-          console.log("Tracker not initialized - no user info available");
+           
         }
       } else {
-        console.log("Tracker not initialized - no token available");
+         
       }
     } catch (error) {
       console.error("Error initializing tracker:", error);
@@ -187,7 +187,7 @@ export default function MyAppComponent({ Component, pageProps }) {
     // if (currentUser !== null) {
     //   router.push("/"); // you can get login user
     // } else {
-    //   console.log(`redirecting >>> `);
+    //    
 
     //   handlePublicRoutes(pathName, path, router);
     // }

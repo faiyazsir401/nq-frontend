@@ -11,7 +11,7 @@ const AuthUserModal = () => {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const {isAuthModalOpen} = useAppSelector(authState);
-    console.log(isAuthModalOpen, 'isAuthModalOpen')
+     
   return (
     <>
       <Modal 

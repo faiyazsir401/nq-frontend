@@ -62,9 +62,9 @@ const NavHomePage = () => {
     try {
       let res = await getFriendRequests();
       setFriendRequests(res?.friendRequests);
-      console.log("Friend Requests:", res);
+       
     } catch (error) {
-      console.log(error);
+       
     }
   };
 
@@ -162,29 +162,29 @@ const NavHomePage = () => {
       },
     ],
   };
-  console.log("scheduledMeetingDetails12", scheduledMeetingDetails);
+   
 
   // Filter sessions that are confirmed and within the current time range
   useEffect(() => {
-    console.log("sessionSky1", scheduledMeetingDetails);
+     
     if (scheduledMeetingDetails.length > 0) {
-      console.log("sessionSky2", scheduledMeetingDetails);
+       
       const filtered = scheduledMeetingDetails.filter((session) => {
        
         const { start_time, end_time, ratings } = session;
 
-        console.log("sessionSky3", session);
+         
         const startTimeUpdated = CovertTimeAccordingToTimeZone(start_time, session.time_zone, false);
         const endTimeUpdated = CovertTimeAccordingToTimeZone(end_time, session.time_zone, false);
-        console.log("startTimeUpdated", startTimeUpdated);
-        console.log("endTimeUpdated", endTimeUpdated);
+         
+         
         const currentTime = DateTime.now(); // Use UTC to avoid timezone mismatch
 
         // Parse the start_time and end_time in UTC
         const startTime = DateTime.fromISO(startTimeUpdated, { zone: "utc" });
         const endTime = DateTime.fromISO(endTimeUpdated, { zone: "utc" });
-        console.log("startTime", startTime);
-        console.log("endTime", endTime);
+         
+         
         // Extract date and time components
         const currentDate = currentTime.toFormat("yyyy-MM-dd"); // YYYY-MM-DD format
         const currentTimeOnly = currentTime.toFormat("HH:mm"); // HH:mm format
