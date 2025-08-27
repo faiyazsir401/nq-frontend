@@ -127,33 +127,38 @@ export default function MyAppComponent({ Component, pageProps }) {
           newTracker.setUserID(userInfo.email);
           newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
           
-          // Set additional tracking properties
-          newTracker.setSessionData({
-            userAgent: navigator.userAgent,
-            screenResolution: `${screen.width}x${screen.height}`,
-            viewport: `${window.innerWidth}x${window.innerHeight}`,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            language: navigator.language,
-            platform: navigator.platform,
-            cookieEnabled: navigator.cookieEnabled,
-            onLine: navigator.onLine,
-            connection: navigator.connection ? {
-              effectiveType: navigator.connection.effectiveType,
-              downlink: navigator.connection.downlink,
-              rtt: navigator.connection.rtt
-            } : null
-          });
+          // Set additional tracking properties using setMetadata
+          newTracker.setMetadata("userAgent", navigator.userAgent);
+          newTracker.setMetadata("screenResolution", `${screen.width}x${screen.height}`);
+          newTracker.setMetadata("viewport", `${window.innerWidth}x${window.innerHeight}`);
+          newTracker.setMetadata("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+          newTracker.setMetadata("language", navigator.language);
+          newTracker.setMetadata("platform", navigator.platform);
+          newTracker.setMetadata("cookieEnabled", navigator.cookieEnabled.toString());
+          newTracker.setMetadata("onLine", navigator.onLine.toString());
+          
+          if (navigator.connection) {
+            newTracker.setMetadata("connectionEffectiveType", navigator.connection.effectiveType);
+            newTracker.setMetadata("connectionDownlink", navigator.connection.downlink.toString());
+            newTracker.setMetadata("connectionRtt", navigator.connection.rtt.toString());
+          }
           
           // Track performance metrics
           if ('performance' in window) {
             const perfData = performance.getEntriesByType('navigation')[0];
             if (perfData) {
-              newTracker.setSessionData({
-                pageLoadTime: perfData.loadEventEnd - perfData.loadEventStart,
-                domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
-                firstPaint: performance.getEntriesByName('first-paint')[0]?.startTime,
-                firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime
-              });
+              newTracker.setMetadata("pageLoadTime", (perfData.loadEventEnd - perfData.loadEventStart).toString());
+              newTracker.setMetadata("domContentLoaded", (perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart).toString());
+              
+              const firstPaint = performance.getEntriesByName('first-paint')[0];
+              if (firstPaint) {
+                newTracker.setMetadata("firstPaint", firstPaint.startTime.toString());
+              }
+              
+              const firstContentfulPaint = performance.getEntriesByName('first-contentful-paint')[0];
+              if (firstContentfulPaint) {
+                newTracker.setMetadata("firstContentfulPaint", firstContentfulPaint.startTime.toString());
+              }
             }
           }
           

@@ -883,7 +883,7 @@ const VideoContainer = ({
                 poster={Utils?.generateThumbnailURL(clip)}
                 preload="auto"
                 crossOrigin="anonymous"
-                onLoadedData={() => {
+                onLoadedData={(e) => {
                   console.log("📹 [VideoContainer] Video data loaded", {
                     clipId: clip?._id,
                     index,
@@ -892,7 +892,7 @@ const VideoContainer = ({
                   });
                   setIsVideoLoading(false);
                 }}
-                onCanPlayThrough={() => {
+                onCanPlayThrough={(e) => {
                   console.log("✅ [VideoContainer] Video can play through", {
                     clipId: clip?._id,
                     index,
@@ -901,7 +901,7 @@ const VideoContainer = ({
                   });
                   setIsVideoLoading(false);
                 }} 
-                onWaiting={() => {
+                onWaiting={(e) => {
                   console.log("⏳ [VideoContainer] Video waiting for data", {
                     clipId: clip?._id,
                     index,
