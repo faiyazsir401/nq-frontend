@@ -762,7 +762,7 @@ const VideoContainer = ({
     });
     setHasAutopaused(false);
     setIsVideoLoading(true);
-  }, [clip]);
+  }, [clip?._id, index, accountType]);
 
   return (
     <>
