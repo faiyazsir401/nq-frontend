@@ -884,6 +884,7 @@ const VideoContainer = ({
                 preload="auto"
                 crossOrigin="anonymous"
                 onLoadedData={(e) => {
+                  try {
                   console.log("📹 [VideoContainer] Video data loaded", {
                     clipId: clip?._id,
                     index,
@@ -891,8 +892,12 @@ const VideoContainer = ({
                     duration: e?.currentTarget?.duration
                   });
                   setIsVideoLoading(false);
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onLoadedData event", error);
+                  }
                 }}
                 onCanPlayThrough={(e) => {
+                  try {
                   console.log("✅ [VideoContainer] Video can play through", {
                     clipId: clip?._id,
                     index,
@@ -900,33 +905,46 @@ const VideoContainer = ({
                     duration: e?.currentTarget?.duration
                   });
                   setIsVideoLoading(false);
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onCanPlayThrough event", error);
+                  }
                 }} 
                 onWaiting={(e) => {
-                  console.log("⏳ [VideoContainer] Video waiting for data", {
-                    clipId: clip?._id,
-                    index,
-                    currentTime: e?.currentTarget?.currentTime
-                  });
-                  setIsVideoLoading(true);
+                  try {
+                    console.log("⏳ [VideoContainer] Video waiting for data", {
+                      clipId: clip?._id,
+                      index,
+                      currentTime: e?.currentTarget?.currentTime
+                    });
+                    setIsVideoLoading(true);
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onWaiting event", error);
+                  }
+                
                 }} 
                 onPlay={(e) => {
-                  console.log("▶️ [VideoContainer] Video play event triggered", {
-                    clipId: clip?._id,
-                    index,
-                    hasAutopaused,
-                    currentTime: e.currentTarget.currentTime,
-                    duration: e.currentTarget.duration
-                  });
-                  
-                  if (!hasAutopaused) {
-                    console.log("⏸️ [VideoContainer] Auto-pausing video (autoplay prevention)", {
+                  try {
+                    console.log("▶️ [VideoContainer] Video play event triggered", {
                       clipId: clip?._id,
-                      index
+                      index,
+                      hasAutopaused,
+                      currentTime: e.currentTarget.currentTime,
+                      duration: e.currentTarget.duration
                     });
-                    e.currentTarget.pause(); // only pause once (the autoplay)
-                    setHasAutopaused(true);
-                    setIsVideoLoading(false);
+                    
+                    if (!hasAutopaused) {
+                      console.log("⏸️ [VideoContainer] Auto-pausing video (autoplay prevention)", {
+                        clipId: clip?._id,
+                        index
+                      });
+                      e.currentTarget.pause(); // only pause once (the autoplay)
+                      setHasAutopaused(true);
+                      setIsVideoLoading(false);
+                    }
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onPlay event", error);
                   }
+                  
                 }}
               >
                 <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
