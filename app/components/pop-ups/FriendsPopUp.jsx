@@ -30,7 +30,7 @@ const FriendsPopup = ({ props }) => {
     setLoading(true);
     try {
       const response = await getFriends();
-      console.log("Fetched friends:", response?.friends);
+       
       setFriends(response?.friends || []);
     } catch (error) {
       console.error("Error fetching friends list:", error);

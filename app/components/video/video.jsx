@@ -104,7 +104,7 @@ export const HandleVideoCall = ({
   session_end_time,
   bIndex,
 }) => {
-  //  console.log(toUser , fromUser , 'toUserFromUser')
+  //   
   // const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
   const [sketchPickerColor, setSketchPickerColor] = useState({
@@ -129,7 +129,7 @@ export const HandleVideoCall = ({
   };
   const [selectedClips, setSelectedClips] = useState([]);
 
-  // console.log("selectedClips============>", selectedClips)
+  //  
 
   const selectedVideoRef1 = useRef(null);
   const selectedVideoRef2 = useRef(null);
@@ -238,7 +238,7 @@ export const HandleVideoCall = ({
 
   // selects trainee clips on load
   async function selectTraineeClip (setter){
-    console.log('selected Trainee clips called , ' , startMeeting)
+     
     try{
         if(startMeeting?.trainee_clip?.length > 0){
           setter(startMeeting.trainee_clip)
@@ -246,7 +246,7 @@ export const HandleVideoCall = ({
           setter([])
         }
     }catch(err){
-        console.log(err)
+         
     }
 }
 useEffect(() =>{
@@ -279,16 +279,16 @@ useEffect(() => {
   }
   }, []); // Empty dependency array to run only once when component mounts
 
-  // console.log("=========",height,  height < 500, {pinnedUser, isPinned})
+  //  
   useLayoutEffect(() => {
     const updateOrientation = () => {
       let width = window.innerWidth;
       let height = window.innerHeight;
       if (width > height == false) {
-        // console.log("=========if block")
+        //  
         setModal(true)
       } else {
-        // console.log("=========else block")
+        //  
         setModal(false)
       }
     };
@@ -364,11 +364,11 @@ useEffect(() => {
           .map((chunk) => {
             // Assuming chunk is already a Buffer or Uint8Array, no conversion needed
             if (chunk) {
-              // console.log("Chunk type:", typeof chunk);
+              //  
               return chunk;
             } else {
               // Handle invalid chunk data here
-              // console.log("Invalid chunk data:", chunk);
+              //  
               return null; // or handle differently as needed
             }
           })
@@ -379,9 +379,9 @@ useEffect(() => {
           const chunkData = { data: chunkBuffers };
           socket.emit("chunk", chunkData);
           // Handle the recorded data here (in chunks array)
-          // console.log("Data:", chunkBuffers);
+          //  
         } else {
-          // console.log("No valid chunks to send");
+          //  
         }
 
         // Clear chunks array for next interval
@@ -433,7 +433,7 @@ useEffect(() => {
         audio: true,
       });
 
-      // console.log("Media stream obtained:", stream);
+      //  
 
       // Update state and UI
       setPermissionModal(false);
@@ -466,11 +466,11 @@ useEffect(() => {
       
       // Handle Peer events
       peer.on("open", (id) => {
-        // console.log("Peer connection opened with ID:", id);
+        //  
         socket.emit("ON_CALL_JOIN", {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
         });
-        console.log('call joined')
+         
       });
 
       peer.on("error", (error) => {
@@ -478,17 +478,17 @@ useEffect(() => {
       });
 
       peer.on("call", (call) => {
-        // console.log("Incoming call received:", call);
+        //  
         call.answer(stream);
         call.on("stream", (remoteStream) => {
-          // console.log("Remote stream received:", remoteStream);
+          //  
           setIsTraineeJoined(true);
           setDisplayMsg({ showMsg: false, msg: "" });
           setRemoteStream(remoteStream);
         });
       });
 
-      // console.log("Call setup complete.");
+      //  
     } catch (err) {
       // console.error("Media permission error:", err);
       setPermissionModal(true);
@@ -498,11 +498,11 @@ useEffect(() => {
 
   //NOTE -  Initiate outgoing connection
   let connectToPeer = (peer, peerId) => {
-    // console.log(`Connecting to ${peerId}...`);
+    //  
 
     // let conn = peer.connect(peerId);
     // conn.on('data', (data) => {
-    //     console.log(`received: ${data}`);
+    //      
     // });
     // conn.on('open', () => {
     //     conn.send('hi!');
@@ -513,7 +513,7 @@ useEffect(() => {
     if (!(videoRef && videoRef?.current)) return;
     let call = peer.call(peerId, videoRef?.current?.srcObject);
     call.on("stream", (remoteStream) => {
-      // console.log(`setting remoteStream for 2nd user here ---- `);
+      //  
       setDisplayMsg({ showMsg: false, msg: "" });
       setIsTraineeJoined(true);
       remoteVideoRef.current.srcObject = remoteStream;
@@ -522,7 +522,7 @@ useEffect(() => {
     });
     // })
     // .catch((err) => {
-    //     console.log('Failed to get local stream', err);
+    //      
     // });
   };
 
@@ -549,17 +549,17 @@ useEffect(() => {
 
     // Handle signaling events from the signaling server
     socket.on(EVENTS.VIDEO_CALL.ON_OFFER, (offer) => {
-      // console.log(` -- on OFFER --`);
+      //  
       peerRef.current?.signal(offer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ANSWER, (answer) => {
-      // console.log(` -- on answer --`);
+      //  
       peerRef.current?.signal(answer);
     });
 
     socket.on(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, (candidate) => {
-      // console.log(` -- on ICE candidate --`);
+      //  
       peerRef.current?.signal(candidate);
     });
 
@@ -580,9 +580,9 @@ useEffect(() => {
       // if (remoteVideoRef.current && remoteVideoRef.current.srcObject) {
       //   remoteVideoRef.current.srcObject.getVideoTracks()[0].enabled =
       //     feedStatus;
-      //   console.log("====================================");
-      //   console.log(feedStatus, "feedStatus");
-      //   console.log("====================================");
+      //    
+      //    
+      //    
       //   setRemoteVideoOff(feedStatus);
       // } else {
       //   // remoteVideoRef.current.srcObject.getVideoTracks()[0].enabled = feedStatus;
@@ -667,7 +667,7 @@ useEffect(() => {
 
   // NOTE - call end
   const cutCall = () => {
-    // console.log(`--- cut call --- `);
+    //  
     stopRecording();
     cleanupFunction();
     if (isTraineeJoined && AccountType.TRAINER === accountType) {
@@ -972,7 +972,7 @@ useEffect(() => {
         drawShapes();
         context.stroke();
       } else {
-        // console.log(`--- drawing ---- `);
+        //  
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
         context.lineCap = "round";
@@ -984,7 +984,7 @@ useEffect(() => {
     const stopDrawing = (event) => {
       event.preventDefault();
       if (state.mousedown) {
-        // console.log(`--- stop drawing ---- `);
+        //  
         sendStopDrawingEvent();
         isDrawing = false;
         state.mousedown = false;
@@ -1064,7 +1064,7 @@ useEffect(() => {
       reader.onload = (event) => {
         if (!(event && event.target)) return;
         const binaryData = event.target.result;
-        // console.log(`emit draw event---`);
+        //  
         socket.emit(EVENTS.DRAW, {
           userInfo: { from_user: fromUser._id, to_user: toUser._id },
           // storedEvents,
@@ -1241,7 +1241,7 @@ useEffect(() => {
       trainer: fromUser?._id,
       trainee: toUser?._id,
     });
-    // console.log(res, "set screenshot data for session");
+    //  
     setScreenShots(res?.data?.reportData);
     setReportObj({ title: res?.data?.title, topic: res?.data?.description });
   };
@@ -1269,7 +1269,7 @@ useEffect(() => {
       ctx.clearRect(0, 0, w, h); // clean the canvas
       return true;
     } catch (e) {
-      // console.log(e);
+      //  
     }
   }
 
@@ -1300,7 +1300,7 @@ useEffect(() => {
     const ChevronRight = document.getElementById("ChevronRight");
     const Timer = document.getElementById("sessionEndTime");
     const ssTooltip = document.querySelector(".custom-tooltip-hh");
-    // console.log(ssTooltip, 'ssTooltip')
+    //  
     if (ssTooltip) {
       ssTooltip.style.transition = "opacity 1s";
       ssTooltip.style.visibility = 'hidden';
@@ -1387,10 +1387,10 @@ useEffect(() => {
       useCORS:true
      }).then(async (canvas) => {
       // document.body.appendChild(canvas);
-      // console.log("1366=======S3",{canvas})
+      //  
  
       const dataUrl = canvas.toDataURL("image/png");
-      // console.log("1367=======S3",{dataUrl})
+      //  
       // screenShots.push({
       //   title: "",
       //   description: "",
@@ -1538,7 +1538,7 @@ useEffect(() => {
   //NOTE -  listening both selected clips and swapped videos with single event by type
   socket.on(EVENTS.ON_VIDEO_SELECT, ({ type, videos, mainScreen }) => {
     if (type === "clips") {
-      // console.log(videos, "videos");
+      //  
       setSelectedClips([...videos]);
       if (videos?.length) {
         resetInitialPinnedUser()
@@ -1691,7 +1691,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
 };
 
 const togglePlay = (num) => {
-  console.log("whichvideo",num)
+   
   if (num === 'one' && showThumbnailForFirstVideo) {
       setShowThumbnailForFirstVideo(false);
   }
@@ -1759,7 +1759,7 @@ const togglePlay = (num) => {
 };
 
 
-  // console.log("video time--------->",videoTime)
+  //  
   const handleTimeUpdate = (videoRef, progressBarRef, number) => {
     
     if (!videoRef.current) return; // Ensure videoRef is valid
@@ -1972,11 +1972,11 @@ const togglePlay = (num) => {
         onUploadProgress: (progressEvent) => {
           const { loaded, total } = progressEvent;
           const percentCompleted = (loaded / total) * 100;
-          // console.log("percentCompletedpercentCompleted", percentCompleted);
+          //  
         },
       })
       .then((response) => {
-        // console.log(response);
+        //  
       })
       .catch((error) => {
         // console.error("Error:", error);
@@ -2014,7 +2014,7 @@ const togglePlay = (num) => {
 
 
   const renderCallActionButtons = () => {
-    // console.log("code:0.0.2" + session_end_time);
+    //  
     return (
       <div className="call-action-buttons z-50 my-3 " >
         <Tooltip
@@ -2064,9 +2064,9 @@ const togglePlay = (num) => {
               } ml-3`}
             style={{ height: '4vw', width: '4vw' }}
             onClick={() => {
-              // console.log("outside of local stream  statement");
+              //  
               if (localStream) {
-                // console.log("inside of local stream  statement");
+                //  
                 localStream.getVideoTracks().forEach((track) => {
                   track.enabled = !track.enabled; // Toggle camera state
                 });
@@ -2330,7 +2330,7 @@ const togglePlay = (num) => {
 
       // Check if the browser can play this video type
       if (video.canPlayType(mimeType)) {
-        // console.log(`This browser can play ${fileExtension} videos`);
+        //  
         return true;
       } else {
         // console.warn(`This browser cannot play ${fileExtension} videos`);
@@ -2355,7 +2355,7 @@ const togglePlay = (num) => {
   // } else {
   //   // Show alternative content or message
   // }
-  // console.log('..pinnedUser...',pinnedUser)
+  //  
 
 
   const calculateCanvasDimensions = () => {
@@ -2455,7 +2455,7 @@ useEffect(() => {
   // Initial delayed call to update canvas dimensions
   const initialTimeoutId = setTimeout(() => {
       updateCanvasDimensions();
-      console.log('Initial delayed call to updateCanvasDimensions');
+       
   }, delay);
 
   // Set up delayed resize event listener

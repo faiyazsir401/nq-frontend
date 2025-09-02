@@ -6,7 +6,7 @@ import UploadClipCard from "../../videoupload/UploadClipCard";
 
 const StudentDetail = ({ videoClips, data }) => {
   // useEffect(() => {
-  //   console.log("Received Data in StudentDetail:", data);
+  //    
   // }, [data]);
   const [progress,setProgress] = useState(0)
   const width600 = useMediaQuery(700);

@@ -111,7 +111,7 @@ const TrainersDetails = ({
         search: searchTerm,
       };
       dispatch(getTraineeWithSlotsAsync(filterPayload));
-      console.log(`searchQuery --- `, searchTerm, filterParams);
+       
     }
   }, [filterParams]);
 
@@ -1099,7 +1099,7 @@ const SelectedCategory = ({
                     <Input
                       defaultChecked={time.id === FILTER_DEFAULT_CHECKED_ID}
                       onChange={(event) => {
-                        console.log(`event --- `, event);
+                         
                         const pickedId = event.target.value;
                         const selectedLog = FILTER_TIME.find(
                           (time) => time.id === +pickedId
@@ -1165,7 +1165,7 @@ const SelectedCategory = ({
                       <h3
                         className="card-title pointer underline"
                         onClick={() => {
-                          console.log(`data`);
+                           
                           dispatch(handleTrainerAvailable(null));
                           setTrainerDetails((prev) => ({
                             ...prev,

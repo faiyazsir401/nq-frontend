@@ -25,9 +25,9 @@ const OneOnOneCall = ({
 }) => {
   const socket = useContext(SocketContext);
   const { accountType } = useAppSelector(authState);
-  console.log("selectedUser", selectedUser);
-  console.log("toUser", toUser._id);
-  console.log("fromUser", fromUser._id);
+   
+   
+   
 
   useEffect(()=>{
     setShowScreenshotButton(false)

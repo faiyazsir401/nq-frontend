@@ -114,6 +114,16 @@ const VideoContainer = ({
     const zoomFactor = delta < 0 ? 1.1 : 0.9;
     const newScale = Math.max(1, Math.min(5, scale * zoomFactor));
 
+    console.log("🔍 [VideoContainer] Wheel zoom event", {
+      delta,
+      zoomFactor,
+      oldScale: scale,
+      newScale,
+      clipId: clip?._id,
+      index,
+      accountType
+    });
+
     setScale(newScale);
 
     socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
@@ -129,6 +139,15 @@ const VideoContainer = ({
 
     // Increase the scale by 0.5, with a maximum value of 5
     const newScale = Math.min(5, scale + 0.2);
+    
+    console.log("🔍 [VideoContainer] Zoom in button clicked", {
+      oldScale: scale,
+      newScale,
+      clipId: clip?._id,
+      index,
+      accountType
+    });
+    
     setScale(newScale);
 
     socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
@@ -144,7 +163,15 @@ const VideoContainer = ({
 
     // Decrease the scale by 0.5, with a minimum value of 1
     const newScale = Math.max(1, scale - 0.2);
-    console.log("newScale", newScale);
+    
+    console.log("🔍 [VideoContainer] Zoom out button clicked", {
+      oldScale: scale,
+      newScale,
+      clipId: clip?._id,
+      index,
+      accountType
+    });
+     
     setScale(newScale);
 
     socket?.emit(EVENTS?.ON_VIDEO_ZOOM_PAN, {
@@ -170,6 +197,16 @@ const VideoContainer = ({
         const scaleChange = currentDistance / lastTouch;
         const newScale = Math.max(1, Math.min(5, scale * scaleChange));
 
+        console.log("🔍 [VideoContainer] Touch zoom", {
+          oldScale: scale,
+          newScale,
+          scaleChange,
+          currentDistance,
+          lastTouch,
+          clipId: clip?._id,
+          index
+        });
+
         setScale(newScale);
       }
       setLastTouch(currentDistance);
@@ -181,6 +218,15 @@ const VideoContainer = ({
 
       let newX = translate.x + deltaX;
       let newY = translate.y + deltaY;
+
+      console.log("🖐️ [VideoContainer] Touch pan", {
+        oldTranslate: translate,
+        newTranslate: { x: newX, y: newY },
+        deltaX,
+        deltaY,
+        clipId: clip?._id,
+        index
+      });
 
       setTranslate({ x: newX, y: newY });
       setDragStart({ x: touch.pageX, y: touch.pageY });
@@ -217,9 +263,25 @@ const VideoContainer = ({
   // Play/pause video
   const togglePlayPause = () => {
     const video = videoRef?.current;
-    console.log("video hai", video);
+    console.log("🎬 [VideoContainer] togglePlayPause called", {
+      videoExists: !!video,
+      videoPaused: video?.paused,
+      clipId: clip?._id,
+      currentTime: video?.currentTime,
+      duration: video?.duration,
+      isVideoLoading,
+      accountType,
+      index
+    });
+    
     if (video) {
       if (video.paused) {
+        console.log("▶️ [VideoContainer] Playing video", {
+          clipId: clip?._id,
+          currentTime: video.currentTime,
+          duration: video.duration,
+          index
+        });
         video.play();
         setIsPlaying(true);
         socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
@@ -228,6 +290,12 @@ const VideoContainer = ({
           isPlaying: true,
         });
       } else {
+        console.log("⏸️ [VideoContainer] Pausing video", {
+          clipId: clip?._id,
+          currentTime: video.currentTime,
+          duration: video.duration,
+          index
+        });
         video.pause();
         setIsPlaying(false);
         socket?.emit(EVENTS?.ON_VIDEO_PLAY_PAUSE, {
@@ -237,7 +305,7 @@ const VideoContainer = ({
         });
       }
     } else {
-      console.log("video not loaded yet");
+      console.warn("⚠️ [VideoContainer] Video not loaded yet", { clipId: clip?._id, index });
     }
   };
 
@@ -245,11 +313,30 @@ const VideoContainer = ({
     const video = videoRef?.current;
 
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+      console.log("📡 [VideoContainer] Received ON_VIDEO_PLAY_PAUSE event", {
+        receivedData: data,
+        clipId: clip?._id,
+        isMatch: data?.videoId === clip?._id,
+        shouldPlay: data?.isPlaying,
+        videoPaused: video?.paused,
+        index
+      });
+      
       if (data?.videoId === clip?._id && data?.isPlaying) {
         // Only play if the video matches and the action is play
         if (video?.paused) {
+          console.log("▶️ [VideoContainer] Playing video from socket event", {
+            clipId: clip?._id,
+            currentTime: video.currentTime,
+            index
+          });
           video.play();
           setIsPlaying(true);
+        } else {
+          console.log("ℹ️ [VideoContainer] Video already playing, no action needed", {
+            clipId: clip?._id,
+            index
+          });
         }
       }
     });
@@ -257,28 +344,58 @@ const VideoContainer = ({
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
       if (data?.videoId === clip?._id && !data?.isPlaying) {
         if (video?.play) {
+          console.log("⏸️ [VideoContainer] Pausing video from socket event", {
+            clipId: clip?._id,
+            currentTime: video.currentTime,
+            index
+          });
           video.pause();
           setIsPlaying(false);
+        } else {
+          console.log("ℹ️ [VideoContainer] Video already paused, no action needed", {
+            clipId: clip?._id,
+            index
+          });
         }
       }
     });
 
     socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
+      console.log("📡 [VideoContainer] Received ON_VIDEO_TIME event", {
+        receivedData: data,
+        clipId: clip?._id,
+        isMatch: data?.videoId === clip?._id,
+        isTrainee: accountType === AccountType.TRAINEE,
+        currentTime: video?.currentTime,
+        newTime: data?.progress,
+        index
+      });
+      
       if (data?.videoId === clip?._id && accountType === AccountType.TRAINEE) {
+        const oldTime = video?.currentTime;
         video.currentTime = data.progress;
+        console.log("⏩ [VideoContainer] Video time synced from socket", {
+          clipId: clip?._id,
+          from: oldTime,
+          to: data.progress,
+          index
+        });
       }
     });
     const handleZoomPanChange = (data) => {
+      console.log("📡 [VideoContainer] Received ON_VIDEO_ZOOM_PAN event", {
+        receivedData: data,
+        clipId: clip?._id,
+        isMatch: data?.videoId === clip?._id,
+        isTrainee: accountType === AccountType.TRAINEE,
+        currentScale: scale,
+        currentTranslate: translate,
+        newScale: data?.zoom,
+        newPan: data?.pan,
+        index
+      });
+      
       if (data?.videoId === clip?._id) {
-        console.log(
-          "Received zoom:",
-          data.zoom,
-          "Received pan:",
-          data.pan,
-          "Clip Video ID:",
-          clip?._id
-        );
-
         // If the current user is the Trainee, apply the zoom and pan changes
         if (accountType === AccountType.TRAINEE) {
           // Only update if the zoom or pan values are different to avoid unnecessary re-renders
@@ -287,8 +404,21 @@ const VideoContainer = ({
             data.pan?.x !== translate.x ||
             data.pan?.y !== translate.y
           ) {
+            console.log("🔄 [VideoContainer] Applying zoom/pan changes from socket", {
+              clipId: clip?._id,
+              oldScale: scale,
+              newScale: data.zoom,
+              oldTranslate: translate,
+              newTranslate: data.pan,
+              index
+            });
             setScale(data.zoom);
             setTranslate(data.pan);
+          } else {
+            console.log("ℹ️ [VideoContainer] No zoom/pan changes needed", {
+              clipId: clip?._id,
+              index
+            });
           }
         }
       }
@@ -304,7 +434,7 @@ const VideoContainer = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
     };
   }, [socket, clip?._id, videoRef]);
-  // console.log("IsVideoLoaded",isVideoLoaded)
+  //  
   // useEffect(() => {
   //   const video = videoRef?.current;
   //   if (!video) return;
@@ -326,7 +456,7 @@ const VideoContainer = ({
   //   //   setVideoProgress(100);
   //   //   setIsVideoLoaded(true);
       
-  //   //   console.log(`Video ${clip?.id} loaded successfully`);
+  //   //    
   //   // };
   
   //   // const handleError = (error,isMessage=true) => {
@@ -347,17 +477,17 @@ const VideoContainer = ({
   //   // };
   
   //   // const handleStalled = () => {
-  //   //   console.log("Video playback stalled");
+  //   //    
   //   //   // Don't reset loading state on stall, just log it
   //   // };
   
   //   // const handleWaiting = () => {
-  //   //   console.log("Video waiting for data");
+  //   //    
   //   //   // Don't reset loading state on waiting, just log it
   //   // };
 
   //   // const handleVideoLoadStart = () => {
-  //   //   console.log(`Video ${clip?.id} load started`);
+  //   //    
   //   //   setIsVideoLoading(true);
   //   //   setVideoProgress(0);
   //   //   setIsVideoLoaded(false);
@@ -366,7 +496,7 @@ const VideoContainer = ({
   //   //   setTimeout(() => {
   //   //     if (!isVideoLoaded && videoProgress === 0) {
   //   //       setVideoProgress(5);
-  //   //       console.log(`Video ${clip?.id} initial progress: 5%`);
+  //   //        
   //   //     }
   //   //   }, 200);
   //   // };
@@ -378,7 +508,7 @@ const VideoContainer = ({
   //   //     const duration = video.duration;
   //   //     const progress = (bufferedEnd / duration) * 100;
   //   //     setVideoProgress(Math.round(progress));
-  //   //     console.log(`Video ${clip?.id} progress: ${Math.round(progress)}%`);
+  //   //      }%`);
   //   //   }
   //   // };
 
@@ -411,7 +541,7 @@ const VideoContainer = ({
   //         const finalProgress = Math.max(videoProgress + minIncrement, newProgress);
           
   //         setVideoProgress(Math.min(finalProgress, 100));
-  //         console.log(`Video ${clip?.id} interval progress: ${Math.min(finalProgress, 100)}%`);
+  //          }%`);
   //       }
         
   //       // If video is ready but we haven't completed, force completion
@@ -422,34 +552,34 @@ const VideoContainer = ({
   //   }, 150); // Check every 150ms for smoother progress updates
 
   //   const handleVideoCanPlay = () => {
-  //     console.log(`Video ${clip?.id} can play`);
+  //      
   //     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
   //       // Ensure we show some progress before completing
   //       if (videoProgress < 90) {
   //         setVideoProgress(90);
-  //         console.log(`Video ${clip?.id} final progress: 90%`);
+  //          
   //       }
   //       setTimeout(() => handleVideoLoadComplete(), 100);
   //     }
   //   };
 
   //   const handleVideoCanPlayThrough = () => {
-  //     console.log(`Video ${clip?.id} can play through`);
+  //      
   //     // Ensure we show some progress before completing
   //     if (videoProgress < 95) {
   //       setVideoProgress(95);
-  //       console.log(`Video ${clip?.id} final progress: 95%`);
+  //        
   //     }
   //     setTimeout(() => handleVideoLoadComplete(), 100);
   //   };
 
   //   const handleVideoLoadedData = () => {
-  //     console.log(`Video ${clip?.id} loaded data`);
+  //      
   //     if (video.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
   //       // Ensure we show some progress before completing
   //       if (videoProgress < 85) {
   //         setVideoProgress(85);
-  //         console.log(`Video ${clip?.id} loaded data progress: 85%`);
+  //          
   //       }
   //       setTimeout(() => handleVideoLoadComplete(), 100);
   //     }
@@ -489,7 +619,7 @@ const VideoContainer = ({
   //       console.warn(`Video ${clip?.id} loading timeout - readyState: ${video.readyState}`);
   //       handleError(new Error('Loading timeout'),false);
   //     } else if (isVideoLoaded) {
-  //       console.log(`Video ${clip?.id} already loaded, clearing timeout`);
+  //        
   //     }
   //   }, 15000); // 15 second timeout
   
@@ -510,10 +640,10 @@ const VideoContainer = ({
   //   };
   // }, [videoRef, clip?.id, isVideoLoaded]);
 
-  console.log("sky.zoom", scale);
-  console.log("sky.pan", translate);
-  console.log("sky.dragStart", dragStart);
-  console.log("sky.lastTouch", lastTouch);
+   
+   
+   
+   
 
   // // Handle volume change
   // const changeVolume = (e) => {
@@ -548,15 +678,39 @@ const VideoContainer = ({
   // Handle seeking
   const handleSeek = (e) => {
     const video = videoRef?.current;
+    const progress = parseFloat(e.target.value);
+    
+    console.log("🎯 [VideoContainer] handleSeek called", {
+      progress,
+      oldTime: video?.currentTime,
+      duration: video?.duration,
+      clipId: clip?._id,
+      index,
+      accountType
+    });
+    
     if (video) {
-      const progress = e.target.value;
-
+      const oldTime = video.currentTime;
       video.currentTime = progress;
       setCurrentTime(progress);
+      
+      console.log("⏩ [VideoContainer] Video seeked", {
+        clipId: clip?._id,
+        from: oldTime,
+        to: progress,
+        duration: video.duration,
+        index
+      });
+      
       socket?.emit(EVENTS?.ON_VIDEO_TIME, {
         userInfo: { from_user: fromUser?._id, to_user: toUser?._id },
         videoId: clip._id,
         progress,
+      });
+    } else {
+      console.warn("⚠️ [VideoContainer] Cannot seek - video not available", {
+        clipId: clip?._id,
+        index
       });
     }
   };
@@ -587,7 +741,7 @@ const VideoContainer = ({
       canvas.width = width;
       canvas.height = height;
       
-      console.log('Canvas dimensions updated:', width, height);
+       
     };
   
     // Initial setup
@@ -601,9 +755,14 @@ const VideoContainer = ({
   }, [canvasRef, videoContainerRef]);
 
   useEffect(() => {
+    console.log("🔄 [VideoContainer] Clip changed, resetting video state", {
+      clipId: clip?._id,
+      index,
+      accountType
+    });
     setHasAutopaused(false);
     setIsVideoLoading(true);
-  }, [clip]);
+  }, [clip?._id, index, accountType]);
 
   return (
     <>
@@ -724,15 +883,68 @@ const VideoContainer = ({
                 poster={Utils?.generateThumbnailURL(clip)}
                 preload="auto"
                 crossOrigin="anonymous"
-                onLoadedData={() => setIsVideoLoading(false)}
-                onCanPlayThrough={() => setIsVideoLoading(false)} 
-                onWaiting={() => setIsVideoLoading(true)} 
-                onPlay={(e) => {
-                  if (!hasAutopaused) {
-                    e.currentTarget.pause(); // only pause once (the autoplay)
-                    setHasAutopaused(true);
-                    setIsVideoLoading(false);
+                onLoadedData={(e) => {
+                  try {
+                  console.log("📹 [VideoContainer] Video data loaded", {
+                    clipId: clip?._id,
+                    index,
+                    currentTime: e?.currentTarget?.currentTime,
+                    duration: e?.currentTarget?.duration
+                  });
+                  setIsVideoLoading(false);
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onLoadedData event", error);
                   }
+                }}
+                onCanPlayThrough={(e) => {
+                  try {
+                  console.log("✅ [VideoContainer] Video can play through", {
+                    clipId: clip?._id,
+                    index,
+                    currentTime: e?.currentTarget?.currentTime,
+                    duration: e?.currentTarget?.duration
+                  });
+                  setIsVideoLoading(false);
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onCanPlayThrough event", error);
+                  }
+                }} 
+                onWaiting={(e) => {
+                  try {
+                    console.log("⏳ [VideoContainer] Video waiting for data", {
+                      clipId: clip?._id,
+                      index,
+                      currentTime: e?.currentTarget?.currentTime
+                    });
+                    setIsVideoLoading(true);
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onWaiting event", error);
+                  }
+                
+                }} 
+                onPlay={(e) => {
+                  try {
+                    console.log("▶️ [VideoContainer] Video play event triggered", {
+                      clipId: clip?._id,
+                      index,
+                      hasAutopaused,
+                      currentTime: e.currentTarget.currentTime,
+                      duration: e.currentTarget.duration
+                    });
+                    
+                    if (!hasAutopaused) {
+                      console.log("⏸️ [VideoContainer] Auto-pausing video (autoplay prevention)", {
+                        clipId: clip?._id,
+                        index
+                      });
+                      e.currentTarget.pause(); // only pause once (the autoplay)
+                      setHasAutopaused(true);
+                      setIsVideoLoading(false);
+                    }
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onPlay event", error);
+                  }
+                  
                 }}
               >
                 <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
@@ -905,12 +1117,24 @@ const ClipModeCall = ({
     const video2 = videoRef2.current;
 
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+      console.log("📡 [ClipModeCall] Received ON_VIDEO_PLAY_PAUSE event (dual)", {
+        receivedData: data,
+        isBoth: data?.both,
+        shouldPlay: data?.isPlaying,
+        video1Paused: video1?.paused,
+        video2Paused: video2?.paused,
+        accountType
+      });
+      
       if (data?.both && data?.isPlaying) {
         // Only play if the video matches and the action is play
         if (video1?.paused) {
+          console.log("▶️ [ClipModeCall] Playing both videos from socket event");
           video1.play();
           video2.play();
           setIsPlayingBoth(true);
+        } else {
+          console.log("ℹ️ [ClipModeCall] Videos already playing, no action needed");
         }
       }
     });
@@ -918,17 +1142,37 @@ const ClipModeCall = ({
     socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
       if (data?.both && !data?.isPlaying) {
         if (video1?.play) {
+          console.log("⏸️ [ClipModeCall] Pausing both videos from socket event");
           video1.pause();
           video2.pause();
           setIsPlayingBoth(false);
+        } else {
+          console.log("ℹ️ [ClipModeCall] Videos already paused, no action needed");
         }
       }
     });
 
     socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
+      console.log("📡 [ClipModeCall] Received ON_VIDEO_TIME event (dual)", {
+        receivedData: data,
+        isBoth: data?.both,
+        isTrainee: accountType === AccountType.TRAINEE,
+        video1Time: video1?.currentTime,
+        video2Time: video2?.currentTime,
+        newTime: data?.progress
+      });
+      
       if (data?.both && accountType === AccountType.TRAINEE) {
+        const oldTime1 = video1.currentTime;
+        const oldTime2 = video2.currentTime;
+        
         video1.currentTime = data.progress;
         video2.currentTime = data.progress;
+        
+        console.log("⏩ [ClipModeCall] Both videos synced from socket", {
+          from: { video1: oldTime1, video2: oldTime2 },
+          to: data.progress
+        });
       }
     });
 
@@ -945,9 +1189,19 @@ const ClipModeCall = ({
     });
 
     socket?.on(EVENTS.TOGGLE_LOCK_MODE, (data) => {
+      console.log("📡 [ClipModeCall] Received TOGGLE_LOCK_MODE event", {
+        receivedData: data,
+        isTrainee: accountType === AccountType.TRAINEE,
+        currentLockState: isLock,
+        newLockState: data.isLockMode
+      });
+      
       if (accountType === AccountType.TRAINEE) {
+        console.log("🔒 [ClipModeCall] Updating lock mode from socket", {
+          from: isLock,
+          to: data.isLockMode
+        });
         setIsLock(data.isLockMode);
-       
       }
     });
 
@@ -971,8 +1225,26 @@ const ClipModeCall = ({
   const togglePlayPause = () => {
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
+    
+    console.log("🎬 [ClipModeCall] togglePlayPause called (dual video)", {
+      video1Exists: !!video1,
+      video2Exists: !!video2,
+      video1Paused: video1?.paused,
+      video2Paused: video2?.paused,
+      video1Time: video1?.currentTime,
+      video2Time: video2?.currentTime,
+      video1Duration: video1?.duration,
+      video2Duration: video2?.duration,
+      isLock,
+      accountType
+    });
+    
     if (video1 && video2) {
       if (video1.paused) {
+        console.log("▶️ [ClipModeCall] Playing both videos", {
+          video1Time: video1.currentTime,
+          video2Time: video2.currentTime
+        });
         video1.play();
         video2.play();
         setIsPlayingBoth(true);
@@ -982,6 +1254,10 @@ const ClipModeCall = ({
           isPlaying: true,
         });
       } else {
+        console.log("⏸️ [ClipModeCall] Pausing both videos", {
+          video1Time: video1.currentTime,
+          video2Time: video2.currentTime
+        });
         video1.pause();
         video2.pause();
         setIsPlayingBoth(false);
@@ -991,13 +1267,33 @@ const ClipModeCall = ({
           isPlaying: false,
         });
       }
+    } else {
+      console.warn("⚠️ [ClipModeCall] Cannot toggle play/pause - videos not available", {
+        video1Exists: !!video1,
+        video2Exists: !!video2
+      });
     }
   };
 
   const handleSeek = (e) => {
     const newProgress = parseFloat(e.target.value);
 
-    if (!videoRef?.current || !videoRef2?.current) return;
+    console.log("🎯 [ClipModeCall] handleSeek called (dual video)", {
+      newProgress,
+      video1Exists: !!videoRef?.current,
+      video2Exists: !!videoRef2?.current,
+      video1Time: videoRef?.current?.currentTime,
+      video2Time: videoRef2?.current?.currentTime,
+      video1Duration: videoRef?.current?.duration,
+      video2Duration: videoRef2?.current?.duration,
+      isLock,
+      accountType
+    });
+
+    if (!videoRef?.current || !videoRef2?.current) {
+      console.warn("⚠️ [ClipModeCall] Cannot seek - videos not available");
+      return;
+    }
 
     const video1 = videoRef.current;
     const video2 = videoRef2.current;
@@ -1006,8 +1302,21 @@ const ClipModeCall = ({
     const longerVideo = isVideo1Longer ? video1 : video2;
     const shorterVideo = isVideo1Longer ? video2 : video1;
 
+    const oldTime1 = video1.currentTime;
+    const oldTime2 = video2.currentTime;
+
     // Calculate the delta (difference) in progress
     const delta = newProgress - longerVideo.currentTime;
+
+    console.log("⏩ [ClipModeCall] Seeking both videos", {
+      isVideo1Longer,
+      longerVideoDuration: longerVideo.duration,
+      shorterVideoDuration: shorterVideo.duration,
+      oldTime1,
+      oldTime2,
+      newProgress,
+      delta
+    });
 
     // Apply delta to both videos while ensuring shorterVideo does not exceed limits
     longerVideo.currentTime = newProgress;
@@ -1018,6 +1327,13 @@ const ClipModeCall = ({
 
     // Update state
     setCurrentTime(longerVideo.currentTime);
+
+    console.log("✅ [ClipModeCall] Videos seeked successfully", {
+      video1NewTime: video1.currentTime,
+      video2NewTime: video2.currentTime,
+      longerVideoTime: longerVideo.currentTime,
+      shorterVideoTime: shorterVideo.currentTime
+    });
 
     // Emit event with the new progress
     socket?.emit(EVENTS?.ON_VIDEO_TIME, {
@@ -1055,7 +1371,7 @@ const ClipModeCall = ({
   };
 
   const sendStopDrawingEvent = (canvasIndex = 1) => {
-    console.log("canvassendStopDrawingEvent", canvasIndex);
+     
     if (remoteVideoRef && remoteVideoRef.current) {
       socket.emit(EVENTS.STOP_DRAWING, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
@@ -1065,14 +1381,14 @@ const ClipModeCall = ({
   };
 
   // const [drawingStep, setDrawingStep] = useState("baseline")
-  // console.log("drawingStep", drawingStep)
+  //  
   const stopDrawing = (event, canvasIndex = 1) => {
-    console.log("stopDrawingexcuted")
+     
     event.preventDefault();
 
     if (selectedShape === SHAPES.ANGLE) {
       if (drawingStep === 'baseline' && currPos[`canvas${canvasIndex}`]) {
-        console.log("stop-drawingStep", drawingStep, startPos, currPos)
+         
 
         // If we're in baseline step and we completed it, move to angle drawing step
         lastDrawingStep = "baseline"
@@ -1094,7 +1410,7 @@ const ClipModeCall = ({
   };
 
   const sendDrawEvent = (canvasIndex = 1) => {
-    console.log("canvassendDrawEvent", canvasIndex);
+     
     try {
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
@@ -1116,14 +1432,14 @@ const ClipModeCall = ({
         reader.readAsArrayBuffer(blob);
       });
     } catch (error) {
-      console.log("error", error);
+       
     }
   };
 
   socket.on(
     EVENTS.EMIT_DRAWING_CORDS,
     ({ strikes, canvasSize, canvasIndex }) => {
-      console.log("is sending data");
+       
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
       const context = canvas?.getContext("2d");
@@ -1151,7 +1467,7 @@ const ClipModeCall = ({
     removeLastCoordinate = true,
     canvasIndex = 1
   ) => {
-    console.log("canvasundoDrawing", canvasIndex);
+     
     try {
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
@@ -1196,7 +1512,7 @@ const ClipModeCall = ({
 
       if (strikes[`canvas${canvasIndex}`].length <= 0) return;
       context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
-      console.log("drawingStep", drawingStep, selectedShape, lastDrawingStep)
+       
       if (drawingStep === "baseline" && selectedShape === SHAPES.ANGLE && lastDrawingStep === "angle") {
         context.putImageData(strikes[`canvas${canvasIndex}`].pop(), 0, 0);
       }
@@ -1205,25 +1521,25 @@ const ClipModeCall = ({
         sendEmitUndoEvent(canvasIndex);
       }
     } catch (error) {
-      console.log("error", error);
+       
     }
   };
 
   const calculateAngle = (start, end, angle) => {
-    console.log("start", start, end, angle)
+     
     const dx1 = end.x - start.x;
     const dy1 = end.y - start.y;
     const dx2 = angle.x - end.x;
     const dy2 = angle.y - end.y;
-    console.log("start2", dx1, dy1, dx2, dy2)
+     
     const dotProduct = -(dx1 * dx2 + dy1 * dy2);
-    console.log("start3", dotProduct)
+     
     const magnitude1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
     const magnitude2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-    console.log("start4", magnitude1, magnitude2)
+     
     let angleRad = Math.acos(dotProduct / (magnitude1 * magnitude2));
     let angleDeg = (angleRad * 180) / Math.PI;
-    console.log("start5", angleRad, angleDeg)
+     
 
     return isNaN(angleDeg) ? 0 : angleDeg;
   };
@@ -1274,7 +1590,7 @@ const ClipModeCall = ({
     // Drawing Logic for Canvas 1 and Canvas 2
     const startDrawing = (event, canvasIndex = 1) => {
       try {
-        console.log("canvas", canvasIndex);
+         
         event.preventDefault();
         isDrawing = true;
         const canvas =
@@ -1304,7 +1620,7 @@ const ClipModeCall = ({
         context.moveTo(mousePos.x, mousePos.y);
         state.mousedown[`canvas${canvasIndex}`] = true;
         if (selectedShape === SHAPES.ANGLE) {
-          console.log("drawingStep", drawingStep)
+           
           if (drawingStep === "baseline") {
 
             startPos[`canvas${canvasIndex}`] = { x: mousePos.x, y: mousePos.y };
@@ -1320,7 +1636,7 @@ const ClipModeCall = ({
         }
 
       } catch (error) {
-        console.log("error", error);
+         
       }
     };
 
@@ -1532,7 +1848,7 @@ const ClipModeCall = ({
     };
 
     const draw = (event, canvasIndex = 1) => {
-      console.log("canvasDraw", canvasIndex);
+       
       event.preventDefault();
       const canvas =
         canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
@@ -1544,7 +1860,7 @@ const ClipModeCall = ({
         ? getTouchPos(event, canvas)
         : getMousePositionOnCanvas(event, canvas);
 
-      console.log("selectedShape1", selectedShape);
+       
       if (selectedShape === SHAPES.FREE_HAND) {
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
@@ -1578,7 +1894,7 @@ const ClipModeCall = ({
           const completeComputedAngle = calculateCompleteAngle(startPos[`canvas${canvasIndex}`],
             currPos[`canvas${canvasIndex}`],
             mousePos)
-          console.log("completeComputedAngle", completeComputedAngle)
+           
           // Optionally, display the angle computed (you can use context.fillText)
           context.fillStyle = canvasConfigs.sender.strokeStyle;
           context.font = "16px Arial";
@@ -1592,7 +1908,7 @@ const ClipModeCall = ({
         }
 
       } else {
-        // console.log(`--- drawing ---- `);
+        //  
         currPos[`canvas${canvasIndex}`] = { x: mousePos?.x, y: mousePos.y };
         context.putImageData(savedPos[`canvas${canvasIndex}`], 0, 0);
         context.beginPath();
@@ -1669,7 +1985,7 @@ const ClipModeCall = ({
   const isSingle = selectedClips?.length === 1;
 
 
-  console.log("selectedClips-sky", selectedClips)
+   
 
   return (
     <>
@@ -1708,17 +2024,29 @@ const ClipModeCall = ({
               <div
                 className="button video-lock  ml-1"
                 onClick={() => {
+                  const newLockState = !isLock;
+                  const lockPointTemp = !isLock
+                    ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                      ? videoRef.current?.currentTime || 0
+                      : videoRef2.current?.currentTime || 0
+                    : videoRef.current?.currentTime || 0;
+                  
+                  console.log("🔒 [ClipModeCall] Toggling lock mode", {
+                    oldLockState: isLock,
+                    newLockState,
+                    lockPointTemp,
+                    video1Time: videoRef.current?.currentTime,
+                    video2Time: videoRef2.current?.currentTime,
+                    video1Duration: videoRef.current?.duration,
+                    video2Duration: videoRef2.current?.duration,
+                    accountType
+                  });
+                  
                   socket.emit(EVENTS.TOGGLE_LOCK_MODE, {
                     userInfo: { from_user: fromUser._id, to_user: toUser._id },
-                    isLockMode: !isLock,
+                    isLockMode: newLockState,
                   });
-                  setIsLock(!isLock);
-                  const lockPointTemp = !isLock
-                  ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
-                    ? videoRef.current?.currentTime || 0
-                    : videoRef2.current?.currentTime || 0
-                  : videoRef.current?.currentTime || 0;
-                  console.log("lockPointTemp",lockPointTemp)
+                  setIsLock(newLockState);
                   setLockPoint(lockPointTemp);
                 }}
               >
@@ -1775,7 +2103,7 @@ const ClipModeCall = ({
                       canvasConfigs = config;
                     }}
                     drawShapes={(shapeType) => {
-                      console.log("shapeType", shapeType);
+                       
                       selectedShape = shapeType;
                     }}
                     refreshDrawing={() => {

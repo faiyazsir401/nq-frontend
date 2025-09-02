@@ -116,7 +116,7 @@ const BookingTable = ({
     );
   }, [getTraineeSlots]);
   useEffect(() => {
-    console.log("transaction", transaction)
+     
     if (
       transaction?.intent?.result?.client_secret
     ) {
@@ -132,7 +132,7 @@ const BookingTable = ({
         //   transaction?.intent?.result?.application_fee_amount / 100,
       };
       dispatch(bookSessionAsync(payload));
-      console.log("newBookingData", payload)
+       
 
       sendNotifications({
         title: notificiationTitles.newBookingRequest,
@@ -160,7 +160,7 @@ const BookingTable = ({
     }
   }, [transaction, bookSessionPayload]);
 
-  console.log("newBookingDatatesting", bookSessionPayload)
+   
 
   // useEffect(() => {
   //   if (status === STATUS.fulfilled) {
@@ -222,9 +222,9 @@ const BookingTable = ({
   //       //     // dispatch(authAction.updateIsAuthModalOpen(true))
   //       //   });
   //       // dispatch(checkSlotAsync(payload));
-  //       console.log("payload",payload)
+  //        
   //       checkSlot(payload).then(res => {
-  //         console.log("payload",res)
+  //          
   //         dispatch(commonAction.setSlots(res.data.availableSlots))
   //       }).catch((err) =>{
   //         dispatch(commonAction.setSlots([]))
@@ -276,7 +276,7 @@ const BookingTable = ({
       {Utils.formateDate(startDate)}
     </span>
   );
-  // console.log(trainerInfo, "trainerInfo");
+  //  
 
   const userIsOnlineOrNot =
     isUserOnline ||
@@ -305,7 +305,7 @@ const BookingTable = ({
               onChange={(date) => {
                 if (date) {
                   let booked_date = DateTime.fromJSDate(date, { zone: 'utc' }); // Sample booked date
-                  console.log("booked_date", booked_date)
+                   
                   const today = DateTime.now();
 
                   // Initialize a variable to store the final formatted date
@@ -338,7 +338,7 @@ const BookingTable = ({
                   } else {
                     // Optional: Handle the case where the booked_date is in the past
                     finalFormattedDate = null; // or any other value you want to set for past dates
-                    console.log("Booked date is in the past.");
+                     
                   }
 
                   const payload = {
@@ -574,7 +574,7 @@ const BookingTable = ({
     );
   };
 
-  console.log("trainerInfo", trainerInfo)
+   
 
   if (trainerInfo?.userInfo?.status !== "approved") {
     return <p style={{ textAlign: "center", color: "red" }}>You cannot book session with unverified trainer!</p>;
@@ -702,7 +702,7 @@ const BookingTable = ({
               let date = new Date();
               if (date) {
                 let booked_date = DateTime.fromJSDate(date, { zone: 'utc' }); // Sample booked date
-                console.log("booked_date", booked_date)
+                 
                 const today = DateTime.now();
 
                 // Initialize a variable to store the final formatted date
@@ -735,7 +735,7 @@ const BookingTable = ({
                 } else {
                   // Optional: Handle the case where the booked_date is in the past
                   finalFormattedDate = null; // or any other value you want to set for past dates
-                  console.log("Booked date is in the past.");
+                   
                 }
 
                 const payload = {

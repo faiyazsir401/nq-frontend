@@ -47,7 +47,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const isMobileScreen= useMediaQuery(600)
   //  const { userInfo } = useAppSelector(authState);
 
-  // console.log("allClips ========>*", allClips)
+  //  
   useEffect(() => {
     let lightbox = new PhotoSwipeLightbox({
       gallery: "#" + "my-test-gallery",
@@ -157,7 +157,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
         };
         //NOTE -  call the SortClips funtion 
         const sortedClips = sortClips(clips);
-        console.log("sortedClips",sortedClips)
+         
         setSortedClips(sortedClips);
       }
     }else{
@@ -173,7 +173,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
         };
         //NOTE -  call the SortClips funtion 
         const sortedClips = sortClips(myClips);
-        console.log("sortedClips",sortedClips)
+         
         setSortedClips(sortedClips);
       }
     }

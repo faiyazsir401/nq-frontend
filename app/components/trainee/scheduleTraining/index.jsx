@@ -275,7 +275,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       });
     }
 
-    //   // console.log("new Date(startDate).toISOStringnew Date(startDate).toISOString", moment(new Date(`${startDate}`).toISOString()).format('YYYY-MM-DD'))
+    //   //  .toISOStringnew Date(startDate).toISOString", moment(new Date(`${startDate}`).toISOString()).format('YYYY-MM-DD'))
   }, [selectedTrainer?.trainer_id]);
 
   // useEffect(() => {
@@ -311,7 +311,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   }, [selectedTrainerInfo?.selected_category]);
 
 
-console.log("getParams1",getParams)
+ 
   const [bookSessionPayload, setBookSessionPayload] = useState({});
   const toggle = () => setInstantScheduleMeeting(!isOpenInstantScheduleMeeting);
 
@@ -327,7 +327,7 @@ console.log("getParams1",getParams)
   };
 
   useEffect(() => {
-    console.log("getParams",getParams)
+     
     if (getParams.search) {
       dispatch(getTraineeWithSlotsAsync(getParams));
     }
@@ -744,7 +744,7 @@ console.log("getParams1",getParams)
       </Popover>
     ));
   };
-  console.log("isMobileScreen",isMobileScreen)
+   
   const renderSearchMenu = () => (
     <div
       onScroll={() => {
@@ -802,7 +802,7 @@ console.log("getParams1",getParams)
             setParams({ search: value });
           }}
           selectedOption={(option) => {
-            console.log(option, "option");
+             
             if (option && option.isCategory) {
               setTrainerInfo((prev) => ({
                 ...prev,

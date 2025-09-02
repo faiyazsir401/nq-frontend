@@ -90,13 +90,13 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
   useEffect(() => {
     if (socket) {
       socket.on('userStatus', (data) => {
-        // console.log("========>data", data)
+        //  
         // setOnlineUsers(data);
         dispatch(authAction.updateOnlineUsers(data?.user))
       });
 
       socket.on('onlineUser', (data) => {
-        // console.log("onlineUser========>data", data)
+        //  
         // setOnlineUsers(data);
         dispatch(authAction.updateOnlineUsers(data?.user))
       });
@@ -108,7 +108,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
     }
   }, [socket]);
 
-  // console.log("onlineUsers===========>", onlineUsers, accountType)/
+  //  /
 
   useEffect(() => {
     setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));

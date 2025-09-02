@@ -142,7 +142,7 @@ function EventModal({ modal, setModal, toggle, data, selectedModalDate, setData,
     //         setSelectedEndTime("")
     //         setError(false)
     //       } catch (error) {
-    //         console.log(error)
+    //          
     //       }
     //     }
     //   }
@@ -152,10 +152,10 @@ function EventModal({ modal, setModal, toggle, data, selectedModalDate, setData,
 
     if (overlap()) {
       setError(true)
-      console.log("error not booked you")
+       
     }
     else {
-      console.log("booking succeusjfuly")
+       
       try {
         let res = await addTrainerSlot({ start_time: selectedStartTime, end_time: selectedEndTime })
         let updatedData = data
@@ -165,7 +165,7 @@ function EventModal({ modal, setModal, toggle, data, selectedModalDate, setData,
         setSelectedEndTime("")
         setError(false)
       } catch (error) {
-        console.log(error)
+         
       }
     }
   }
@@ -176,7 +176,7 @@ function EventModal({ modal, setModal, toggle, data, selectedModalDate, setData,
       data.splice(index, 1)
       setData([...data])
     } catch (error) {
-      console.log(error)
+       
     }
   }
 
@@ -191,7 +191,7 @@ function EventModal({ modal, setModal, toggle, data, selectedModalDate, setData,
         setIndexErr("")
       }
     } catch (error) {
-      console.log(error)
+       
     }
   }
 
@@ -372,7 +372,7 @@ export default function CalendarPage() {
   const [options, setOptions] = useState([])
   const [userTimeZone, setUserTimeZone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone)
   const [view, setView] = useState('dayGridMonth');
-  // console.log("=====>", userInfo?.extraInfo?.working_hours?.time_zone  )
+  //  
 
   useEffect(() => {
     if (userInfo?.extraInfo?.working_hours?.time_zone) {
@@ -423,7 +423,7 @@ export default function CalendarPage() {
     return currentDate.format('YYYY-MM-DD');
   };
 
-  // console.log(Intl.DateTimeFormat().resolvedOptions().timeZone, "=====>", userTimeZone )
+  //  .resolvedOptions().timeZone, "=====>", userTimeZone )
 
   // const currentDateAndtime = (startDate) => {
   //   // Create a new Date object for the current date
@@ -438,7 +438,7 @@ export default function CalendarPage() {
   //   // Format the date in the desired format
   //   const formattedDate = `${year}-${month}-${day}`;
 
-  //   console.log("formattedDate ====", formattedDate)
+  //    
 
   //   return formattedDate
   // }
@@ -517,7 +517,7 @@ export default function CalendarPage() {
   // }));
 
   const handleViewChange = (view) => {
-    console.log(view , 'view')
+     
     setView(view); // Update view state when the view changes
   };
 

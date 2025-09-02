@@ -614,7 +614,7 @@ export const UpdateSettingProfileForm = ({
           const { loaded, total } = progressEvent;
           const percentCompleted = (loaded / total) * 100;
           // if (fileType === 'video') {
-          console.log("percentCompleted =====", percentCompleted);
+           
           setUploadProgress(
             Math.trunc(percentCompleted === 100 ? 0 : percentCompleted)
           );
@@ -654,7 +654,7 @@ export const UpdateSettingProfileForm = ({
       };
 
       const data = await getS3SignedUrl(payload);
-      // console.log(data);
+      //  
       // return;
       if (!data?.url) {
         throw new Error("Failed to get S3 signed URL");

@@ -46,7 +46,7 @@ const ChangePhoneNumber = ({ setCollapseShow, collapseShow }) => {
         // formik.setStatus({ successMessage:  });
         formik.setSubmitting(false);
       } catch (err) {
-        console.log("error",err)
+         
         toast.error(err?.response?.data?.error??'Error updating phone number')
         formik.setStatus({ errorMessage: 'Error updating phone number' });
         formik.setSubmitting(false);

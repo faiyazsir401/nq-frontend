@@ -36,7 +36,7 @@ const getTimeRange = (duration, isSchedule, selectedSlot) => {
   const now = moment();
   const startTime = moment(now).add(0, 'minutes');
   const endTime = moment(startTime).add(duration, 'minutes');
-  console.log("getTimeRange", startTime, endTime);
+   
   return {
     sessionStartTime: startTime.format('HH:mm'),
     sessionEndTime: endTime.format('HH:mm'),
@@ -66,7 +66,6 @@ const InstantLessonTimeLine = ({
   const [formError, setFormError] = useState("");
 
   useEffect(() => {
-    console.log('prinitng', selectedLesson, trainerInfo, parseInt(trainerInfo?.extraInfo?.availabilityInfo?.selectedDuration));
     if (isCommonBooking) {
       setSelectedLesson(parseInt(trainerInfo.userInfo?.extraInfo?.availabilityInfo?.selectedDuration));
     }
@@ -193,7 +192,7 @@ const InstantLessonTimeLine = ({
             className="mt-3 btn btn-sm btn-primary"
             onClick={async() => {
               try {
-                console.log("!selectedLesson || !handleFormValidation()",!selectedLesson || !handleFormValidation())
+               
                 if (!selectedLesson || !handleFormValidation()) {
                   return;
                 }
@@ -213,7 +212,7 @@ const InstantLessonTimeLine = ({
                   trainerInfo?.userInfo?.extraInfo?.hourly_rate
                 );
                 let paymentIntentData;
-                console.log("amountPayable", +amountPayable.toFixed(1),isTokenExists)
+         
                 if (amountPayable > 0) {
                   if (isTokenExists) {
                     dispatch(authAction.updateIsAuthModalOpen(false));
@@ -248,13 +247,13 @@ const InstantLessonTimeLine = ({
                     start_time: convertTimesToISO(today, startTime),
                     end_time: convertTimesToISO(today, endTime),
                   };
-                  console.log("payloadtesting",payload)
+                   
                   setBookSessionPayload(payload);
                   setAmount(amountPayable.toFixed(1));
                   onClose(false);
                 }
               } catch (error) {
-                console.log("found the issue",error)
+                 
               }
              
             }}

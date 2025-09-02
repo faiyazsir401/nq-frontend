@@ -70,7 +70,7 @@ const reportModal = ({
         reader.readAsDataURL(blob);
       });
     } catch (err) {
-      console.log("----->err", err);
+       
     }
   };
 
@@ -143,7 +143,7 @@ const reportModal = ({
         setReportArr([...newReportImages]);
       }
     } catch (error) {
-      console.log("error", error);
+       
     } finally {
       setLoading(false);
     }

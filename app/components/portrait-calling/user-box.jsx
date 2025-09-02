@@ -17,7 +17,7 @@ export const UserBox = ({
   isLandscape,
   muted
 }) => {
-  console.log("user", id);
+   
 
   const setVideoRef = useCallback(
     (node) => {
@@ -31,7 +31,7 @@ export const UserBox = ({
     [stream]
   );
   useEffect(() => {
-    console.log("ideoRef?.current", videoRef?.current);
+     
     if (videoRef?.current) {
       videoRef.current.srcObject = stream;
     }
@@ -128,7 +128,7 @@ export const UserBoxMini = ({
   const handleBoxClick = () => {
     // event.stopPropagation();
     if (onClick && id) {
-      console.log("i am clicked");
+       
       onClick(id);
     }
   };
@@ -181,7 +181,7 @@ export const VideoMiniBox = ({ onClick, id, clips,bottom }) => {
   const handleBoxClick = () => {
     // event.stopPropagation();
     if (onClick) {
-      console.log("i am clicked");
+       
       onClick(id);
     }
   };

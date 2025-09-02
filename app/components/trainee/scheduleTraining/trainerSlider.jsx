@@ -10,7 +10,7 @@ const TrainerSlider = ({
   setParams,
   isOnlineFuncCall = false
 }) => {
-  console.log("=====> list", list);
+   
   const settings = {
     autoplay: true,
     infinite: false,

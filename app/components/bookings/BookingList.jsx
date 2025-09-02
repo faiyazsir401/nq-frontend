@@ -97,7 +97,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             moment.tz(tz).utcOffset() === moment.duration(utcOffset).asMinutes()
         )
       : "";
-    // console.log("=====>ianaTimeZone", ianaTimeZone, utcOffset)
+    //  
     setUserTimeZone(
       ianaTimeZone
         ? ianaTimeZone
@@ -497,7 +497,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   }, [startMeeting?.isOpenModal]);
 
   const renderRating = () => {
-    // console.log("trainer_info",trainer_info)
+    //  
     return (
       <ReactStrapModal
         allowFullWidth={true}

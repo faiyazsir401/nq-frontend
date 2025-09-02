@@ -235,7 +235,7 @@ const SettingSection = (props) => {
         toast("please enter required values.");
       }
 
-      console.log(`save here `, profile);
+       
     } else {
       setProfile({ ...profile, editStatus: !profile.editStatus });
     }
@@ -318,7 +318,7 @@ const SettingSection = (props) => {
   }
 
   const handleNotificationChange= (category,channel,e)=>{
-    console.log("category",category,channel,e.target.value)
+     
 
   }
 
@@ -787,7 +787,7 @@ const SettingSection = (props) => {
                           //     },
                           //   })
                           // );
-                          console.log("formValue ===", formValue)
+                           
                           requestForSettelment(formValue);
                         }}
                       />

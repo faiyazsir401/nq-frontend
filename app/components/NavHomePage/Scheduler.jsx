@@ -96,7 +96,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
   };
 
   const getNextTimeSlot = () => {
-    console.log("times", times);
+     
     if (times.length === 0) return { start: "9:00 AM", end: "10:00 AM" };
 
     const lastSlot = times[times.length - 1];
@@ -122,7 +122,7 @@ const DayAvailability = ({ day, times, setTimes, copyToAll }) => {
 
   const addTimeSlot = () => {
     if (times.length === 0 || times[times.length - 1].end !== "12:00 PM") {
-      console.log("slimshady", [...times, getNextTimeSlot()]);
+      
       setTimes([...times, getNextTimeSlot()]);
     }
   };

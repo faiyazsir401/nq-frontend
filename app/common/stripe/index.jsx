@@ -50,7 +50,7 @@ const CheckoutForm = ({clientSecret, handlePaymentSuccess, extraContent = <></>}
       toast.success("Payment succeeded");
       handlePaymentSuccess();
     } else {
-      console.log("Payment failed");
+       
     }
   };
 
@@ -78,7 +78,7 @@ const CheckoutForm = ({clientSecret, handlePaymentSuccess, extraContent = <></>}
     });
 
     pr.on('paymentmethod', async (e) => {
-      console.log("paymentmethod=======>", e)
+       
       const {error: backendError, clientSecret} = await fetch(
         '/api/create-payment-intent',
         {
@@ -214,7 +214,7 @@ export default StripeCard;
 //       toast.success("Payment succeeded");
 //       handlePaymentSuccess();
 //     } else {
-//       console.log("Payment failed");
+//        
 //     }
 //   };
 
@@ -235,7 +235,7 @@ export default StripeCard;
 // };
 
 // const StripeCard = ({clientSecret, handlePaymentSuccess, extraContent = <></>, amount}) => {
-//   // console.log("==========>amou",amount)
+//   //  
 //   // const options = {
 //   //   name: 'netquix',
 //   //   description: 'netquix trainer payment',

@@ -120,7 +120,7 @@ export const CanvasMenuBar = ({
       setActiveTab(null);
     }
   }
-  console.log("isMobileScreen", isMobileScreen)
+   
   return (
     <div style={{ margin: isFromPotrait ? "0.5rem" : "1rem", display: "flex", justifyContent: "center" }}>
       <div

@@ -84,16 +84,16 @@ const Schedule = ({ activeCenterContainerTab }) => {
 
 
 //     const client_secret = session.data.result.clientSecret
-//     console.log("============>", client_secret)
+//      
 //     if (client_secret) {
 
 //       // Show the verification modal.
 //       const { error } = await stripe?.verifyIdentity(client_secret);
 
 //       if (error) {
-//         console.log('[error]', error);
+//          
 //       } else {
-//         console.log('Verification submitted!');
+//          
 //         this.setState({ submitted: true });
 //       }
 //     }
@@ -270,10 +270,10 @@ const NavHomePageCenterContainer = () => {
       let width = window.innerWidth;
       let height = window.innerHeight;
       if (width > height == false && activeTab === "upcomingLesson") {
-        // console.log("=========if block")
+        //  
         setModal(true)
       } else {
-        // console.log("=========else block")
+        //  
         setModal(false)
       }
 

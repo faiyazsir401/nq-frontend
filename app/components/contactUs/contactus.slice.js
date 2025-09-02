@@ -22,7 +22,7 @@ export const writeUsAsync = createAsyncThunk("writeUs/post", async (payload) => 
   try {
     const response = await writeUs(payload);
     // Ensure that SuccessMsgs is defined with appropriate success messages
-    console.log(response, "response");
+     
     return response;
   } catch (err) {
     if (!err.isUnauthorized) {

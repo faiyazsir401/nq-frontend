@@ -17,8 +17,8 @@ function ScreenShotDetails({
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
 
-  console.log(screenShotImages)
-  console.log("=======>URL after screenshot", `${awsS3Url}${screenShotImages[screenShotImages?.length - 1]?.imageUrl}`)
+   
+   
 
   function resetForm() {
     setTitle("");
