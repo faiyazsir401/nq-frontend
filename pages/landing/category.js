@@ -203,11 +203,11 @@ const Category = (masterRecords) => {
               </div>
             </div>
             <div
-              className="col-lg-6  bg-primary mt-3"
+              className="col-lg-6 mt-3"
               style={{ borderRadius: "50%",width:isMobileScreen?"70%":"100%",margin:'auto' }}
             >
               <img
-                src="/assets/images/1-removebg 1.png"
+                src="/assets/images/nqhero.png"
                 alt="logo"
                 style={{
                   // maxWidth: "500px",

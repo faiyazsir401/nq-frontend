@@ -550,7 +550,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             marginTop: "40px",
           }}
         >
-          <h5 className="block-title">No upcoming Session</h5>
+          <h5 className="block-title">No Upcoming Sessions</h5>
         </div>
       ) : (
         // Render scheduled meetings if there are any

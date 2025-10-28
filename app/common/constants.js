@@ -76,9 +76,9 @@ export const weekDays = [
 export const bookingButton = ["upcoming", "canceled", "completed"];
 
 export const not_data_for_booking = {
-  upcoming: "No upcoming Session available",
-  canceled: "No canceled booking",
-  completed: "No completed booking",
+  upcoming: "No Upcoming Sessions",
+  canceled: "No Cancelled Sessions",
+  completed: "No Completed Sessions",
 };
 
 export const debouncedConfigs = {
