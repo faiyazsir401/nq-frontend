@@ -11,7 +11,7 @@ import {
 import { getFriends } from "../../common/common.api";
 import { Utils } from "../../../utils/utils";
 import { X } from "react-feather";
-import "./common.css";
+import "./common.scss";
 import { useMediaQuery } from "usehooks-ts";
 
 const FriendsPopup = ({ props }) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Card, CardImg, CardBody, CardTitle, CardText } from 'reactstrap';
-import "./index.css"
+import "./index.scss"
 
 const teamMembers = [
   {

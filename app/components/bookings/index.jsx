@@ -7,7 +7,7 @@ import { Formik } from "formik";
 import Slider from "react-slick";
 import Addworkinghour from "../../../containers/leftSidebar/Addworkinghour";
 import { Edit } from "react-feather";
-import "./index.css";
+import "./index.scss";
 import {
   bookingsAction,
   bookingsState,

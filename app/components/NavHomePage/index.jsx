@@ -14,7 +14,7 @@ import {
 } from "../../common/constants";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";
-import "./index.css";
+import "./index.scss";
 import Slider from "react-slick";
 import OnlineUserCard from "./banner";
 import {

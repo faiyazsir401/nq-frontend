@@ -8,7 +8,7 @@ import { TrainerDetails } from "../../app/components/trainer/trainerDetails";
 import BookingTable from "../../app/components/trainee/scheduleTraining/BookingTable";
 import "../../app/components/trainee/scheduleTraining/index.scss";
 import { Button, Card, CardBody, CardText, CardTitle } from "reactstrap";
-import "./landing.css";
+import "./landing.scss";
 import { getTraineeWithSlotsAsync } from "../../app/components/trainee/trainee.slice";
 import { useAppDispatch } from "../../app/store";
 import { useMediaQuery } from "usehooks-ts";

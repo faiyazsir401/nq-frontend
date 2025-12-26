@@ -17,7 +17,7 @@ import { FaDownload, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmModal from "./confirmModal";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
-import "../../trainer/dashboard/index.css";
+import "../../trainer/dashboard/index.scss";
 import { commonState, getClipsAsync, getMyClipsAsync } from "../../../common/common.slice";
 import { masterState } from "../../master/master.slice";
 import { MY_CLIPS_LABEL_LIMIT } from "../../../../utils/constant";

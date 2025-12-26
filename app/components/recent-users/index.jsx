@@ -12,11 +12,10 @@ import Modal from "../../common/modal";
 import { X } from "react-feather";
 import StudentDetail from "../Header/StudentTab/StudentDetail";
 import { Utils } from "../../../utils/utils";
-import './index.js';
-import { useMediaQuery } from "../../hook/useMediaQuery.js";
+import { useMediaQuery } from "../../hook/useMediaQuery";
 import BookingTable from "../trainee/scheduleTraining/BookingTable.jsx";
 import { TrainerDetails } from "../trainer/trainerDetails.jsx";
-import { getTraineeWithSlotsAsync } from "../trainee/trainee.slice.js";
+import { getTraineeWithSlotsAsync } from "../trainee/trainee.slice";
 
 // const placeholderImageUrl = '/assets/images/avtar/user.png'; // Placeholder image path
 const placeholderImageUrl = "/assets/images/demoUser.png"; // Placeholder image path

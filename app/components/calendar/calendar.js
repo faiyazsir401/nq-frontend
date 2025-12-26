@@ -14,7 +14,7 @@ import axios from 'axios';
 import { toast } from "react-toastify";
 import Script from 'next/script';
 import { Utils } from '../../../utils/utils';
-import './calendar.css';
+import './calendar.scss';
 function EventModal({ modal, setModal, toggle, data, selectedModalDate, setData, options, userTimeZone, ...args }) {
 
   const [showSelectTimeDiv, setShowSelectTimeDiv] = useState(false)

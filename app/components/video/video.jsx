@@ -70,7 +70,7 @@ import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 import { fetchPeerConfig } from "../../../api";
 import { bookingsState } from "../common/common.slice";
 import { useAppSelector } from "../../store";
-import './common.css'
+import './common.scss'
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
 let canvasConfigs = {

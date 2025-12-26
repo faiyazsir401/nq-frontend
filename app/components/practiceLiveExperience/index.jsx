@@ -35,7 +35,7 @@ import { getInitials, demoSessionEndTime } from "../../../utils/videoCall";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { authState, authAction } from "../auth/auth.slice";
 import GuideModal from "./GuideModal";
-import "./index.css";
+import "./index.scss";
 import Notes from "./Notes";
 import { useMediaQuery } from "../../hook/useMediaQuery";
 

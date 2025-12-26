@@ -1,5 +1,5 @@
 import "rc-time-picker/assets/index.css";
-import "../dashboard/index.css";
+import "../dashboard/index.scss";
 
 import React, { useState, useEffect } from "react";
 import moment from "moment";

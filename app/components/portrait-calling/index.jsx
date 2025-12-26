@@ -6,9 +6,9 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import "./index.css";
+import "./index.scss";
 import { AccountType } from "../../common/constants";
-import "./action-buttons.css";
+import "./action-buttons.scss";
 import { EVENTS } from "../../../helpers/events";
 import { SocketContext } from "../socket";
 import OneOnOneCall from "./one-on-one-call";
