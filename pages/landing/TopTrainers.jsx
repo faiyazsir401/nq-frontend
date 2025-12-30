@@ -20,6 +20,7 @@ import { object } from "prop-types";
 import { useMediaQuery } from "usehooks-ts";
 import Modal from "../../app/common/modal";
 import { ChevronLeft, ChevronRight } from "react-feather";
+import "./slider.scss";
 
 const filter = (category, trainers) => {
   const filteredTrainers = trainers.filter(
@@ -32,6 +33,7 @@ const TopTrainers = (props) => {
   const dispatch = useDispatch();
   const [categories, setCategories] = useState([]);
   const [allTrainers, setAllTrainers] = useState({});
+  const isMobileScreen = useMediaQuery("(max-width: 768px)");
 
   // profile states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -100,7 +102,12 @@ const TopTrainers = (props) => {
 
       {/* Trainer Details Modal */}
       {trainerInfo?.userInfo && (
-        <Modal className="recent-user-modal" allowFullWidth={true} isOpen={isModalOpen} element={<TrainerDetails
+        <Modal 
+          className="trainer-booking-modal" 
+          allowFullWidth={isMobileScreen} 
+          isOpen={isModalOpen} 
+          toggle={() => setIsModalOpen(false)}
+          element={<TrainerDetails
           selectOption={trainerInfo}
           isPopoverOpen={props.isPopoverOpen}
           categoryList={props.categoryList}
