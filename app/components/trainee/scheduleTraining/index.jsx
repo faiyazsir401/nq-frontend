@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo, useRef } from "react";
 import DatePicker from "react-datepicker";
 import moment from "moment";
 import "../scheduleTraining/index.scss";
@@ -306,9 +306,12 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   useEffect(() => {
     selectedTrainerInfo &&
       setTrainerInfo(JSON.parse(JSON.stringify(selectedTrainerInfo)));
-    selectedTrainerInfo?.selected_category &&
+    if (selectedTrainerInfo?.selected_category) {
+      debouncedSearchAPI.cancel();
+      dispatch(getTraineeWithSlotsAsync({ search: selectedTrainerInfo?.selected_category }));
       setParams({ search: selectedTrainerInfo?.selected_category });
-  }, [selectedTrainerInfo?.selected_category]);
+    }
+  }, [selectedTrainerInfo?.selected_category, dispatch, debouncedSearchAPI]);
 
 
  
@@ -326,12 +329,23 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
     setPopup(false);
   };
 
+  // Debounced function to call API after user stops typing
+  const debouncedSearchAPI = useMemo(
+    () =>
+      debounce((searchValue) => {
+        if (searchValue && searchValue.trim()) {
+          dispatch(getTraineeWithSlotsAsync({ search: searchValue }));
+        }
+      }, 500), // 500ms delay - waits for user to stop typing
+    [dispatch]
+  );
+
+  // Cleanup debounced function on unmount
   useEffect(() => {
-     
-    if (getParams.search) {
-      dispatch(getTraineeWithSlotsAsync(getParams));
-    }
-  }, [getParams]);
+    return () => {
+      debouncedSearchAPI.cancel();
+    };
+  }, [debouncedSearchAPI]); 
 
   useEffect(() => {
     dispatch(getTrainersAsync());
@@ -414,15 +428,19 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
 
   useEffect(() => {
     if (selectedOnlineUser) {
+      debouncedSearchAPI.cancel();
       setTrainerInfo((prev) => ({
         ...prev,
         userInfo: selectedOnlineUser,
         selected_category: null,
       }));
       setSelectedTrainer({...selectedOnlineUser});
+      if (selectedOnlineUser?.fullName) {
+        dispatch(getTraineeWithSlotsAsync({ search: selectedOnlineUser?.fullName }));
+      }
       setParams({ search: selectedOnlineUser?.fullName });
     }
-  }, [selectedOnlineUser]);
+  }, [selectedOnlineUser, dispatch, debouncedSearchAPI]);
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
@@ -789,36 +807,49 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
             dropdown: "custom-dropdown-width",
           }}
           onSearchClick={(query) => {
+            debouncedSearchAPI.cancel();
             if (query) {
               setTrainerInfo((prev) => ({
                 ...prev,
                 userInfo: null,
                 selected_category: query,
               }));
+              dispatch(getTraineeWithSlotsAsync({ search: query }));
             }
             setQuery(query);
+            setParams({ search: query });
           }}
           searchValue={(value) => {
             setParams({ search: value });
+            debouncedSearchAPI(value);
           }}
           selectedOption={(option) => {
-             
+            debouncedSearchAPI.cancel();
+            
             if (option && option.isCategory) {
               setTrainerInfo((prev) => ({
                 ...prev,
                 userInfo: option,
                 selected_category: option.name,
               }));
+              dispatch(getTraineeWithSlotsAsync({ search: option.name }));
+              setParams({ search: option.name });
             } else {
               setTrainerInfo((prev) => ({
                 ...prev,
                 userInfo: option,
                 selected_category: null,
               }));
+              const searchValue = option?.name || option?.fullname || "";
+              if (searchValue) {
+                dispatch(getTraineeWithSlotsAsync({ search: searchValue }));
+                setParams({ search: searchValue });
+              }
             }
           }}
           handleChange={(value) => {
-            setParams({ search: value });
+            setParams({ search: value || "" });
+            debouncedSearchAPI(value || "");
           }}
           activeTrainer={activeTrainer}
         />
@@ -844,6 +875,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                       flexDirection: isMobileScreen ? "auto":"column",
                     }}
                     onClick={() => {
+                      debouncedSearchAPI.cancel();
                       setTrainerInfo((prev) => ({
                         ...prev,
                         userInfo: {
@@ -853,6 +885,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                         },
                         selected_category: item,
                       }));
+                      dispatch(getTraineeWithSlotsAsync({ search: item }));
                       setParams({ search: item });
                     }}
                   >
@@ -896,12 +929,16 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                         <Trainer
                           trainer={data.trainer_info}
                           onClickFunc={() => {
+                            debouncedSearchAPI.cancel();
                             setTrainerInfo((prev) => ({
                               ...prev,
                               userInfo: data.trainer_info,
                               selected_category: null,
                             }));
                             setSelectedTrainer(data.trainer_info);
+                            if (data.trainer_info?.fullName) {
+                              dispatch(getTraineeWithSlotsAsync({ search: data.trainer_info?.fullName }));
+                            }
                             setParams({ search: data.trainer_info?.fullName });
                           }}
                           
