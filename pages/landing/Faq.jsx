@@ -1,6 +1,7 @@
-import React from "react";
-// import { Accordion } from 'react-bootstrap';
+import React, { useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
+import { Card, CardHeader, CardBody, Collapse } from "reactstrap";
+import { Plus, Minus } from "react-feather";
 
 const faqs = [
   {
@@ -204,21 +205,118 @@ function Section({ id, title, subtitle, description, children, className }) {
 
 export default function FAQ() {
   const isMobileScreen = useMediaQuery("(max-width: 768px)");
+  const [openItems, setOpenItems] = useState(new Set());
+
+  const toggleItem = (index) => {
+    setOpenItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <Section title="FAQ" subtitle="Frequently asked questions">
       <div className="container my-5">
-        <ul style={{ padding: isMobileScreen ? 0 : "auto" }}>
-          {faqs.map((faq, idx) => (
-            <li eventKey={String(idx)} key={idx}>
-              <h5 className="mb-1">{faq.question}</h5>
-              <p style={{ fontWeight: 400 }}>{faq.answer}</p>
-            </li>
-          ))}
-        </ul>
+        <div className="faq-accordion-container">
+          {faqs.map((faq, idx) => {
+            const isOpen = openItems.has(idx);
+            return (
+              <Card
+                key={idx}
+                className="faq-card mb-3"
+                style={{
+                  border: "1px solid #e0e0e0",
+                  borderRadius: "8px",
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                }}
+              >
+                <CardHeader
+                  className="faq-header"
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    cursor: "pointer",
+                    padding: isMobileScreen ? "15px" : "20px",
+                    borderBottom: isOpen ? "1px solid #e0e0e0" : "none",
+                  }}
+                  onClick={() => toggleItem(idx)}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <h5
+                      className="mb-0"
+                      style={{
+                        fontSize: isMobileScreen ? "16px" : "18px",
+                        fontWeight: 600,
+                        color: "#000080",
+                        flex: 1,
+                        marginRight: "15px",
+                        textAlign: "left",
+                      }}
+                    >
+                      {faq.question}
+                    </h5>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minWidth: "30px",
+                        height: "30px",
+                        backgroundColor: "#000080",
+                        borderRadius: "50%",
+                        color: "white",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isOpen ? (
+                        <Minus size={18} />
+                      ) : (
+                        <Plus size={18} />
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                <Collapse isOpen={isOpen}>
+                  <CardBody
+                    style={{
+                      padding: isMobileScreen ? "15px" : "20px",
+                      fontSize: isMobileScreen ? "14px" : "16px",
+                      lineHeight: "1.6",
+                      color: "#333",
+                    }}
+                  >
+                    {faq.answer}
+                  </CardBody>
+                </Collapse>
+              </Card>
+            );
+          })}
+        </div>
       </div>
-      <h4 className="text-center text-muted">
+      <h4
+        className="text-center text-muted"
+        style={{
+          fontSize: isMobileScreen ? "16px" : "18px",
+          marginTop: "40px",
+          padding: isMobileScreen ? "0 15px" : "0",
+        }}
+      >
         Still have questions? Email us at{" "}
-        <a href="mailto:phil@netqwix.com" className="text-decoration-underline">
+        <a
+          href="mailto:phil@netqwix.com"
+          className="text-decoration-underline"
+          style={{ color: "#000080" }}
+        >
           phil[@]netqwix.com
         </a>
       </h4>

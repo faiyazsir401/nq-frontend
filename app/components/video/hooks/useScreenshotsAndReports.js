@@ -9,7 +9,7 @@ import {
   createReport,
   removeImage,
   cropImage,
-} from '../../videoupload/videoupload.api';
+} from '../../../videoupload/videoupload.api';
 import { getS3SignPdfUrl } from '../video.api';
 import { awsS3Url } from '../../../../utils/constant';
 
