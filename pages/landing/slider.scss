@@ -1,13 +1,66 @@
+.category-slider-wrapper {
+  position: relative;
+  
+  .category-title {
+    padding-left: 70px; 
+    transition: padding 0.3s ease;
+    font-size: 2rem; // Increased font size for better visibility
+    font-weight: 600; // Make it slightly bolder
+    
+    @media (max-width: 1000px) {
+      padding-left: 0;
+      font-size: 1.5rem; // Slightly smaller on mobile but still prominent
+    }
+  }
+}
+
 .slider-container {
   position: relative;
   width: 100%;
   overflow: hidden;
+  padding: 0 60px; 
+  box-sizing: border-box;
+  
+  @media (max-width: 1000px) {
+    padding: 0; 
+  }
 }
 
 .slider-content {
   display: flex;
   scroll-behavior: smooth;
   overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  width: 100%;
+  
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  @media (max-width: 1000px) {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
 }
 
 .slider-item {
@@ -15,8 +68,24 @@
   max-width: 150px;
   margin-right: 15px;
   flex-shrink: 0;
+  
+  &:first-child {
+    margin-left: 15px;
+    
+    @media (max-width: 1000px) {
+      margin-left: 0;
+    }
+  }
+  
+  &:last-child {
+    margin-right: 15px;
+    padding-right: 15px;
+    
+    @media (max-width: 1000px) {
+      padding-right: 0;
+    }
+  }
 }
-
 
 @media only screen and (min-width: 600px) {
   .slider-item {
@@ -24,29 +93,194 @@
     max-width: 280px;
     margin-right: 15px;
     flex-shrink: 0;
+    
+    &:first-child {
+      margin-left: 15px;
+      
+      @media (max-width: 1000px) {
+        margin-left: 0;
+      }
+    }
+    
+    &:last-child {
+      margin-right: 15px;
+      padding-right: 15px;
+      
+      @media (max-width: 1000px) {
+        padding-right: 0;
+      }
+    }
   }
-  
 }
 
-.prev-button,
-.next-button {
+.slider-nav-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color:white;
-  border: none;
-  color: black;
+  background-color: #ffffff;
+  border: 2px solid #000080;
+  color: #000080;
   font-size: 1rem;
   cursor: pointer;
   z-index: 10;
-  padding: 10px;
-  border-radius: 30%;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+  
+  &:hover {
+    background-color: #000080;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 128, 0.3);
+    transform: translateY(-50%) scale(1.1);
+  }
+  
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+  
+  &:disabled,
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  @media (max-width: 1000px) {
+    width: 40px;
+    height: 40px;
+    border-width: 1.5px;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    &.scrolling {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+  }
 }
 
 .prev-button {
-  left: 10px;
+  left: 10px; 
+  
+  @media (max-width: 1000px) {
+    left: 5px;
+  }
 }
 
 .next-button {
-  right: 10px;
+  right: 10px; 
+  
+  @media (max-width: 1000px) {
+    right: 5px;
+  }
+}
+
+// Trainer Card Styles
+.trainer-card {
+  display: flex;
+  flex-direction: column;
+  
+  .trainer-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+  
+  .verified-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    
+    .verified-icon {
+      color: #28a745;
+      font-size: 14px;
+      line-height: 1;
+    }
+    
+    .verified-text {
+      color: #28a745;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    @media (max-width: 1000px) {
+      top: 6px;
+      right: 6px;
+      padding: 3px 6px;
+      border-radius: 15px;
+      
+      .verified-icon {
+        font-size: 12px;
+      }
+      
+      .verified-text {
+        font-size: 9px;
+      }
+    }
+  }
+  
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    flex-grow: 1;
+    
+    @media (max-width: 1000px) {
+      padding: 0.75rem;
+    }
+  }
+  
+  .trainer-name {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    margin-bottom: 0.5rem;
+  }
+  
+  .hourly-rate {
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+    
+    i {
+      color: #6c757d;
+    }
+    
+    strong {
+      color: #212529;
+    }
+  }
+  
+  .btn {
+    margin-top: auto;
+    white-space: nowrap;
+  }
 }

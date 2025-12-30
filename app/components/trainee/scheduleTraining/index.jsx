@@ -794,7 +794,12 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       <div
         id="dashboard"
         className="d-flex justify-content-center align-items-center dashboard-search-trainer"
-        style={{ marginTop: "5%", marginBottom: "2%" }}
+        style={{ 
+          marginTop: isMobileScreen ? "3%" : "5%", 
+          marginBottom: isMobileScreen ? "3%" : "2%",
+          padding: isMobileScreen ? "0 15px" : "0",
+          width: "100%"
+        }}
       >
         <SearchableDropdown
           placeholder="Search Experts..."
