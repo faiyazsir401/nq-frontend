@@ -4,7 +4,7 @@ import {HOW_IT_WORKS, WHY_CHOOSE_US} from '../../common/constants';
 export const HowItWorks = () => {
   return (
     <div className="why-choose-us">
-      <div className="feat bg-gray pt-5 pb-5">
+      <div className="feat bg-gray pt-5 pb-5 how-it-works-container">
         <div className="container">
           <div className="row" style={{justifyContent: 'center'}}>
             <div className="section-head col-sm-12">
@@ -15,19 +15,19 @@ export const HowItWorks = () => {
             </div>
             {HOW_IT_WORKS.map ((info, index) => {
               return (
-                <div className="col-lg-4 col-sm-6" key={`why-us-${index}`}>
-                  <div className="item">
+                <div className="col-lg-4 col-sm-6 col-12" key={`why-us-${index}`}>
+                  <div className="item how-it-works-item">
                     <span className="icon feature_box_col_one">
                       {/* <i className="fa fa-globe" /> */}
                       {info.icon}
                     </span>
                     <h6>
-                      <div style={{fontSize: '20px', textDecoration: 'underline', textUnderlineOffset: '0.4em', textDecorationColor: '#000080' }}>
+                      <div className="how-it-works-title" style={{fontSize: '20px', textDecoration: 'underline', textUnderlineOffset: '0.4em', textDecorationColor: '#000080' }}>
                         {info.title}
                       </div>{' '}
                     </h6>
 
-                    <p>
+                    <p className="how-it-works-content">
                       {info.content}
                     </p>
                   </div>

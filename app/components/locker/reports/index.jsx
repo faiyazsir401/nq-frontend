@@ -19,7 +19,7 @@ import { defaultLayoutIcons, DefaultVideoLayout } from '@vidstack/react/player/l
 import { Tooltip } from "react-tippy";
 import { FaDownload, FaTrash } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
-import '../../trainer/dashboard/index.css';
+import '../../trainer/dashboard/index.scss';
 import ConfirmModal from "../my-clips/confirmModal";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import SearchableDropdown from "../../app/components/trainee/helper/searchableDropdown";
 import {
   createPaymentIntentAsync,
@@ -40,12 +40,24 @@ const Category = (masterRecords) => {
   const [bookSessionPayload, setBookSessionPayload] = useState({});
   const [bookingColumns, setBookingColumns] = useState([]);
   const [isTrainerModal, setIsTrainerModal] = useState(false);
+
+  // Debounced function to call API after user stops typing
+  const debouncedSearchAPI = useMemo(
+    () =>
+      debounce((searchValue) => {
+        if (searchValue && searchValue.trim()) {
+          dispatch(getTraineeWithSlotsAsync({ search: searchValue }));
+        }
+      }, 500), // 500ms delay - waits for user to stop typing
+    [dispatch]
+  );
+
+  // Cleanup debounced function on unmount
   useEffect(() => {
-    setStartDate(new Date())
-    if (getParams.search) {
-      dispatch(getTraineeWithSlotsAsync(getParams));
-    }
-  }, [getParams]);
+    return () => {
+      debouncedSearchAPI.cancel();
+    };
+  }, [debouncedSearchAPI]);
 
   useEffect(() => {
     setStartDate(new Date())
@@ -140,6 +152,7 @@ const Category = (masterRecords) => {
                     cursor : 'pointer'
                   }}
                     onClick={() => {
+                      debouncedSearchAPI.cancel();
                       setTrainerInfo((prev) => ({
                         ...prev,
                         userInfo: {
@@ -149,7 +162,8 @@ const Category = (masterRecords) => {
                         },
                         selected_category: item,
                       }));
-                      setParams({ search: item })
+                      dispatch(getTraineeWithSlotsAsync({ search: item }));
+                      setParams({ search: item });
                       setIsTrainerModal(true);
                     }}
                 >
@@ -235,27 +249,33 @@ const Category = (masterRecords) => {
                   dropdown: "custom-dropdown-width-landing",
                 }}
                 onSearchClick={(query) => {
+                  debouncedSearchAPI.cancel();
                   if (query) {
                     setTrainerInfo((prev) => ({
                       ...prev,
                       userInfo: null,
                       selected_category: query,
                     }));
+                    dispatch(getTraineeWithSlotsAsync({ search: query }));
                     setIsTrainerModal(true);
                   }
                   setQuery(query);
-                  setIsTrainerModal(true);
+                  setParams({ search: query });
                 }}
                 searchValue={(value) => {
                   setParams({ search: value });
+                  debouncedSearchAPI(value);
                 }}
                 selectedOption={(option) => {
+                  debouncedSearchAPI.cancel();
                   if (option && option.isCategory) {
                     setTrainerInfo((prev) => ({
                       ...prev,
                       userInfo: option,
                       selected_category: option.name,
                     }));
+                    dispatch(getTraineeWithSlotsAsync({ search: option.name }));
+                    setParams({ search: option.name });
                     setIsTrainerModal(true);
 
                   } else {
@@ -264,11 +284,17 @@ const Category = (masterRecords) => {
                       userInfo: option,
                       selected_category: null,
                     }));
+                    const searchValue = option?.name || option?.fullname || "";
+                    if (searchValue) {
+                      dispatch(getTraineeWithSlotsAsync({ search: searchValue }));
+                      setParams({ search: searchValue });
+                    }
                     setIsTrainerModal(true);
                   }
                 }}
                 handleChange={(value) => {
                   setParams({ search: value });
+                  debouncedSearchAPI(value || "");
                 }}
               />
             </div>

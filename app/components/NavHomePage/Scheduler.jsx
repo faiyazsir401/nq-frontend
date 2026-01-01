@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./schedular.css";
+import "./schedular.scss";
 import timezones from "../../../utils/timezones.json";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";

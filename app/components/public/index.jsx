@@ -142,6 +142,8 @@ const TrainersDetails = ({
     );
   }, [getTraineeSlots]);
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
   useEffect(() => {
     const handleResize = () => {
       setScreenWidth(window.innerWidth);
@@ -173,8 +175,6 @@ const TrainersDetails = ({
       value: accordion.curriculum || accordionsData.curriculum,
     },
   ];
-
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   const renderBookingTable = () => (
     <React.Fragment>

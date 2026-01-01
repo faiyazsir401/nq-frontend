@@ -70,7 +70,14 @@ import { traineeClips } from "../../../containers/rightSidebar/fileSection.api";
 import { fetchPeerConfig } from "../../../api";
 import { bookingsState } from "../common/common.slice";
 import { useAppSelector } from "../../store";
-import './common.css'
+import './common.scss'
+import { useVideoState } from "./hooks/useVideoState";
+import { useSocketEvents } from "./hooks/useSocketEvents";
+import { useScreenshotsAndReports } from "./hooks/useScreenshotsAndReports";
+import { useVideoPlayback } from "./hooks/useVideoPlayback";
+import { formatTime, calculateCanvasDimensions } from "./utils/videoUtils";
+import { VideoCallControls } from "./components/VideoCallControls";
+import { ClipsContainer } from "./components/ClipsContainer";
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
 let canvasConfigs = {
@@ -107,104 +114,126 @@ export const HandleVideoCall = ({
   //   
   // const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);
+
+  // Refs
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const peerRef = useRef(null);
+  const selectedVideoRef1 = useRef(null);
+  const selectedVideoRef2 = useRef(null);
+  const progressBarRef = useRef(null);
+  const progressBarRef2 = useRef(null);
+  const globalProgressBarRef = useRef(0);
+  const volumeInputRef = useRef(null);
+  const volumeInputRef2 = useRef(null);
+  const ffmpegRef = useRef(new FFmpeg());
+
+  // Use video state hook
+  const videoState = useVideoState({
+    accountType,
+    session_end_time,
+    toUser,
+    isTraineeJoined: false, // Will be set by video call hook
+  });
+
+  // Destructure state from hook
+  const {
+    selectedClips,
+    isMuted,
+    isFeedStopped,
+    displayMsg,
+    isRemoteVideoOff,
+    isPinned,
+    pinnedUser,
+    videoController,
+    isCanvasMenuNoteShow,
+    micNote,
+    clipSelectNote,
+    countClipNoteOpen,
+    permissionModal,
+    isTooltipShow,
+    modal,
+    showThumbnailForFirstVideo,
+    showThumbnailForTwoVideo,
+    globalSliderValue,
+    isOpen,
+    isOpenConfirm,
+    isOpenReport,
+    isOpenCrop,
+    screenShots,
+    reportObj,
+    isScreenShotModelOpen,
+    isModelOpen,
+    callEnd,
+    width500,
+    width768,
+    width900,
+    width1000,
+    timeDifference,
+    height,
+    setSelectedClips,
+    setIsMuted,
+    setIsFeedStopped,
+    setDisplayMsg,
+    setRemoteVideoOff,
+    setIsPinned,
+    setPinnedUser,
+    setVideoController,
+    setIsCanvasMenuNoteShow,
+    setMicNote,
+    setClipSelectNote,
+    setCountClipNoteOpen,
+    setPermissionModal,
+    setIsTooltipShow,
+    setModal,
+    setShowThumbnailForFirstVideo,
+    setShowThumbnailForTwoVideo,
+    setGlobalSliderValue,
+    setIsOpen,
+    setIsOpenConfirm,
+    setIsOpenReport,
+    setIsOpenCrop,
+    setScreenShots,
+    setReportObj,
+    setIsScreenShotModelOpen,
+    setIsModelOpen,
+    setCallEnd,
+    setInitialPinnedUser,
+    resetInitialPinnedUser,
+  } = videoState;
+
+  // Additional state not in hook
+  const [isTraineeJoined, setIsTraineeJoined] = useState(false);
+  const [maxMin, setMaxMin] = useState(false);
+  const [volume, setVolume] = useState(1);
+  const [volume2, setVolume2] = useState(1);
+  const [progressRange, setProgressRange] = useState(0);
+  const [reportArr, setReportArr] = useState([]);
+  const [selectImage, setSelectImage] = useState(0);
+  const [recording, setRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [recordedChunks, setRecordedChunks] = useState([]);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [timeoutReached, setTimeoutReached] = useState(false);
+  const [screenStream, setScreenStream] = useState(null);
+  const [isCallEnded, setIsCallEnded] = useState(false);
+  const [micStream, setMicStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [localStream, setLocalStream] = useState(null);
+
+  const errorHandling = (err) => toast.error(err);
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
     g: 112,
     b: 19,
     a: 1,
   });
-  const { startMeeting  } = useAppSelector(bookingsState);
+  const { startMeeting } = useAppSelector(bookingsState);
 
-  const [remoteStream, setRemoteStream] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const ffmpegRef = useRef(new FFmpeg());
-
-  const [isMuted, setIsMuted] = useState(false);
-  const [isFeedStopped, setIsFeedStopped] = useState(false);
-  const [displayMsg, setDisplayMsg] = useState({ showMsg: false, msg: "" });
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const state = {
-    mousedown: false,
-  };
-  const [selectedClips, setSelectedClips] = useState([]);
-
-  //  
-
-  const selectedVideoRef1 = useRef(null);
-  const selectedVideoRef2 = useRef(null);
-  const progressBarRef = useRef(null);
-  const progressBarRef2 = useRef(null);
-  const globalProgressBarRef = useRef(0);
-  const [progressRange, setProgressRange] = useState(0);
-  const [isRemoteVideoOff, setRemoteVideoOff] = useState(false);
-  const [isPlaying, setIsPlaying] = useState({
-    isPlayingAll: false,
-    number: "",
-    isPlaying1: false,
-    isPlaying2: false,
-  });
-  const [videoTime, setVideoTime] = useState({
-    currentTime1: "00:00",
-    currentTime2: "00:00",
-    remainingTime1: "00:00",
-    remainingTime2: "00:00",
-  });
-  const [maxMin, setMaxMin] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isOpenConfirm, setIsOpenConfirm] = useState(false);
-  const remoteVideoRef = useRef(null);
-  const peerRef = useRef(null);
-  const [isOpenReport, setIsOpenReport] = useState(false);
-  const [isOpenCrop, setIsOpenCrop] = useState(false);
-  const [screenShots, setScreenShots] = useState([]);
-  const [reportObj, setReportObj] = useState({ title: "", topic: "" });
-  const [reportArr, setReportArr] = useState([]);
-  const [selectImage, setSelectImage] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [volume2, setVolume2] = useState(1);
-
-  const volumeInputRef = useRef(null);
-  const volumeInputRef2 = useRef(null);
-
-  const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
-  const [recordedChunks, setRecordedChunks] = useState([]);
-  // const [screenStream, setScreenStream] = useState(null);
-
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [timeoutReached, setTimeoutReached] = useState(false);
-  // const [timeDifference, setTimeDifference] = useState("");
-  const [screenStream, setScreenStream] = useState(null);
-
-  const [isCallEnded, setIsCallEnded] = useState(false);
-  const [micStream, setMicStream] = useState(null);
-
-  const [isModelOpen, setIsModelOpen] = useState(false);
-  const [isScreenShotModelOpen, setIsScreenShotModelOpen] = useState(false);
-
-  const [isPinned, setIsPinned] = useState(false);
-  const [pinnedUser, setPinnedUser] = useState(null);
-  const [videoController, setVideoController] = useState(false);
-  const [isTraineeJoined, setIsTraineeJoined] = useState(false);
-  const [isCanvasMenuNoteShow, setIsCanvasMenuNoteShow] = useState(false);
-  const [micNote, setMicNote] = useState(false);
-  const [clipSelectNote, setClipSelectNote] = useState(false);
-  const [countClipNoteOpen, setCountClipNoteOpen] = useState(false);
-  const [callEnd, setCallEnd] = useState(false);
-  const [permissionModal, setPermissionModal] = useState(true);
-  const width500 = useMediaQuery(500);
-  const width768 = useMediaQuery(768);
-  const width900 = useMediaQuery(900);
-  const width1000 = useMediaQuery(1000);
-
-  const [isTooltipShow, setIsTooltipShow] = useState(true);
-  const [modal, setModal] = useState(false);
-  const [showThumbnailForFirstVideo, setShowThumbnailForFirstVideo] = useState(true);
-  const [showThumbnailForTwoVideo, setShowThumbnailForTwoVideo] = useState(true);
-  const timeDifference = Timer(session_end_time);
-  const errorHandling = (err) => toast.error(err)
-  const [globalSliderValue ,setGlobalSliderValue] = useState(0);
+  // Initialize hooks
+  // Note: Some hooks need to be initialized after certain state is set up
+  // We'll integrate them as we refactor the component
 
 
   /**
@@ -215,26 +244,7 @@ export const HandleVideoCall = ({
 
   // const needsCrossOrigin = videoUrl.startsWith('https://different-domain.com');
 
-  let height = window.innerHeight;
-
-
-  function setInitialPinnedUser() {
-    if (height < 500) {
-      setIsPinned(true)
-      if (accountType === AccountType.TRAINER) {
-        setPinnedUser("user-video-1")
-      } else {
-        setPinnedUser("user-video-2")
-      }
-    }
-  }
-
-  function resetInitialPinnedUser() {
-    if (height < 500) {
-      setIsPinned(false);
-      setPinnedUser(null);
-    }
-  }
+  // setInitialPinnedUser and resetInitialPinnedUser are now provided by useVideoState hook
 
   // selects trainee clips on load
   async function selectTraineeClip (setter){

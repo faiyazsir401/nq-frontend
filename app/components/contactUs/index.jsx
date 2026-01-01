@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import WriteForm from "./WriteForm";
-import "./contact.css";
+import "./contact.scss";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { authState, getMeAsync } from "../auth/auth.slice";
 import SessionsList from "./SessionsList";

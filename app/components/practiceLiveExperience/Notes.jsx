@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { Button } from "reactstrap";
-import "./index.css";
+import "./index.scss";
 const Notes = ({
   isOpen,
   onClose,

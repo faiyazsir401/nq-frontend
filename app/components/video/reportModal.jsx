@@ -20,7 +20,7 @@ import { Utils } from "../../../utils/utils";
 import Notes from "../practiceLiveExperience/Notes";
 import { SocketContext } from "../socket";
 import { EVENTS } from "../../../helpers/events";
-import "./reportModal.css";
+import "./reportModal.scss";
 import { useMediaQuery } from "usehooks-ts";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 

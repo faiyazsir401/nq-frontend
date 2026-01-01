@@ -12,6 +12,7 @@ const Modal = ({
   height,
   overflowHidden = false,
   minHeight = false,
+  className = "",
 }) => {
   return (
     <ReactStrapModal
@@ -19,7 +20,7 @@ const Modal = ({
         allowFullWidth
           ? "react-strap-modal-full"
           : "custom-react-strap-modal-full"
-      } `}
+      } ${className}`}
       isOpen={isOpen}
       toggle={toggle}
       key={id}
@@ -29,7 +30,12 @@ const Modal = ({
         overflow: overflowHidden ? "hidden" : null,
         minHeight: minHeight ? "100vh" : null,
       }}
-      onClick={() =>toggle && toggle()}
+      onClick={(e) => {
+        // Only close if clicking the backdrop (modal itself), not the content
+        if (e.target === e.currentTarget && toggle) {
+          toggle();
+        }
+      }}
     >
       <ModalBody>{element}</ModalBody>
       {footer &&<ModalFooter>{footer}</ModalFooter>}

@@ -1,0 +1,593 @@
+.category-slider-wrapper {
+  position: relative;
+  
+  .category-title {
+    padding-left: 70px; 
+    transition: padding 0.3s ease;
+    font-size: 2rem; // Increased font size for better visibility
+    font-weight: 600; // Make it slightly bolder
+    
+    @media (max-width: 1000px) {
+      padding-left: 0;
+      font-size: 1.5rem; // Slightly smaller on mobile but still prominent
+    }
+  }
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 60px; 
+  box-sizing: border-box;
+  
+  @media (max-width: 1000px) {
+    padding: 0; 
+  }
+}
+
+.slider-content {
+  display: flex;
+  scroll-behavior: smooth;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+  width: 100%;
+  
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  @media (max-width: 1000px) {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.slider-item {
+  min-width: 150px;
+  max-width: 150px;
+  margin-right: 15px;
+  flex-shrink: 0;
+  
+  &:first-child {
+    margin-left: 15px;
+    
+    @media (max-width: 1000px) {
+      margin-left: 0;
+    }
+  }
+  
+  &:last-child {
+    margin-right: 15px;
+    padding-right: 15px;
+    
+    @media (max-width: 1000px) {
+      padding-right: 0;
+    }
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .slider-item {
+    min-width: 280px;
+    max-width: 280px;
+    margin-right: 15px;
+    flex-shrink: 0;
+    
+    &:first-child {
+      margin-left: 15px;
+      
+      @media (max-width: 1000px) {
+        margin-left: 0;
+      }
+    }
+    
+    &:last-child {
+      margin-right: 15px;
+      padding-right: 15px;
+      
+      @media (max-width: 1000px) {
+        padding-right: 0;
+      }
+    }
+  }
+}
+
+.slider-nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #ffffff;
+  border: 2px solid #000080;
+  color: #000080;
+  font-size: 1rem;
+  cursor: pointer;
+  z-index: 10;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+  
+  &:hover {
+    background-color: #000080;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 128, 0.3);
+    transform: translateY(-50%) scale(1.1);
+  }
+  
+  &:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+  
+  &:disabled,
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  
+  @media (max-width: 1000px) {
+    width: 40px;
+    height: 40px;
+    border-width: 1.5px;
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+    
+    &.scrolling {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+  }
+}
+
+.prev-button {
+  left: 10px;
+  
+  @media (max-width: 1000px) {
+    left: 5px;
+  }
+}
+
+.next-button {
+  right: 10px;
+  
+  @media (max-width: 1000px) {
+    right: 5px;
+  }
+}
+
+// Trainer Card Styles
+.trainer-card {
+  display: flex;
+  flex-direction: column;
+  
+  .trainer-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  }
+  
+  .verified-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(4px);
+    border-radius: 20px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    z-index: 2;
+    
+    .verified-icon {
+      color: #28a745;
+      font-size: 14px;
+      line-height: 1;
+    }
+    
+    .verified-text {
+      color: #28a745;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    @media (max-width: 1000px) {
+      top: 6px;
+      right: 6px;
+      padding: 3px 6px;
+      border-radius: 15px;
+      
+      .verified-icon {
+        font-size: 12px;
+      }
+      
+      .verified-text {
+        font-size: 9px;
+      }
+    }
+  }
+  
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    flex-grow: 1;
+    
+    @media (max-width: 1000px) {
+      padding: 0.75rem;
+    }
+  }
+  
+  .trainer-name {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    margin-bottom: 0.5rem;
+  }
+  
+  .hourly-rate {
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+    
+    i {
+      color: #6c757d;
+    }
+    
+    strong {
+      color: #212529;
+    }
+  }
+  
+  .btn {
+    margin-top: auto;
+    white-space: nowrap;
+  }
+}
+
+// Trainer Booking Modal Styles
+.trainer-booking-modal {
+  z-index: 1050;
+  
+  // Backdrop styling
+  + .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    
+    @media (max-width: 768px) {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+  }
+  
+  &.custom-react-strap-modal-full {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    
+    .modal-dialog {
+      max-width: 90%;
+      width: 100%;
+      margin: 2rem auto;
+      display: flex;
+      align-items: center;
+      min-height: calc(100% - 4rem);
+      
+      @media (min-width: 576px) {
+        max-width: 600px;
+        margin: 2.5rem auto;
+      }
+      
+      @media (min-width: 768px) {
+        max-width: 700px;
+        margin: 3rem auto;
+      }
+      
+      @media (min-width: 992px) {
+        max-width: 900px;
+        margin: 3rem auto;
+      }
+      
+      @media (min-width: 1200px) {
+        max-width: 1000px;
+        margin: 4rem auto;
+      }
+    }
+    
+    .modal-content {
+      border-radius: 12px;
+      border: none;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+    }
+    
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+      
+      @media (min-width: 768px) {
+        padding: 2rem;
+      }
+      
+      @media (min-width: 992px) {
+        padding: 2.5rem;
+      }
+      
+      // Custom scrollbar
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+        
+        &:hover {
+          background: #555;
+        }
+      }
+    }
+  }
+  
+  // Smaller modal box on mobile (similar to desktop)
+  &.react-strap-modal-full {
+    @media (max-width: 768px) {
+      padding: 1rem !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      height: 100vh !important;
+      
+      .modal-dialog {
+        max-width: 95% !important;
+        width: 100% !important;
+        margin: 1rem auto !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: 90vh !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      
+      .modal-content {
+        height: auto !important;
+        max-height: 90vh !important;
+        min-height: 400px !important;
+        border-radius: 12px !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        border: none !important;
+      }
+      
+      .modal-body {
+        padding: 1rem !important;
+        padding-top: 3.5rem !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        flex: 1 !important;
+        max-height: calc(90vh - 100px) !important;
+        -webkit-overflow-scrolling: touch;
+        box-sizing: border-box;
+        background: #ffffff !important;
+        
+        // Custom scrollbar for mobile
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 2px;
+        }
+        
+        // Ensure content inside has proper spacing
+        > * {
+          max-width: 100%;
+          box-sizing: border-box;
+        }
+        
+        // Style the trainer details content for mobile
+        .custom-trainer-scroll {
+          position: relative !important;
+          left: auto !important;
+          right: auto !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          height: auto !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          padding-top: 0 !important;
+          overflow-x: hidden !important;
+          overflow-y: visible !important;
+          
+          #trainerinfo {
+            padding: 0.5rem !important;
+            margin: 0 !important;
+            height: auto !important;
+            overflow-x: auto !important;
+            
+            @media (max-width: 576px) {
+              padding: 0.4rem !important;
+            }
+          }
+        }
+        
+        // Override any absolute positioning inside modal
+        .media-body {
+          position: relative !important;
+          padding-top: 0 !important;
+          margin: 0 !important;
+        }
+        
+        .custom-close-icon,
+        .custom-arrow-icon {
+          position: absolute !important;
+          top: 0.75rem !important;
+          right: 0.75rem !important;
+          z-index: 1060 !important;
+          background: #ffffff !important;
+          border-radius: 50% !important;
+          padding: 0.35rem !important;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+          width: 30px !important;
+          height: 30px !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          cursor: pointer !important;
+          transition: all 0.2s ease !important;
+          border: 1px solid rgba(0, 0, 0, 0.1) !important;
+          
+          @media (max-width: 576px) {
+            top: 0.5rem !important;
+            right: 0.5rem !important;
+            width: 26px !important;
+            height: 26px !important;
+            padding: 0.25rem !important;
+          }
+          
+          &:hover {
+            background: #f8f9fa !important;
+            transform: scale(1.05);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
+          }
+          
+          &:active {
+            transform: scale(0.95);
+          }
+          
+          svg {
+            width: 16px !important;
+            height: 16px !important;
+            stroke-width: 2.5 !important;
+            color: #333 !important;
+            
+            @media (max-width: 576px) {
+              width: 14px !important;
+              height: 14px !important;
+              stroke-width: 2.5 !important;
+            }
+          }
+        }
+        
+        // Ensure the div containing close button doesn't interfere with content
+        .ml-2.mt-3 {
+          position: absolute !important;
+          top: 0 !important;
+          right: 0 !important;
+          z-index: 1055 !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          width: auto !important;
+          height: auto !important;
+        }
+      }
+      
+      // Extra small phones
+      @media (max-width: 576px) {
+        padding: 0.75rem !important;
+        
+        .modal-dialog {
+          max-width: 98% !important;
+          margin: 0.75rem auto !important;
+          max-height: 85vh !important;
+        }
+        
+        .modal-content {
+          max-height: 85vh !important;
+          min-height: 350px !important;
+          border-radius: 10px !important;
+        }
+        
+        .modal-body {
+          padding: 0.75rem !important;
+          padding-top: 3rem !important;
+          max-height: calc(85vh - 90px) !important;
+        }
+      }
+      
+      // Very small phones
+      @media (max-width: 375px) {
+        padding: 0.5rem !important;
+        
+        .modal-dialog {
+          max-width: 98% !important;
+          margin: 0.5rem auto !important;
+          max-height: 90vh !important;
+        }
+        
+        .modal-content {
+          max-height: 90vh !important;
+          min-height: 300px !important;
+          border-radius: 8px !important;
+        }
+        
+        .modal-body {
+          padding: 0.6rem !important;
+          padding-top: 2.75rem !important;
+          max-height: calc(90vh - 80px) !important;
+        }
+      }
+    }
+  }
+}
