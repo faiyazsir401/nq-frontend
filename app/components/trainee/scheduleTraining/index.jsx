@@ -335,7 +335,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       debounce((searchValue) => {
         if (searchValue && searchValue.trim()) {
           dispatch(getTraineeWithSlotsAsync({ search: searchValue }));
-        }
+    }
       }, 500), // 500ms delay - waits for user to stop typing
     [dispatch]
   );
@@ -830,7 +830,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
           }}
           selectedOption={(option) => {
             debouncedSearchAPI.cancel();
-            
+             
             if (option && option.isCategory) {
               setTrainerInfo((prev) => ({
                 ...prev,

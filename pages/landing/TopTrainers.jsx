@@ -252,7 +252,7 @@ const CategoryTrainerSlider = ({
             aria-label="Previous trainers"
           >
             <ChevronLeft size={20} />
-          </button>
+        </button>
         )}
         <div 
           ref={sliderRef} 
@@ -279,7 +279,7 @@ const CategoryTrainerSlider = ({
             aria-label="Next trainers"
           >
             <ChevronRight size={20} />
-          </button>
+        </button>
         )}
       </div>
     </div>
@@ -306,21 +306,21 @@ const TrainerCard = ({ trainer, setter }) => {
   return (
     <Card className="overflow-hidden rounded shadow-sm h-100 trainer-card">
       <div className="trainer-image-wrapper position-relative">
-        <img
-          alt={trainer.fullname}
-          style={{
-            width: "100%",
+      <img
+        alt={trainer.fullname}
+        style={{
+          width: "100%",
             maxHeight: isMobileScreen ? 150 : 250,
             minHeight: isMobileScreen ? 150 : 250,
-            maxWidth: "100%",
-            objectFit: "cover",
-          }}
-          src={
-            trainer.profile_picture
-              ? getImageUrl(trainer.profile_picture)
-              : "/assets/images/demoUser.png"
-          }
-        />
+          maxWidth: "100%",
+          objectFit: "cover",
+        }}
+        src={
+          trainer.profile_picture
+            ? getImageUrl(trainer.profile_picture)
+            : "/assets/images/demoUser.png"
+        }
+      />
         {/* Verified Badge on Image */}
         <div className="verified-badge">
           <i className="fa fa-check-circle verified-icon"></i>

@@ -130,7 +130,7 @@ const Faq = (props) => {
 								].map((faq, index) => {
 									const isOpen = openItems.has(index);
 									return (
-										<Card
+								<Card
 											key={faq.id}
 											className="faq-block accordion theme-accordion mb-3"
 											style={{
@@ -167,9 +167,9 @@ const Faq = (props) => {
 															marginRight: "15px",
 															textAlign: "left",
 														}}
-													>
+											>
 														{faq.question}
-													</h5>
+										</h5>
 													<div
 														style={{
 															display: "flex",
@@ -186,7 +186,7 @@ const Faq = (props) => {
 														{isOpen ? <Minus size={18} /> : <Plus size={18} />}
 													</div>
 												</div>
-											</CardHeader>
+									</CardHeader>
 											<Collapse isOpen={isOpen}>
 												<CardBody
 													style={{
@@ -196,17 +196,17 @@ const Faq = (props) => {
 														color: "#333",
 													}}
 												>
-													<p>
-														<img
-															className="img-fluid faq-decor"
-															src="../assets/images/landing/chitchat/2.png"
-															alt="chit-chat-back-img"
-														/>
+											<p>
+												<img
+													className="img-fluid faq-decor"
+													src="../assets/images/landing/chitchat/2.png"
+													alt="chit-chat-back-img"
+												/>
 														{faq.answer}
-													</p>
-												</CardBody>
-											</Collapse>
-										</Card>
+											</p>
+										</CardBody>
+									</Collapse>
+								</Card>
 									);
 								})}
 							</div>
