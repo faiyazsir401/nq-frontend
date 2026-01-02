@@ -101,7 +101,8 @@ const Auth_SignIn = ({isRedirect = true}) => {
                         <input
                           className="form-control"
                           id="inputPassword3"
-                          defaultValue={credential.password}
+                          // defaultValue={credential.password}
+                          value={credential.password}
                           onChange={(e) => handleChange(e)}
                           name="password"
                           type={showPassword ? "text" : "password"}
