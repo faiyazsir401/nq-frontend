@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import { Eye, EyeOff } from "react-feather";
 
 const BasicInfo = (props) => {
   const { values, handleChange, isFromGoogle = false } = props;
   const [passwordError, setPasswordError] = useState("");
   const [nameError, setNameError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const validatePassword = (password) => {
     if (password.length < 6) {
@@ -75,15 +77,37 @@ const BasicInfo = (props) => {
             Password
           </label>
           <span> </span>
-          <input
-            className={`form-control ${passwordError ? "border-danger" : ""}`}
-            id="inputPassword3"
-            onChange={handlePasswordChange}
-            type="password"
-            name="password"
-            placeholder="Password (min 6 chars, 1 number, 1 letter)"
-            value={values.password}
-          />
+          <div style={{ position: "relative" }}>
+            <input
+              className={`form-control ${passwordError ? "border-danger" : ""}`}
+              id="inputPassword3"
+              onChange={handlePasswordChange}
+              type={showPassword ? "text" : "password"}
+              name="password"
+              placeholder="Password (min 6 chars, 1 number, 1 letter)"
+              value={values.password}
+              style={{ paddingRight: "40px" }}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: "absolute",
+                right: "10px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                cursor: "pointer",
+                color: "#6c757d",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {showPassword ? (
+                <EyeOff size={18} />
+              ) : (
+                <Eye size={18} />
+              )}
+            </span>
+          </div>
           {passwordError && <div className="text-danger small mt-1">{passwordError}</div>}
         </div>
       )}

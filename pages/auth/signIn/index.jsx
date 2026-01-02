@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import Link from "next/link";
+import { Eye, EyeOff } from "react-feather";
 import { googleOAuthLink, routingPaths } from "../../../app/common/constants";
 import { useAppDispatch } from "../../../app/store";
 import {
@@ -17,6 +18,7 @@ const Auth_SignIn = ({isRedirect = true}) => {
     email: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,15 +97,37 @@ const Auth_SignIn = ({isRedirect = true}) => {
                         Password
                       </label>
                       <span> </span>
-                      <input
-                        className="form-control"
-                        id="inputPassword3"
-                        defaultValue={credential.password}
-                        onChange={(e) => handleChange(e)}
-                        name="password"
-                        type="password"
-                        placeholder="Enter password"
-                      />
+                      <div style={{ position: "relative" }}>
+                        <input
+                          className="form-control"
+                          id="inputPassword3"
+                          defaultValue={credential.password}
+                          onChange={(e) => handleChange(e)}
+                          name="password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter password"
+                          style={{ paddingRight: "40px" }}
+                        />
+                        <span
+                          onClick={() => setShowPassword(!showPassword)}
+                          style={{
+                            position: "absolute",
+                            right: "10px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            cursor: "pointer",
+                            color: "#6c757d",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </span>
+                      </div>
                     </div>
                     <div className="form-group">
                       <div className="rememberchk">

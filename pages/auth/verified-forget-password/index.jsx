@@ -5,6 +5,7 @@ import {
   verifiedForgetPasswordAsync,
 } from "../../../app/components/auth/auth.slice";
 import { useRouter } from "next/router";
+import { Eye, EyeOff } from "react-feather";
 import { STATUS, routingPaths } from "../../../app/common/constants";
 
 const VerifiedForgetPassword = () => {
@@ -14,6 +15,7 @@ const VerifiedForgetPassword = () => {
   const { token } = router.query;
   const [getToken, setToken] = useState("");
   const [updatePassword, setUpdatePassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -67,16 +69,37 @@ const VerifiedForgetPassword = () => {
                         type="email"
                         placeholder="Demo@123gmail.com"
                       /> */}
-                      <input
-                        className="form-control"
-                        id="inputEmail3"
-                        type="password"
-                        name="password"
-                        placeholder="Enter password"
-                        style={{ placeholder: "red" }}
-                        value={updatePassword}
-                        onChange={(e) => setUpdatePassword(e.target.value)}
-                      />
+                      <div style={{ position: "relative" }}>
+                        <input
+                          className="form-control"
+                          id="inputEmail3"
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          placeholder="Enter password"
+                          style={{ placeholder: "red", paddingRight: "40px" }}
+                          value={updatePassword}
+                          onChange={(e) => setUpdatePassword(e.target.value)}
+                        />
+                        <span
+                          onClick={() => setShowPassword(!showPassword)}
+                          style={{
+                            position: "absolute",
+                            right: "10px",
+                            top: "50%",
+                            transform: "translateY(-50%)",
+                            cursor: "pointer",
+                            color: "#6c757d",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          {showPassword ? (
+                            <EyeOff size={18} />
+                          ) : (
+                            <Eye size={18} />
+                          )}
+                        </span>
+                      </div>
                     </div>
                     <div className="form-group">
                       <div className="d-flex justify-content-center">
