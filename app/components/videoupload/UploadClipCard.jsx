@@ -8,10 +8,11 @@ import { getS3SignUrl } from "./videoupload.api";
 import { AccountType, LIST_OF_ACCOUNT_TYPE } from "../../common/constants";
 import { getMasterData } from "../master/master.api";
 import axios from "axios";
-import { X } from "react-feather";
+import { X, Upload, Video, FileText, Users, Mail, CheckCircle, AlertCircle, Loader } from "react-feather";
 import { toast } from "react-toastify";
 import { getClipsAsync } from "../../common/common.slice";
 import { generateThumbnailURL } from "../common/common.api";
+import "./UploadClipCard.scss";
 import dynamic from 'next/dynamic';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
@@ -143,7 +144,25 @@ const UploadClipCard = (props) => {
       });
     } catch (error) {
       console.error('Error generating thumbnail:', error);
-      await generateThumbnailOnServer(index);
+      // Fallback: try to generate thumbnail on server if client-side generation fails
+      try {
+        const thumbnailUrl = await generateThumbnailURL(videos[index]);
+        if (thumbnailUrl) {
+          const response = await fetch(thumbnailUrl);
+          const blob = await response.blob();
+          setThumbnails(prev => {
+            const newThumbnails = [...prev];
+            newThumbnails[index] = {
+              thumbnailFile: blob,
+              dataUrl: thumbnailUrl,
+              fileType: blob.type
+            };
+            return newThumbnails;
+          });
+        }
+      } catch (serverError) {
+        console.error('Error generating thumbnail on server:', serverError);
+      }
     } finally {
       setLoading(prev => {
         const newLoading = [...prev];
@@ -352,167 +371,227 @@ const UploadClipCard = (props) => {
     setProgress(prev => prev.filter((_, i) => i !== index));
   };
 
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
   return (
-    <div
-      className="d-flex flex-column align-items-center justify-content-center"
-      style={{ minHeight: props.minHeight ?? "" }}
-    >
-      {!isFromCommunity && <h2>Upload Clip</h2>}
-      <div className="form-group" style={{ color: "black" }}>
-        {
-          !isFromCommunity && userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER &&
-          <>
-            <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
+    <div className="upload-clip-container" style={{ minHeight: props.minHeight ?? "" }}>
+      {!isFromCommunity && (
+        <div className="upload-header">
+          <h2 className="upload-title">
+            <Video size={28} className="upload-icon" />
+            Upload Clip
+          </h2>
+          <p className="upload-subtitle">Select and upload your video clips</p>
+        </div>
+      )}
+
+      <div className="upload-form-section">
+        {!isFromCommunity && userInfo?.account_type && userInfo?.account_type !== AccountType.TRAINER && (
+          <div className="form-field-wrapper">
+            <label className="form-label" htmlFor="category">
+              <FileText size={18} className="label-icon" />
               Choose Category
             </label>
             <select
               disabled={isUploading}
-              id="account_type"
-              className="form-control"
-              name="account_type"
+              id="category"
+              className="form-select-custom"
+              name="category"
               onChange={(e) => setCategory(e?.target?.value)}
               value={category}
             >
               <option>Choose Category</option>
               {categoryList?.map((category_type, index) => (
                 <option key={index} value={category_type.label}>
-                  {" "}
                   {category_type.label}
                 </option>
               ))}
             </select>
-          </>
-        }
-        {!isFromCommunity &&
-        <>
-          <label className="col-form-label mt-2 btn_css" htmlFor="account_type">
-            Upload To
-          </label>
-          <select
-            disabled={isUploading}
-            id="account_type"
-            className="form-control"
-            name="account_type"
-            onChange={(e) => setShareWith(e?.target?.value)}
-            value={shareWith}
-          >
-            {Object.values(shareWithConstants)?.map((category_type, index) => (
-              <option key={index} value={category_type}>
-                {" "}
-                {category_type}
-              </option>
-            ))}
-          </select>
-        </>}
-        {
-          !isFromCommunity && shareWith === shareWithConstants.myFriends &&
-          <div className="d-flex flex-column align-items-center">
-            <FriendsPopup props={{ buttonLabel: "Select Friends", setSelectedFriends,selectedFriends,isFromCommunity }} />
-            <div>Total Friends Selected {selectedFriends.length}</div>
           </div>
-        }
-        {
-          shareWith === shareWithConstants.newUsers &&
-          <div className="d-flex flex-column align-items-center">
-            <EmailsPopup props={{ buttonLabel: "Add New User", setSelectedEmails }} />
-            <div>Total Emails Selected {selectedEmails.length}</div>
-          </div>
-        }
+        )}
 
-        <div style={{ textAlign: "center" }}>
-          <label className="col-form-label mt-2">
-            Select clips to upload: &nbsp;
+        {!isFromCommunity && (
+          <div className="form-field-wrapper">
+            <label className="form-label" htmlFor="uploadTo">
+              <Upload size={18} className="label-icon" />
+              Upload To
+            </label>
+            <select
+              disabled={isUploading}
+              id="uploadTo"
+              className="form-select-custom"
+              name="uploadTo"
+              onChange={(e) => setShareWith(e?.target?.value)}
+              value={shareWith}
+            >
+              {Object.values(shareWithConstants)?.map((category_type, index) => (
+                <option key={index} value={category_type}>
+                  {category_type}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {!isFromCommunity && shareWith === shareWithConstants.myFriends && (
+          <div className="share-options-wrapper">
+            <FriendsPopup props={{ buttonLabel: "Select Friends", setSelectedFriends, selectedFriends, isFromCommunity }} />
+            <div className="selection-count">
+              <Users size={16} />
+              <span>Total Friends Selected: <strong>{selectedFriends.length}</strong></span>
+            </div>
+          </div>
+        )}
+
+        {shareWith === shareWithConstants.newUsers && (
+          <div className="share-options-wrapper">
+            <EmailsPopup props={{ buttonLabel: "Add New User", setSelectedEmails }} />
+            <div className="selection-count">
+              <Mail size={16} />
+              <span>Total Emails Selected: <strong>{selectedEmails.length}</strong></span>
+            </div>
+          </div>
+        )}
+
+        <div className="file-upload-wrapper">
+          <label htmlFor="fileUpload" className="file-upload-label">
+            <div className="file-upload-content">
+              <Upload size={24} className="upload-icon-large" />
+              <div className="upload-text">
+                <span className="upload-text-main">Click to select videos</span>
+                <span className="upload-text-sub">or drag and drop</span>
+              </div>
+              <span className="upload-hint">Supports MP4, WebM, QuickTime (Max 150MB per file)</span>
+            </div>
           </label>
           <input
-            disabled={isUploading || userInfo.status!== "approved"}
+            disabled={isUploading || userInfo.status !== "approved"}
             type="file"
             name="file"
             id="fileUpload"
             onChange={handleFileChange}
-            style={{ width: "67%" }}
+            className="file-input-hidden"
             accept="video/*,video/mp4,video/webm,video/quicktime"
             multiple
-            
           />
         </div>
       </div>
 
       {selectedFiles.length > 0 && (
-        <div className="w-100 mt-3">
-          {selectedFiles.map((file, index) => (
-            <div key={index} className="mb-3 p-2 border rounded">
-              <div className="d-flex justify-content-between align-items-center">
-                <span>{file.name}</span>
-                <div
-                  className="icon-btn btn-sm btn-outline-light close-apps pointer"
-                  onClick={() => removeFile(index)}
-                  disabled={isUploading}
-                >
-                  <X size={16} />
+        <div className="selected-files-section">
+          <div className="files-header">
+            <h3 className="files-title">
+              <Video size={20} />
+              Selected Videos ({selectedFiles.length})
+            </h3>
+          </div>
+          <div className="files-list">
+            {selectedFiles.map((file, index) => (
+              <div key={index} className="file-card">
+                <div className="file-card-header">
+                  <div className="file-info">
+                    <Video size={20} className="file-icon" />
+                    <div className="file-details">
+                      <span className="file-name">{file.name}</span>
+                      <span className="file-size">{formatFileSize(file.size)}</span>
+                    </div>
+                  </div>
+                  <button
+                    className="remove-file-btn"
+                    onClick={() => removeFile(index)}
+                    disabled={isUploading}
+                    title="Remove file"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="file-card-body">
+                  <div className="form-field-wrapper">
+                    <label className="form-label-small">Video Title</label>
+                    <input
+                      disabled={isUploading}
+                      className="form-input-custom"
+                      type="text"
+                      placeholder="Enter video title..."
+                      value={titles[index] || ""}
+                      onChange={(e) => handleTitleChange(index, e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="thumbnail-section">
+                    {loading[index] ? (
+                      <div className="thumbnail-loading">
+                        <Loader size={24} className="spinning" />
+                        <span>Generating thumbnail...</span>
+                      </div>
+                    ) : thumbnails[index]?.dataUrl ? (
+                      <div className="thumbnail-wrapper">
+                        <div className="thumbnail-container">
+                          <img
+                            src={thumbnails[index]?.dataUrl}
+                            alt="thumbnail"
+                            className="thumbnail-image"
+                          />
+                          <div className="thumbnail-overlay">
+                            <CheckCircle size={20} className="check-icon" />
+                          </div>
+                        </div>
+                        {isUploading && progress[index] > 0 && (
+                          <div className="progress-container">
+                            <div className="progress-bar-wrapper">
+                              <div 
+                                className="progress-bar-fill" 
+                                style={{ width: `${progress[index]}%` }}
+                              />
+                            </div>
+                            <span className="progress-text">{progress[index]}%</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="thumbnail-error">
+                        <AlertCircle size={20} />
+                        <span>Failed to generate thumbnail. Try another video.</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-
-              <div className="form-group mt-2">
-                <label className="col-form-label">Title</label>
-                <input
-                  disabled={isUploading}
-                  className="form-control"
-                  type="text"
-                  placeholder="Title"
-                  value={titles[index] || ""}
-                  onChange={(e) => handleTitleChange(index, e.target.value)}
-                  required
-                />
-              </div>
-
-              {loading[index] ? (
-                <div className="d-flex align-items-center mt-2">
-                  <div className="spinner-border text-primary" role="status">
-                    <span className="sr-only">Loading...</span>
-                  </div>
-                  <span className="ml-2">Generating thumbnail...</span>
-                </div>
-              ) : thumbnails[index]?.dataUrl ? (
-                <div className="d-flex align-items-center mt-2">
-                  <img
-                    src={thumbnails[index]?.dataUrl}
-                    alt="thumbnail"
-                    style={{
-                      width: 100,
-                      height: 100,
-                      objectFit: 'cover',
-                      border: '1px solid #ddd'
-                    }}
-                  />
-                  <div className="ml-2">
-                   <h2>{progress[index]}%</h2> 
-                  </div>
-                </div>
-              ) : (
-                <div className="text-danger mt-2">
-                  Failed to generate thumbnail. Try another video.
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
-
       {selectedFiles.length > 0 && !loading.some(l => l) && (
-        <div className="d-flex justify-content-center btn_css">
+        <div className="upload-action-section">
           <Button
-            className="mx-3 btn_css"
+            className="upload-button"
             color="primary"
             onClick={handleUpload}
             disabled={isUploading}
           >
-            {isUploading ? "Uploading..." : `Upload ${selectedFiles.length} Videos`}
+            {isUploading ? (
+              <>
+                <Loader size={20} className="spinning" />
+                <span>Uploading...</span>
+              </>
+            ) : (
+              <>
+                <Upload size={20} />
+                <span>Upload {selectedFiles.length} Video{selectedFiles.length > 1 ? 's' : ''}</span>
+              </>
+            )}
           </Button>
         </div>
       )}
-
-      {/* Hidden video and canvas elements are created dynamically in handleFileChange */}
     </div>
   );
 };

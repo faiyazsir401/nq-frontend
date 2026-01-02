@@ -39,9 +39,9 @@ const FooterLanding = (masterRecords) => {
               <div className="footer-categories">
                 {masterRecords?.masterRecords?.category?.map((item, index) => {
                   return (
-                    <div className="footer-category-item" key={`item-${index}`}>
+                    <span className="footer-category-item" key={`item-${index}`}>
                       {item}
-                    </div>
+                    </span>
                   );
                 })}
               </div>

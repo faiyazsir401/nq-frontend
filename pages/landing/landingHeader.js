@@ -78,25 +78,20 @@ const LandingHeader = (masterRecords) => {
             >
               {!isMobileScreen &&
                 <>
-              <Dropdown nav isOpen={dropdownOpen} toggle={toggle}>
+              <Dropdown nav isOpen={dropdownOpen} toggle={toggle} className="categories-dropdown">
                 <DropdownToggle
                   nav
                   caret
-                  style={{ fontSize: "16px", color: "grey" }}
+                  className="categories-dropdown-toggle"
                 >
                   Categories
                 </DropdownToggle>
-                <DropdownMenu>
+                <DropdownMenu className="categories-dropdown-menu">
                   {masterRecords?.masterRecords?.category?.map((cat, index) => {
                     return (
                       <DropdownItem
                         key={`master_data${index}`}
-                        style={{
-                          textDecoration: "underline",
-                          textUnderlineOffset: "0.4em",
-                          textDecorationColor: "#000080",
-                          fontWeight: 500,
-                        }}
+                        className="categories-dropdown-item"
                       >
                         {cat}
                       </DropdownItem>

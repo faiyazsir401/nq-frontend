@@ -135,11 +135,11 @@ const Header = () => {
             className="header-image-logo"
           />
         </div>
-        <div className='menu-container' style={{ marginLeft: 40 }}>
+        <div className='menu-container'>
           {menuItems?.map((item, index) => (
             item?.accessBy?.includes(accountType) && <p
               key={index}
-              className={`${activeNav === item?.value && "active"}`}
+              className={`header-menu-item ${activeNav === item?.value ? "active" : ""}`}
               onClick={() => {
                 if (item?.leftSideBarTab) {
                   TogglTab(item?.leftSideBarTab);
@@ -155,23 +155,10 @@ const Header = () => {
           ))}
         </div>
         <div
-          style={{
-            width: "50px",
-            height: "50px",
-            borderRadius: '50%',
-            overflow: 'hidden',
-            border: `1px solid #0000`,
-            position: 'relative',
-            cursor: 'pointer'
-          }}
+          className="header-profile-picture"
           onClick={togglePopup}
         >
           <img
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover'
-            }}
             src={Utils?.getImageUrlOfS3(userInfo?.profile_picture) || '/assets/images/demoUser.png'}
             alt={userInfo?.fullname}
             onError={(e) => {
