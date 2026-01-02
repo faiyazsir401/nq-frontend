@@ -250,4 +250,3 @@ npm test
 This project is proprietary and confidential. All rights reserved.
 
 **Built with ❤️ by the NetQwix Team**
-
