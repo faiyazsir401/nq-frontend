@@ -15,7 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store";
 import { authState } from "../auth/auth.slice";
 import "./index.scss";
-import Slider from "react-slick";
+import Slider from "react-slick"; 
 import OnlineUserCard from "./banner";
 import {
   addTraineeClipInBookedSessionAsync,
@@ -101,6 +101,7 @@ const NavHomePage = () => {
     }
   };
 
+  //comment added
 
   const [userTimeZone, setUserTimeZone] = useState(
     Intl.DateTimeFormat().resolvedOptions().timeZone
