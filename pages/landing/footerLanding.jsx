@@ -16,75 +16,60 @@ const FooterLanding = (masterRecords) => {
   }, []);
   return (
     <>
-      <div className="container">
-        <div className="row border border-#ffecf2 m-2 rounded">
-          <div className="col-lg-2 col-sm-3 mb-2">
-            <img
-              src="/assets/images/netquix_logo_beta.png"
-              alt="logo"
-              className="mt-2"
-              style={{
-                maxWidth: "150px",
-              }}
-            />
-          </div>
-          <div className="col-sm-9 col-lg-10 ">
-            <p className="mt-4">
-              NetQwix is a community where passionate Experts and Enthusiasts
-              meet LIVE for “Qwick Sessions over the Net”
-            </p>
-          </div>
-        </div>
-        <div className="container mt-5">
-          <div className="row">
-            <div className="col-md-4 col-sm-2 col-lg-4 mb-4">
-              <span>CATEGORIES</span>
-              {masterRecords?.masterRecords?.category?.map((item, index) => {
-                return (
-                  <div className="mt-2" key={`item-${index}`}>
-                    {item}
-                  </div>
-                );
-              })}
+      <div className="footer-landing-wrapper">
+        <div className="container">
+          <div className="row footer-landing-top">
+            <div className="col-lg-2 col-md-3 col-12 footer-logo-col">
+              <img
+                src="/assets/images/netquix_logo_beta.png"
+                alt="logo"
+                className="footer-logo-img"
+              />
             </div>
-            <div className="col-md-4 col-sm-2 col-lg-4 mb-4">
-              <div>
-                {" "}
-                <b>Quick access</b>
-              </div>
-              <ul className="mt-2">
-                {QUICK_ACCESS.map((accessItems, index) => {
-                  return <li><a href={accessItems.link} key={`item-${index}`}>{accessItems.label}</a></li>;
-                })}
-              </ul>
+            <div className="col-lg-10 col-md-9 col-12">
+              <p className="footer-description">
+                NetQwix is a community where passionate Experts and Enthusiasts
+                meet LIVE for "Qwick Sessions over the Net"
+              </p>
             </div>
-            {/* <div className="col-md-4 col-sm-2 col-lg-4">
-              <div>
-                {" "}
-                <b>New Comments</b>
-              </div>
-              <div className="mt-2">
-                {NEW_COMMENTS.map((commentInfo, index) => {
+          </div>
+          <div className="row footer-landing-links">
+            <div className="col-md-6 col-lg-4 footer-link-col">
+              <h6 className="footer-section-title">CATEGORIES</h6>
+              <div className="footer-categories">
+                {masterRecords?.masterRecords?.category?.map((item, index) => {
                   return (
-                    <div className="card bg-light my-2 " key={`item-${index}`}>
-                      <div className="card-content p-2">
-                        <div>
-                          <b>{commentInfo.label}</b>
-                          <p>{commentInfo.comment}</p>
-                        </div>
-                      </div>
+                    <div className="footer-category-item" key={`item-${index}`}>
+                      {item}
                     </div>
                   );
                 })}
               </div>
-            </div>  */}
+            </div>
+            <div className="col-md-6 col-lg-4 footer-link-col">
+              <h6 className="footer-section-title">Quick access</h6>
+              <ul className="footer-quick-access">
+                {QUICK_ACCESS.map((accessItems, index) => {
+                  return (
+                    <li key={`item-${index}`}>
+                      <a href={accessItems.link}>{accessItems.label}</a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           </div>
         </div>
-
-        <div className="row bg-primary p-3 m-2 justify-content-center">
-          <span style={{ fontSize: "14px", color: "white" }}>
-            All Copyright &copy; {new Date().getFullYear()} Reserved
-          </span>
+        <div className="footer-copyright">
+          <div className="container">
+            <div className="row">
+              <div className="col-12 text-center">
+                <span className="copyright-text">
+                  All Copyright &copy; {new Date().getFullYear()} Reserved
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>

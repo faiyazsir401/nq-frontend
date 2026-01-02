@@ -4,10 +4,10 @@ import Link from "next/link";
 
 const Footer = (props) => {
 	return (
-		<footer>
+		<footer className="footer-compact">
 			<Container className="footer-main">
 				<Row className="footer-block">
-					<Col lg="3" md="6">
+					<Col lg="3" md="6" sm="12" className="mb-4 mb-lg-0">
 						<div className="footer-title footer-mobile-title">
 							<h3>About</h3>
 						</div>
@@ -17,10 +17,11 @@ const Footer = (props) => {
 										<img
 											src="/assets/images/logo/landing-logo.png"
 											alt="logo"
+											className="footer-logo"
 										/>
 								</Link>
 							</div>
-							<p>
+							<p className="footer-about-text">
 								Contrary to popular belief, Lorem Ipsum is not simply random
 								text. It has roots in a piece Lorem fugit on looked ipsum.
 							</p>
@@ -60,7 +61,7 @@ const Footer = (props) => {
 							</ul>
 						</div>
 					</Col>
-					<Col lg="2" md="3">
+					<Col lg="2" md="3" sm="6" className="mb-4 mb-lg-0">
 						<div className="links">
 							<div className="footer-title">
 								<h3>Useful Links</h3>
@@ -83,7 +84,7 @@ const Footer = (props) => {
 							</div>
 						</div>
 					</Col>
-					<Col lg="2" md="3">
+					<Col lg="2" md="3" sm="6" className="mb-4 mb-lg-0">
 						<div className="links">
 							<div className="footer-title">
 								<h3>Blog Links</h3>
@@ -106,7 +107,7 @@ const Footer = (props) => {
 							</div>
 						</div>
 					</Col>
-					<Col lg="2" md="4">
+					<Col lg="2" md="3" sm="6" className="mb-4 mb-lg-0">
 						<div className="links">
 							<div className="footer-title">
 								<h3>Authentication</h3>
@@ -129,7 +130,7 @@ const Footer = (props) => {
 							</div>
 						</div>
 					</Col>
-					<Col lg="3" md="4">
+					<Col lg="3" md="4" sm="6" className="mb-4 mb-lg-0">
 						<div className="downlaod">
 							<div>
 								<div className="footer-title">
@@ -172,11 +173,11 @@ const Footer = (props) => {
 			</div>
 			<Container className="copyright-footer">
 				<Row className="copyright">
-					<Col md="6" sm="12">
+					<Col md="6" sm="12" className="mb-2 mb-md-0">
 						<p className="footer-left">© 2021 Chitchat. All Rights Reserved</p>
 					</Col>
 					<Col md="6" sm="12" className="links_horizontal">
-						<p className="text-right">
+						<p className="text-right text-md-right text-center">
 							Made with <span>&hearts; </span>By Theme Pixelstrap
 						</p>
 					</Col>
