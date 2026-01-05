@@ -177,7 +177,7 @@ const Footer = (props) => {
 						<p className="footer-left">© 2021 Chitchat. All Rights Reserved</p>
 					</Col>
 					<Col md="6" sm="12" className="links_horizontal">
-						<p className="text-right text-md-right text-center">
+						<p className="text-right footer-copyright-text">
 							Made with <span>&hearts; </span>By Theme Pixelstrap
 						</p>
 					</Col>

@@ -218,6 +218,14 @@ footer.footer-compact {
   .copyright-footer {
     padding-top: 15px;
     padding-bottom: 15px;
+    
+    .footer-copyright-text {
+      // Right-aligned by default (medium+ screens via text-right class)
+      // Center on small screens using media query
+      @media (max-width: 767px) {
+        text-align: center !important;
+      }
+    }
   }
   
   .social-group {
