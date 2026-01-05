@@ -419,14 +419,13 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
           ToggleTab={ToggleTab}
         /> */}
       <div id="left-nav-wrapper" className="left-nav-wrapper">
-        {openCloseToggleSideNav &&
-          <aside
-            className={`main-nav on custom-scroll ${openCloseToggleSideNav && "open"} ${accountType === AccountType.TRAINEE &&
-              POSITION_FIXED_SIDEBAR_MENU.includes(activeTab) &&
-              "custom-sidebar"
-              }`}
-            style={(width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM) ? {} : { paddingTop: "0px" }}
-          >
+        <aside
+          className={`main-nav on custom-scroll ${openCloseToggleSideNav ? "open" : "closed"} ${accountType === AccountType.TRAINEE &&
+            POSITION_FIXED_SIDEBAR_MENU.includes(activeTab) &&
+            "custom-sidebar"
+            }`}
+          style={(width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM) ? {} : { paddingTop: "0px" }}
+        >
             {/* logo section */}
             {(width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM) && <div className="logo-warpper">
               <img id="Net"
@@ -836,12 +835,19 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                 </li>
               </ul> */}
             </div>
-            {openCloseToggleSideNav &&
-              <ChevronLeft id="ChevronLeft" style={{ right: "-12px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(false)} />
-            }
-          </aside>}
-        {!openCloseToggleSideNav &&
-          <ChevronRight id="ChevronRight" style={{ left: "0px" }} className="collapse-left-drawer-icon" onClick={() => setOpenCloseToggleSideNav(true)} />}
+            <ChevronLeft 
+              id="ChevronLeft" 
+              style={{ right: "-12px" }} 
+              className={`collapse-left-drawer-icon collapse-icon ${openCloseToggleSideNav ? "visible" : "hidden"}`}
+              onClick={() => setOpenCloseToggleSideNav(false)} 
+            />
+          </aside>
+        <ChevronRight 
+          id="ChevronRight" 
+          style={{ left: "0px" }} 
+          className={`collapse-left-drawer-icon collapse-icon ${!openCloseToggleSideNav ? "visible" : "hidden"}`}
+          onClick={() => setOpenCloseToggleSideNav(true)} 
+        />
 
 
 

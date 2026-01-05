@@ -10,7 +10,8 @@ import commonReducer from "../app/common/common.slice";
 import videouploadReducer from "./components/videoupload/videoupload.slice";
 import transactionReducer from "./components/transaction/transaction.slice";
 import contactusReducer from './components/contactUs/contactus.slice';
-import notificationReducer from './components/notifications-service/notification.slice'
+import notificationReducer from './components/notifications-service/notification.slice';
+import instantLessonReducer from './components/instant-lesson/instantLesson.slice';
 
 // OpenReplay tracker configuration
 let openReplayMiddleware = null;
@@ -78,7 +79,8 @@ const makeStore = () => {
       videoupload: videouploadReducer,
       transaction: transactionReducer,
       contactus: contactusReducer,
-      notification: notificationReducer
+      notification: notificationReducer,
+      instantLesson: instantLessonReducer
     },
     middleware: (getDefaultMiddleware) => 
       getDefaultMiddleware().concat(middleware),

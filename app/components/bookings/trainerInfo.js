@@ -136,11 +136,26 @@ const TrainerInfo = () => {
         {/* Right side */}
         <div className={`${width600 ? "col-sm-12" : width1200 ? "row" : width2000 ? "col-sm-3" : ""}  my-3`} style={{ width: "auto !important" }}>
           <div className={`${width600 ? "col-sm-12" : width1200 ? "col-sm-6" : width2000 ? "col-sm-12" : ""}`}>
-            <UserInfoCard />
+            <div className='card trainer-profile-card Home-main-Cont' style={{ 
+              height: "100%", 
+              width: "100%",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none"
+            }}>
+              <UserInfoCard />
+            </div>
           </div>
           <div className={`${width600 ? "col-sm-12" : width1200 ? "col-sm-6" : width2000 ? "col-sm-12" : ""} my-3`} >
-            <div className='card trainer-profile-card Home-main-Cont' style={{ height: "100%", width: "100%", color: "black" }}>
-              <div className='card-body'>
+            <div className='card trainer-profile-card Home-main-Cont' style={{ 
+              height: "100%", 
+              width: "100%", 
+              color: "black",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none"
+            }}>
+              <div className='card-body' style={{ padding: "10px" }}>
                 <RecentUsers />
               </div>
             </div>
@@ -148,8 +163,13 @@ const TrainerInfo = () => {
         </div>
         {/* Middle */}
         <div className={`${width600 ? "col-sm-12" : width1200 ? "col-sm-12" : width2000 ? "col-sm-6" : ""} my-3`} id="Nav-T" style={{ width: "auto !important" }}>
-          <div className='card trainer-profile-card Home-main-Cont' style={{ width: "100%" }}>
-            <div className='card-body'>
+          <div className='card trainer-profile-card Home-main-Cont' style={{ 
+            width: "100%",
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            border: "none"
+          }}>
+            <div className='card-body' style={{ padding: "15px" }}>
               <NavHomePageCenterContainer />
             </div>
           </div>
@@ -158,22 +178,40 @@ const TrainerInfo = () => {
         {/* Left side */}
         <div className={`${width600 ? "col-sm-12" : width1200 ? "row" : width2000 ? "col-sm-3" : ""}`} style={{ width: "auto !important" }}>
           <div className={`${width600 ? "col-sm-12" : width1200 ? "col-sm-6" : width2000 ? "col-sm-12" : ""} my-3`}>
-            <div className='card trainer-profile-card Home-main-Cont' style={{ height: "100%", width: "100%" }}>
-              <div className='card-body'>
+            <div className='card trainer-profile-card Home-main-Cont' style={{ 
+              height: "100%", 
+              width: "100%",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none"
+            }}>
+              <div className='card-body' style={{ padding: "15px" }}>
                 <UploadClipCard progress={progress} setProgress={setProgress} />
               </div>
             </div>
           </div>
           <div className={`${width600 ? "col-sm-12" : width1200 ? "col-sm-6" : width2000 ? "col-sm-12" : ""} my-3`}>
-            <div className='card trainer-profile-card Home-main-Cont' style={{ height: "100%", width: "100%" }}>
-              <div className='card-body'>
+            <div className='card trainer-profile-card Home-main-Cont' style={{ 
+              height: "100%", 
+              width: "100%",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none"
+            }}>
+              <div className='card-body' style={{ padding: "15px" }}>
                 <InviteFriendsCard />
               </div>
             </div>
           </div>
           <div className={`${width600 ? "col-sm-12" : width1200 ? "col-sm-6" : width2000 ? "col-sm-12" : ""} my-3`}>
-            <div className='card trainer-profile-card Home-main-Cont' style={{ height: "100%", width: "100%" }}>
-              <div className='card-body'>
+            <div className='card trainer-profile-card Home-main-Cont' style={{ 
+              height: "100%", 
+              width: "100%",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none"
+            }}>
+              <div className='card-body' style={{ padding: "15px" }}>
                 <ShareClipsCard />
               </div>
             </div>

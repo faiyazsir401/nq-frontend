@@ -531,8 +531,7 @@ const NavHomePage = () => {
             padding: "0px",
             height: "100%",
             display: width1200 || width600 ? "flex" : "block",
-            gap: width600 ? "30px" : "0px",
-
+            gap: width600 ? "20px" : width1200 ? "15px" : "0px",
           }}
         >
           <div
@@ -545,10 +544,18 @@ const NavHomePage = () => {
                   : ""
               }`}
             style={{
-              height: width600 ? "" : "400px",
+              height: width600 ? "auto" : "400px",
             }}
           >
-            <UserInfoCard />
+            <div className="card trainer-profile-card Home-main-Cont" style={{ 
+              height: "100%", 
+              width: "100%", 
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none"
+            }}>
+              <UserInfoCard />
+            </div>
           </div>
 
           {(width1000 && friendRequests && friendRequests.length > 0) ? (
@@ -565,21 +572,31 @@ const NavHomePage = () => {
                 height: width1200 ? "100%" : "calc(100% - 400px)",
               }}
             >
+            <div
+              className={`card trainer-profile-card Home-main-Cont`}
+              style={{ 
+                width: "100%", 
+                color: "black", 
+                height: "100%",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "none"
+              }}
+            >
               <div
-                className={`card trainer-profile-card Home-main-Cont `}
-                style={{ width: "100%", color: "black", height: "100%" }}
+                className="card-body"
+                style={{
+                  height: "100%",
+                  padding: "15px"
+                }}
               >
-                <div
-                  className="card-body"
-                  style={{
-                    height: "100%",
-
-                  }}
-                >
-                  <h3 style={{
-                    textAlign: "center",
-                    marginBottom: "20px",
-                  }}>Recent Friend Requests</h3>
+                <h3 style={{
+                  textAlign: "center",
+                  marginBottom: "20px",
+                  fontSize: width600 ? "18px" : "20px",
+                  fontWeight: "600",
+                  color: "#333"
+                }}>Recent Friend Requests</h3>
                   <div style={{
                     display: "flex",
                     flexWrap: "wrap",
@@ -698,13 +715,21 @@ const NavHomePage = () => {
                             </div>
                         </div> */}
             <div
-              className={`card trainer-profile-card Home-main-Cont `}
-              style={{ width: "100%", color: "black", height: "100%" }}
+              className={`card trainer-profile-card Home-main-Cont`}
+              style={{ 
+                width: "100%", 
+                color: "black", 
+                height: "100%",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "none"
+              }}
             >
               <div
                 className="card-body"
                 style={{
                   height: "100%",
+                  padding: "10px"
                 }}
               >
                 <RecentUsers />
@@ -731,11 +756,14 @@ const NavHomePage = () => {
               width: "100%",
               overflow: "auto",
               minWidth: "97%",
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none"
             }}
           >
             <div
               className="card-body"
-              style={{ padding: width600 ? "5px" : "auto" }}
+              style={{ padding: width600 ? "10px" : "15px" }}
             >
               <NavHomePageCenterContainer />
             </div>
@@ -768,10 +796,16 @@ const NavHomePage = () => {
             }}
           >
             <div
-              className="card trainer-profile-card Home-main-Cont "
-              style={{ height: "100%", width: "100%" }}
+              className="card trainer-profile-card Home-main-Cont"
+              style={{ 
+                height: "100%", 
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "none"
+              }}
             >
-              <div className="card-body">
+              <div className="card-body" style={{ padding: "15px" }}>
                 <UploadClipCard progress={progress} setProgress={setProgress} />
               </div>
             </div>
@@ -797,20 +831,25 @@ const NavHomePage = () => {
                 minWidth: "200px",
                 width: "100%",
                 minHeight: "10rem",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "none",
+                overflow: "hidden"
               }}
             >
-              <div className="card-body">
+              <div className="card-body" style={{ padding: "0px" }}>
                 <div>
                   {/* <ShareClipsCard /> */}
                   <img
                     src={"/assets/images/dashboard-card.webp"}
-                    alt="trainer_image"
+                    alt="dashboard card"
                     className="rounded"
                     style={{
                       height: "150px",
                       width: "100%",
                       marginInline: "auto",
                       display: "block",
+                      objectFit: "cover"
                     }}
                     onError={(e) => {
                       e.target.src = "/assets/images/dashboard-card.webp";
@@ -835,9 +874,15 @@ const NavHomePage = () => {
           >
             <div
               className="card trainer-profile-card Home-main-Cont"
-              style={{ height: "100%", width: "100%" }}
+              style={{ 
+                height: "100%", 
+                width: "100%",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "none"
+              }}
             >
-              <div className="card-body">
+              <div className="card-body" style={{ padding: "15px" }}>
                 <InviteFriendsCard />
               </div>
             </div>
@@ -858,20 +903,29 @@ const NavHomePage = () => {
           >
             <div
               className="card trainer-profile-card Home-main-Cont"
-              style={{ height: "auto", width: "100%", minHeight: "10rem" }}
+              style={{ 
+                height: "auto", 
+                width: "100%", 
+                minHeight: "10rem",
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "none",
+                overflow: "hidden"
+              }}
             >
-              <div className="card-body">
+              <div className="card-body" style={{ padding: "0px" }}>
                 <div>
                   {/* <ShareClipsCard /> */}
                   <img
                     src={"/assets/images/callaway.jpg"}
-                    alt="trainer_image"
+                    alt="callaway card"
                     className="rounded"
                     style={{
                       height: "150px",
                       marginInline: "auto",
                       display: "block",
                       width: "100%",
+                      objectFit: "cover"
                     }}
                     onError={(e) => {
                       e.target.src = "/assets/images/callaway.jpg";

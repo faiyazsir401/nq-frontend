@@ -206,101 +206,197 @@ const UserInfoCard = () => {
   return (
     <>
       {/* <ToastContainer /> */}
-      <div className={`Trainer-box-1 card-body`} style={{ height: "100%" }}>
+      <div className={`Trainer-box-1 card-body`} style={{ 
+        height: "100%", 
+        display: "flex", 
+        flexDirection: "column", 
+        alignItems: "center", 
+        gap: width600 ? "10px" : "15px",
+        padding: width600 ? "10px" : "15px"
+      }}>
         <div
+          className="profile-picture-container"
           style={{
             position: "relative",
-            width: "200px",
-            height: "200px",
-            borderRadius: "5px",
-            border: "3px solid #000080",
-            padding: "5px",
-            transition: 'all 0.6s linear'
+            width: width600 ? "120px" : width1200 ? "160px" : "200px",
+            height: width600 ? "120px" : width1200 ? "160px" : "200px",
+            borderRadius: "50%",
+            border: width600 ? "2px solid #000080" : "3px solid #000080",
+            overflow: "hidden",
+            transition: 'all 0.3s ease',
+            cursor: "pointer",
+            margin: "0 auto"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.05)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 128, 0.3)";
+            const overlay = e.currentTarget.querySelector('.profile-edit-overlay');
+            if (overlay) overlay.style.opacity = "1";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "none";
+            const overlay = e.currentTarget.querySelector('.profile-edit-overlay');
+            if (overlay) overlay.style.opacity = "0";
+          }}
+          onClick={() => {
+            if (!croppedImage) {
+              document.getElementById("profilePictureInput")?.click();
+            }
           }}
         >
-
           {!croppedImage ? (
-            <img
-              src={displayedImage?.startsWith("blob:")
-                ? displayedImage
-                : Utils.getImageUrlOfS3(displayedImage) || "/assets/images/demoUser.png"}
-              alt="trainer_image"
-              className="rounded"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                borderRadius: "50%",
-                transition: 'all 0.6s linear'
-              }}
-              onError={(e) => {
-                e.target.src = "/assets/images/demoUser.png";
-              }}
-            />
+            <>
+              <img
+                src={displayedImage?.startsWith("blob:")
+                  ? displayedImage
+                  : Utils.getImageUrlOfS3(displayedImage) || "/assets/images/demoUser.png"}
+                alt="profile_image"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                  transition: 'all 0.3s ease',
+                  pointerEvents: "none"
+                }}
+                onError={(e) => {
+                  e.target.src = "/assets/images/demoUser.png";
+                }}
+              />
+              {/* Edit button overlay */}
+              <div
+                className="profile-edit-overlay"
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(0, 0, 0, 0.6)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  opacity: 0,
+                  transition: "opacity 0.3s ease",
+                  cursor: "pointer",
+                  pointerEvents: "auto"
+                }}
+              >
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "3px",
+                  color: "white"
+                }}>
+                  <Edit size={width600 ? 18 : 24} />
+                  {!width600 && <span style={{ fontSize: "12px", fontWeight: "500" }}>Edit</span>}
+                </div>
+              </div>
+            </>
           ) : (
-            <span>Uploading... </span>
+            <div style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#f0f0f0"
+            }}>
+              <span style={{ color: "#000080", fontWeight: "500" }}>Uploading...</span>
+            </div>
           )}
-
-
+          <input
+            id="profilePictureInput"
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handlePictureChange}
+          />
         </div>
-        <div className="">
+        <div style={{ width: "100%", textAlign: "center" }}>
+          <h4 style={{ 
+            marginBottom: width600 ? "8px" : "10px", 
+            fontWeight: "600", 
+            color: "#333",
+            fontSize: width600 ? "14px" : width1200 ? "16px" : "18px"
+          }}>
+            {profile?.fullname || userInfo?.fullname || "User"}
+          </h4>
+          
           {accountType === AccountType?.TRAINER && (
-            <div div className="Hourly-up">
-              <h3 className="Hourly-rate">
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              justifyContent: "center", 
+              gap: width600 ? "6px" : "10px",
+              marginBottom: width600 ? "8px" : "10px",
+              flexWrap: "wrap"
+            }}>
+              <h5 style={{ 
+                margin: 0, 
+                fontWeight: "500", 
+                color: "#666",
+                fontSize: width600 ? "12px" : width1200 ? "14px" : "16px"
+              }}>
                 Hourly Rate: $
                 {isEditing ? (
                   <input
-                    className="Rate-input-box"
                     type="number"
-                    value={profile?.extraInfo?.hourly_rate}
+                    value={profile?.extraInfo?.hourly_rate || 0}
                     onChange={handleRateChange}
                     onBlur={handleSaveClick}
+                    style={{
+                      width: width600 ? "60px" : "80px",
+                      padding: width600 ? "3px 6px" : "4px 8px",
+                      border: "1px solid #000080",
+                      borderRadius: "4px",
+                      fontSize: width600 ? "12px" : "14px",
+                      marginLeft: "5px"
+                    }}
                   />
                 ) : (
-                  profile?.extraInfo?.hourly_rate
+                  <span style={{ color: "#000080", fontWeight: "600" }}>
+                    {profile?.extraInfo?.hourly_rate || 0}
+                  </span>
                 )}
-              </h3>
+              </h5>
               <button
-                className="icon-btn btn-outline-light btn-sm edit-btn Trainer"
+                className="icon-btn btn-outline-primary btn-sm"
                 type="button"
                 onClick={isEditing ? handleSaveClick : handleEditClick}
+                style={{
+                  padding: width600 ? "3px 6px" : "4px 8px",
+                  border: "1px solid #000080",
+                  borderRadius: "4px",
+                  backgroundColor: isEditing ? "#000080" : "transparent",
+                  color: isEditing ? "white" : "#000080",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease"
+                }}
               >
-                {isEditing ? <Save /> : <Edit />}
+                {isEditing ? <Save size={width600 ? 14 : 16} /> : <Edit size={width600 ? 14 : 16} />}
               </button>
             </div>
           )}
 
           {accountType === AccountType?.TRAINER &&
             showRatings(trainerRatings, "d-flex justify-content-center")}
+          
           {userInfo &&
             userInfo.extraInfo &&
             userInfo.extraInfo.social_media_links &&
             userInfo.extraInfo.social_media_links ? (
-            <SocialMediaIcons
-              profileImageURL={""}
-              social_media_links={userInfo.extraInfo.social_media_links}
-              isvisible={false}
-            />
-          ) : null}
-        </div>
-
-        <div className="Change-up-button">
-          {!croppedImage ? (
-            <>
-              <label
-                htmlFor="profilePictureInput"
-                className="btn btn-primary btn-sm"
-              >
-                change Picture
-              </label>
-              <input
-                id="profilePictureInput"
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={handlePictureChange}
+            <div style={{ marginTop: width600 ? "8px" : "10px" }}>
+              <SocialMediaIcons
+                profileImageURL={""}
+                social_media_links={userInfo.extraInfo.social_media_links}
+                isvisible={false}
+                isMobile={width600}
               />
-            </>
+            </div>
           ) : null}
         </div>
       </div>

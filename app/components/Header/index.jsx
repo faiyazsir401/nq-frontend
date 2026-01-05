@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../store";
 import { authAction, authState } from "../auth/auth.slice";
 import { AccountType, LOCAL_STORAGE_KEYS, leftSideBarOptions, topNavbarOptions } from "../../common/constants";
 import PopupContent from "../trainee/scheduleTraining/PopupContent";
-import { SocketContext } from "../socket";
+import { SocketContext } from "../socket/SocketProvider";
 import { useRouter } from "next/router";
 import StudentRecord from "./StudentTab/StudentRecord";
 
@@ -31,8 +31,12 @@ const Header = () => {
   const router = useRouter();
   const [isSticky, setIsSticky] = useState(false);
   const [activeNav, setActiveNav] = useState(null)
-  const { userInfo, topNavbarActiveTab, sidebarActiveTab, accountType } = useAppSelector(authState);
+  const { userInfo, topNavbarActiveTab, sidebarActiveTab, accountType: accountTypeFromRedux } = useAppSelector(authState);
   const dispatch = useAppDispatch()
+  
+  // Use userInfo.account_type as fallback if accountType from Redux is not set
+  // Check if we're in browser before accessing localStorage (SSR safety)
+  const accountType = accountTypeFromRedux || userInfo?.account_type || (typeof window !== 'undefined' ? localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE) : null);
   const TogglTab = (value) => {
     if (value == "file") {
       dispatch(authAction?.setActiveModalTab(value));

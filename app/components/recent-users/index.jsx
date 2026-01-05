@@ -98,7 +98,7 @@ const RecentUsers = () => {
 
   return (
 
-    <div className="card rounded trainer-profile-card Select Recent Student">
+    <div className="card rounded trainer-profile-card Select Recent Student" style={{ height: "100%" }}>
       {trainerInfo && trainerInfo.userInfo ? (
         <Modal
           className="recent-user-modal"
@@ -162,7 +162,14 @@ const RecentUsers = () => {
       )}
       <h2
         className="Recent-Heading"
-        style={{ textAlign: "center", fontSize: "20px" }}
+        style={{ 
+          textAlign: "center", 
+          fontSize: width600 ? "18px" : "20px",
+          fontWeight: "600",
+          color: "#333",
+          marginBottom: "15px",
+          paddingTop: "15px"
+        }}
       >
         Recent {accountType === AccountType?.TRAINER ? "Students" : "Experts"}
       </h2>
@@ -171,23 +178,23 @@ const RecentUsers = () => {
         style={{
           width: "100%",
           maxHeight: "95%",
-          // height :"300px",
           marginTop: "5px",
-          // overflowX: "auto",
+          overflowY: "auto",
+          padding: "10px"
         }}
       >
         <div
           className="row"
-          style={{ justifyContent: "center", paddingTop: "10px" }}
+          style={{ justifyContent: "center", paddingTop: "5px" }}
         >
           <div
             className="recent-users"
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(100px, 1fr))",
-              gridGap: width600 ? "15px" : "10px",
+              gridTemplateColumns: width600 ? "repeat(1, 1fr)" : "repeat(2, minmax(100px, 1fr))",
+              gridGap: width600 ? "20px" : "15px",
               paddingTop: "5px",
-              width: width600 ? "50%" : "100%",
+              width: "100%",
               justifyContent: "center",
               alignItems: "center",
             }}
@@ -196,91 +203,166 @@ const RecentUsers = () => {
             {accountType === AccountType?.TRAINER &&
               recentStudent?.map((item, index) => (
                 <div
+                  key={index}
                   style={{
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-
-                    // padding : "5px",
                     textAlign: "center",
                     overflow: "hidden",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f5f5f5";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  onClick={() => {
+                    handleStudentClick(item);
+                    SetselectedStudentData({ ...item });
                   }}
                 >
-                  <img
-                    className="Image-Division"
+                  <div
                     style={{
-                      marginRight: "0px",
-                      border: "2px solid rgb(0, 0, 128)",
+                      width: width600 ? "100px" : "80px",
+                      height: width600 ? "100px" : "80px",
+                      borderRadius: "50%",
+                      border: "3px solid rgb(0, 0, 128)",
+                      padding: "3px",
+                      marginBottom: "8px",
+                      transition: "all 0.3s ease",
                     }}
-                    key={index}
-                    // src={item?.profile_picture}
-                    src={
-                      Utils?.getImageUrlOfS3(item?.profile_picture) ||
-                      "/assets/images/demoUser.png"
-                    }
-                    alt={`Recent Enthusiast ${index + 1}`}
-                    onError={(e) => {
-                      e.target.src = "/assets/images/demoUser.png"; // Set default image on error
+                  >
+                    <img
+                      className="Image-Division"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        marginRight: "0px",
+                      }}
+                      src={
+                        Utils?.getImageUrlOfS3(item?.profile_picture) ||
+                        "/assets/images/demoUser.png"
+                      }
+                      alt={`Recent Student ${index + 1}`}
+                      onError={(e) => {
+                        e.target.src = "/assets/images/demoUser.png";
+                      }}
+                    />
+                  </div>
+                  <h5 
+                    style={{ 
+                      maxWidth: "100px", 
+                      marginBottom: "0px",
+                      fontSize: width600 ? "14px" : "12px",
+                      fontWeight: "500",
+                      color: "#333",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
                     }}
-                    onClick={() => {
-                      handleStudentClick(item);
-                      SetselectedStudentData({ ...item });
-                    }}
-                  />
-                  <h5 class="d-inline-block" style={{ maxWidth: "80px", marginBottom: "5px" }}>{item?.fullname}</h5>
+                  >
+                    {item?.fullname}
+                  </h5>
                 </div>
               ))}
 
             {accountType === AccountType?.TRAINEE &&
               recentTrainer?.map((item, index) => (
                 <div
+                  key={index}
                   style={{
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-
-                    // padding: "5px",
                     textAlign: "center",
-                    overflow: "hidden"
+                    overflow: "hidden",
+                    cursor: "pointer",
+                    padding: "10px",
+                    borderRadius: "8px",
+                    transition: "all 0.3s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f5f5f5";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  onClick={() => {
+                    setTrainerInfo((prev) => ({
+                      ...prev,
+                      userInfo: item,
+                      selected_category: null,
+                    }));
+                    setSelectedTrainer({
+                      id: item?.id,
+                      trainer_id: item?.id,
+                      data: trainer,
+                    });
+                     
+                    dispatch(getTraineeWithSlotsAsync({ search: item?.fullname }));
+                    
+                    setIsModalOpen(true);
                   }}
                 >
-                  <img
-                    className="Image-Division"
+                  <div
                     style={{
-                      marginRight: "0px",
-                      border: "2px solid rgb(0, 0, 128)",
+                      width: width600 ? "100px" : "80px",
+                      height: width600 ? "100px" : "80px",
+                      borderRadius: "50%",
+                      border: "3px solid rgb(0, 0, 128)",
+                      padding: "3px",
+                      marginBottom: "8px",
+                      transition: "all 0.3s ease",
                     }}
-                    key={index}
-                    // src={item || '/assets/images/demoUser.png'}
-                    src={
-                      Utils?.getImageUrlOfS3(item.profile_picture) ||
-                      "/assets/images/demoUser.png"
-                    }
-                    onClick={() => {
-                      setTrainerInfo((prev) => ({
-                        ...prev,
-                        userInfo: item,
-                        selected_category: null,
-                      }));
-                      setSelectedTrainer({
-                        id: item?.id,
-                        trainer_id: item?.id,
-                        data: trainer,
-                      });
-                       
-                      dispatch(getTraineeWithSlotsAsync({ search: item?.fullname }));
-                      
-                      setIsModalOpen(true);
+                  >
+                    <img
+                      className="Image-Division"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        marginRight: "0px",
+                      }}
+                      src={
+                        Utils?.getImageUrlOfS3(item.profile_picture) ||
+                        "/assets/images/demoUser.png"
+                      }
+                      onError={(e) => {
+                        e.target.src = "/assets/images/demoUser.png";
+                      }}
+                      alt={`Recent Expert ${index + 1}`}
+                    />
+                  </div>
+                  <h5 
+                    style={{ 
+                      maxWidth: "100px", 
+                      marginBottom: "0px",
+                      fontSize: width600 ? "14px" : "12px",
+                      fontWeight: "500",
+                      color: "#333",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap"
                     }}
-                    onError={(e) => {
-                      e.target.src = "/assets/images/demoUser.png"; // Set default image on error
-                    }}
-                    alt={`Recent Enthusiast ${index + 1}`}
-
-                  />
-                  <h5 class="d-inline-block " style={{ maxWidth: "80px", marginBottom: "5px" }}>
+                  >
                     {item.fullname}
                   </h5>
                 </div>

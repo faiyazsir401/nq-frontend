@@ -155,22 +155,31 @@ const Auth_SignIn = ({isRedirect = true}) => {
                       </div>
                     </div>
                     <div className="form-group">
-                      <div className="buttons">
+                      <div className="buttons" style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                         <div
                           className="btn btn-primary button-effect"
                           onClick={() => Login()}
+                          style={{ width: "100%", maxWidth: "400px", padding: "12px 24px", fontSize: "16px", fontWeight: "500" }}
                         >
                           Login
                         </div>
-                        <Link
-                          className="btn button-effect btn-signup"
-                          href={routingPaths.signUp}
-                        >
-                          Sign Up
-                        </Link>
                       </div>
                     </div>
                   </form>
+                  <div className="line">
+                    <h6>OR</h6>
+                  </div>
+                  <div className="form-group">
+                    <div className="buttons" style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+                      <Link
+                        className="btn btn-primary button-effect"
+                        href={routingPaths.signUp}
+                        style={{ width: "100%", maxWidth: "400px", padding: "12px 24px", fontSize: "16px", fontWeight: "500", display: "block", textAlign: "center", textDecoration: "none" }}
+                      >
+                        Sign Up
+                      </Link>
+                    </div>
+                  </div>
                   <div className="line">
                     <h6>OR Connect with</h6>
                   </div>

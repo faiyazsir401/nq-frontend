@@ -12,7 +12,8 @@ import store from "../app/store";
 import AuthGuard, {
   handlePublicRoutes,
 } from "../app/components/auth/AuthGuard";
-import { SocketContext, getSocket } from "../app/components/socket";
+import { SocketProvider } from "../app/components/socket/SocketProvider";
+import InstantLessonProvider from "../app/components/instant-lesson/InstantLessonProvider";
 import { LOCAL_STORAGE_KEYS, routingPaths } from "../app/common/constants";
 import { bookingsAction } from "../app/components/common/common.slice";
 import Script from "next/script";
@@ -239,26 +240,23 @@ export default function MyAppComponent({ Component, pageProps }) {
         </Head>
         <Provider store={store}>
           <AuthGuard>
-            {/* adding socket as context hook */}
-            {/* <SocketContext.Provider  value={getSocket()}>  */}
-            {loader && (
-              // <div className="chitchat-loader">
-              //   <img src="/assets/images/logo/logo_big.png" alt="" />
-              //   <h3>Simple, secure messaging for fast connect to world..!</h3>
-              // </div>
-              <div className="chitchat-loader">
-                <img src="/assets/images/netquix_logo_beta.png" alt="images" />
+            <SocketProvider>
+              {loader && (
+                <div className="chitchat-loader">
+                  <img src="/assets/images/netquix_logo_beta.png" alt="images" />
+                </div>
+              )}
+              <div>
+                <CustomizerContextProvider>
+                  <ChatContextProvider>
+                    <Component {...pageProps} />
+                    {/* Global instant lesson request handler */}
+                    <InstantLessonProvider />
+                  </ChatContextProvider>
+                </CustomizerContextProvider>
+                <ToastContainer />
               </div>
-            )}
-            <div>
-              <CustomizerContextProvider>
-                <ChatContextProvider>
-                  <Component {...pageProps} />
-                </ChatContextProvider>
-              </CustomizerContextProvider>
-              <ToastContainer />
-            </div>
-            {/* </SocketContext.Provider> */}
+            </SocketProvider>
           </AuthGuard>
         </Provider>
       </GoogleOAuthProvider>
