@@ -30,6 +30,12 @@ export const SocketProvider = ({ children }) => {
       return;
     }
 
+    // Guard: Prevent socket connection if URL is missing
+    if (!URL) {
+      console.error('[SOCKET ERROR] Cannot connect socket: NEXT_PUBLIC_API_BASE_URL is undefined');
+      return;
+    }
+
     // Disconnect existing socket before creating new one
     setSocket((prevSocket) => {
       if (prevSocket) {

@@ -136,7 +136,19 @@ const Bookings = ({ accountType = null }) => {
     setTabBook(tab);
   };
 
+  // Use ref to track last fetched tabBook to prevent duplicate calls
+  const lastFetchedTabBookRef = useRef(null);
+  const hasInitialFetchRef = useRef(false);
+
   useEffect(() => {
+    // Guard: Only fetch if tabBook changed or if this is the initial mount
+    if (lastFetchedTabBookRef.current === tabBook && hasInitialFetchRef.current) {
+      return;
+    }
+    
+    lastFetchedTabBookRef.current = tabBook;
+    hasInitialFetchRef.current = true;
+    
     if (accountType === AccountType.TRAINER) {
       if (tabBook) {
         const payload = {
@@ -148,7 +160,7 @@ const Bookings = ({ accountType = null }) => {
     } else {
       dispatch(getScheduledMeetingDetailsAsync());
     }
-  }, [tabBook]);
+  }, [tabBook, accountType, dispatch]);
 
   useEffect(() => {
     if (bookedSession.id) {

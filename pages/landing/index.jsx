@@ -45,20 +45,30 @@ const Landing = () => {
   }, [masterRecords]);
 
   useEffect(() => {
-    if (socket) {
-      socket.on('userStatus', (data) => {
-        dispatch(authAction.updateOnlineUsers(data?.user))
-      });
-
-      socket.on('onlineUser', (data) => {
-        dispatch(authAction.updateOnlineUsers(data?.user))
-      });
+    if (!socket) {
+      return;
     }
-    return () => {
-      socket?.off('userStatus');
-      socket?.off('onlineUser');
+
+    // Socket event handlers - only update state, do NOT trigger API calls
+    const handleUserStatus = (data) => {
+      dispatch(authAction.updateOnlineUsers(data?.user));
     };
-  }, [socket]);
+
+    const handleOnlineUser = (data) => {
+      dispatch(authAction.updateOnlineUsers(data?.user));
+    };
+
+    socket.on('userStatus', handleUserStatus);
+    socket.on('onlineUser', handleOnlineUser);
+
+    // Cleanup: Remove listeners on unmount to prevent duplicates
+    return () => {
+      if (socket) {
+        socket.off('userStatus', handleUserStatus);
+        socket.off('onlineUser', handleOnlineUser);
+      }
+    };
+  }, [socket, dispatch]);
 
   return (
     // <div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Context from "./index";
 import { fetchChatMemberApi, fetchChatApi } from "../../api/index";
 
@@ -20,8 +20,17 @@ const ChatProvider = (props) => {
     typing: true,
   });
   const [isTyeping, setIsTypeing] = useState(false);
+  
+  // Use ref to ensure APIs are called only once on mount
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
+    // Guard: Only run once on mount
+    if (hasFetchedRef.current) {
+      return;
+    }
+    hasFetchedRef.current = true;
+    
     // get all initial chat users
     fetchChatMemberApi().then((res) => {
       setChatMembers(res.data);

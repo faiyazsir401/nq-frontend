@@ -72,6 +72,7 @@ export const settelReqestToBankAccount = async (payload) => {
 
 
 export const getAllTrainers = async () => {
+  console.trace('[API AUDIT] getAllTrainers (top-trainers) called from:');
   try {
     const response = await axiosInstance({
       method: "GET",
