@@ -163,7 +163,7 @@ const InstantLessonModal = () => {
     }
 
     try {
-      // Immediately update UI state
+      // Immediately update UI state - but don't redirect
       dispatch(instantLessonAction.setAccepting());
 
       // Emit accept event via socket
@@ -176,21 +176,11 @@ const InstantLessonModal = () => {
         });
       }
 
-      // Mock delay for connection (simulate API call)
-      // In production, wait for socket confirmation
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Navigate to meeting room (mock - replace with actual lesson ID when available)
-      // For now, we'll just close and show success
-      toast.success("Lesson accepted! Connecting to meeting room...");
+      // Show success message but don't redirect
+      toast.success("Lesson accepted! Waiting for trainee to complete video selection...");
       
-      // TODO: Navigate to actual meeting room when lesson is created
-      // Utils.navigateToMeeting(lessonId);
-      
-      // Close modal after short delay
-      setTimeout(() => {
-        dispatch(instantLessonAction.clearIncomingRequest());
-      }, 500);
+      // Keep modal open - don't close or redirect
+      // The modal will show waiting state until trainee joins
     } catch (error) {
       console.error("Error accepting lesson:", error);
       dispatch(instantLessonAction.setError({ message: "Failed to accept lesson request" }));
@@ -345,12 +335,22 @@ const InstantLessonModal = () => {
               </div>
 
               {!isExpired && (
-                <div className="countdown-timer">
-                  <div className="timer-label">Time Remaining</div>
-                  <div className={`timer-value ${timeRemaining <= 10 ? "timer-warning" : ""}`}>
-                    {formatTime(timeRemaining)}
+                <>
+                  <div className="countdown-timer">
+                    <div className="timer-label">Time Remaining</div>
+                    <div className={`timer-value ${timeRemaining <= 10 ? "timer-warning" : ""}`}>
+                      {formatTime(timeRemaining)}
+                    </div>
                   </div>
-                </div>
+                  {uiState === UI_STATES.ACCEPTING && (
+                    <div className="waiting-message" style={{ marginTop: "15px", padding: "10px", background: "#e7f3ff", borderRadius: "5px", textAlign: "center" }}>
+                      <p style={{ margin: 0, color: "#0066cc", fontWeight: "500" }}>
+                        <i className="fa fa-clock-o" aria-hidden="true" style={{ marginRight: "5px" }}></i>
+                        Waiting for trainee to complete video selection...
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
 
               {isExpired && (
