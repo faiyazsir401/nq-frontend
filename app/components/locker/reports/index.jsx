@@ -23,6 +23,9 @@ import '../../trainer/dashboard/index.scss';
 import ConfirmModal from "../my-clips/confirmModal";
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
+import { Spinner } from "reactstrap";
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
 const Reports = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
@@ -83,6 +86,9 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
   const [isConfirmModalOpen , setIsConfirmModalOpen] = useState(false)
   const [selectedReportId , setSelectedReportId] = useState(null);
   const [selectedRecordingId , setselectedRecordingId] = useState(null);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [isLoadingPDF, setIsLoadingPDF] = useState(false);
+  const [pdfError, setPdfError] = useState(false);
   useEffect(() => {
     setActiveTab(sidebarLockerActiveTab)
     if (sidebarLockerActiveTab === "report") {
@@ -108,6 +114,15 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
     if (!isOpen && activeCenterContainerTab === 'gamePlans') getMyClips()
   }, [isOpen, activeCenterContainerTab])
 
+  // Reset PDF loading state when modal closes
+  useEffect(() => {
+    if (!isOpenPDF) {
+      setIsLoadingPDF(false);
+      setPdfError(false);
+      setReportName("");
+    }
+  }, [isOpenPDF])
+
   function extractDateParts(dateString) {
     const date = new Date(dateString);
     return {
@@ -118,67 +133,74 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
   }
 
   const getMyClips = async () => {
-    var res3
-    if (trainee_id) {
-      res3 = await reports({ trainee_id })
-    } else {
-      res3 = await reports({})
-    }
-    const savedSessions = await getAllSavedSessions()
-    const organizedData = savedSessions.data.reduce((acc, obj) => {
-      const createdAtDate = extractDateParts(obj.createdAt);
-      const key = `${createdAtDate.year}-${createdAtDate.month}-${createdAtDate.day}`;
-
-      if (!acc[key]) {
-        acc[key] = {
-          _id: {
-            year: createdAtDate.year,
-            month: createdAtDate.month,
-            day: createdAtDate.day
-          },
-          report: [],
-          date: new Date(obj.createdAt)
-        };
-      }
-
-      acc[key].report.push(obj);
-
-      return acc;
-    }, {});
-
-    const result = Object.values(organizedData).map(item => ({
-      ...item,
-      show: true,
-    }));
-
-    var temp = res3?.result
-
-    temp = temp.map(vl => {
-      return { ...vl, show: true, date: vl?.report?.length ? new Date(vl?.report[0]?.createdAt) : new Date() }
-    });
-
-    // setReportsData([...result, ...temp])
-
-    const groupedReports = {};
-
-    [...result, ...temp]?.forEach((item) => {
-      const { _id, report, ...rest } = item;
-
-      const idString = JSON.stringify(_id);
-
-      if (groupedReports[idString]) {
-
-        groupedReports[idString].report.push(...report);
+    setIsLoadingData(true);
+    try {
+      var res3
+      if (trainee_id) {
+        res3 = await reports({ trainee_id })
       } else {
-
-        groupedReports[idString] = { _id, report, ...rest };
+        res3 = await reports({})
       }
-    });
+      const savedSessions = await getAllSavedSessions()
+      const organizedData = savedSessions.data.reduce((acc, obj) => {
+        const createdAtDate = extractDateParts(obj.createdAt);
+        const key = `${createdAtDate.year}-${createdAtDate.month}-${createdAtDate.day}`;
 
-    const mergedData = Object.values(groupedReports);
+        if (!acc[key]) {
+          acc[key] = {
+            _id: {
+              year: createdAtDate.year,
+              month: createdAtDate.month,
+              day: createdAtDate.day
+            },
+            report: [],
+            date: new Date(obj.createdAt)
+          };
+        }
 
-    setReportsData(mergedData?.sort((a, b) => new Date(b.date) - new Date(a.date)))
+        acc[key].report.push(obj);
 
+        return acc;
+      }, {});
+
+      const result = Object.values(organizedData).map(item => ({
+        ...item,
+        show: true,
+      }));
+
+      var temp = res3?.result
+
+      temp = temp.map(vl => {
+        return { ...vl, show: true, date: vl?.report?.length ? new Date(vl?.report[0]?.createdAt) : new Date() }
+      });
+
+      // setReportsData([...result, ...temp])
+
+      const groupedReports = {};
+
+      [...result, ...temp]?.forEach((item) => {
+        const { _id, report, ...rest } = item;
+
+        const idString = JSON.stringify(_id);
+
+        if (groupedReports[idString]) {
+
+          groupedReports[idString].report.push(...report);
+        } else {
+
+          groupedReports[idString] = { _id, report, ...rest };
+        }
+      });
+
+      const mergedData = Object.values(groupedReports);
+
+      setReportsData(mergedData?.sort((a, b) => new Date(b.date) - new Date(a.date)))
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+      toast.error("Failed to load reports. Please try again.");
+    } finally {
+      setIsLoadingData(false);
+    }
   }
   function formatDate(dateStr) {
     const date = new Date(dateStr);
@@ -217,11 +239,40 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
     setSelectedReportId(null)
     setselectedRecordingId(null)
   }
+
+  // Initialize PDF viewer plugin with toolbar
+  const defaultLayoutPluginInstance = defaultLayoutPlugin({
+    sidebarTabs: (defaultTabs) => [],
+  });
+
+  const handlePdfLoadSuccess = (e) => {
+    setIsLoadingPDF(false);
+    setPdfError(false);
+  };
+
+  const handlePdfLoadError = (error) => {
+    setIsLoadingPDF(false);
+    setPdfError(true);
+    console.error("PDF loading error:", error);
+  };
+
   return (
     <>
       {/* <ToastContainer /> */}
     <div className="media-gallery portfolio-section grid-portfolio">
-      {reportsData?.length ? reportsData?.map((cl, ind) =>
+      {isLoadingData ? (
+        <div style={{ 
+          display: "flex", 
+          justifyContent: "center", 
+          alignItems: "center", 
+          minHeight: "400px",
+          flexDirection: "column",
+          gap: "20px"
+        }}>
+          <Spinner color="primary" style={{ width: "3rem", height: "3rem" }} />
+          <h5 style={{ color: "#666", margin: 0 }}>Loading Saved Lessons & Game Plans...</h5>
+        </div>
+      ) : reportsData?.length ? reportsData?.map((cl, ind) =>
         <div className={`collapse-block ${!cl?.show ? "" : "open"}`} key={ind}>
           <h5
             className="block-title"
@@ -250,11 +301,13 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                       <dd
                         className="video-container2"
                         style={{ cursor: "pointer", textAlign: "center" }}
-                        onClick={() => {
+                        onClick={async () => {
                           if (accountType === "Trainer") {
                             setCurrentReportData({ session: clp?.session?._id, trainer: clp?.trainer?._id, trainee: clp?.trainee?._id })
                             setIsOpenReport(true)
                           } else {
+                            setIsLoadingPDF(true);
+                            setPdfError(false);
                             setIsOpenPDF(true)
                             setReportName(clp?.session?.report)
                           }
@@ -447,25 +500,183 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
 
       <Modal
         isOpen={isOpenPDF}
+        allowFullWidth={true}
         element={
           <>
-            <div className="container media-gallery portfolio-section grid-portfolio ">
-              <div className="theme-title">
-                <div className="media">
-                  <div className="media-body media-body text-right">
-                    <div className="icon-btn btn-sm btn-outline-light close-apps pointer" onClick={() => { setIsOpenPDF(false) }} > <X /> </div>
-                  </div>
+            <div style={{ 
+              width: "100%", 
+              height: "100vh", 
+              display: "flex", 
+              flexDirection: "column",
+              backgroundColor: "#f5f5f5"
+            }}>
+              {/* Header */}
+              <div style={{
+                padding: "15px 20px",
+                backgroundColor: "#fff",
+                borderBottom: "1px solid #e0e0e0",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+              }}>
+                <h2 style={{ 
+                  margin: 0, 
+                  fontSize: "1.5rem", 
+                  fontWeight: 600,
+                  color: "#333"
+                }}>
+                  Game Plan Report
+                </h2>
+                <div 
+                  className="icon-btn btn-sm btn-outline-light close-apps pointer" 
+                  onClick={() => { 
+                    setIsOpenPDF(false);
+                    setIsLoadingPDF(false);
+                    setPdfError(false);
+                  }}
+                  style={{
+                    padding: "8px",
+                    borderRadius: "50%",
+                    backgroundColor: "#f0f0f0",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "background-color 0.2s"
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#e0e0e0"}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#f0f0f0"}
+                >
+                  <X size={20} />
                 </div>
               </div>
-              <div className="d-flex flex-column align-items-center">
-                <h1 className="p-3">Report</h1>
-                <div style={{ height: '100vh' }} className="pdf-viewer">
+
+              {/* PDF Viewer Container */}
+              <div style={{ 
+                flex: 1, 
+                overflow: "hidden",
+                position: "relative",
+                backgroundColor: "#525252",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}>
+                {isLoadingPDF && (
+                  <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(255, 255, 255, 0.95)",
+                    zIndex: 10,
+                    gap: "20px"
+                  }}>
+                    <Spinner color="primary" style={{ width: "3rem", height: "3rem" }} />
+                    <h5 style={{ color: "#666", margin: 0 }}>Loading PDF...</h5>
+                  </div>
+                )}
+                
+                {pdfError && (
+                  <div style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "#fff",
+                    zIndex: 10,
+                    gap: "15px",
+                    padding: "20px"
+                  }}>
+                    <div style={{ fontSize: "3rem" }}>⚠️</div>
+                    <h5 style={{ color: "#d32f2f", margin: 0, textAlign: "center" }}>
+                      Failed to load PDF
+                    </h5>
+                    <p style={{ color: "#666", textAlign: "center", margin: 0 }}>
+                      The PDF file could not be loaded. Please try again later.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setPdfError(false);
+                        setIsLoadingPDF(true);
+                        // Force re-render by toggling modal
+                        setIsOpenPDF(false);
+                        setTimeout(() => {
+                          setIsOpenPDF(true);
+                        }, 100);
+                      }}
+                      style={{
+                        padding: "10px 20px",
+                        backgroundColor: "#1976d2",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        fontWeight: 500
+                      }}
+                    >
+                      Retry
+                    </button>
+                  </div>
+                )}
+
+                <div style={{ 
+                  width: "100%", 
+                  height: "100%",
+                  maxWidth: "100%",
+                  overflow: "auto"
+                }}>
                   <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                    <Viewer fileUrl={`${awsS3Url}${reportName}`} />
+                    <Viewer 
+                      fileUrl={`${awsS3Url}${reportName}`}
+                      plugins={[defaultLayoutPluginInstance]}
+                      onDocumentLoad={handlePdfLoadSuccess}
+                      renderError={(error) => {
+                        handlePdfLoadError(error);
+                        return (
+                          <div style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            height: "100%",
+                            color: "#d32f2f",
+                            padding: "20px"
+                          }}>
+                            <div style={{ fontSize: "3rem", marginBottom: "10px" }}>⚠️</div>
+                            <p style={{ textAlign: "center" }}>Error loading PDF: {error?.message || "Unknown error"}</p>
+                          </div>
+                        );
+                      }}
+                      renderLoader={(percentages) => (
+                        <div style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          height: "100%",
+                          gap: "20px"
+                        }}>
+                          <Spinner color="primary" style={{ width: "3rem", height: "3rem" }} />
+                          <div style={{ color: "#666" }}>
+                            Loading PDF... {percentages}%
+                          </div>
+                        </div>
+                      )}
+                    />
                   </Worker>
                 </div>
-              </div>
-              <div className="justify-content-center">
               </div>
             </div>
           </>
