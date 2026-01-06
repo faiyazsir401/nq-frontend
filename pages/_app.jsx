@@ -254,7 +254,14 @@ export default function MyAppComponent({ Component, pageProps }) {
                     <InstantLessonProvider />
                   </ChatContextProvider>
                 </CustomizerContextProvider>
-                <ToastContainer />
+                <ToastContainer
+                  autoClose={3000}
+                  closeButton
+                  pauseOnHover
+                  pauseOnFocusLoss
+                  newestOnTop
+                  draggable
+                />
               </div>
             </SocketProvider>
           </AuthGuard>
