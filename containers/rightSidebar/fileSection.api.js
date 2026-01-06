@@ -84,6 +84,7 @@ export const reports = async (payload) => {
   } catch (err) {
     throw err;
   }
+  //error thrown
 };
 export const deleteReports = async (payload) => {
   try {
