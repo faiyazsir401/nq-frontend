@@ -44,14 +44,25 @@ const NotificationPopup = () => {
   const autoCloseTimerRef = useRef(null);
 
   useEffect(() => {
-    if (socket) {
-      socket.on(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE, (notification) => {
-        dispatch(notificationAction.addNotification(notification));
-        notificationHandler(notification);
-      });
-    } else {
+    if (!socket) {
       console.error("Socket is null or undefined");
+      return;
     }
+
+    // Socket event handler - only updates state, does NOT trigger API calls
+    const handleNotification = (notification) => {
+      dispatch(notificationAction.addNotification(notification));
+      notificationHandler(notification);
+    };
+
+    socket.on(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE, handleNotification);
+
+    // Cleanup: Remove listener on unmount to prevent duplicates
+    return () => {
+      if (socket) {
+        socket.off(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE, handleNotification);
+      }
+    };
   }, [socket, dispatch]);
 
   // Reset popup state and clear any running auto-close timer

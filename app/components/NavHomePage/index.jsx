@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import NavHomePageCenterContainer from "./NavHomePageCenterContainer";
 import "./home.scss";
 import ShareClipsCard from "../share-clips";
@@ -108,10 +108,20 @@ const NavHomePage = () => {
   );
   const dispatch = useAppDispatch();
   const { scheduledMeetingDetails } = useAppSelector(bookingsState);
+  
+  // Use ref to ensure APIs are called only once on mount
+  const hasFetchedRef = useRef(false);
+  
   useEffect(() => {
+    // Guard: Only run once on mount
+    if (hasFetchedRef.current) {
+      return;
+    }
+    hasFetchedRef.current = true;
+    
     dispatch(getScheduledMeetingDetailsAsync());
-    getAllLatestActiveTrainer()
-  }, []);
+    getAllLatestActiveTrainer();
+  }, [dispatch]);
 
   var settings = {
     autoplay: true,

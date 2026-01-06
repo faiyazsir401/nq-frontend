@@ -23,6 +23,7 @@ export const addRating = async (payload) => {
 };
 
 export const getScheduledMeetingDetails = async (payload) => {
+  console.trace('[API AUDIT] getScheduledMeetingDetails called from:');
   try {
     const response = await axiosInstance({
       method: "get",

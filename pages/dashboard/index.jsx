@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, useContext } from "react";
+import React, { Fragment, useState, useEffect, useContext, useRef } from "react";
 import LeftSide from "../../containers/leftSidebar";
 import ChitChat from "../../containers/chatBoard";
 import RightSide from "../../containers/rightSidebar";
@@ -44,20 +44,39 @@ const Dashboard = () => {
   const [accountType, setAccountType] = useState("");
   const [openCloseToggleSideNav, setOpenCloseToggleSideNav] = useState(true);
   
+  // Use ref to ensure APIs are called only once on mount
+  // STEP 6: Centralize Dashboard data - All dashboard APIs triggered from ONE place
+  const hasFetchedRef = useRef(false);
+  
   useEffect(() => {
-    WebPushRegister()
+    // Guard: Only run once on mount
+    if (hasFetchedRef.current) {
+      return;
+    }
+    hasFetchedRef.current = true;
+    
+    WebPushRegister();
     // Use userInfo.account_type from Redux if available, otherwise fallback to localStorage
     const accountTypeFromUser = userInfo?.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE);
     setAccountType(accountTypeFromUser);
-    // fetching master data, TODO: stop over calling API calls.
+    
+    // STEP 6: Centralized Dashboard API calls - called only once on mount
+    // These APIs are called from Dashboard only, not from child components
     dispatch(getMasterDataAsync());
-    dispatch(getAllNotifications({page : 1, limit : 10})) ;
+    dispatch(getAllNotifications({page : 1, limit : 10}));
     
     // Get user info if not already loaded and user is logged in
     if ((!userInfo || !userInfo._id)) {
       dispatch(getMeAsync());
     }
-  }, [userInfo, dispatch]);
+  }, []); // Empty dependency array - run only once on mount
+  
+  // Separate effect to update accountType when userInfo changes (without refetching APIs)
+  useEffect(() => {
+    if (userInfo?.account_type) {
+      setAccountType(userInfo.account_type);
+    }
+  }, [userInfo?.account_type]);
 
 
 
