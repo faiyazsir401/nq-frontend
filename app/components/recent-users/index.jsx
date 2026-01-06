@@ -180,7 +180,7 @@ const RecentUsers = () => {
           maxHeight: "95%",
           marginTop: "5px",
           overflowY: "auto",
-          padding: "10px"
+          padding: width600 ? "8px" : "10px"
         }}
       >
         <div
@@ -191,8 +191,8 @@ const RecentUsers = () => {
             className="recent-users"
             style={{
               display: "grid",
-              gridTemplateColumns: width600 ? "repeat(1, 1fr)" : "repeat(2, minmax(100px, 1fr))",
-              gridGap: width600 ? "20px" : "15px",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gridGap: width600 ? "12px" : "15px",
               paddingTop: "5px",
               width: "100%",
               justifyContent: "center",
@@ -212,9 +212,10 @@ const RecentUsers = () => {
                     textAlign: "center",
                     overflow: "hidden",
                     cursor: "pointer",
-                    padding: "10px",
+                    padding: width600 ? "8px 4px" : "10px",
                     borderRadius: "8px",
                     transition: "all 0.3s ease",
+                    width: "100%",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = "#f5f5f5";
@@ -233,13 +234,19 @@ const RecentUsers = () => {
                 >
                   <div
                     style={{
-                      width: width600 ? "100px" : "80px",
-                      height: width600 ? "100px" : "80px",
+                      width: width600 ? "70px" : "80px",
+                      height: width600 ? "70px" : "80px",
                       borderRadius: "50%",
-                      border: "3px solid rgb(0, 0, 128)",
-                      padding: "3px",
-                      marginBottom: "8px",
+                      border: width600 ? "2px solid rgb(0, 0, 128)" : "3px solid rgb(0, 0, 128)",
+                      padding: "2px",
+                      marginBottom: width600 ? "6px" : "8px",
                       transition: "all 0.3s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                      backgroundColor: "#fff",
+                      boxSizing: "border-box",
                     }}
                   >
                     <img
@@ -249,7 +256,8 @@ const RecentUsers = () => {
                         height: "100%",
                         borderRadius: "50%",
                         objectFit: "cover",
-                        marginRight: "0px",
+                        objectPosition: "center",
+                        display: "block",
                       }}
                       src={
                         Utils?.getImageUrlOfS3(item?.profile_picture) ||
@@ -263,14 +271,16 @@ const RecentUsers = () => {
                   </div>
                   <h5 
                     style={{ 
-                      maxWidth: "100px", 
+                      maxWidth: "100%", 
                       marginBottom: "0px",
-                      fontSize: width600 ? "14px" : "12px",
+                      fontSize: width600 ? "12px" : "12px",
                       fontWeight: "500",
                       color: "#333",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      whiteSpace: "nowrap"
+                      whiteSpace: "nowrap",
+                      width: "100%",
+                      padding: "0 4px",
                     }}
                   >
                     {item?.fullname}
@@ -290,9 +300,10 @@ const RecentUsers = () => {
                     textAlign: "center",
                     overflow: "hidden",
                     cursor: "pointer",
-                    padding: "10px",
+                    padding: width600 ? "8px 4px" : "10px",
                     borderRadius: "8px",
                     transition: "all 0.3s ease",
+                    width: "100%",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = "#f5f5f5";
@@ -323,13 +334,19 @@ const RecentUsers = () => {
                 >
                   <div
                     style={{
-                      width: width600 ? "100px" : "80px",
-                      height: width600 ? "100px" : "80px",
+                      width: width600 ? "70px" : "80px",
+                      height: width600 ? "70px" : "80px",
                       borderRadius: "50%",
-                      border: "3px solid rgb(0, 0, 128)",
-                      padding: "3px",
-                      marginBottom: "8px",
+                      border: width600 ? "2px solid rgb(0, 0, 128)" : "3px solid rgb(0, 0, 128)",
+                      padding: "2px",
+                      marginBottom: width600 ? "6px" : "8px",
                       transition: "all 0.3s ease",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                      backgroundColor: "#fff",
+                      boxSizing: "border-box",
                     }}
                   >
                     <img
@@ -339,7 +356,8 @@ const RecentUsers = () => {
                         height: "100%",
                         borderRadius: "50%",
                         objectFit: "cover",
-                        marginRight: "0px",
+                        objectPosition: "center",
+                        display: "block",
                       }}
                       src={
                         Utils?.getImageUrlOfS3(item.profile_picture) ||
@@ -353,14 +371,16 @@ const RecentUsers = () => {
                   </div>
                   <h5 
                     style={{ 
-                      maxWidth: "100px", 
+                      maxWidth: "100%", 
                       marginBottom: "0px",
-                      fontSize: width600 ? "14px" : "12px",
+                      fontSize: width600 ? "12px" : "12px",
                       fontWeight: "500",
                       color: "#333",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
-                      whiteSpace: "nowrap"
+                      whiteSpace: "nowrap",
+                      width: "100%",
+                      padding: "0 4px",
                     }}
                   >
                     {item.fullname}
