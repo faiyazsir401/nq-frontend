@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { SocketContext } from "../socket";
 import { notificationAction } from "../notifications-service/notification.slice";
@@ -41,6 +41,7 @@ const NotificationPopup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasShownPopup, setHasShownPopup] = useState(false);
   const [lastNotificationId, setLastNotificationId] = useState(null);
+  const autoCloseTimerRef = useRef(null);
 
   useEffect(() => {
     if (socket) {
@@ -53,11 +54,16 @@ const NotificationPopup = () => {
     }
   }, [socket, dispatch]);
 
-  // Reset popup state when component unmounts or user changes
+  // Reset popup state and clear any running auto-close timer
+  // when component unmounts or user changes
   useEffect(() => {
     return () => {
       setHasShownPopup(false);
       setLastNotificationId(null);
+      if (autoCloseTimerRef.current) {
+        clearTimeout(autoCloseTimerRef.current);
+        autoCloseTimerRef.current = null;
+      }
     };
   }, [userInfo?._id]);
 
@@ -195,16 +201,26 @@ const NotificationPopup = () => {
     tempObj.title = notification.title;
     tempObj.description = notification.description;
     setModelObj(tempObj);
-    
+
     // Only show popup if not already shown and no drawing canvas is present
     if (!document.getElementById("drawing-canvas") && !hasShownPopup) {
       SetIsOpen(true);
       setHasShownPopup(true);
       setLastNotificationId(notification._id);
+      if (autoCloseTimerRef.current) {
+        clearTimeout(autoCloseTimerRef.current);
+      }
+      autoCloseTimerRef.current = setTimeout(() => {
+        SetIsOpen(false);
+      }, 3000);
     }
   };
 
   const toggle = () => {
+    if (autoCloseTimerRef.current) {
+      clearTimeout(autoCloseTimerRef.current);
+      autoCloseTimerRef.current = null;
+    }
     SetIsOpen((prev) => !prev);
   };
 
@@ -223,9 +239,8 @@ const NotificationPopup = () => {
         id="notification_Model_id"
         element={
           <>
-            {" "}
             <Modal isOpen={isOpen} toggle={toggle} centered={true}>
-              <ModalHeader>{modelObj?.title}</ModalHeader>
+              <ModalHeader toggle={toggle}>{modelObj?.title}</ModalHeader>
               <ModalBody>{modelObj?.description}</ModalBody>
               <ModalFooter>
                 <Button

@@ -10,7 +10,7 @@ import { getMasterData } from "../master/master.api";
 import axios from "axios";
 import { X, Upload, Video, FileText, Users, Mail, CheckCircle, AlertCircle, Loader } from "react-feather";
 import { toast } from "react-toastify";
-import { getClipsAsync } from "../../common/common.slice";
+import { getClipsAsync, getMyClipsAsync } from "../../common/common.slice";
 import { generateThumbnailURL } from "../common/common.api";
 import "./UploadClipCard.scss";
 import dynamic from 'next/dynamic';
@@ -275,15 +275,30 @@ const UploadClipCard = (props) => {
 
         const results = await Promise.all(uploadPromises);
         if (results.every(r => r)) {
-          toast.success("All clips uploaded successfully!",{
-            autoClose:false
+          /**
+           * NOTE:
+           * - We explicitly refresh the clips lists in Redux after a successful upload
+           *   so that the "My Uploads / Uploaded Videos" (MyClips) section updates
+           *   automatically without requiring a full page refresh.
+           * - For community uploads we refresh the trainee-specific clips via
+           *   `getClipsAsync({ trainee_id })`.
+           * - For normal uploads we refresh the current user's own clips via
+           *   `getMyClipsAsync()`, which updates the `myClips` slice used by
+           *   the MyClips component.
+           * - This avoids duplicates because we always re-fetch the full list
+           *   from the backend instead of manually appending to state.
+           */
+          toast.success("All clips uploaded successfully!", {
+            autoClose: false
           });
           resetForm();
-          // If uploading from community context, refresh the specific user's clips
+
           if (isFromCommunity) {
+            // Refresh the specific trainee's clips when uploading from community context
             dispatch(getClipsAsync({ trainee_id: isFromCommunity }));
           } else {
-            dispatch(getClipsAsync({}));
+            // Refresh the current user's own clips used in "My Uploads / Uploaded Videos"
+            dispatch(getMyClipsAsync());
           }
         } else {
           toast.error("Some clips failed to upload.",{

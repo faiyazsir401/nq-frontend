@@ -308,10 +308,12 @@ const FileSection = (props) => {
                   <h5
                     className="block-title"
                     onClick={() => {
-                      var temp = clips
-                      temp = temp.map(vl => { return { ...vl, show: false } })
-                      temp[ind].show = true
-                      setClips([...temp])
+                      // Toggle only the clicked section and keep others as they are,
+                      // so multiple sections can be open or closed independently.
+                      const updatedClips = clips.map((vl, i) =>
+                        i === ind ? { ...vl, show: !vl.show } : vl
+                      );
+                      setClips(updatedClips);
                     }}
                   >
                     {cl?._id}
@@ -365,10 +367,11 @@ const FileSection = (props) => {
                   <h5
                     className="block-title"
                     onClick={() => {
-                      var temp = traineeClip
-                      temp = temp.map(vl => { return { ...vl, show: false } })
-                      temp[ind].show = true
-                      setTraineeClips([...temp])
+                      // Toggle only the clicked trainee section; allow multiple open.
+                      const updatedTraineeClips = traineeClip.map((vl, i) =>
+                        i === ind ? { ...vl, show: !vl.show } : vl
+                      );
+                      setTraineeClips(updatedTraineeClips);
                     }}
                   >
                     {cl?._id?.fullname}
@@ -738,10 +741,11 @@ const FileSection = (props) => {
                   <h5
                     className="block-title"
                     onClick={() => {
-                      var temp = reportsData
-                      temp = temp.map(vl => { return { ...vl, show: false } })
-                      temp[ind].show = true
-                      setReportsData([...temp])
+                      // Toggle only the clicked report section; allow multiple open.
+                      const updatedReports = reportsData.map((vl, i) =>
+                        i === ind ? { ...vl, show: !vl.show } : vl
+                      );
+                      setReportsData(updatedReports);
                     }}
                   >
                     <label className="badge badge-primary sm ml-2" onClick={() => {}}>{`${cl?._id?.month}/${cl?._id?.day}/${cl?._id?.year}`}</label>
