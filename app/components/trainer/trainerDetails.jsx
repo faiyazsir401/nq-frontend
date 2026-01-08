@@ -464,193 +464,311 @@ const TrainerSessionInfo = ({
       className="row"
       style={{
         margin: "0px",
-        padding: "10px",
+        padding: "20px",
         height: !AccountType.TRAINEE || (!AccountType.TRAINER && "92vh"),
         overflowX: !AccountType.TRAINEE || (!AccountType.TRAINER && "auto"),
+        maxWidth: "100%",
       }}
       id="trainerinfo"
     >
-      <div className=" col-lg-6">
-        <div className="d-flex justify-content-start" style={{ gap: "20px" }}>
-          <div>
-            <img
-              src={
-                trainer && trainer.profile_picture
-                  ? Utils?.getImageUrlOfS3(trainer.profile_picture)
-                  : "/assets/images/avtar/statusMenuIcon.jpeg"
-              }
-              width={100}
-              style={{
-                // marginTop: "15px",
-                minHeight: "120px",
-                minWidth: "110px",
-              }}
-              className="img-fluid rounded profile_picture"
-              alt="profile-picture"
-            />
-          </div>
-          <div>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-start',
-                alignItems: isMobileScreen?"baseline":'center',
-                flexDirection:isMobileScreen?"column":"row"
-              }}>
-              <h2>
-                {trainer && trainer ? trainer.fullname || trainer?.fullName : null}
-              </h2>
-              {isUserOnline || (onlineUsers &&
-                Utils.isTrainerOnline(trainer?._id, onlineUsers)) ? (
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    marginLeft: '5px'
-                  }}>
-
-                  <div
-                    className="dot-btn dot-success grow"
-                    style={{
-                      marginLeft: "13px",
-                      marginTop: "-16px",
-                    }}
-                  ></div>
-                  <span className="text-success">Online Now</span>
-                </div>
-              ) : (
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    marginLeft: '5px'
-                  }}>
-                  <div
-                    className="dot-btn dot-danger grow"
-                    style={{
-                      marginLeft: "13px",
-                      marginTop: "-16px",
-                    }}
-                  ></div>
-                  <span className="text-danger" >Offline</span>
-                </div>
-              )}
-            </div>
-            <h3 className="mt-2">
-              Hourly Rate: $
-              {trainer?.extraInfo?.hourly_rate || TRAINER_AMOUNT_USD}
-            </h3>
-            {/* {showRatings(
-              trainer && trainer?.trainer_ratings,
-              "mt-3 mb-3 d-flex"
-            )} */}
-            <Ratings
-              ratings={trainer && trainer?.trainer_ratings}
-              extraClasses={"d-flex"}
-            />
-            {trainer &&
-              trainer?.extraInfo &&
-              trainer?.extraInfo?.media &&
-              trainer?.extraInfo?.social_media_links ? (
-              <SocialMediaIcons
-                profileImageURL={
-                  trainer &&
-                  trainer?.extraInfo &&
-                  trainer?.extraInfo?.social_media_links &&
-                  Utils?.getImageUrlOfS3(
-                    trainer?.extraInfo?.social_media_links?.profile_image_url
-                  )
+      <div className="col-lg-6" style={{ paddingRight: "15px" }}>
+        {/* Trainer Profile Section */}
+        <div
+          style={{
+            backgroundColor: "#f8f9fa",
+            borderRadius: "12px",
+            padding: "20px",
+            marginBottom: "25px",
+            border: "1px solid #e9ecef",
+          }}
+        >
+          <div className="d-flex justify-content-start" style={{ gap: "20px", flexWrap: "wrap" }}>
+            <div>
+              <img
+                src={
+                  trainer && trainer.profile_picture
+                    ? Utils?.getImageUrlOfS3(trainer.profile_picture)
+                    : "/assets/images/avtar/statusMenuIcon.jpeg"
                 }
-                social_media_links={
-                  trainer &&
-                  trainer?.extraInfo &&
-                  trainer?.extraInfo?.social_media_links
-                }
-                isvisible={false}
+                width={120}
+                height={120}
+                style={{
+                  minHeight: "120px",
+                  minWidth: "120px",
+                  objectFit: "cover",
+                  borderRadius: "12px",
+                  border: "3px solid #000080",
+                }}
+                className="img-fluid rounded profile_picture"
+                alt="profile-picture"
               />
-            ) : null}
-          </div>
-
-        </div>
-
-        <div className="mt-2">
-          {/* <h2 className=" tag-name booking-text text-dark">Book session</h2> */}
-          <div className="mt-1 text-dark">{element}</div>
-        </div>
-
-
-
-        {trainer && trainer.extraInfo && trainer.extraInfo.about && <div>
-          <h4 className=" my-1 tag-name booking-text text-dark">About</h4>
-          <p className="mt-3  ml-1 text-start text-dark">
-            {trainer && trainer.extraInfo && trainer.extraInfo.about}
-          </p>
-        </div>}
-
-        {accordionData.length
-          ? accordionData.map((data, index) => {
-            return (
-              <Accordion key={`accordion_${index}`} className="mb-5 mt-2">
-                <Accordion.Item>
-                  <Accordion.Header
-                    index={index}
-                    activeAccordion={activeAccordion}
-                    onAClick={() => {
-                      if (activeAccordion[index]) {
-                        delete activeAccordion[index];
-                      } else if (!activeAccordion[index]) {
-                        activeAccordion[index] = true;
-                      } else {
-                        activeAccordion[index] = !activeAccordion[index];
-                      }
-                      setActiveAccordion(activeAccordion);
-                    }}
-                  >
-                    {data.label}
-                  </Accordion.Header>
-                  <Accordion.Body>
-                    {!data.value ? Message.notFound : data.value}
-                  </Accordion.Body>
-                </Accordion.Item>
-              </Accordion>
-            );
-          })
-          : Message.notFound}
-      </div>
-      <div className=" col-lg-6">
-        {/* <h2 className="ml-n1 tag-name booking-text">Book session</h2>
-        <div className="mt-3">{element}</div> */}
-        {/* {hasRatings && (
-          <div>
-            <h2 className="mb-3 booking-text  tag-name">Reviews</h2>
-            <div className="ml-lg-n4">
-              <ReviewCard trainer={trainer} />
+            </div>
+            <div style={{ flex: 1, minWidth: "200px" }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-start',
+                  alignItems: isMobileScreen ? "baseline" : 'center',
+                  flexDirection: isMobileScreen ? "column" : "row",
+                  marginBottom: "10px",
+                }}>
+                <h2 style={{ 
+                  margin: 0, 
+                  fontSize: isMobileScreen ? "20px" : "24px",
+                  fontWeight: "600",
+                  color: "#212529",
+                }}>
+                  {trainer && trainer ? trainer.fullname || trainer?.fullName : null}
+                </h2>
+                {isUserOnline || (onlineUsers &&
+                  Utils.isTrainerOnline(trainer?._id, onlineUsers)) ? (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      marginLeft: isMobileScreen ? '0px' : '10px',
+                      marginTop: isMobileScreen ? '5px' : '0px',
+                    }}>
+                    <div
+                      className="dot-btn dot-success grow"
+                      style={{
+                        marginRight: "8px",
+                      }}
+                    ></div>
+                    <span className="text-success">Online Now</span>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      marginLeft: isMobileScreen ? '0px' : '10px',
+                      marginTop: isMobileScreen ? '5px' : '0px',
+                    }}>
+                    <div
+                      className="dot-btn dot-danger grow"
+                      style={{
+                        marginRight: "8px",
+                      }}
+                    ></div>
+                    <span className="text-danger">Offline</span>
+                  </div>
+                )}
+              </div>
+              <div style={{ 
+                marginTop: "12px",
+                padding: "10px",
+                backgroundColor: "#fff",
+                borderRadius: "8px",
+                border: "1px solid #dee2e6",
+              }}>
+                <h3 style={{ 
+                  margin: 0, 
+                  fontSize: "18px",
+                  fontWeight: "500",
+                  color: "#000080",
+                }}>
+                  Hourly Rate: ${trainer?.extraInfo?.hourly_rate || TRAINER_AMOUNT_USD}
+                </h3>
+              </div>
+              <div style={{ marginTop: "15px" }}>
+                <Ratings
+                  ratings={trainer && trainer?.trainer_ratings}
+                  extraClasses={"d-flex"}
+                />
+              </div>
+              {trainer &&
+                trainer?.extraInfo &&
+                trainer?.extraInfo?.media &&
+                trainer?.extraInfo?.social_media_links ? (
+                <div style={{ marginTop: "15px" }}>
+                  <SocialMediaIcons
+                    profileImageURL={
+                      trainer &&
+                      trainer?.extraInfo &&
+                      trainer?.extraInfo?.social_media_links &&
+                      Utils?.getImageUrlOfS3(
+                        trainer?.extraInfo?.social_media_links?.profile_image_url
+                      )
+                    }
+                    social_media_links={
+                      trainer &&
+                      trainer?.extraInfo &&
+                      trainer?.extraInfo?.social_media_links
+                    }
+                    isvisible={false}
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
-        )} */}
+        </div>
 
-        <h2 className="mb-4 tag-name booking-text">Featured content </h2>
-        {revampedMedia && revampedMedia?.length ? (
-          <ImageVideoThumbnailCarousel
-            media={revampedMedia}
-            originalMedia={
-              trainer && trainer?.extraInfo && trainer?.extraInfo?.media
-            }
-          />
-        ) : (
-          <div className="no-media-found">{Message.noMediaFound}</div>
+        {/* Booking Section */}
+        <div
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: "12px",
+            padding: "20px",
+            marginBottom: "25px",
+            border: "1px solid #e9ecef",
+          }}
+        >
+          <h3 style={{
+            fontSize: "20px",
+            fontWeight: "600",
+            color: "#212529",
+            marginBottom: "15px",
+            paddingBottom: "10px",
+            borderBottom: "2px solid #000080",
+          }}>
+            Book Session
+          </h3>
+          <div className="text-dark">{element}</div>
+        </div>
+
+        {/* About Section */}
+        {trainer && trainer.extraInfo && trainer.extraInfo.about && (
+          <div
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "12px",
+              padding: "20px",
+              marginBottom: "25px",
+              border: "1px solid #e9ecef",
+            }}
+          >
+            <h4 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#212529",
+              marginBottom: "15px",
+              paddingBottom: "10px",
+              borderBottom: "2px solid #000080",
+            }}>
+              About
+            </h4>
+            <p style={{
+              margin: 0,
+              fontSize: "15px",
+              lineHeight: "1.6",
+              color: "#495057",
+            }}>
+              {trainer && trainer.extraInfo && trainer.extraInfo.about}
+            </p>
+          </div>
         )}
 
+        {/* Accordion Section */}
+        {accordionData.length > 0 && (
+          <div
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "12px",
+              padding: "20px",
+              marginBottom: "25px",
+              border: "1px solid #e9ecef",
+            }}
+          >
+            {accordionData.map((data, index) => {
+              return (
+                <Accordion key={`accordion_${index}`} className="mb-3">
+                  <Accordion.Item>
+                    <Accordion.Header
+                      index={index}
+                      activeAccordion={activeAccordion}
+                      onAClick={() => {
+                        if (activeAccordion[index]) {
+                          delete activeAccordion[index];
+                        } else if (!activeAccordion[index]) {
+                          activeAccordion[index] = true;
+                        } else {
+                          activeAccordion[index] = !activeAccordion[index];
+                        }
+                        setActiveAccordion(activeAccordion);
+                      }}
+                    >
+                      {data.label}
+                    </Accordion.Header>
+                    <Accordion.Body>
+                      {!data.value ? Message.notFound : data.value}
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              );
+            })}
+          </div>
+        )}
+      </div>
+      <div className="col-lg-6" style={{ paddingLeft: "15px" }}>
+        {/* Featured Content Section */}
+        <div
+          style={{
+            backgroundColor: "#fff",
+            borderRadius: "12px",
+            padding: "20px",
+            marginBottom: "25px",
+            border: "1px solid #e9ecef",
+          }}
+        >
+          <h2 style={{
+            fontSize: "20px",
+            fontWeight: "600",
+            color: "#212529",
+            marginBottom: "20px",
+            paddingBottom: "10px",
+            borderBottom: "2px solid #000080",
+          }}>
+            Featured Content
+          </h2>
+          {revampedMedia && revampedMedia?.length ? (
+            <ImageVideoThumbnailCarousel
+              media={revampedMedia}
+              originalMedia={
+                trainer && trainer?.extraInfo && trainer?.extraInfo?.media
+              }
+            />
+          ) : (
+            <div style={{
+              padding: "40px",
+              textAlign: "center",
+              color: "#6c757d",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+            }}>
+              {Message.noMediaFound}
+            </div>
+          )}
+        </div>
+
+        {/* Reviews Section */}
         {hasRatings && (
-          <div className="mt-3">
-            <h2 className="mb-3 booking-text  tag-name">Reviews</h2>
-            <div className="">
+          <div
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "12px",
+              padding: "20px",
+              marginBottom: "25px",
+              border: "1px solid #e9ecef",
+            }}
+          >
+            <h2 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#212529",
+              marginBottom: "20px",
+              paddingBottom: "10px",
+              borderBottom: "2px solid #000080",
+            }}>
+              Reviews
+            </h2>
+            <div>
               <ReviewCard trainer={trainer} />
             </div>
           </div>

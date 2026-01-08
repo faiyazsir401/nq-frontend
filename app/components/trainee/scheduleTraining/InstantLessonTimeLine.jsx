@@ -92,104 +92,244 @@ const InstantLessonTimeLine = ({
       <div
         style={{
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "20px 20px 10px 20px",
+          borderBottom: "2px solid #e9ecef",
         }}
       >
+        <h3
+          style={{
+            margin: 0,
+            fontSize: "22px",
+            fontWeight: "600",
+            color: "#000080",
+          }}
+        >
+          {isCommonBooking ? "Schedule Your Lesson" : "Book Instant Lesson"}
+        </h3>
         <RxCross2
           style={{
-            fontSize: "22px",
-            color: "#000080",
-            margin: "5px 5px 0 0",
+            fontSize: "24px",
+            color: "#6c757d",
             cursor: "pointer",
+            transition: "color 0.2s ease",
           }}
           onClick={() => {
             onClose(false);
             setSelectedLesson(null);
             setIsCommonBooking(false);
           }}
+          onMouseEnter={(e) => {
+            e.target.style.color = "#000080";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.color = "#6c757d";
+          }}
         />
       </div>
       <div
         style={{
-          padding: '20px',
+          padding: '30px',
+          maxWidth: '600px',
+          margin: '0 auto',
         }}
       >
-        <p
-          style={{
-            color: '#000080',
-            fontSize: '18px',
-            textAlign: 'center',
-          }}
-        >
-          {isCommonBooking
-            ? "Book your slot in advance to avoid waiting for the trainer to come online."
-            : "Don't want to wait for a scheduled slot? Book an Instant Lesson and get started within just 2 minutes!"}
-        </p>
         <div
-          className="row"
           style={{
-            width: '100%',
-            margin: '0px auto',
-            justifyContent: 'center',
-            textAlign: 'center',
+            backgroundColor: "#f8f9fa",
+            borderRadius: "10px",
+            padding: "20px",
+            marginBottom: "25px",
+            border: "1px solid #e9ecef",
           }}
         >
-          {!isCommonBooking && InstantLessons.map((item, i) => {
-            return (
+          <p
+            style={{
+              color: '#495057',
+              fontSize: '16px',
+              textAlign: 'center',
+              margin: 0,
+              lineHeight: "1.6",
+            }}
+          >
+            {isCommonBooking
+              ? "Book your slot in advance to avoid waiting for the trainer to come online."
+              : "Don't want to wait for a scheduled slot? Book an Instant Lesson and get started within just 2 minutes!"}
+          </p>
+        </div>
+
+        {/* Duration Selection Section */}
+        <div
+          style={{
+            marginBottom: "25px",
+          }}
+        >
+          <label
+            style={{
+              display: "block",
+              fontSize: "16px",
+              fontWeight: "600",
+              color: "#212529",
+              marginBottom: "15px",
+            }}
+          >
+            {isCommonBooking ? "Selected Duration" : "Select Lesson Duration"}
+          </label>
+          <div
+            className="row"
+            style={{
+              width: '100%',
+              margin: '0px auto',
+              justifyContent: 'center',
+              textAlign: 'center',
+            }}
+          >
+            {!isCommonBooking && InstantLessons.map((item, i) => {
+              return (
+                <div
+                  key={i}
+                  onClick={() => setSelectedLesson(item)}
+                  className="col-5"
+                  style={{
+                    border: selectedLesson?.duration === item?.duration 
+                      ? '3px solid #28a745' 
+                      : '2px solid #000080',
+                    backgroundColor: selectedLesson?.duration === item?.duration 
+                      ? '#f0f8f0' 
+                      : '#fff',
+                    cursor: 'pointer',
+                    padding: '15px 10px',
+                    margin: '8px 5px',
+                    borderRadius: '8px',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedLesson?.duration !== item?.duration) {
+                      e.currentTarget.style.backgroundColor = '#f8f9fa';
+                      e.currentTarget.style.transform = 'scale(1.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedLesson?.duration !== item?.duration) {
+                      e.currentTarget.style.backgroundColor = '#fff';
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }
+                  }}
+                >
+                  <b style={{ 
+                    color: selectedLesson?.duration === item?.duration 
+                      ? '#28a745' 
+                      : '#000080',
+                    fontSize: '16px',
+                  }}>
+                    {item.label}
+                  </b>
+                </div>
+              );
+            })}
+            {isCommonBooking && (
               <div
-                key={i}
-                onClick={() => setSelectedLesson(item)}
                 className="col-5"
                 style={{
-                  border: selectedLesson?.duration === item?.duration ? '3px solid green' : '2px solid #000080',
-                  cursor: 'pointer',
-                  padding: '10px 0px',
-                  margin: '5px 3px',
+                  border: '2px solid #000080',
+                  backgroundColor: '#f8f9fa',
+                  padding: '15px 10px',
+                  margin: '8px 5px',
+                  borderRadius: '8px',
                 }}
               >
-                <b style={{ color: '#000080' }}>{item.label}</b>
+                <b style={{ color: '#000080', fontSize: '16px' }}>
+                  {indexedInstantLesson[selectedLesson]?.label}
+                </b>
               </div>
-            );
-          })}
-          {isCommonBooking && (
-            <div
-              className="col-5"
-              style={{
-                border: '2px solid #000080',
-                cursor: 'pointer',
-                padding: '10px 0px',
-                margin: '5px 3px',
-              }}
-            >
-              <b style={{ color: '#000080' }}>{indexedInstantLesson[selectedLesson]?.label}</b>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-        <Form>
-          <FormGroup noMargin>
-            
-            <Input
-              type="text"
-              id="couponCode"
-              value={couponCode}
-              onChange={(e) => setCouponCode(e.target.value)}
-              className='mt-3 mb-0'
-              style={{
-                border: '2px solid #000080',
-                color: '#000080',
-                width:"50%",
-                margin:"auto"
-              }}
-              placeholder="Enter Promo code"
-            />
-          </FormGroup>
-          {formError && <p style={{ color: 'red', fontSize: '14px' }}>{formError}</p>}
-        </Form>
+
+        {/* Coupon Code Section */}
+        <div
+          style={{
+            marginBottom: "25px",
+          }}
+        >
+          <Form>
+            <FormGroup noMargin>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  color: "#212529",
+                  marginBottom: "10px",
+                }}
+              >
+                Promo Code (Optional)
+              </label>
+              <Input
+                type="text"
+                id="couponCode"
+                value={couponCode}
+                onChange={(e) => {
+                  setCouponCode(e.target.value);
+                  if (formError) {
+                    setFormError("");
+                  }
+                }}
+                className='mt-0 mb-0'
+                style={{
+                  border: formError ? '2px solid #dc3545' : '2px solid #000080',
+                  color: '#000080',
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "8px",
+                  fontSize: "15px",
+                }}
+                placeholder="Enter promo code"
+              />
+            </FormGroup>
+            {formError && (
+              <p style={{ 
+                color: '#dc3545', 
+                fontSize: '14px',
+                marginTop: "8px",
+                marginBottom: 0,
+              }}>
+                {formError}
+              </p>
+            )}
+          </Form>
+        </div>
+
+        {/* Action Button */}
         <div className="col-12 mb-3 d-flex justify-content-center align-items-center">
           <Button
             type="button"
             disabled={!selectedLesson}
             className="mt-3 btn btn-sm btn-primary"
+            style={{
+              backgroundColor: !selectedLesson ? "#6c757d" : "#000080",
+              borderColor: !selectedLesson ? "#6c757d" : "#000080",
+              padding: "12px 40px",
+              fontSize: "16px",
+              fontWeight: "600",
+              borderRadius: "8px",
+              cursor: !selectedLesson ? "not-allowed" : "pointer",
+              transition: "all 0.3s ease",
+              minWidth: "200px",
+            }}
+            onMouseEnter={(e) => {
+              if (selectedLesson) {
+                e.target.style.backgroundColor = "#0000a0";
+                e.target.style.transform = "scale(1.05)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (selectedLesson) {
+                e.target.style.backgroundColor = "#000080";
+                e.target.style.transform = "scale(1)";
+              }
+            }}
             onClick={async() => {
               try {
                
@@ -258,7 +398,7 @@ const InstantLessonTimeLine = ({
              
             }}
           >
-            {isCommonBooking ? "Process to Checkout" : "Book Instant Lesson"}
+            {isCommonBooking ? "Proceed to Checkout" : "Book Instant Lesson"}
           </Button>
         </div>
       </div>
