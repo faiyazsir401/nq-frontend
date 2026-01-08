@@ -110,8 +110,15 @@ const Bookings = ({ accountType = null }) => {
     setIsModalOpen(false);
   };
 
+  // Use ref to prevent refetching clips on tab toggle
+  const hasFetchedClipsRef = useRef(false);
+
   useEffect(() => {
-    getMyClips();
+    // Only fetch clips once on initial mount
+    if (!hasFetchedClipsRef.current) {
+      hasFetchedClipsRef.current = true;
+      getMyClips();
+    }
   }, []);
 
   // useEffect(() => {
@@ -139,8 +146,21 @@ const Bookings = ({ accountType = null }) => {
   // Use ref to track last fetched tabBook to prevent duplicate calls
   const lastFetchedTabBookRef = useRef(null);
   const hasInitialFetchRef = useRef(false);
+  
+  // Get cache metadata from Redux
+  const { lastFetchedTimestamp, cachedTabBook } = useAppSelector(bookingsState);
 
   useEffect(() => {
+    // Check if data already exists in Redux and is recent (within 5 minutes)
+    const hasDataInRedux = scheduledMeetingDetails && scheduledMeetingDetails.length > 0;
+    const isDataRecent = lastFetchedTimestamp && (Date.now() - lastFetchedTimestamp) < 5 * 60 * 1000; // 5 minutes
+    const isSameTab = cachedTabBook === tabBook || (!cachedTabBook && !tabBook);
+    
+    // If we have recent data for the same tab, use cached data
+    if (hasDataInRedux && isDataRecent && isSameTab && hasInitialFetchRef.current) {
+      return;
+    }
+    
     // Guard: Only fetch if tabBook changed or if this is the initial mount
     if (lastFetchedTabBookRef.current === tabBook && hasInitialFetchRef.current) {
       return;
@@ -149,18 +169,18 @@ const Bookings = ({ accountType = null }) => {
     lastFetchedTabBookRef.current = tabBook;
     hasInitialFetchRef.current = true;
     
+    // Fetch data if no recent cached data exists or tab changed
     if (accountType === AccountType.TRAINER) {
       if (tabBook) {
         const payload = {
           status: tabBook,
         };
-        // dispatch(getScheduledMeetingDetailsAsync(payload));
-        dispatch(getScheduledMeetingDetailsAsync());
+        dispatch(getScheduledMeetingDetailsAsync(payload));
       }
     } else {
       dispatch(getScheduledMeetingDetailsAsync());
     }
-  }, [tabBook, accountType, dispatch]);
+  }, [tabBook, accountType, dispatch, scheduledMeetingDetails, lastFetchedTimestamp, cachedTabBook]);
 
   useEffect(() => {
     if (bookedSession.id) {

@@ -119,14 +119,26 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
     setData(masterRecords?.masterData);
   }, [masterRecords]);
   const [activeTrainer, setActiveTrainer] = useState([]);
+  const hasFetchedActiveTrainersRef = useRef(false);
 
   const getAllLatestActiveTrainer = async () => {
+    // Only fetch if not already fetched
+    if (hasFetchedActiveTrainersRef.current) {
+      return;
+    }
+    
+    hasFetchedActiveTrainersRef.current = true;
     const response = await fetchAllLatestOnlineUsers();
 
     if (response.code === 200) {
       setActiveTrainer(response.result);
     }
   };
+  
+  // Fetch active trainers on mount only
+  useEffect(() => {
+    getAllLatestActiveTrainer();
+  }, []);
 
 
   const dispatch = useAppDispatch();
@@ -365,9 +377,16 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
     };
   }, [debouncedSearchAPI]); 
 
+  // Use ref to prevent refetching on tab toggle
+  const hasFetchedTrainersRef = useRef(false);
+  
   useEffect(() => {
-    dispatch(getTrainersAsync());
-  }, []);
+    // Only fetch trainers once on initial mount
+    if (!hasFetchedTrainersRef.current) {
+      hasFetchedTrainersRef.current = true;
+      dispatch(getTrainersAsync());
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     const todaySDate = Utils.getDateInFormatIOS(new Date());

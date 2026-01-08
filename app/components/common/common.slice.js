@@ -31,6 +31,9 @@ const initialState = {
     id: null,
     isOpenModal: false,
   },
+  // Cache metadata to prevent unnecessary refetches
+  lastFetchedTimestamp: null,
+  cachedTabBook: null,
 };
 
 export const addRatingAsync = createAsyncThunk(
@@ -91,7 +94,8 @@ export const getScheduledMeetingDetailsAsync = createAsyncThunk(
   async (payload) => {
     try {
       const response = await getScheduledMeetingDetails(payload);
-      return response;
+      // Include the payload (tabBook) in the response for caching
+      return { ...response, cachedTabBook: payload?.status || null };
     } catch (err) {
       if (!err.isUnauthorized) {
         toast.error(err.response.data.error);
@@ -170,6 +174,8 @@ export const bookingsSlice = createSlice({
         state.status = "fulfilled";
         state.isMeetingLoading = false;
         state.scheduledMeetingDetails = action.payload.data;
+        state.lastFetchedTimestamp = Date.now();
+        state.cachedTabBook = action.payload.cachedTabBook;
       })
       .addCase(getScheduledMeetingDetailsAsync.rejected, (state, action) => {
         state.status = "rejected";

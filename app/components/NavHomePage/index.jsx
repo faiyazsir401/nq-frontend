@@ -58,6 +58,12 @@ const NavHomePage = () => {
   const [activeTrainer, setActiveTrainer] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [filteredSessions, setFilteredSessions] = useState([]);
+  
+  // Use refs to prevent duplicate API calls when switching tabs
+  const hasFetchedFriendRequestsRef = useRef(false);
+  const hasFetchedActiveTrainerRef = useRef(false);
+  const hasFetchedScheduledMeetingsRef = useRef(false);
+  
   const getFriendRequestsApi = async () => {
     try {
       let res = await getFriendRequests();
@@ -69,8 +75,11 @@ const NavHomePage = () => {
   };
 
   useEffect(() => {
-    // getFriendsApi();
-    getFriendRequestsApi();
+    // Only fetch if not already fetched
+    if (!hasFetchedFriendRequestsRef.current) {
+      hasFetchedFriendRequestsRef.current = true;
+      getFriendRequestsApi();
+    }
   }, []);
 
   const handleAcceptFriendRequest = async (requestId) => {
@@ -109,19 +118,28 @@ const NavHomePage = () => {
   const dispatch = useAppDispatch();
   const { scheduledMeetingDetails } = useAppSelector(bookingsState);
   
-  // Use ref to ensure APIs are called only once on mount
-  const hasFetchedRef = useRef(false);
+  useEffect(() => {
+    // Check if data already exists in Redux before making API call
+    // Only fetch if data doesn't exist or hasn't been fetched yet
+    if (!hasFetchedScheduledMeetingsRef.current) {
+      if (scheduledMeetingDetails && scheduledMeetingDetails.length > 0) {
+        // Data already exists in Redux, use it
+        hasFetchedScheduledMeetingsRef.current = true;
+        return;
+      }
+      // No data in Redux, fetch it
+      hasFetchedScheduledMeetingsRef.current = true;
+      dispatch(getScheduledMeetingDetailsAsync());
+    }
+  }, [dispatch, scheduledMeetingDetails]);
   
   useEffect(() => {
-    // Guard: Only run once on mount
-    if (hasFetchedRef.current) {
-      return;
+    // Only fetch active trainers if not already fetched
+    if (!hasFetchedActiveTrainerRef.current) {
+      hasFetchedActiveTrainerRef.current = true;
+      getAllLatestActiveTrainer();
     }
-    hasFetchedRef.current = true;
-    
-    dispatch(getScheduledMeetingDetailsAsync());
-    getAllLatestActiveTrainer();
-  }, [dispatch]);
+  }, []);
 
   var settings = {
     autoplay: true,

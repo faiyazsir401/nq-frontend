@@ -43,6 +43,10 @@ const MyCommunity = (props) => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
 
+  // Use refs to prevent duplicate API calls when switching tabs
+  const hasFetchedFriendsRef = useRef(false);
+  const hasFetchedFriendRequestsRef = useRef(false);
+  
   const getFriendsApi = async () => {
     try {
       let res = await getFriends();
@@ -64,8 +68,15 @@ const MyCommunity = (props) => {
   };
 
   useEffect(() => {
-    getFriendsApi();
-    getFriendRequestsApi();
+    // Only fetch if not already fetched (prevents refetching when switching tabs)
+    if (!hasFetchedFriendsRef.current) {
+      hasFetchedFriendsRef.current = true;
+      getFriendsApi();
+    }
+    if (!hasFetchedFriendRequestsRef.current) {
+      hasFetchedFriendRequestsRef.current = true;
+      getFriendRequestsApi();
+    }
   }, []);
 
   const [activeTab, setActiveTab] = useState("friends");
