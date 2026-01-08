@@ -9,7 +9,7 @@ import {
 } from "../../app/components/common/common.slice";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { useEffect, useState } from "react";
-import { getSocket, SocketContext } from "../../app/components/socket";
+import { SocketContext } from "../../app/components/socket";
 import { LOCAL_STORAGE_KEYS, topNavbarOptions } from "../../app/common/constants";
 import { useMediaQuery } from "usehooks-ts";
 import { useWindowDimensions } from "../../app/hook/useWindowDimensions";
@@ -149,7 +149,7 @@ const MeetingRoom = () => {
   }, [meetingDetails, accountType]);
 
   return (
-    <SocketContext.Provider value={getSocket()}>
+    <>
       {!accountType ? (
         <div>Loading...</div>
       ) : loading || (id && !meetingDetails && scheduledMeetingDetails?.length === 0) ? (
@@ -214,7 +214,7 @@ const MeetingRoom = () => {
             }
           })()
       )}
-    </SocketContext.Provider>
+    </>
   );
 };
 

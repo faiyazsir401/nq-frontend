@@ -64,6 +64,38 @@ export const SocketProvider = ({ children }) => {
       forceNew: false,
     });
 
+    // Add error handling to suppress console errors
+    newSocket.on('connect_error', (error) => {
+      // Only log in development to reduce console noise
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[Socket] Connection error:', error.message);
+      }
+    });
+
+    newSocket.on('reconnect_error', (error) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[Socket] Reconnection error:', error.message);
+      }
+    });
+
+    newSocket.on('reconnect_failed', () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('[Socket] Reconnection failed after all attempts');
+      }
+    });
+
+    newSocket.on('connect', () => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Socket] Connected successfully');
+      }
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[Socket] Disconnected:', reason);
+      }
+    });
+
     socketRef.current = newSocket;
     setSocket(newSocket);
 
