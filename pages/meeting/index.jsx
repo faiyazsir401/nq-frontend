@@ -35,16 +35,23 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
   };
 
   useEffect(()=>{
-    MeetingSetter({
-      ...startMeeting,
-      id: meetingDetails._id,
-      isOpenModal: true,
-      traineeInfo: meetingDetails.trainee_info,
-      trainerInfo: meetingDetails.trainer_info,
-      iceServers: meetingDetails.iceServers,
-      trainee_clip: meetingDetails.trainee_clips,
-    });
+    if (meetingDetails && meetingDetails._id) {
+      MeetingSetter({
+        ...startMeeting,
+        id: meetingDetails._id,
+        isOpenModal: true,
+        traineeInfo: meetingDetails.trainee_info,
+        trainerInfo: meetingDetails.trainer_info,
+        iceServers: meetingDetails.iceServers,
+        // Handle both trainee_clip (singular) and trainee_clips (plural) from API
+        trainee_clip: meetingDetails.trainee_clips || meetingDetails.trainee_clip || [],
+      });
+    }
   },[meetingDetails])
+
+  if (!meetingDetails) {
+    return null;
+  }
 
   return (
     // height > width && !isRotatedInitally ?
@@ -116,9 +123,23 @@ const MeetingRoom = () => {
   );
   
   useEffect(() => {
-    dispatch(getScheduledMeetingDetailsAsync());
-    dispatch(authAction?.setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE)))
-  }, [dispatch]);
+    // Fetch meeting details when component mounts or when id changes
+    if (id) {
+      dispatch(getScheduledMeetingDetailsAsync());
+      dispatch(authAction?.setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE)))
+    }
+  }, [dispatch, id]);
+  
+  // Refetch if meeting details not found but we have an id
+  useEffect(() => {
+    if (id && !meetingDetails && !loading && scheduledMeetingDetails?.length >= 0) {
+      // Meeting not found, try refetching once
+      const timer = setTimeout(() => {
+        dispatch(getScheduledMeetingDetailsAsync());
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [id, meetingDetails, loading, scheduledMeetingDetails, dispatch]);
 
   useEffect(() => {
     if (meetingDetails && accountType) {
@@ -130,8 +151,13 @@ const MeetingRoom = () => {
     <SocketContext.Provider value={getSocket()}>
       {loading ||
       !scheduledMeetingDetails ||
-      !meetingDetails ||
       !accountType ? (
+        <div>Loading...</div>
+      ) : !meetingDetails && id ? (
+        <div className="booking-status-message">
+          Meeting not found. Please check your bookings and try again.
+        </div>
+      ) : !meetingDetails ? (
         <div>Loading...</div>
       ) : (
         (() => {
@@ -148,7 +174,7 @@ const MeetingRoom = () => {
                       }
                       onScroll={() => {
                         if (configs.sidebar.isMobileMode) {
-                          dispatch(isSidebarToggleEnabled(true));
+                          dispatch(bookingsAction.isSidebarToggleEnabled(true));
                         }
                       }}
                     >
