@@ -26,8 +26,30 @@ export const bookSession = async (payload) => {
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     // Include the timezone in the payload
     payload.time_zone = userTimeZone;
-    const iceServerResponse = await fetchPeerConfig();
-    payload.iceServers = iceServerResponse.data.formattedIceServers;
+    
+    // Try to fetch peer config, but don't let it block booking creation
+    try {
+      const iceServerResponse = await fetchPeerConfig();
+      if (iceServerResponse?.data?.formattedIceServers) {
+        payload.iceServers = iceServerResponse.data.formattedIceServers;
+      } else {
+        // Fallback to basic STUN servers if peer config fails
+        payload.iceServers = [
+          { urls: "stun:stun.cloudflare.com:3478" },
+          { urls: "stun:stun.cloudflare.com:53" },
+          { urls: "stun:stun.l.google.com:19302" }
+        ];
+      }
+    } catch (peerError) {
+      console.warn('Failed to fetch peer config, using fallback STUN servers:', peerError);
+      // Use fallback STUN servers if peer config fetch fails
+      payload.iceServers = [
+        { urls: "stun:stun.cloudflare.com:3478" },
+        { urls: "stun:stun.cloudflare.com:53" },
+        { urls: "stun:stun.l.google.com:19302" }
+      ];
+    }
+    
     const response = await axiosInstance({
       method: "post",
       url: `/trainee/book-session`,

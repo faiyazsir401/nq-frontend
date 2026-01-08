@@ -4,6 +4,26 @@ import axios from 'axios';
 export async function GET(req) {
     const TURN_KEY_ID = process.env.TURN_KEY_ID; // Your TURN key ID
     const TURN_KEY_API_TOKEN = process.env.TURN_KEY_API_TOKEN; // Your API token
+    
+    // Fallback ICE servers (STUN only) if TURN credentials fail
+    const fallbackIceServers = [
+        {
+            "urls": "stun:stun.cloudflare.com:3478"
+        },
+        {
+            "urls": "stun:stun.cloudflare.com:53"
+        },
+        {
+            "urls": "stun:stun.l.google.com:19302"
+        }
+    ];
+
+    // If TURN credentials are not configured, return fallback servers
+    if (!TURN_KEY_ID || !TURN_KEY_API_TOKEN) {
+        console.warn('TURN_KEY_ID or TURN_KEY_API_TOKEN not configured. Using fallback STUN servers.');
+        return NextResponse.json({ formattedIceServers: fallbackIceServers });
+    }
+
     try {
         // Call Cloudflare API to generate TURN credentials
         const response = await axios.post(
@@ -19,6 +39,11 @@ export async function GET(req) {
 
         // Extract the generated ICE servers from the response
         const { iceServers } = response.data;
+
+        if (!iceServers || !iceServers.username || !iceServers.credential) {
+            console.warn('Invalid TURN credentials received. Using fallback STUN servers.');
+            return NextResponse.json({ formattedIceServers: fallbackIceServers });
+        }
 
         const formattedIceServers = [
             {
@@ -59,13 +84,14 @@ export async function GET(req) {
             }
         ]
 
-
         // Return the iceServers in the response
         return NextResponse.json({ formattedIceServers });
 
     } catch (error) {
         console.error('Error generating TURN credentials:', error.response?.data || error.message);
-        return NextResponse.json({ error: error.response?.data || error.message }, { status: 500 });
+        // Return fallback servers instead of failing completely
+        console.warn('Using fallback STUN servers due to TURN credential error.');
+        return NextResponse.json({ formattedIceServers: fallbackIceServers });
     }
 }
 

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import TrainerSlider from "./trainerSlider";
 import ReactDatePicker from "react-datepicker";
 import moment from "moment";
@@ -87,6 +87,7 @@ const BookingTable = ({
   const { slots } = useAppSelector(commonState);
   const [isCommonBooking, setIsCommonBooking] = useState(false);
   const [selectedSlots, setSelectedSlot] = useState(null);
+  const bookingProcessedRef = useRef(false);
 
   const sendNotifications = (data) => {
     socket?.emit(EVENTS.PUSH_NOTIFICATIONS.ON_SEND, data);
@@ -116,49 +117,75 @@ const BookingTable = ({
     );
   }, [getTraineeSlots]);
   useEffect(() => {
-     
-    if (
-      transaction?.intent?.result?.client_secret
-    ) {
+    // Show payment modal if client_secret exists
+    if (transaction?.intent?.result?.client_secret) {
       setShowTransactionModal(true);
     }
 
-    if (transaction?.intent?.result?.skip && bookSessionPayload?.trainer_id) {
+    // Handle skip transaction (free bookings)
+    if (
+      transaction?.intent?.result?.skip && 
+      bookSessionPayload?.trainer_id &&
+      Object.keys(bookSessionPayload).length > 0 &&
+      !bookingProcessedRef.current
+    ) {
+      bookingProcessedRef.current = true; // Mark as processed to prevent duplicate calls
+      
       const payload = {
         ...bookSessionPayload,
-        // payment_intent_id: transaction?.intent?.result?.id,
-        amount: 0,
-        // application_fee_amount:
-        //   transaction?.intent?.result?.application_fee_amount / 100,
+        amount: bookSessionPayload.charging_price || 0,
+        // Ensure all required fields are present
+        trainer_id: bookSessionPayload.trainer_id,
+        booked_date: bookSessionPayload.booked_date,
+        session_start_time: bookSessionPayload.session_start_time,
+        session_end_time: bookSessionPayload.session_end_time,
+        start_time: bookSessionPayload.start_time,
+        end_time: bookSessionPayload.end_time,
+        status: bookSessionPayload.status || BookedSession.booked,
       };
-      dispatch(bookSessionAsync(payload));
-       
 
-      sendNotifications({
-        title: notificiationTitles.newBookingRequest,
-        description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
-        senderId: userInfo?._id,
-        receiverId: payload?.trainer_id,
-        bookingInfo: null,
-        type: NotificationType.TRANSCATIONAL
-      });
-
-      // Refecting the current Booking 
-
-      // Redirecting to the Booking tab
-      dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
-
-      dispatch(
-        getScheduledMeetingDetailsAsync({
-          status: "upcoming",
-        })
-      );
-
-
-
+      // Clear payload immediately to prevent duplicate calls
       setBookSessionPayload({});
+      
+      // Dispatch booking
+      dispatch(bookSessionAsync(payload))
+        .then((result) => {
+          // Only send notification and redirect if booking succeeds
+          if (result.type === 'add/trainee/book-session/fulfilled') {
+            sendNotifications({
+              title: notificiationTitles.newBookingRequest,
+              description: `${userInfo?.fullname} has booked a session with you. Please confirm and start the lesson via the upcoming sessions tab in My Locker.`,
+              senderId: userInfo?._id,
+              receiverId: payload?.trainer_id,
+              bookingInfo: null,
+              type: NotificationType.TRANSCATIONAL
+            });
+
+            // Redirecting to the Booking tab
+            dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION));
+
+            // Refresh scheduled meetings
+            dispatch(
+              getScheduledMeetingDetailsAsync({
+                status: "upcoming",
+              })
+            );
+          }
+          // Reset ref after booking completes (success or failure)
+          bookingProcessedRef.current = false;
+        })
+        .catch((error) => {
+          console.error('Booking failed:', error);
+          // Reset ref on error to allow retry
+          bookingProcessedRef.current = false;
+        });
     }
-  }, [transaction, bookSessionPayload]);
+
+    // Reset ref when transaction changes (new payment intent)
+    if (!transaction?.intent?.result?.skip) {
+      bookingProcessedRef.current = false;
+    }
+  }, [transaction?.intent?.result, bookSessionPayload?.trainer_id, dispatch, userInfo, sendNotifications]);
 
    
 
