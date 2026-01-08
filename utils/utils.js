@@ -683,11 +683,19 @@ export class Utils {
   static generateVideoURL2(clip) {
   //  const mp4FileName = clip.file_name.replace('.quicktime', '.mp4');
   // return `https://data.netqwix.com/${mp4FileName}`
-  return `https://data.netqwix.com/${clip?.file_name}`;
+  if (!clip?.file_name) {
+    console.warn('[Utils] generateVideoURL2: clip.file_name is undefined', clip);
+    return '';
+  }
+  return `https://data.netqwix.com/${clip.file_name}`;
   }
 
   static generateThumbnailURL(clip) {
-    return `https://data.netqwix.com/${clip?.thumbnail}`;
+    if (!clip?.thumbnail) {
+      console.warn('[Utils] generateThumbnailURL: clip.thumbnail is undefined', clip);
+      return '';
+    }
+    return `https://data.netqwix.com/${clip.thumbnail}`;
   }
 
   static dynamicImageURL = (url) => {

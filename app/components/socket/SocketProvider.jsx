@@ -49,47 +49,85 @@ export const SocketProvider = ({ children }) => {
       socketRef.current = null;
     }
 
+    console.log('[Socket] Attempting to connect to:', URL);
+    console.log('[Socket] Token present:', !!token);
+
     const newSocket = socketio.connect(URL, {
       query: { authorization: token, autoConnect: true },
-      // Prefer websocket transport to reduce polling requests
-      transports: ['websocket', 'polling'],
-      // Reduce reconnection attempts and delays
+      // Try polling first if websocket fails, then fallback to websocket
+      // This helps with firewalls/proxies that block websocket
+      transports: ['polling', 'websocket'],
+      // Increase reconnection attempts
       reconnection: true,
-      reconnectionAttempts: 5,
+      reconnectionAttempts: 10,
       reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
+      reconnectionDelayMax: 10000,
       // Timeout for connection attempts
-      timeout: 20000,
+      timeout: 30000,
       // Force new connection to avoid stale connections
       forceNew: false,
+      // Upgrade transport automatically
+      upgrade: true,
+      // Remember transport preference
+      rememberUpgrade: true,
     });
 
-    // Add error handling to suppress console errors
+    // Track connection attempts
+    let connectionAttempts = 0;
+
     newSocket.on('connect_error', (error) => {
-      console.error('[Socket] Connection error:', error.message);
-      // Set socket to null on connection failure so components know it's unavailable
-      setSocket(null);
+      connectionAttempts++;
+      console.error('[Socket] Connection error:', {
+        message: error.message,
+        type: error.type,
+        description: error.description,
+        attempts: connectionAttempts,
+        transport: newSocket.io?.engine?.transport?.name || 'unknown'
+      });
+      
+      // If websocket fails multiple times, try forcing polling
+      if (connectionAttempts >= 3 && newSocket.io?.engine?.transport?.name === 'websocket') {
+        console.warn('[Socket] WebSocket failed multiple times, attempting to upgrade to polling');
+        newSocket.io.opts.transports = ['polling'];
+      }
     });
 
     newSocket.on('reconnect_error', (error) => {
-      console.error('[Socket] Reconnection error:', error.message);
+      console.error('[Socket] Reconnection error:', {
+        message: error.message,
+        type: error.type,
+        transport: newSocket.io?.engine?.transport?.name || 'unknown'
+      });
+    });
+
+    newSocket.on('reconnect_attempt', (attemptNumber) => {
+      console.log(`[Socket] Reconnection attempt ${attemptNumber}`);
     });
 
     newSocket.on('reconnect_failed', () => {
       console.error('[Socket] Reconnection failed after all attempts');
+      console.error('[Socket] Final transport:', newSocket.io?.engine?.transport?.name || 'unknown');
       setSocket(null);
     });
 
     newSocket.on('connect', () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Socket] Connected successfully');
-      }
+      connectionAttempts = 0; // Reset on successful connection
+      setSocket(newSocket);
+      const transport = newSocket.io?.engine?.transport?.name || 'unknown';
+      console.log(`[Socket] Connected successfully using ${transport} transport`);
+    });
+
+    newSocket.on('reconnect', (attemptNumber) => {
+      connectionAttempts = 0; // Reset on successful reconnection
+      setSocket(newSocket);
+      const transport = newSocket.io?.engine?.transport?.name || 'unknown';
+      console.log(`[Socket] Reconnected after ${attemptNumber} attempts using ${transport} transport`);
     });
 
     newSocket.on('disconnect', (reason) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Socket] Disconnected:', reason);
-      }
+      console.log('[Socket] Disconnected:', reason);
+      // Don't set socket to null on disconnect - it might reconnect
+      // Only set to null if it's a forced disconnect or after reconnect_failed
     });
 
     socketRef.current = newSocket;

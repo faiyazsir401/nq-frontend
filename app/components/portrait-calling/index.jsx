@@ -280,6 +280,93 @@ const VideoCallUI = ({
     setTraineeClips(arr);
   };
 
+  // Define cleanupFunction early (needed by cutCall)
+  function handlePeerDisconnect() {
+    if (!(peerRef && peerRef.current)) return;
+    //NOTE -  manually close the peer connections
+    for (let conns in peerRef.current.connections) {
+      peerRef.current.connections[conns].forEach((conn, index, array) => {
+        conn.peerConnection.close();
+        //NOTE - close it using peerjs methods
+        if (conn.close) conn.close();
+      });
+    }
+  }
+
+  const cleanupFunction = useCallback(() => {
+    if (!userAlreadyInCall) {
+      handlePeerDisconnect();
+    }
+    setIsCallEnded(true);
+
+    if (localStream) {
+      localStream.getAudioTracks().forEach(function (track) {
+        track.stop();
+      });
+      localStream.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+      setLocalStream(null);
+    }
+
+    if (remoteStream) {
+      remoteStream.getAudioTracks().forEach(function (track) {
+        track.stop();
+      });
+      setRemoteStream(null);
+    }
+    if (micStream) {
+      micStream.getAudioTracks().forEach((track) => {
+        track.stop();
+      });
+    }
+    let videorefSrc = localVideoRef.current;
+    if (localVideoRef && videorefSrc && videorefSrc.srcObject) {
+      videorefSrc.srcObject.getTracks().forEach((t) => {
+        t.stop();
+      });
+      videorefSrc.srcObject.getVideoTracks().forEach((t) => {
+        t.stop();
+      });
+    }
+
+    let videorefSrcRemote = remoteVideoRef.current;
+    if (remoteVideoRef && videorefSrcRemote && videorefSrcRemote.srcObject) {
+      videorefSrcRemote.srcObject.getTracks().forEach((t) => {
+        t.stop();
+      });
+      videorefSrcRemote.srcObject.getVideoTracks().forEach((t) => {
+        t.stop();
+      });
+    }
+
+    if (peerRef.current) {
+      peerRef.current.destroy();
+      peerRef.current = null;
+    }
+  }, [localStream, remoteStream, micStream, userAlreadyInCall]);
+
+  // Define cutCall early using useCallback so it can be used in useEffect hooks
+  const cutCall = useCallback((manually) => {
+    if (!userAlreadyInCall && socket) {
+      socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, {
+        userInfo: { from_user: fromUser._id, to_user: toUser._id }
+      });
+    }
+
+    // Show session ended modal if not already shown
+    if (!showSessionEndedModal && manually) {
+      setShowSessionEndedModal(true);
+    } else {
+      cleanupFunction();
+      if (AccountType.TRAINER === accountType) {
+        setIsOpenReport(true);
+      } else if (accountType === AccountType.TRAINEE) {
+        setIsOpenRating(true);
+      }
+    }
+  }, [socket, userAlreadyInCall, fromUser, toUser, showSessionEndedModal, accountType, cleanupFunction]);
+
   // Set up socket event listeners with null checks
   useEffect(() => {
     if (!socket) return;
@@ -306,7 +393,7 @@ const VideoCallUI = ({
         socket.off(EVENTS.CALL_END, handleCallEnd);
       }
     };
-  }, [socket, accountType]);
+  }, [socket, accountType, cutCall]);
 
   // 30-second warning before lesson ends (backend-driven)
   useEffect(() => {
@@ -1009,101 +1096,7 @@ const VideoCallUI = ({
     }
   };
 
-  function handlePeerDisconnect() {
-    if (!(peerRef && peerRef.current)) return;
-    //NOTE -  manually close the peer connections
-    for (let conns in peerRef.current.connections) {
-      peerRef.current.connections[conns].forEach((conn, index, array) => {
-        // console.log(
-        //   `closing ${conn.connectionId} peerConnection (${index + 1}/${array.length
-        //   })`,
-        //   conn.peerConnection
-        // );
-        conn.peerConnection.close();
-
-        //NOTE - close it using peerjs methods
-        if (conn.close) conn.close();
-      });
-    }
-  }
-
-  const cleanupFunction = () => {
-    if (!userAlreadyInCall) {
-      handlePeerDisconnect();
-    }
-    setIsCallEnded(true);
-
-    if (localStream) {
-      localStream.getAudioTracks().forEach(function (track) {
-        track.stop();
-      });
-      localStream.getVideoTracks().forEach((track) => {
-        track.stop();
-      });
-      setLocalStream(null);
-    }
-
-    if (remoteStream) {
-      remoteStream.getAudioTracks().forEach(function (track) {
-        track.stop();
-      });
-      setRemoteStream(null);
-    }
-    if (micStream) {
-      micStream.getAudioTracks().forEach((track) => {
-        track.stop();
-      });
-    }
-    let videorefSrc = localVideoRef.current;
-    if (localVideoRef && videorefSrc && videorefSrc.srcObject) {
-      videorefSrc.srcObject.getTracks().forEach((t) => {
-        t.stop();
-      });
-
-      videorefSrc.srcObject.getVideoTracks().forEach((t) => {
-        t.stop();
-      });
-    }
-
-    let videorefSrcRemote = remoteVideoRef.current;
-    if (remoteVideoRef && videorefSrcRemote && videorefSrcRemote.srcObject) {
-      videorefSrcRemote.srcObject.getTracks().forEach((t) => {
-        t.stop();
-      });
-      videorefSrcRemote.srcObject.getVideoTracks().forEach((t) => {
-        t.stop();
-      });
-    }
-
-    if (peerRef.current) {
-      peerRef.current.destroy();
-      peerRef.current = null;
-    }
-
-    // clearCanvas();
-  };
-
-   
-
-  const cutCall = (manually) => {
-    if (!userAlreadyInCall && socket) {
-      socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, {
-        userInfo: { from_user: fromUser._id, to_user: toUser._id }
-      });
-    }
-
-    // Show session ended modal if not already shown
-    if (!showSessionEndedModal && manually) {
-      setShowSessionEndedModal(true);
-    } else {
-      cleanupFunction();
-      if (AccountType.TRAINER === accountType) {
-        setIsOpenReport(true);
-      } else if (accountType === AccountType.TRAINEE) {
-        setIsOpenRating(true);
-      }
-    }
-  };
+  // handlePeerDisconnect moved earlier (before cleanupFunction)
 
   const handelTabClose = async () => {
     // mediaRecorder?.stop();
@@ -1132,7 +1125,7 @@ const VideoCallUI = ({
       window.removeEventListener('unload', handleUnload);
 
     };
-  }, []);
+  }, [cutCall]);
 
   const width1200 = useMediaQuery("(max-width:1200px)")
 

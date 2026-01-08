@@ -308,8 +308,26 @@
 }
 
 .banner_Slider {
-  padding: 10px 0;
+  padding: 10px 0 0 0;
   width: 100%;
+
+  .slick-slide {
+    margin-bottom: 0 !important;
+    
+    > div {
+      margin-bottom: 0 !important;
+    }
+  }
+
+  .slick-list {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .slick-track {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
 }
 
 .trainer-card {

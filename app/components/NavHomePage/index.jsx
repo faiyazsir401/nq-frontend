@@ -400,7 +400,7 @@ const NavHomePage = () => {
             borderRadius: "8px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
             border: "none",
-            padding: width600 ? "10px" : "15px"
+            padding: width600 ? "10px 10px 5px 10px" : "15px 15px 8px 15px"
           }}>
             <div className="banner_Slider">
               <Slider {...settings}>
