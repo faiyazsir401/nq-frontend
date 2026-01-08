@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { Nav, NavLink, NavItem, TabContent, TabPane } from "reactstrap";
 
 import "photoswipe/style.css";
