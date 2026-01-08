@@ -232,15 +232,27 @@ const TraineeRenderBooking = ({
                   }}
                   disabled={!isWithinTimeFrame}
                   onClick={() => {
-                    navigateToMeeting(_id)
-                    sendNotifications({
-                      title: notificiationTitles.sessionStrated,
-                      description: `${trainee_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
-                      senderId: trainee_info?._id,
-                      receiverId: trainer_info?._id,
-                      bookingInfo: bookingInfo,
-                      type:NotificationType.TRANSCATIONAL
-                    });
+                    try {
+                      // Navigate first to ensure user gets to meeting page
+                      navigateToMeeting(_id);
+                      
+                      // Send notification (non-blocking)
+                      try {
+                        sendNotifications({
+                          title: notificiationTitles.sessionStrated,
+                          description: `${trainee_info.fullname} has started the session. Join the session via the upcoming sessions tab in My Locker.`,
+                          senderId: trainee_info?._id,
+                          receiverId: trainer_info?._id,
+                          bookingInfo: bookingInfo,
+                          type:NotificationType.TRANSCATIONAL
+                        });
+                      } catch (notifError) {
+                        console.warn("Failed to send notification:", notifError);
+                        // Don't block navigation if notification fails
+                      }
+                    } catch (error) {
+                      console.error("Error starting session:", error);
+                    }
                   }}
                 >
                   {BookedSession.start}

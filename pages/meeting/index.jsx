@@ -49,8 +49,9 @@ const RenderVideoCall = ({height,width,isRotatedInitally}) => {
     }
   },[meetingDetails])
 
+  // Show loading if meeting details not found yet
   if (!meetingDetails) {
-    return null;
+    return <div>Loading meeting details...</div>;
   }
 
   return (
@@ -132,14 +133,14 @@ const MeetingRoom = () => {
   
   // Refetch if meeting details not found but we have an id
   useEffect(() => {
-    if (id && !meetingDetails && !loading && scheduledMeetingDetails?.length >= 0) {
-      // Meeting not found, try refetching once
+    if (id && !meetingDetails && !loading) {
+      // Meeting not found, try refetching with a small delay
       const timer = setTimeout(() => {
         dispatch(getScheduledMeetingDetailsAsync());
-      }, 500);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [id, meetingDetails, loading, scheduledMeetingDetails, dispatch]);
+  }, [id, meetingDetails, loading, dispatch]);
 
   useEffect(() => {
     if (meetingDetails && accountType) {
@@ -149,11 +150,11 @@ const MeetingRoom = () => {
 
   return (
     <SocketContext.Provider value={getSocket()}>
-      {loading ||
-      !scheduledMeetingDetails ||
-      !accountType ? (
+      {!accountType ? (
         <div>Loading...</div>
-      ) : !meetingDetails && id ? (
+      ) : loading || (id && !meetingDetails && scheduledMeetingDetails?.length === 0) ? (
+        <div>Loading meeting details...</div>
+      ) : !meetingDetails && id && !loading && scheduledMeetingDetails?.length > 0 ? (
         <div className="booking-status-message">
           Meeting not found. Please check your bookings and try again.
         </div>
