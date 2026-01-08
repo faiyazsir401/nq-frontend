@@ -482,7 +482,12 @@ const TrainerSessionInfo = ({
             border: "1px solid #e9ecef",
           }}
         >
-          <div className="d-flex justify-content-start" style={{ gap: "20px", flexWrap: "wrap" }}>
+          <div style={{ 
+            display: "flex", 
+            flexDirection: "column", 
+            alignItems: "center",
+            marginBottom: "20px",
+          }}>
             <div>
               <img
                 src={
@@ -498,19 +503,23 @@ const TrainerSessionInfo = ({
                   objectFit: "cover",
                   borderRadius: "12px",
                   border: "3px solid #000080",
+                  display: "block",
+                  margin: "0 auto",
                 }}
                 className="img-fluid rounded profile_picture"
                 alt="profile-picture"
               />
             </div>
-            <div style={{ flex: 1, minWidth: "200px" }}>
+          </div>
+          <div style={{ width: "100%", textAlign: "center" }}>
               <div
                 style={{
                   display: 'flex',
-                  justifyContent: 'flex-start',
-                  alignItems: isMobileScreen ? "baseline" : 'center',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                   flexDirection: isMobileScreen ? "column" : "row",
                   marginBottom: "10px",
+                  gap: isMobileScreen ? "5px" : "10px",
                 }}>
                 <h2 style={{ 
                   margin: 0, 
@@ -529,16 +538,19 @@ const TrainerSessionInfo = ({
                       alignItems: 'center',
                       fontSize: '13px',
                       fontWeight: '600',
-                      marginLeft: isMobileScreen ? '0px' : '10px',
-                      marginTop: isMobileScreen ? '5px' : '0px',
+                      gap: '8px',
                     }}>
                     <div
                       className="dot-btn dot-success grow"
                       style={{
-                        marginRight: "8px",
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                        alignSelf: 'center',
                       }}
                     ></div>
-                    <span className="text-success">Online Now</span>
+                    <span className="text-success" style={{ lineHeight: '1' }}>Online Now</span>
                   </div>
                 ) : (
                   <div
@@ -548,16 +560,19 @@ const TrainerSessionInfo = ({
                       alignItems: 'center',
                       fontSize: '13px',
                       fontWeight: '600',
-                      marginLeft: isMobileScreen ? '0px' : '10px',
-                      marginTop: isMobileScreen ? '5px' : '0px',
+                      gap: '8px',
                     }}>
                     <div
                       className="dot-btn dot-danger grow"
                       style={{
-                        marginRight: "8px",
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        flexShrink: 0,
+                        alignSelf: 'center',
                       }}
                     ></div>
-                    <span className="text-danger">Offline</span>
+                    <span className="text-danger" style={{ lineHeight: '1' }}>Offline</span>
                   </div>
                 )}
               </div>
@@ -567,6 +582,7 @@ const TrainerSessionInfo = ({
                 backgroundColor: "#fff",
                 borderRadius: "8px",
                 border: "1px solid #dee2e6",
+                display: "inline-block",
               }}>
                 <h3 style={{ 
                   margin: 0, 
@@ -577,7 +593,7 @@ const TrainerSessionInfo = ({
                   Hourly Rate: ${trainer?.extraInfo?.hourly_rate || TRAINER_AMOUNT_USD}
                 </h3>
               </div>
-              <div style={{ marginTop: "15px" }}>
+              <div style={{ marginTop: "15px", display: "flex", justifyContent: "center" }}>
                 <Ratings
                   ratings={trainer && trainer?.trainer_ratings}
                   extraClasses={"d-flex"}
@@ -587,7 +603,7 @@ const TrainerSessionInfo = ({
                 trainer?.extraInfo &&
                 trainer?.extraInfo?.media &&
                 trainer?.extraInfo?.social_media_links ? (
-                <div style={{ marginTop: "15px" }}>
+                <div style={{ marginTop: "15px", display: "flex", justifyContent: "center" }}>
                   <SocialMediaIcons
                     profileImageURL={
                       trainer &&

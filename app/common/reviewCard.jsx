@@ -14,12 +14,17 @@ const ReviewCard = ({ trainer, isPublic = false }) => {
     : itemsWithRatings.slice(0, INITIAL_REVIEWS_COUNT);
   const hasMoreReviews = itemsWithRatings.length > INITIAL_REVIEWS_COUNT;
 
+  // Early return if no reviews
+  if (!itemsWithRatings || itemsWithRatings.length === 0) {
+    return null;
+  }
+
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <div className="row d-flex justify-content-start">
         {displayedReviews.map((item, index) => {
           return (
-            <React.Fragment key={`trainer_ratings${index}`}>
+            <React.Fragment key={`trainer_ratings_${index}`}>
               <div
                 className={`${
                   isPublic ? "col-sm-5  m-2" : "col-sm-6  m-0"
@@ -63,30 +68,42 @@ const ReviewCard = ({ trainer, isPublic = false }) => {
         })}
       </div>
       {hasMoreReviews && (
-        <div className="d-flex justify-content-center mt-3 mb-3">
+        <div 
+          className="d-flex justify-content-center mt-4 mb-2"
+          style={{ 
+            width: "100%",
+            clear: "both",
+            paddingTop: "10px",
+          }}
+        >
           <button
             onClick={() => setShowAllReviews(!showAllReviews)}
             style={{
               backgroundColor: "#000080",
               color: "#fff",
               border: "1px solid #000080",
-              padding: "0.5rem 1.5rem",
-              borderRadius: "5px",
+              padding: "0.6rem 1.8rem",
+              borderRadius: "6px",
               cursor: "pointer",
-              fontSize: "14px",
+              fontSize: "15px",
               fontWeight: "500",
               transition: "all 0.3s ease",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
             }}
             onMouseEnter={(e) => {
               e.target.style.backgroundColor = "#0000a0";
               e.target.style.transform = "scale(1.05)";
+              e.target.style.boxShadow = "0 4px 8px rgba(0,0,0,0.15)";
             }}
             onMouseLeave={(e) => {
               e.target.style.backgroundColor = "#000080";
               e.target.style.transform = "scale(1)";
+              e.target.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
             }}
           >
-            {showAllReviews ? "Show Less" : `View More (${itemsWithRatings.length - INITIAL_REVIEWS_COUNT} more reviews)`}
+            {showAllReviews 
+              ? "Show Less" 
+              : `View More (${itemsWithRatings.length - INITIAL_REVIEWS_COUNT} more ${itemsWithRatings.length - INITIAL_REVIEWS_COUNT === 1 ? 'review' : 'reviews'})`}
           </button>
         </div>
       )}
