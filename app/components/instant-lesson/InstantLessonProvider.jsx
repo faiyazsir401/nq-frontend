@@ -2,6 +2,7 @@ import React from "react";
 import { useInstantLessonSocket } from "./useInstantLessonSocket";
 import InstantLessonModal from "./InstantLessonModal";
 import InstantLessonTraineeModal from "./InstantLessonTraineeModal";
+import InstantLessonNavigationGuard from "./InstantLessonNavigationGuard";
 
 /**
  * Provider component that sets up global instant lesson socket listener
@@ -11,9 +12,11 @@ const InstantLessonProvider = () => {
   // Set up global socket listener
   useInstantLessonSocket();
 
-  // Render both modals (only one will be visible based on account type and state)
+  // Render navigation guard and both modals (only one modal will be visible
+  // based on account type and state)
   return (
     <>
+      <InstantLessonNavigationGuard />
       <InstantLessonModal />
       <InstantLessonTraineeModal />
     </>

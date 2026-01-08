@@ -87,7 +87,6 @@ const VideoCallUI = ({
   const videoContainerRef = useRef(null);
   const videoContainerRef2 = useRef(null);
 
-  const intervalRef = useRef(null); // useRef for interval
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
   const { startMeeting } = useAppSelector(bookingsState);
@@ -136,6 +135,10 @@ const VideoCallUI = ({
   const sessionEndedModalDismissedRef = useRef(false);
   const [lockPoint, setLockPoint] = useState(0);
 
+  // Authoritative lesson timer (backend-driven)
+  const lessonTimerIntervalRef = useRef(null);
+  const [authoritativeTimer, setAuthoritativeTimer] = useState(null);
+
   const netquixVideos = [
     {
       _id: "656acd81cd2d7329ed0d8e91",
@@ -164,41 +167,6 @@ const VideoCallUI = ({
       getMyClips();
     }
   }, [isOpen]);
-
-  function getTimeDifferenceStatus(session_end_time) {
-    const now = new Date();
-
-    if (typeof session_end_time === "string" && session_end_time.includes(":")) {
-      const [endHours, endMinutes] = session_end_time.split(":").map(Number);
-      const endTime = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        endHours,
-        endMinutes
-      );
-
-      const timeDiff = (endTime - now) / (1000 * 60); // Convert to minutes
-      // Show grace period modal at -4 minutes
-       
-      if (timeDiff <= -4 && timeDiff > -5 && !gracePeriodModalDismissedRef.current) {
-        setShowGracePeriodModal(true);
-        setCountdownMessage("1 minute");
-      }
-
-      // Show session ended modal at -5 minutes
-      if (timeDiff <= -5 && !sessionEndedModalDismissedRef.current) {
-        setShowGracePeriodModal(false);
-        setShowSessionEndedModal(true);
-        return true; // Returns true to trigger call end
-      }
-
-      return false;
-    } else {
-      console.error("Invalid session_end_time:", session_end_time);
-      return false; // Handle invalid input
-    }
-  };
 
   // Add this function to extend the session time
   const extendSessionTime = async () => {
@@ -255,43 +223,22 @@ const VideoCallUI = ({
         suppressMilliseconds: false,
         includeOffset: false,
       }) + "Z";
-      // Update the session_end_time
-       
+      // Update local display of session_end_time for UI purposes
       setSessionEndTime(newEndTimeStr);
-      socket.emit("ON_BOTH_JOIN", {
-        userInfo: { from_user: fromUser._id, to_user: toUser._id },
-        newEndTimeStr,
-        newEndTime:testEndTime
+
+      // Notify backend about the requested extension; backend remains in full
+      // control of the actual lesson timer and will emit updated timing info.
+      await updateExtendedSessionTime({
+        sessionId: id,
+        extendedEndTime: testEndTime,
+        extended_session_end_time: newEndTimeStr,
       });
-      await updateExtendedSessionTime({ sessionId: id, extendedEndTime: testEndTime, extended_session_end_time: newEndTimeStr });
        
     } catch (error) {
       console.error("Error extending session time:", error);
     }
   };
 
-
-  useEffect(() => {
-    const checkStatus = () => {
-      const isEndCall = getTimeDifferenceStatus(sessionEndTime);
-
-      if (isEndCall) {
-        cutCall(true)
-      }
-    };
-    if (sessionEndTime) {
-      // Initial check
-      checkStatus();
-
-
-
-      // Check every second
-      const intervalId = setInterval(checkStatus, 1000);
-
-      // Cleanup on unmount
-      return () => clearInterval(intervalId);
-    }
-  }, [sessionEndTime]);
 
   const getMyClips = async () => {
     var res = await myClips({});
@@ -344,6 +291,77 @@ const VideoCallUI = ({
       cutCall();
       setIsOpenRating(true)
     }
+  });
+
+  // 30-second warning before lesson ends (backend-driven)
+  useEffect(() => {
+    const handleLessonTimeWarning = ({ sessionId, remainingSeconds }) => {
+      if (sessionId !== id) return;
+      toast.warning(
+        `Only ${remainingSeconds} seconds remaining in this lesson.`,
+      );
+      // Optional: open an extend-time CTA that calls extendSessionTime()
+    };
+
+    socket.on("LESSON_TIME_WARNING", handleLessonTimeWarning);
+
+    return () => {
+      socket.off("LESSON_TIME_WARNING", handleLessonTimeWarning);
+    };
+  }, [socket, id]);
+
+  // Lesson time ended - stop authoritative timer and end the session (backend-driven)
+  useEffect(() => {
+    const handleLessonTimeEnded = ({ sessionId }) => {
+      if (sessionId !== id) return;
+
+      if (lessonTimerIntervalRef.current) {
+        clearInterval(lessonTimerIntervalRef.current);
+        lessonTimerIntervalRef.current = null;
+      }
+
+      setAuthoritativeTimer((prev) =>
+        prev && prev.sessionId === sessionId
+          ? { ...prev, remainingSeconds: 0 }
+          : prev
+      );
+
+      toast.info("Lesson time has ended.");
+      // End the call from frontend when backend declares time over
+      cutCall(true);
+    };
+
+    socket.on("LESSON_TIME_ENDED", handleLessonTimeEnded);
+
+    return () => {
+      socket.off("LESSON_TIME_ENDED", handleLessonTimeEnded);
+    };
+  }, [socket, id, cutCall]);
+
+  // 30-second warning before lesson ends
+  socket.on("LESSON_TIME_WARNING", ({ sessionId, remainingSeconds }) => {
+    if (sessionId !== id) return;
+    toast.warning(
+      `Only ${remainingSeconds} seconds remaining in this lesson.`,
+    );
+  });
+
+  // Lesson time ended - stop authoritative timer (UI may optionally prompt to end call)
+  socket.on("LESSON_TIME_ENDED", ({ sessionId, startedAt, duration }) => {
+    if (sessionId !== id) return;
+
+    if (lessonTimerIntervalRef.current) {
+      clearInterval(lessonTimerIntervalRef.current);
+      lessonTimerIntervalRef.current = null;
+    }
+
+    setAuthoritativeTimer((prev) =>
+      prev && prev.sessionId === sessionId
+        ? { ...prev, remainingSeconds: 0 }
+        : prev
+    );
+
+    toast.info("Lesson time has ended.");
   });
 
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
@@ -865,16 +883,65 @@ const VideoCallUI = ({
       accountType === AccountType.TRAINEE ? setIsModelOpen(true) : null;
     });
   };
-   
+  
+  // Start lesson countdown based on backend timer info
+  const startLessonTimer = useCallback(({ sessionId, startedAt, duration }) => {
+    if (!sessionId || !startedAt || !duration) return;
 
-  socket.on("ON_BOTH_JOIN", (data) => {
-     
-    if (accountType === AccountType.TRAINER) {
-      const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(data.socketReq.newEndTime, time_zone, false);
-      const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
-      setSessionEndTime(formattedExtendedEndTime)
+    if (lessonTimerIntervalRef.current) {
+      clearInterval(lessonTimerIntervalRef.current);
+      lessonTimerIntervalRef.current = null;
     }
-  });
+
+    const updateTimer = () => {
+      const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
+      const remainingSeconds = Math.max(0, duration - elapsedSeconds);
+
+      setAuthoritativeTimer({
+        sessionId,
+        startedAt,
+        duration,
+        remainingSeconds,
+      });
+
+      if (remainingSeconds <= 0 && lessonTimerIntervalRef.current) {
+        clearInterval(lessonTimerIntervalRef.current);
+        lessonTimerIntervalRef.current = null;
+      }
+    };
+
+    updateTimer();
+    lessonTimerIntervalRef.current = setInterval(updateTimer, 1000);
+  }, []);
+
+  // Listen for backend "both joined" and timer events
+  useEffect(() => {
+    const handleBothJoin = (data) => {
+      const { timerStarted } = data || {};
+
+      // If backend started an authoritative timer, sync to it
+      if (timerStarted && timerStarted.sessionId === id) {
+        const { sessionId, startedAt, duration } = timerStarted;
+        startLessonTimer({ sessionId, startedAt, duration });
+      }
+
+      if (accountType === AccountType.TRAINER && data?.socketReq?.newEndTime) {
+        const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(
+          data.socketReq.newEndTime,
+          time_zone,
+          false
+        );
+        const formattedExtendedEndTime = formatToHHMM(convertedExtendedEndTime);
+        setSessionEndTime(formattedExtendedEndTime);
+      }
+    };
+
+    socket.on("ON_BOTH_JOIN", handleBothJoin);
+
+    return () => {
+      socket.off("ON_BOTH_JOIN", handleBothJoin);
+    };
+  }, [socket, id, accountType, time_zone, startLessonTimer]);
 
   const listenSocketEvents = () => {
 
