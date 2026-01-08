@@ -427,7 +427,7 @@ const TrainerSessionInfo = ({
   useEffect(() => {
     if (trainer && trainer.extraInfo) {
       setAccordionsData((prev) => ({
-        prev,
+        ...prev,
         teaching_style: trainer?.extraInfo?.teaching_style,
         credentials_and_affiliations:
           trainer?.extraInfo?.credentials_and_affiliations,
@@ -435,7 +435,7 @@ const TrainerSessionInfo = ({
       }));
     } else {
       setAccordionsData((prev) => ({
-        prev,
+        ...prev,
         teaching_style: null,
         credentials_and_affiliations: null,
         curriculum: null,
@@ -459,16 +459,21 @@ const TrainerSessionInfo = ({
     ? trainer.trainer_ratings.some(({ ratings }) => ratings?.trainee)
     : null;
 
+  const rowStyle = {
+    margin: "0px",
+    padding: "20px",
+    maxWidth: "100%",
+  };
+
+  if (!AccountType.TRAINEE || !AccountType.TRAINER) {
+    rowStyle.height = "92vh";
+    rowStyle.overflowX = "auto";
+  }
+
   return (
     <div
       className="row"
-      style={{
-        margin: "0px",
-        padding: "20px",
-        height: !AccountType.TRAINEE || (!AccountType.TRAINER && "92vh"),
-        overflowX: !AccountType.TRAINEE || (!AccountType.TRAINER && "auto"),
-        maxWidth: "100%",
-      }}
+      style={rowStyle}
       id="trainerinfo"
     >
       <div className="col-lg-6" style={{ paddingRight: "15px" }}>
@@ -622,7 +627,6 @@ const TrainerSessionInfo = ({
                   />
                 </div>
               ) : null}
-            </div>
           </div>
         </div>
 
