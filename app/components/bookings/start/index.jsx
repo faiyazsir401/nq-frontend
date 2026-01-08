@@ -27,10 +27,7 @@ const StartMeeting = ({
     // Set up event listener for call close
     socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
       setTimeout(() => {
-       setTimeout(() => {
-         // closing video call window in 3 sec
-         isClose();
-       }, 3000);
+        // closing video call window in 3 sec
         isClose();
       }, 3000);
     });

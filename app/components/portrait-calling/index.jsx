@@ -280,21 +280,38 @@ const VideoCallUI = ({
     setTraineeClips(arr);
   };
 
-  socket.on(EVENTS.ON_VIDEO_SELECT, ({ videos, type }) => {
-    if (type === "clips") {
-      setSelectedClips([...videos]);
-    }
-  });
+  // Set up socket event listeners with null checks
+  useEffect(() => {
+    if (!socket) return;
 
-  socket.on(EVENTS.CALL_END, () => {
-    if (accountType === AccountType.TRAINEE) {
-      cutCall();
-      setIsOpenRating(true)
-    }
-  });
+    const handleVideoSelect = ({ videos, type }) => {
+      if (type === "clips") {
+        setSelectedClips([...videos]);
+      }
+    };
+
+    const handleCallEnd = () => {
+      if (accountType === AccountType.TRAINEE) {
+        cutCall();
+        setIsOpenRating(true);
+      }
+    };
+
+    socket.on(EVENTS.ON_VIDEO_SELECT, handleVideoSelect);
+    socket.on(EVENTS.CALL_END, handleCallEnd);
+
+    return () => {
+      if (socket) {
+        socket.off(EVENTS.ON_VIDEO_SELECT, handleVideoSelect);
+        socket.off(EVENTS.CALL_END, handleCallEnd);
+      }
+    };
+  }, [socket, accountType]);
 
   // 30-second warning before lesson ends (backend-driven)
   useEffect(() => {
+    if (!socket) return;
+
     const handleLessonTimeWarning = ({ sessionId, remainingSeconds }) => {
       if (sessionId !== id) return;
       toast.warning(
@@ -306,12 +323,16 @@ const VideoCallUI = ({
     socket.on("LESSON_TIME_WARNING", handleLessonTimeWarning);
 
     return () => {
-      socket.off("LESSON_TIME_WARNING", handleLessonTimeWarning);
+      if (socket) {
+        socket.off("LESSON_TIME_WARNING", handleLessonTimeWarning);
+      }
     };
   }, [socket, id]);
 
   // Lesson time ended - stop authoritative timer and end the session (backend-driven)
   useEffect(() => {
+    if (!socket) return;
+
     const handleLessonTimeEnded = ({ sessionId }) => {
       if (sessionId !== id) return;
 
@@ -334,43 +355,24 @@ const VideoCallUI = ({
     socket.on("LESSON_TIME_ENDED", handleLessonTimeEnded);
 
     return () => {
-      socket.off("LESSON_TIME_ENDED", handleLessonTimeEnded);
+      if (socket) {
+        socket.off("LESSON_TIME_ENDED", handleLessonTimeEnded);
+      }
     };
   }, [socket, id, cutCall]);
 
-  // 30-second warning before lesson ends
-  socket.on("LESSON_TIME_WARNING", ({ sessionId, remainingSeconds }) => {
-    if (sessionId !== id) return;
-    toast.warning(
-      `Only ${remainingSeconds} seconds remaining in this lesson.`,
-    );
-  });
-
-  // Lesson time ended - stop authoritative timer (UI may optionally prompt to end call)
-  socket.on("LESSON_TIME_ENDED", ({ sessionId, startedAt, duration }) => {
-    if (sessionId !== id) return;
-
-    if (lessonTimerIntervalRef.current) {
-      clearInterval(lessonTimerIntervalRef.current);
-      lessonTimerIntervalRef.current = null;
-    }
-
-    setAuthoritativeTimer((prev) =>
-      prev && prev.sessionId === sessionId
-        ? { ...prev, remainingSeconds: 0 }
-        : prev
-    );
-
-    toast.info("Lesson time has ended.");
-  });
+  // NOTE: LESSON_TIME_WARNING and LESSON_TIME_ENDED handlers are set up in useEffect hooks above
+  // Duplicate handlers have been removed to prevent duplicate registrations
 
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
   const emitVideoSelectEvent = (type, videos) => {
-    socket.emit(EVENTS.ON_VIDEO_SELECT, {
-      userInfo: { from_user: fromUser._id, to_user: toUser._id },
-      type,
-      videos,
-    });
+    if (socket) {
+      socket.emit(EVENTS.ON_VIDEO_SELECT, {
+        userInfo: { from_user: fromUser._id, to_user: toUser._id },
+        type,
+        videos,
+      });
+    }
   };
 
   //NOTE - emit event after selecting the clips
@@ -751,8 +753,13 @@ const VideoCallUI = ({
       }
 
       // Handle socket disconnect or errors after initial connection
+      if (!socket) {
+        console.error('[VideoCallUI] Socket is not available when starting call');
+        toast.error("Unable to connect to the server. Please refresh the page and try again.");
+        return;
+      }
+
       socket.on('disconnect', (reason) => {
-         
         toast.error("You have been disconnected from the server. Please reconnect.");
         // Additional logic to handle the disconnect (e.g., retry connection or show UI)
       });
@@ -829,11 +836,11 @@ const VideoCallUI = ({
 
       // Handle Peer events
       peer.on("open", (id) => {
-        socket.emit("ON_CALL_JOIN", {
-          userInfo: { from_user: fromUser._id, to_user: toUser._id },
-        });
-
-         
+        if (socket) {
+          socket.emit("ON_CALL_JOIN", {
+            userInfo: { from_user: fromUser._id, to_user: toUser._id },
+          });
+        }
       });
 
 
@@ -997,7 +1004,9 @@ const VideoCallUI = ({
 
   // NOTE - handle user offline
   const handleOffline = () => {
-    socket.emit("chunksCompleted");
+    if (socket) {
+      socket.emit("chunksCompleted");
+    }
   };
 
   function handlePeerDisconnect() {
@@ -1077,7 +1086,7 @@ const VideoCallUI = ({
    
 
   const cutCall = (manually) => {
-    if (!userAlreadyInCall) {
+    if (!userAlreadyInCall && socket) {
       socket.emit(EVENTS.VIDEO_CALL.ON_CLOSE, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id }
       });
@@ -1099,7 +1108,9 @@ const VideoCallUI = ({
   const handelTabClose = async () => {
     // mediaRecorder?.stop();
     // setRecording(false);
-    socket.emit("chunksCompleted");
+    if (socket) {
+      socket.emit("chunksCompleted");
+    }
   };
 
   useEffect(() => {
@@ -1792,7 +1803,7 @@ const VideoCallUI = ({
               color="danger"
               onClick={() => {
                 cutCall();
-                if (accountType === AccountType.TRAINER) {
+                if (accountType === AccountType.TRAINER && socket) {
                   socket.emit(EVENTS.CALL_END, {
                     userInfo: { from_user: fromUser._id, to_user: toUser._id }
                   });
