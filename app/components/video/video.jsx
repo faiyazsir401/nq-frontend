@@ -323,7 +323,9 @@ useEffect(() => {
   const handelTabClose = async () => {
     mediaRecorder?.stop();
     setRecording(false);
-    socket.emit("chunksCompleted");
+    if (socket) {
+      socket.emit("chunksCompleted");
+    }
   };
 
   const startRecording = async () => {
@@ -338,7 +340,9 @@ useEffect(() => {
       trainer_name: toUser?.fullname,
     };
 
-    socket.emit("videoUploadData", data);
+    if (socket) {
+      socket.emit("videoUploadData", data);
+    }
 
     const mixedAudioStream = await setupAudioMixing();
 
@@ -387,7 +391,9 @@ useEffect(() => {
         // Send only if there are valid chunkBuffers
         if (chunkBuffers.length > 0) {
           const chunkData = { data: chunkBuffers };
-          socket.emit("chunk", chunkData);
+          if (socket) {
+            socket.emit("chunk", chunkData);
+          }
           // Handle the recorded data here (in chunks array)
           //  
         } else {
@@ -409,7 +415,9 @@ useEffect(() => {
       // a.download = `${Date.now()}.webm`;
       // a.click();
       // window.URL.revokeObjectURL(url);
-      socket.emit("chunksCompleted");
+      if (socket) {
+        socket.emit("chunksCompleted");
+      }
     };
 
     mediaRecorder.start();
@@ -430,7 +438,9 @@ useEffect(() => {
   // NOTE - handle user offline
   const handleOffline = () => {
     stopRecording();
-    socket.emit("chunksCompleted");
+    if (socket) {
+      socket.emit("chunksCompleted");
+    }
   };
 
   // NOTE - Start call
@@ -477,9 +487,17 @@ useEffect(() => {
       // Handle Peer events
       peer.on("open", (id) => {
         //  
-        socket.emit("ON_CALL_JOIN", {
-          userInfo: { from_user: fromUser._id, to_user: toUser._id },
-        });
+        if (socket) {
+          socket.emit("ON_CALL_JOIN", {
+            userInfo: { from_user: fromUser._id, to_user: toUser._id },
+          });
+        } else {
+          console.error('[HandleVideoCall] Socket is not available when peer opened');
+          setDisplayMsg({
+            showMsg: true,
+            msg: 'Unable to connect to the server. Please refresh the page and try again.',
+          });
+        }
          
       });
 
@@ -543,6 +561,16 @@ useEffect(() => {
   };
 
   const listenSocketEvents = () => {
+    // Check if socket is available before setting up event listeners
+    if (!socket) {
+      console.error('[HandleVideoCall] Socket is not available');
+      setDisplayMsg({
+        showMsg: true,
+        msg: 'Unable to connect to the server. Please refresh the page and try again.',
+      });
+      return;
+    }
+
     // once user joins the call
     socket.on("ON_CALL_JOIN", ({ userInfo }) => {
       // console.log(
@@ -640,6 +668,55 @@ useEffect(() => {
       });
       cleanupFunction();
     });
+
+    // Additional socket event listeners for video controls
+    socket.on(EVENTS.ON_VIDEO_SELECT, ({ type, videos, mainScreen }) => {
+      if (type === "clips") {
+        setSelectedClips([...videos]);
+        if (videos?.length) {
+          resetInitialPinnedUser()
+        } else {
+          setInitialPinnedUser()
+        }
+      } else {
+        setPinnedUser(mainScreen);
+        if (mainScreen) {
+          setIsPinned(true);
+        } else {
+          setIsPinned(false);
+        }
+      }
+    });
+
+    socket.on(EVENTS.ON_VIDEO_PLAY_PAUSE, ({ isPlayingAll, number, isPlaying1, isPlaying2 }) => {
+      const playPauseVideo = (videoRef, isPlaying) => {
+        if (videoRef?.current) {
+          isPlaying ? videoRef.current.play() : videoRef.current.pause();
+        }
+      };
+    
+      if (number === "all") {
+        playPauseVideo(selectedVideoRef1, isPlayingAll);
+        playPauseVideo(selectedVideoRef2, isPlayingAll);
+      } else if (number === "one") {
+        playPauseVideo(selectedVideoRef1, isPlaying1);
+      } else if (number === "two") {
+        playPauseVideo(selectedVideoRef2, isPlaying2);
+      }
+    
+      setIsPlaying({ isPlayingAll, number, isPlaying1, isPlaying2 });
+    });
+
+    socket.on(EVENTS.ON_VIDEO_TIME, ({ clickedTime, number }) => {
+      if (selectedVideoRef1?.current) {
+        if (number === "one") selectedVideoRef1.current.currentTime = clickedTime;
+        else selectedVideoRef2.current.currentTime = clickedTime;
+      }
+    });
+
+    socket.on(EVENTS.ON_VIDEO_SHOW, ({ isClicked }) => {
+      setMaxMin(isClicked);
+    });
   };
 
   
@@ -714,6 +791,16 @@ useEffect(() => {
 
   useEffect(() => {
     if (fromUser && toUser) {
+      // Check if socket is available before proceeding
+      if (!socket) {
+        console.error('[HandleVideoCall] Socket is not available. Cannot start call.');
+        setDisplayMsg({
+          showMsg: true,
+          msg: 'Unable to connect to the server. Please refresh the page and try again.',
+        });
+        return;
+      }
+
       if (typeof navigator !== "undefined") {
         Peer = require("peerjs").default;
       }
@@ -729,7 +816,7 @@ useEffect(() => {
         cutCall();
       };
     }
-  }, []);
+  }, [socket, fromUser, toUser]);
 
   // NOTE -  end user video stream
   useMemo(() => {
@@ -750,7 +837,7 @@ useEffect(() => {
 
   // NOTE - if trainer is joined before trainee and trainer's video has been pause then emit the even to trainee
   useEffect(() => {
-    if (isTraineeJoined) {
+    if (isTraineeJoined && socket) {
       socket.emit(EVENTS.VIDEO_CALL.STOP_FEED, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
         feedStatus: isFeedStopped,
@@ -1075,20 +1162,22 @@ useEffect(() => {
         if (!(event && event.target)) return;
         const binaryData = event.target.result;
         //  
-        socket.emit(EVENTS.DRAW, {
-          userInfo: { from_user: fromUser._id, to_user: toUser._id },
-          // storedEvents,
-          // canvasConfigs,
-          strikes: binaryData,
-          canvasSize: { width, height }
-        });
+        if (socket) {
+          socket.emit(EVENTS.DRAW, {
+            userInfo: { from_user: fromUser._id, to_user: toUser._id },
+            // storedEvents,
+            // canvasConfigs,
+            strikes: binaryData,
+            canvasSize: { width, height }
+          });
+        }
       };
       reader.readAsArrayBuffer(blob);
     });
   };
 
   const sendStopDrawingEvent = () => {
-    if (remoteVideoRef && remoteVideoRef.current) {
+    if (remoteVideoRef && remoteVideoRef.current && socket) {
       socket.emit(EVENTS.STOP_DRAWING, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
       });
@@ -1096,7 +1185,7 @@ useEffect(() => {
   };
 
   const sendClearCanvasEvent = () => {
-    if (remoteVideoRef && remoteVideoRef.current) {
+    if (remoteVideoRef && remoteVideoRef.current && socket) {
       socket.emit(EVENTS.EMIT_CLEAR_CANVAS, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
       });
@@ -1546,33 +1635,18 @@ useEffect(() => {
 
   //SECTION - selected Clips and swapping the videos
   //NOTE -  listening both selected clips and swapped videos with single event by type
-  socket.on(EVENTS.ON_VIDEO_SELECT, ({ type, videos, mainScreen }) => {
-    if (type === "clips") {
-      //  
-      setSelectedClips([...videos]);
-      if (videos?.length) {
-        resetInitialPinnedUser()
-      } else {
-        setInitialPinnedUser()
-      }
-    } else {
-      setPinnedUser(mainScreen);
-      if (mainScreen) {
-        setIsPinned(true);
-      } else {
-        setIsPinned(false);
-      }
-    }
-  });
+  // Moved to listenSocketEvents function
 
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
   const emitVideoSelectEvent = (type, videos, mainScreen) => {
-    socket.emit(EVENTS.ON_VIDEO_SELECT, {
-      userInfo: { from_user: fromUser._id, to_user: toUser._id },
-      type,
-      videos,
-      mainScreen,
-    });
+    if (socket) {
+      socket.emit(EVENTS.ON_VIDEO_SELECT, {
+        userInfo: { from_user: fromUser._id, to_user: toUser._id },
+        type,
+        videos,
+        mainScreen,
+      });
+    }
   };
 
   //NOTE - emit event after selecting the clips
@@ -1631,9 +1705,7 @@ const emitVideoTimeEvent = (clickedTime, number) => {
   });
 };
 
-  socket.on(EVENTS.ON_VIDEO_SHOW, ({ isClicked }) => {
-    setMaxMin(isClicked);
-  });
+  // Moved to listenSocketEvents function
 
   const globalProgressBarToggler = (e) => {
     setVideoController(!videoController);
@@ -2080,10 +2152,12 @@ const togglePlay = (num) => {
                 localStream.getVideoTracks().forEach((track) => {
                   track.enabled = !track.enabled; // Toggle camera state
                 });
-                socket.emit(EVENTS.VIDEO_CALL.STOP_FEED, {
-                  userInfo: { from_user: fromUser._id, to_user: toUser._id },
-                  feedStatus: !isFeedStopped,
-                });
+                if (socket) {
+                  socket.emit(EVENTS.VIDEO_CALL.STOP_FEED, {
+                    userInfo: { from_user: fromUser._id, to_user: toUser._id },
+                    feedStatus: !isFeedStopped,
+                  });
+                }
                 setIsFeedStopped(!isFeedStopped);
               }
 

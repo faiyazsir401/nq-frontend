@@ -394,22 +394,26 @@ const NavHomePage = () => {
       {accountType === AccountType.TRAINEE &&
         activeTrainer &&
         activeTrainer?.length ? (
-        <div className="banner">
-          <h1>
-            Coaches Online <span>Now!</span>
-          </h1>
-
-          <div className="banner_Slider">
-            <Slider {...settings}>
-              {activeTrainer &&
-                activeTrainer?.map((info, index) => {
-                  return (
-                    <div key={`slider-${info.trainer_info?._id}-${index}`}>
-                      <OnlineUserCard trainer={info.trainer_info} />
-                    </div>
-                  );
-                })}
-            </Slider>
+        <div className="upcoming_session" style={{ marginTop: width600 ? "15px" : "20px", marginBottom: width600 ? "15px" : "20px" }}>
+          <h2 className="text-center" style={{ marginBottom: width600 ? "15px" : "20px" }}>Coaches Online Now!</h2>
+          <div className="card trainer-bookings-card" style={{ 
+            borderRadius: "8px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            border: "none",
+            padding: width600 ? "10px" : "15px"
+          }}>
+            <div className="banner_Slider">
+              <Slider {...settings}>
+                {activeTrainer &&
+                  activeTrainer?.map((info, index) => {
+                    return (
+                      <div key={`slider-${info.trainer_info?._id}-${index}`}>
+                        <OnlineUserCard trainer={info.trainer_info} />
+                      </div>
+                    );
+                  })}
+              </Slider>
+            </div>
           </div>
         </div>
       ) : null}

@@ -66,22 +66,18 @@ export const SocketProvider = ({ children }) => {
 
     // Add error handling to suppress console errors
     newSocket.on('connect_error', (error) => {
-      // Only log in development to reduce console noise
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[Socket] Connection error:', error.message);
-      }
+      console.error('[Socket] Connection error:', error.message);
+      // Set socket to null on connection failure so components know it's unavailable
+      setSocket(null);
     });
 
     newSocket.on('reconnect_error', (error) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[Socket] Reconnection error:', error.message);
-      }
+      console.error('[Socket] Reconnection error:', error.message);
     });
 
     newSocket.on('reconnect_failed', () => {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[Socket] Reconnection failed after all attempts');
-      }
+      console.error('[Socket] Reconnection failed after all attempts');
+      setSocket(null);
     });
 
     newSocket.on('connect', () => {

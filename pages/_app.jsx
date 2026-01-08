@@ -14,6 +14,7 @@ import AuthGuard, {
 } from "../app/components/auth/AuthGuard";
 import { SocketProvider } from "../app/components/socket/SocketProvider";
 import InstantLessonProvider from "../app/components/instant-lesson/InstantLessonProvider";
+import ErrorBoundary from "../app/components/common/ErrorBoundary";
 import { LOCAL_STORAGE_KEYS, routingPaths } from "../app/common/constants";
 import { bookingsAction } from "../app/components/common/common.slice";
 import Script from "next/script";
@@ -34,6 +35,16 @@ export default function MyAppComponent({ Component, pageProps }) {
   // Initialize OpenReplay tracker
   const initializeTracker = async () => {
     try {
+      // Check if project key is available
+      const projectKey = process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY;
+      if (!projectKey || typeof projectKey !== 'string' || projectKey.trim() === '') {
+        // Silently skip tracker initialization if project key is missing
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('[OpenReplay] Project key is missing. Skipping tracker initialization.');
+        }
+        return;
+      }
+
       const token = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN);
       if (token) {
         const userResponse = await getMe();
@@ -44,7 +55,7 @@ export default function MyAppComponent({ Component, pageProps }) {
            
           
           const newTracker = new Tracker({
-            projectKey: process.env.NEXT_PUBLIC_OPENREPLAY_PROJECT_KEY,
+            projectKey: projectKey,
             ingestPoint: "https://analytics.netqwix.com/ingest",
             // Enable comprehensive tracking
             captureIFrames: true,
@@ -122,45 +133,59 @@ export default function MyAppComponent({ Component, pageProps }) {
           });
           
           // Add comprehensive plugins
-          newTracker.use(trackerAssist());
-          
-          newTracker.start();
-          newTracker.setUserID(userInfo.email);
-          newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
-          
-          // Set additional tracking properties using setMetadata
-          newTracker.setMetadata("userAgent", navigator.userAgent);
-          newTracker.setMetadata("screenResolution", `${screen.width}x${screen.height}`);
-          newTracker.setMetadata("viewport", `${window.innerWidth}x${window.innerHeight}`);
-          newTracker.setMetadata("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
-          newTracker.setMetadata("language", navigator.language);
-          newTracker.setMetadata("platform", navigator.platform);
-          newTracker.setMetadata("cookieEnabled", navigator.cookieEnabled.toString());
-          newTracker.setMetadata("onLine", navigator.onLine.toString());
-          
-          if (navigator.connection) {
-            newTracker.setMetadata("connectionEffectiveType", navigator.connection.effectiveType);
-            newTracker.setMetadata("connectionDownlink", navigator.connection.downlink.toString());
-            newTracker.setMetadata("connectionRtt", navigator.connection.rtt.toString());
+          try {
+            newTracker.use(trackerAssist());
+          } catch (pluginError) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('[OpenReplay] Failed to load tracker assist plugin:', pluginError);
+            }
           }
           
-          // Track performance metrics
-          if ('performance' in window) {
-            const perfData = performance.getEntriesByType('navigation')[0];
-            if (perfData) {
-              newTracker.setMetadata("pageLoadTime", (perfData.loadEventEnd - perfData.loadEventStart).toString());
-              newTracker.setMetadata("domContentLoaded", (perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart).toString());
-              
-              const firstPaint = performance.getEntriesByName('first-paint')[0];
-              if (firstPaint) {
-                newTracker.setMetadata("firstPaint", firstPaint.startTime.toString());
-              }
-              
-              const firstContentfulPaint = performance.getEntriesByName('first-contentful-paint')[0];
-              if (firstContentfulPaint) {
-                newTracker.setMetadata("firstContentfulPaint", firstContentfulPaint.startTime.toString());
+          try {
+            newTracker.start();
+            newTracker.setUserID(userInfo.email);
+            newTracker.setMetadata(userInfo.email, userInfo.account_type || localStorage.getItem(LOCAL_STORAGE_KEYS.ACC_TYPE));
+            
+            // Set additional tracking properties using setMetadata
+            newTracker.setMetadata("userAgent", navigator.userAgent);
+            newTracker.setMetadata("screenResolution", `${screen.width}x${screen.height}`);
+            newTracker.setMetadata("viewport", `${window.innerWidth}x${window.innerHeight}`);
+            newTracker.setMetadata("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+            newTracker.setMetadata("language", navigator.language);
+            newTracker.setMetadata("platform", navigator.platform);
+            newTracker.setMetadata("cookieEnabled", navigator.cookieEnabled.toString());
+            newTracker.setMetadata("onLine", navigator.onLine.toString());
+            
+            if (navigator.connection) {
+              newTracker.setMetadata("connectionEffectiveType", navigator.connection.effectiveType);
+              newTracker.setMetadata("connectionDownlink", navigator.connection.downlink.toString());
+              newTracker.setMetadata("connectionRtt", navigator.connection.rtt.toString());
+            }
+            
+            // Track performance metrics
+            if ('performance' in window) {
+              const perfData = performance.getEntriesByType('navigation')[0];
+              if (perfData) {
+                newTracker.setMetadata("pageLoadTime", (perfData.loadEventEnd - perfData.loadEventStart).toString());
+                newTracker.setMetadata("domContentLoaded", (perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart).toString());
+                
+                const firstPaint = performance.getEntriesByName('first-paint')[0];
+                if (firstPaint) {
+                  newTracker.setMetadata("firstPaint", firstPaint.startTime.toString());
+                }
+                
+                const firstContentfulPaint = performance.getEntriesByName('first-contentful-paint')[0];
+                if (firstContentfulPaint) {
+                  newTracker.setMetadata("firstContentfulPaint", firstContentfulPaint.startTime.toString());
+                }
               }
             }
+          } catch (startError) {
+            // Handle errors gracefully - don't crash the app if tracker fails
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('[OpenReplay] Failed to start tracker:', startError);
+            }
+            return; // Exit early if tracker fails to start
           }
           
            
@@ -239,32 +264,34 @@ export default function MyAppComponent({ Component, pageProps }) {
           <title>Qwick Lessons Over the Net</title>
         </Head>
         <Provider store={store}>
-          <AuthGuard>
-            <SocketProvider>
-              {loader && (
-                <div className="chitchat-loader">
-                  <img src="/assets/images/netquix_logo_beta.png" alt="images" />
+          <ErrorBoundary>
+            <AuthGuard>
+              <SocketProvider>
+                {loader && (
+                  <div className="chitchat-loader">
+                    <img src="/assets/images/netquix_logo_beta.png" alt="images" />
+                  </div>
+                )}
+                <div>
+                  <CustomizerContextProvider>
+                    <ChatContextProvider>
+                      <Component {...pageProps} />
+                      {/* Global instant lesson request handler */}
+                      <InstantLessonProvider />
+                    </ChatContextProvider>
+                  </CustomizerContextProvider>
+                  <ToastContainer
+                    autoClose={3000}
+                    closeButton
+                    pauseOnHover
+                    pauseOnFocusLoss
+                    newestOnTop
+                    draggable
+                  />
                 </div>
-              )}
-              <div>
-                <CustomizerContextProvider>
-                  <ChatContextProvider>
-                    <Component {...pageProps} />
-                    {/* Global instant lesson request handler */}
-                    <InstantLessonProvider />
-                  </ChatContextProvider>
-                </CustomizerContextProvider>
-                <ToastContainer
-                  autoClose={3000}
-                  closeButton
-                  pauseOnHover
-                  pauseOnFocusLoss
-                  newestOnTop
-                  draggable
-                />
-              </div>
-            </SocketProvider>
-          </AuthGuard>
+              </SocketProvider>
+            </AuthGuard>
+          </ErrorBoundary>
         </Provider>
       </GoogleOAuthProvider>
     </Fragment>

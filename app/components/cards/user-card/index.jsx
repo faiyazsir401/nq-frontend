@@ -218,14 +218,16 @@ const UserInfoCard = () => {
           className="profile-picture-container"
           style={{
             position: "relative",
-            width: width600 ? "120px" : width1200 ? "160px" : "200px",
-            height: width600 ? "120px" : width1200 ? "160px" : "200px",
-            borderRadius: "50%",
+            width: width600 ? "100px" : width1200 ? "140px" : "180px",
+            height: width600 ? "100px" : width1200 ? "140px" : "180px",
+            borderRadius: "5px",
             border: width600 ? "2px solid #000080" : "3px solid #000080",
             overflow: "hidden",
             transition: 'all 0.3s ease',
             cursor: "pointer",
-            margin: "0 auto"
+            margin: "0 auto",
+            padding: "5px",
+            backgroundColor: "#fff"
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = "scale(1.05)";
@@ -258,7 +260,8 @@ const UserInfoCard = () => {
                   objectFit: "cover",
                   display: "block",
                   transition: 'all 0.3s ease',
-                  pointerEvents: "none"
+                  pointerEvents: "none",
+                  borderRadius: "3px"
                 }}
                 onError={(e) => {
                   e.target.src = "/assets/images/demoUser.png";
@@ -273,7 +276,7 @@ const UserInfoCard = () => {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  borderRadius: "50%",
+                  borderRadius: "5px",
                   backgroundColor: "rgba(0, 0, 0, 0.6)",
                   display: "flex",
                   alignItems: "center",
