@@ -29,6 +29,22 @@ export const login = async (payload) => {
     });
     return res.data;
   } catch (err) {
+    // Enhance network errors with better messages
+    if (!err.response) {
+      if (err.message === 'Network Error' || err.code === 'ERR_CONNECTION_REFUSED' || err.code === 'ECONNREFUSED') {
+        const enhancedError = new Error('Unable to connect to the server. Please check your internet connection and ensure the API server is running.');
+        enhancedError.originalError = err;
+        enhancedError.isNetworkError = true;
+        enhancedError.userMessage = 'Connection refused. Please check if the server is running and try again.';
+        throw enhancedError;
+      } else if (err.code === 'ECONNABORTED') {
+        const enhancedError = new Error('Request timeout. Please check your connection and try again.');
+        enhancedError.originalError = err;
+        enhancedError.isNetworkError = true;
+        enhancedError.userMessage = 'Request took too long. Please try again.';
+        throw enhancedError;
+      }
+    }
     throw err;
   }
 };

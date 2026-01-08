@@ -353,16 +353,39 @@ const UploadClipCard = (props) => {
 
 
   const getCategoryData = async () => {
-    var res = await getMasterData();
-    setCategoryList(
-      res?.data?.data[0]?.category?.map((val, ind) => {
-        return {
-          id: ind,
-          label: val,
-          value: val,
-        };
-      })
-    );
+    try {
+      var res = await getMasterData();
+      
+      // Check if response and data exist
+      if (res?.data?.data?.[0]?.category) {
+        setCategoryList(
+          res.data.data[0].category.map((val, ind) => {
+            return {
+              id: ind,
+              label: val,
+              value: val,
+            };
+          })
+        );
+      } else {
+        console.warn('[UploadClipCard] No category data found in response');
+        setCategoryList([]);
+      }
+    } catch (error) {
+      console.error('[UploadClipCard] Error fetching category data:', error);
+      
+      // Show user-friendly error message
+      if (error.isNetworkError || error.message?.includes('Network Error')) {
+        toast.error('Unable to load categories. Please check your internet connection.');
+      } else if (error.response?.status === 401) {
+        toast.error('Session expired. Please log in again.');
+      } else {
+        toast.error('Failed to load categories. Please try again later.');
+      }
+      
+      // Set empty category list to prevent further errors
+      setCategoryList([]);
+    }
   };
 
   useEffect(() => {

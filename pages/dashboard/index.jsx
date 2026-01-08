@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, useContext, useRef } from "react";
+import React, { Fragment, useState, useEffect, useRef } from "react";
 import LeftSide from "../../containers/leftSidebar";
 import ChitChat from "../../containers/chatBoard";
 import RightSide from "../../containers/rightSidebar";
@@ -14,7 +14,7 @@ import TraineeDashboardContainer from "../../app/components/trainee/dashboard";
 import TrainerDashboardContainer from "../../app/components/trainer/dashboard";
 import ScheduleInventory from "../../app/components/trainer/scheduleInventory";
 import Bookings from "../../app/components/bookings";
-import { SocketContext, getSocket } from "../../app/components/socket";
+// Socket is provided at app level via SocketProvider in _app.jsx
 import {
   getMasterDataAsync,
   masterState,
@@ -38,7 +38,6 @@ import { getMeAsync } from "../../app/components/auth/auth.slice";
 
 
 const Dashboard = () => {
-  const socket = useContext(SocketContext);
   const dispatch = useAppDispatch();
   const { sidebarActiveTab, topNavbarActiveTab, userInfo } = useAppSelector(authState);
   const [accountType, setAccountType] = useState("");
@@ -178,27 +177,25 @@ const Dashboard = () => {
   const width1000 = useMediaQuery(1000);
 
   return (
-    // TODO: move socket to root folder
     <Fragment>
-      <SocketContext.Provider value={getSocket()}>
-        {/* height-max-content */}
-        {!width1000 &&
-          topNavbarActiveTab !== topNavbarOptions?.MEETING_ROOM && <Header />}
-        <div
-          className={`chitchat-container sidebar-toggle ${accountType === AccountType.TRAINEE ? "" : ""
-            }`}
-          style={{
-            marginTop:
-              width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM
-                ? "0px"
-                : "80px",
-          }}
-        >
-          <LeftSide setOpenCloseToggleSideNav={setOpenCloseToggleSideNav} openCloseToggleSideNav={openCloseToggleSideNav}/>
-          {getActiveTabs()}
-        </div>
-        <NotificationPopup/>
-      </SocketContext.Provider>
+      {/* Socket is already provided at app level via SocketProvider in _app.jsx */}
+      {/* height-max-content */}
+      {!width1000 &&
+        topNavbarActiveTab !== topNavbarOptions?.MEETING_ROOM && <Header />}
+      <div
+        className={`chitchat-container sidebar-toggle ${accountType === AccountType.TRAINEE ? "" : ""
+          }`}
+        style={{
+          marginTop:
+            width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM
+              ? "0px"
+              : "80px",
+        }}
+      >
+        <LeftSide setOpenCloseToggleSideNav={setOpenCloseToggleSideNav} openCloseToggleSideNav={openCloseToggleSideNav}/>
+        {getActiveTabs()}
+      </div>
+      <NotificationPopup/>
     </Fragment>
   );
 };

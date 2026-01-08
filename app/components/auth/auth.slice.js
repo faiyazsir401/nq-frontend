@@ -57,8 +57,20 @@ export const loginAsync = createAsyncThunk("login", async (payload) => {
     const response = await login(payload);
     return response;
   } catch (err) {
-    if (!err.isUnauthorized) {
+    // Handle network errors
+    if (err.isNetworkError || !err.response) {
+      const errorMessage = err.userMessage || err.message || 'Unable to connect to the server. Please check your internet connection.';
+      toast.error(errorMessage);
+      throw err;
+    }
+    
+    // Handle API errors with response
+    if (!err.isUnauthorized && err.response?.data?.error) {
       toast.error(err.response.data.error);
+    } else if (!err.isUnauthorized && err.response?.data?.message) {
+      toast.error(err.response.data.message);
+    } else if (!err.isUnauthorized) {
+      toast.error('Login failed. Please check your credentials and try again.');
     }
     throw err;
   }

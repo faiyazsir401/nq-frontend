@@ -1,37 +1,75 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 import Link from "next/link";
-import { Eye, EyeOff } from "react-feather";
+import { Eye, EyeOff, AlertCircle } from "react-feather";
 import { googleOAuthLink, routingPaths } from "../../../app/common/constants";
-import { useAppDispatch } from "../../../app/store";
+import { useAppDispatch, useAppSelector } from "../../../app/store";
 import {
   authAction,
+  authState,
   googleLoginAsync,
   loginAsync,
 } from "../../../app/components/auth/auth.slice";
 
 const Auth_SignIn = ({isRedirect = true}) => {
   const dispatch = useAppDispatch();
+  const { status } = useAppSelector(authState);
   const [credential, setCredential] = useState({
     email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const router = useRouter();
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredential({ ...credential, [name]: value });
+    // Clear error message when user starts typing
+    if (errorMessage) {
+      setErrorMessage("");
+    }
   };
+  
   // simple  login
-  const Login = () => {
-    dispatch(authAction.updateIsRedirectToDashboard(isRedirect))
-    dispatch(loginAsync({
-      email:credential.email.toLowerCase(),
-      password:credential.password
-    }));
+  const Login = async () => {
+    // Validate inputs
+    if (!credential.email || !credential.password) {
+      setErrorMessage("Please enter both email and password.");
+      return;
+    }
+    
+    // Clear previous errors
+    setErrorMessage("");
+    
+    try {
+      dispatch(authAction.updateIsRedirectToDashboard(isRedirect));
+      await dispatch(loginAsync({
+        email: credential.email.toLowerCase(),
+        password: credential.password
+      })).unwrap();
+      // Success - user will be redirected by auth guard
+    } catch (error) {
+      // Error is already shown via toast in loginAsync
+      // But we can also set a local error message for better UX
+      if (error?.isNetworkError || !error?.response) {
+        setErrorMessage("Unable to connect to the server. Please check your internet connection and ensure the server is running.");
+      } else if (error?.response?.status === 401) {
+        setErrorMessage("Invalid email or password. Please try again.");
+      } else {
+        setErrorMessage(error?.response?.data?.error || error?.response?.data?.message || "Login failed. Please try again.");
+      }
+    }
   };
+  
+  // Clear error message when status changes
+  useEffect(() => {
+    if (status === 'idle' || status === 'fulfilled') {
+      setErrorMessage("");
+    }
+  }, [status]);
   // const redirectToSignUpPage = () => {
   //   router.push("/auth/signUp");
   // };
@@ -154,14 +192,45 @@ const Auth_SignIn = ({isRedirect = true}) => {
                         </div>
                       </div>
                     </div>
+                    {/* Error Message Display */}
+                    {errorMessage && (
+                      <div className="form-group" style={{ marginBottom: "15px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            padding: "12px 16px",
+                            backgroundColor: "#fee",
+                            border: "1px solid #fcc",
+                            borderRadius: "4px",
+                            color: "#c33",
+                            fontSize: "14px",
+                          }}
+                        >
+                          <AlertCircle size={18} />
+                          <span>{errorMessage}</span>
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="form-group">
                       <div className="buttons" style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                         <div
                           className="btn btn-primary button-effect"
                           onClick={() => Login()}
-                          style={{ width: "100%", maxWidth: "400px", padding: "12px 24px", fontSize: "16px", fontWeight: "500" }}
+                          disabled={status === 'loading'}
+                          style={{
+                            width: "100%",
+                            maxWidth: "400px",
+                            padding: "12px 24px",
+                            fontSize: "16px",
+                            fontWeight: "500",
+                            opacity: status === 'loading' ? 0.6 : 1,
+                            cursor: status === 'loading' ? 'not-allowed' : 'pointer',
+                          }}
                         >
-                          Login
+                          {status === 'loading' ? 'Logging in...' : 'Login'}
                         </div>
                       </div>
                     </div>

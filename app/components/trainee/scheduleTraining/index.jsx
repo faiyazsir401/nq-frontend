@@ -319,10 +319,28 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   const toggle = () => setInstantScheduleMeeting(!isOpenInstantScheduleMeeting);
 
   const Logout = () => {
-    socket.disconnect();
-    localStorage.clear();
-    router.push("/auth/signIn");
-    dispatch(authAction.updateIsUserLoggedIn());
+    try {
+      // Disconnect socket if it exists
+      if (socket && typeof socket.disconnect === 'function') {
+        socket.disconnect();
+      }
+      
+      // Update Redux state first
+      dispatch(authAction.updateIsUserLoggedIn());
+      dispatch(authAction.userLogout());
+      
+      // Clear all local storage
+      localStorage.clear();
+      
+      // Use window.location for immediate redirect and full page reload
+      // This ensures all state is cleared and socket provider will detect token removal
+      window.location.href = "/auth/signIn";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Even if there's an error, try to clear and redirect
+      localStorage.clear();
+      window.location.href = "/auth/signIn";
+    }
   };
 
   const closePopup = () => {

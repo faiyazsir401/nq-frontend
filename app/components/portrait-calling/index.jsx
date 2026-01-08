@@ -943,47 +943,57 @@ const VideoCallUI = ({
     };
   }, [socket, id, accountType, time_zone, startLessonTimer]);
 
-  const listenSocketEvents = () => {
+  // Listen to socket events with proper cleanup
+  useEffect(() => {
+    if (!socket) return;
 
-    socket.on("ON_CALL_JOIN", ({ userInfo }) => {
+    const handleCallJoin = ({ userInfo }) => {
       const { to_user, from_user } = userInfo;
       if (!(peerRef && peerRef.current)) return;
       connectToPeer(peerRef.current, from_user);
-    });
+    };
 
-
-
-    // Handle signaling events from the signaling server
-    socket.on(EVENTS.VIDEO_CALL.ON_OFFER, (offer) => {
-      //  
+    const handleOffer = (offer) => {
       peerRef.current?.signal(offer);
-    });
+    };
 
-    socket.on(EVENTS.VIDEO_CALL.ON_ANSWER, (answer) => {
-      //  
+    const handleAnswer = (answer) => {
       peerRef.current?.signal(answer);
-    });
+    };
 
-    socket.on(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, (candidate) => {
-      //  
+    const handleIceCandidate = (candidate) => {
       peerRef.current?.signal(candidate);
-    });
+    };
 
-
-    socket.on(EVENTS.VIDEO_CALL.STOP_FEED, ({ feedStatus }) => {
+    const handleStopFeed = ({ feedStatus }) => {
       setIsRemoteStreamOff(feedStatus);
-    });
+    };
 
-
-    socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, () => {
+    const handleCallClose = () => {
       setDisplayMsg({
         show: true,
         msg: `${toUser?.fullname} left the meeting. Waiting for them to join`,
       });
+    };
 
-      // },20000)
-    });
-  };
+    // Register event listeners
+    socket.on("ON_CALL_JOIN", handleCallJoin);
+    socket.on(EVENTS.VIDEO_CALL.ON_OFFER, handleOffer);
+    socket.on(EVENTS.VIDEO_CALL.ON_ANSWER, handleAnswer);
+    socket.on(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, handleIceCandidate);
+    socket.on(EVENTS.VIDEO_CALL.STOP_FEED, handleStopFeed);
+    socket.on(EVENTS.VIDEO_CALL.ON_CLOSE, handleCallClose);
+
+    // Cleanup: Remove all listeners when component unmounts or dependencies change
+    return () => {
+      socket.off("ON_CALL_JOIN", handleCallJoin);
+      socket.off(EVENTS.VIDEO_CALL.ON_OFFER, handleOffer);
+      socket.off(EVENTS.VIDEO_CALL.ON_ANSWER, handleAnswer);
+      socket.off(EVENTS.VIDEO_CALL.ON_ICE_CANDIDATE, handleIceCandidate);
+      socket.off(EVENTS.VIDEO_CALL.STOP_FEED, handleStopFeed);
+      socket.off(EVENTS.VIDEO_CALL.ON_CLOSE, handleCallClose);
+    };
+  }, [socket, toUser, connectToPeer]);
 
   // NOTE - handle user offline
   const handleOffline = () => {
@@ -1121,7 +1131,7 @@ const VideoCallUI = ({
         Peer = require("peerjs").default;
       }
       handleStartCall();
-      listenSocketEvents()
+      // listenSocketEvents() is now handled in useEffect above with proper cleanup
       window.addEventListener("offline", handleOffline);
       window.addEventListener("beforeunload", handelTabClose);
 
