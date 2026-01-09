@@ -466,106 +466,66 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
         isOpen={isOpenPlayVideo}
         element={
           <>
-            <div className="d-flex flex-column align-items-center p-3 justify-content-center h-100">
+            <div className="d-flex flex-column align-items-center justify-content-center h-100" style={{ padding: "20px" }}>
               <div
                 className="position-relative"
-                style={{ borderRadius: 5, maxWidth: "100%" }}
+                style={{ 
+                  borderRadius: 8, 
+                  maxWidth: "100%",
+                  backgroundColor: "#1a1a1a",
+                  padding: "20px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
+                }}
               >
-                <div className="media-body media-body text-right">
+                {/* Close button */}
+                <div className="media-body text-right" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 10 }}>
                   <button
                     ref={closeButtonRef}
                     type="button"
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => setIsOpen(false)}
                     aria-label="Close video"
+                    style={{
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                      borderRadius: "50%",
+                      padding: "8px"
+                    }}
                   >
                     <X />
                   </button>
                 </div>
 
+                {/* Title at top center */}
                 {selectedClip && (
                   <div
                     style={{
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: "10px",
-                      gap: "12px",
+                      justifyContent: "center",
+                      marginBottom: "20px",
+                      paddingTop: "10px"
                     }}
                   >
                     <h4
                       style={{
                         margin: 0,
-                        fontSize: "16px",
+                        fontSize: "18px",
                         fontWeight: 600,
                         color: "#fff",
-                        textAlign: "left",
+                        textAlign: "center",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
-                        maxWidth: "260px",
+                        maxWidth: "80%",
                       }}
                     >
                       {selectedClip.title}
                     </h4>
-
-                    {selectedClip?.user_id === userInfo?._id && (
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                        }}
-                      >
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setIsConfirmModalOpen(true);
-                            setSelectedId(selectedClip?._id);
-                          }}
-                          style={{
-                            border: "none",
-                            background: "#dc3545",
-                            color: "#fff",
-                            borderRadius: "4px",
-                            padding: "6px 10px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            fontSize: "12px",
-                            cursor: "pointer",
-                          }}
-                        >
-                          <FaTrash size={12} />
-                          <span>Delete</span>
-                        </button>
-                        <a
-                          href={Utils?.generateVideoURL(selectedClip)}
-                          download={true}
-                          onClick={(e) => e.stopPropagation()}
-                          style={{
-                            background: "#007bff",
-                            color: "#fff",
-                            borderRadius: "4px",
-                            padding: "6px 10px",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "4px",
-                            fontSize: "12px",
-                            textDecoration: "none",
-                          }}
-                          target="_self"
-                        >
-                          <FaDownload size={12} />
-                          <span>Download</span>
-                        </a>
-                      </div>
-                    )}
                   </div>
                 )}
 
-                <div className="d-flex align-items-center justify-content-center">
+                {/* Video with navigation buttons */}
+                <div className="d-flex align-items-center justify-content-center" style={{ marginBottom: "20px" }}>
                   {/* Previous button */}
                   <button
                     type="button"
@@ -578,12 +538,18 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      border: "none",
+                      padding: "10px",
+                      opacity: !findPreviousClipPosition() ? 0.5 : 1,
+                      cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer"
                     }}
                   >
-                    <ChevronLeft />
+                    <ChevronLeft size={20} color="#fff" />
                   </button>
 
                   <video
+                    key={selectedVideo}
                     style={videoDimensions}
                     autoPlay
                     controls
@@ -604,11 +570,82 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      border: "none",
+                      padding: "10px",
+                      opacity: !findNextClipPosition() ? 0.5 : 1,
+                      cursor: !findNextClipPosition() ? "not-allowed" : "pointer"
                     }}
                   >
-                    <ChevronRight />
+                    <ChevronRight size={20} color="#fff" />
                   </button>
                 </div>
+
+                {/* Action buttons at bottom */}
+                {selectedClip?.user_id === userInfo?._id && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "12px",
+                      paddingTop: "15px",
+                      borderTop: "1px solid rgba(255,255,255,0.1)"
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsConfirmModalOpen(true);
+                        setSelectedId(selectedClip?._id);
+                      }}
+                      style={{
+                        border: "none",
+                        background: "#dc3545",
+                        color: "#fff",
+                        borderRadius: "6px",
+                        padding: "10px 20px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.3s ease"
+                      }}
+                      onMouseEnter={(e) => e.target.style.background = "#c82333"}
+                      onMouseLeave={(e) => e.target.style.background = "#dc3545"}
+                    >
+                      <FaTrash size={14} />
+                      <span>Delete</span>
+                    </button>
+                    <a
+                      href={Utils?.generateVideoURL(selectedClip)}
+                      download={true}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        background: "#007bff",
+                        color: "#fff",
+                        borderRadius: "6px",
+                        padding: "10px 20px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        textDecoration: "none",
+                        transition: "all 0.3s ease"
+                      }}
+                      onMouseEnter={(e) => e.target.style.background = "#0056b3"}
+                      onMouseLeave={(e) => e.target.style.background = "#007bff"}
+                      target="_self"
+                    >
+                      <FaDownload size={14} />
+                      <span>Download</span>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </>

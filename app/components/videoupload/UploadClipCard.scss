@@ -128,7 +128,7 @@
     .file-upload-label {
       display: block;
       width: 100%;
-      min-height: 140px;
+      min-height: 100px;
       border: 2px dashed #c0c0c0;
       border-radius: 12px;
       background: white;
@@ -220,11 +220,11 @@
       gap: 16px;
     }
 
-    .file-card {
+      .file-card {
       background: white;
       border: 1px solid #e0e0e0;
       border-radius: 12px;
-      padding: 20px;
+      padding: 15px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       transition: all 0.3s ease;
 
@@ -361,7 +361,7 @@
             .thumbnail-container {
               position: relative;
               width: 100%;
-              max-width: 200px;
+              max-width: 150px;
               border-radius: 8px;
               overflow: hidden;
               border: 2px solid #e0e0e0;
@@ -393,7 +393,7 @@
 
             .progress-container {
               margin-top: 12px;
-              max-width: 200px;
+              max-width: 150px;
 
               .progress-bar-wrapper {
                 width: 100%;

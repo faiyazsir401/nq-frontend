@@ -182,6 +182,24 @@
     width: 85% !important;
     align-self: center;
     align-items: center;
+
+    .slick-slide {
+      height: auto !important;
+      
+      > div {
+        height: auto !important;
+      }
+    }
+
+    .slick-list {
+      height: auto !important;
+    }
+
+    .slick-track {
+      height: auto !important;
+      display: flex !important;
+      align-items: stretch !important;
+    }
   }
 
 }

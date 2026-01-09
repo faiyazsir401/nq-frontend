@@ -558,23 +558,23 @@ const SettingSection = (props) => {
                 {profile.editStatus && (
                   <div className="form-group mb-2 ml-2">
                     <label> Profile Picture </label>
-                    <div style={{ marginTop: "8px" }}>
+                    <div style={{ marginTop: "8px", display: "flex", flexDirection: "column", gap: "10px" }}>
                       <button
                         type="button"
                         className="btn btn-sm btn-outline-primary"
                         onClick={() => {
                           document.getElementById("profilePictureInputSettings")?.click();
                         }}
-                        style={{ fontSize: "12px" }}
+                        style={{ fontSize: "12px", width: "fit-content" }}
                       >
                         {croppedImage ? "Uploading..." : "Change Picture"}
                       </button>
                       {displayedImage && (
                         <button
                           type="button"
-                          className="btn btn-sm btn-outline-danger ml-2"
+                          className="btn btn-sm btn-outline-danger"
                           onClick={handelClearFile}
-                          style={{ fontSize: "12px" }}
+                          style={{ fontSize: "12px", width: "fit-content" }}
                         >
                           Remove
                         </button>

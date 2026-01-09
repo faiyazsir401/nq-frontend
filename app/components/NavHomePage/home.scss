@@ -313,20 +313,26 @@
 
   .slick-slide {
     margin-bottom: 0 !important;
+    height: auto !important;
     
     > div {
       margin-bottom: 0 !important;
+      height: auto !important;
     }
   }
 
   .slick-list {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
+    height: auto !important;
   }
 
   .slick-track {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: stretch !important;
   }
 }
 
