@@ -23,14 +23,12 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
   const dispatch = useAppDispatch();
   const { removeNewBookingData } = traineeAction;
   const isMobileScreen = useMediaQuery("(max-width:1000px)");
-  const width500 = useMediaQuery(500);
+  const width500 = useMediaQuery("(max-width: 500px)");
   const closeButtonRef = useRef(null);
 
   // Initialize selected clips from props
   useEffect(() => {
-    if (selectedClips && selectedClips.length > 0) {
-      setSelectedClipsCopy([...selectedClips]);
-    }
+    setSelectedClipsCopy(selectedClips && selectedClips.length > 0 ? [...selectedClips] : []);
   }, [selectedClips]);
 
   // Flatten all clips from categories
@@ -371,11 +369,11 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                                 }}
                                 onMouseEnter={(e) => {
                                   if (!isDisabled) {
-                                    e.target.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+                                    e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
                                   }
                                 }}
                                 onMouseLeave={(e) => {
-                                  e.target.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+                                  e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
                                 }}
                               >
                                 <Play size={20} color="#fff" fill="#fff" />

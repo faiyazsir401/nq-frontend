@@ -219,6 +219,13 @@ const FileSection = (props) => {
       setTraineeClips(res2?.data)
       var res3 = await reports({})
       setReportsData(res3?.result || [])
+    } catch (error) {
+      console.error("Error fetching clips data:", error);
+      // Optionally show user-facing notification/toast here
+      // For now, we'll just log the error and ensure state is cleared
+      setClips([])
+      setTraineeClips([])
+      setReportsData([])
     } finally {
       setIsLoading(false);
     }

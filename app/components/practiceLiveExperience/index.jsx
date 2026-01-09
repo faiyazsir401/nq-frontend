@@ -1280,11 +1280,11 @@ export default function PracticeLiveExperience({
             toggle={() => {
               setIsOpenConfirm(false);
             }}
-            close={() => <></>}
+            close={null}
             className="clip-exit-confirm-modal__header"
           >
             <div className="clip-exit-confirm-modal__title">
-              <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+              <i className="fa fa-exclamation-triangle" role="img" aria-label="Warning"></i>
               <span>Confirm Exit</span>
             </div>
           </ModalHeader>

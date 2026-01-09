@@ -910,7 +910,6 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         marginBottom: isMobileScreen ? "15px" : "20px"
       }}>
         <div className="row" style={{
-          margin:"0px",
           width: openCloseToggleSideNav ? (isMobileScreen ? "90%" : "70%") : (isMobileScreen ? "95%" : "80%"),
           display:"flex",
           justifyContent:"center",

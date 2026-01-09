@@ -180,8 +180,7 @@ const RecentUsers = () => {
           maxHeight: "95%",
           marginTop: "5px",
           overflowY: "auto",
-          padding: width600 ? "8px" : "10px",
-          overflowX: "hidden"
+          padding: width600 ? "8px" : "10px"
         }}
       >
         <div

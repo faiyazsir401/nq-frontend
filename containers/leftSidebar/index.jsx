@@ -457,16 +457,28 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
         >
             {/* logo section */}
             {(width1000 || topNavbarActiveTab === topNavbarOptions?.MEETING_ROOM) && <div className="logo-warpper">
-              <img id="Net"
-                src="/assets/images/logo/netquix-logo.png"
-                alt="logo"
-                className="custom-image"
+              <button
+                id="Net"
                 onClick={() => {
                   router.push(routingPaths.dashboard);
                   dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
                 }}
-                style={{ cursor: "pointer" }}
-              />
+                aria-label="Go to dashboard"
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                  background: "none",
+                  padding: 0,
+                  margin: 0
+                }}
+              >
+                <img
+                  src="/assets/images/logo/netquix-logo.png"
+                  alt="logo"
+                  className="custom-image"
+                  style={{ display: "block" }}
+                />
+              </button>
             </div>}
 
 

@@ -163,10 +163,8 @@ const UpcomingSession = ({ accountType = null }) => {
               <TabContent activeTab={activeTabs}>
                 {
                   Array(bookingButton.length).fill().map((_, index) => <TabPane key={`tab-pane-${bookingButton[index]}`} tabId={bookingButton[index]}>
-                  {activeTabs && (
-                    <BookingList key={`${activeTabs}_${index}`} activeCenterContainerTab="upcomingLesson" bookings={scheduledMeetingDetails} activeTabs={activeTabs}/>
-                  )}
-                </TabPane>)
+                    <BookingList key={`${bookingButton[index]}`} activeCenterContainerTab="upcomingLesson" bookings={scheduledMeetingDetails} activeTabs={bookingButton[index]}/>
+                  </TabPane>)
                 }
               </TabContent>
             </div>

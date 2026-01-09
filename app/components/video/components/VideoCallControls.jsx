@@ -230,15 +230,18 @@ export const VideoCallControls = ({
         <></>
       )}
 
+      {/* Accessibility: keyboard dismissal enabled to allow Escape key to close modal,
+          providing equivalent behavior to clicking Cancel for keyboard users (WCAG 2.1) */}
       <Modal
         isOpen={isOpenConfirm}
         toggle={() => {
           setIsOpenConfirmProp(false);
+          setSelectedClips([]);
         }}
         centered
         className="clip-exit-confirm-modal"
         backdrop="static"
-        keyboard={false}
+        keyboard={true}
       >
         <ModalHeader
           toggle={() => {
