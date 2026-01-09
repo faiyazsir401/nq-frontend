@@ -368,19 +368,21 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                               <FaTrash />
                             </div>
                             <div>
-                              <a
-                                href={awsS3Url + clp?.session?.report}
-                                download={getReportDownloadName(clp?.session?.report)}
-                                onClick={(e) => e.stopPropagation()}
-                                style={{
-                                  color: "#007bff",
-                                  fontSize: "16px",
-                                }}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <FaDownload />
-                              </a>
+                              {clp?.session?.report && (
+                                <a
+                                  href={awsS3Url + clp.session.report}
+                                  download={getReportDownloadName(clp.session.report)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{
+                                    color: "#007bff",
+                                    fontSize: "16px",
+                                  }}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <FaDownload />
+                                </a>
+                              )}
                             </div>
                           </div>
                         </div>

@@ -309,9 +309,12 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
               Loading your clips...
             </h5>
           </div>
-        ) : (trainee_id ? clips?.length : myClips.length) ? (
+        ) : (trainee_id ? clips?.length : myClips?.length) ? (
           sortedClips?.map((cl, ind) => (
-            <div className={`collapse-block ${!cl?.show ? "" : "open"}`}>
+            <div
+              className={`collapse-block ${!cl?.show ? "" : "open"}`}
+              key={`clip-${cl?._id ?? ind}`}
+            >
      {accountType !== AccountType.TRAINER && <h5 className="block-title" onClick={() => { }}>
                 {cl?._id}
                 <label className="badge badge-primary sm ml-2">
@@ -380,7 +383,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                             >
                               <source src={Utils?.generateVideoURL(clp)} />
                             </video>
-                            {clp.user_id === userInfo._id &&
+                            {clp.user_id === userInfo?._id &&
                             <div
                               className="download-delete"
                               style={{
@@ -506,7 +509,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       {selectedClip.title}
                     </h4>
 
-                    {selectedClip.user_id === userInfo._id && (
+                    {selectedClip?.user_id === userInfo?._id && (
                       <div
                         style={{
                           display: "flex",

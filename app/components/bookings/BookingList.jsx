@@ -568,13 +568,23 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         </div>
       ) : (
         // Render filtered scheduled meetings
-        filteredMeetings.map((bookingInfo, booking_index) => (
-          <BookingCard
-            bookingInfo={bookingInfo}
-            key={booking_index}
-            booking_index={booking_index}
-          />
-        ))
+        filteredMeetings.map((bookingInfo, filteredIndex) => {
+          const originalIndex =
+            scheduledMeetingDetails?.findIndex(
+              (booking) => booking?._id === bookingInfo?._id
+            ) ?? -1;
+
+          const bookingIndex =
+            originalIndex !== -1 ? originalIndex : filteredIndex;
+
+          return (
+            <BookingCard
+              bookingInfo={bookingInfo}
+              key={bookingInfo?._id || bookingIndex}
+              booking_index={bookingIndex}
+            />
+          );
+        })
       )}
       {addRatingModel.isOpen ? renderRating(startMeeting.trainerInfo) : null}
     </div>
