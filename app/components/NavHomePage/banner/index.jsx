@@ -19,18 +19,18 @@ const OnlineUserCard = ({ trainer }) => {
         <div className="trainer-card" style={{
             display: "flex",
             flexDirection: "row",
-            gap: width600 ? "10px" : "15px",
+            gap: width600 ? "8px" : "12px",
             justifyContent: "center",
             alignItems: "center",
-            padding: width600 ? "8px" : "12px",
+            padding: width600 ? "6px 8px" : "10px 12px",
             width: "100%"
         }}>
             <div style={{ 
-                width: width600 ? "70px" : "80px", 
-                height: width600 ? "70px" : "80px", 
+                width: width600 ? "60px" : "70px", 
+                height: width600 ? "60px" : "70px", 
                 border: "2px solid rgb(0, 0, 128)", 
                 borderRadius: "5px", 
-                padding: "5px",
+                padding: "4px",
                 flexShrink: 0
             }}>
                 <img
@@ -57,7 +57,7 @@ const OnlineUserCard = ({ trainer }) => {
                 minWidth: 0
             }}>
                 <h4 style={{
-                    fontSize: width600 ? "12px" : "14px",
+                    fontSize: width600 ? "12px" : "13px",
                     fontWeight: 600,
                     margin: 0,
                     color: "#333",
@@ -66,7 +66,7 @@ const OnlineUserCard = ({ trainer }) => {
                     textOverflow: "ellipsis"
                 }}>{trainer?.fullName || trainer?.fullname}</h4>
                 <h4 style={{
-                    fontSize: width600 ? "11px" : "13px",
+                    fontSize: width600 ? "11px" : "12px",
                     fontWeight: 500,
                     margin: 0,
                     color: "#666"

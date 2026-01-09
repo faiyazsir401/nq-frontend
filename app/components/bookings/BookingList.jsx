@@ -6,11 +6,16 @@ import {
   bookingsState,
   getScheduledMeetingDetailsAsync,
 } from "../common/common.slice";
-import { formatTimeInLocalZone, formatToAMPM, Utils } from "../../../utils/utils";
+import {
+  formatTimeInLocalZone,
+  formatToAMPM,
+  Utils,
+} from "../../../utils/utils";
 import {
   AccountType,
   BookedSession,
   bookingButton,
+  not_data_for_booking,
   topNavbarOptions,
 } from "../../common/constants";
 import { authAction, authState } from "../auth/auth.slice";
@@ -30,6 +35,7 @@ import OrientationModal from "../modalComponent/OrientationModal";
 import { useMediaQuery } from "usehooks-ts";
 import TraineeRatings from "./ratings/trainee";
 import { DateTime } from "luxon";
+import { Spinner } from "reactstrap";
 
 
 
@@ -42,15 +48,17 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { newBookingData } = useAppSelector(traineeState);
-  const { scheduledMeetingDetails, addRatingModel } =
-    useAppSelector(bookingsState);
+  const { scheduledMeetingDetails, addRatingModel } = useAppSelector(
+    bookingsState
+  );
   const { removeNewBookingData } = traineeAction;
   const { accountType } = useAppSelector(authState);
   const [bookedSession, setBookedSession] = useState({
     id: "",
     booked_status: "",
   });
-  const { isLoading, configs , startMeeting  } = useAppSelector(bookingsState);
+  const { isLoading, configs, startMeeting, isMeetingLoading } =
+    useAppSelector(bookingsState);
   const { userInfo } = useAppSelector(authState);
   const mediaQuery = window.matchMedia("(min-width: 992px)");
   const [userTimeZone, setUserTimeZone] = useState(
@@ -113,24 +121,12 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
   useEffect(() => {
     if (activeCenterContainerTab === "upcomingLesson") {
-      // if (accountType === AccountType.TRAINER) {
-      //   if (tabBook === bookingButton[0]) {
-      //     const payload = {
-      //       status: tabBook,
-      //     };
-      //     dispatch(getScheduledMeetingDetailsAsync(payload));
-      //   }
-      // } else {
-      //   dispatch(getScheduledMeetingDetailsAsync());
-      // }
-      if (tabBook === bookingButton[0]) {
-        const payload = {
-          status: tabBook,
-        };
-        dispatch(getScheduledMeetingDetailsAsync(payload));
-      }
+      const payload = {
+        status: tabBook,
+      };
+      dispatch(getScheduledMeetingDetailsAsync(payload));
     }
-  }, [tabBook,activeCenterContainerTab]);
+  }, [tabBook, activeCenterContainerTab, dispatch]);
 
 
   const showRatingLabel = (ratingInfo) => {
@@ -445,7 +441,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
-  const renderVideoCall = (height, width, isRotatedInitally) => 
+  const renderVideoCall = (height, width, isRotatedInitally) =>
       <StartMeeting
         id={startMeeting.id}
         accountType={accountType}
@@ -539,10 +535,17 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
+  const filteredMeetings =
+    scheduledMeetingDetails?.filter(
+      (booking) => booking?.status === tabBook
+    ) || [];
+
+  const emptyLabel =
+    not_data_for_booking?.[tabBook] || "No sessions found for this filter";
+
   return (
     <div>
-      {!scheduledMeetingDetails.length ? (
-        // Show a message when there are no upcoming sessions
+      {isMeetingLoading ? (
         <div
           style={{
             display: "flex",
@@ -550,11 +553,22 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             marginTop: "40px",
           }}
         >
-          <h5 className="block-title">No Upcoming Sessions</h5>
+          <Spinner color="primary" className="spinner" />
+        </div>
+      ) : !filteredMeetings.length ? (
+        // Show a message when there are no sessions for current filter
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "40px",
+          }}
+        >
+          <h5 className="block-title">{emptyLabel}</h5>
         </div>
       ) : (
-        // Render scheduled meetings if there are any
-        scheduledMeetingDetails?.map((bookingInfo, booking_index) => (
+        // Render filtered scheduled meetings
+        filteredMeetings.map((bookingInfo, booking_index) => (
           <BookingCard
             bookingInfo={bookingInfo}
             key={booking_index}

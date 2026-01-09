@@ -128,7 +128,7 @@
     .file-upload-label {
       display: block;
       width: 100%;
-      min-height: 180px;
+      min-height: 140px;
       border: 2px dashed #c0c0c0;
       border-radius: 12px;
       background: white;
@@ -156,7 +156,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 40px 20px;
+        padding: 28px 18px;
         height: 100%;
 
         .upload-icon-large {
@@ -173,19 +173,19 @@
           margin-bottom: 12px;
 
           .upload-text-main {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: #333;
           }
 
           .upload-text-sub {
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
           }
         }
 
         .upload-hint {
-          font-size: 12px;
+          font-size: 0.8rem;
           color: #999;
           text-align: center;
         }
@@ -455,7 +455,7 @@
       border-radius: 8px;
       border: none;
       background: linear-gradient(135deg, #000080, #1a1a8d);
-      color: white;
+      color: #ffffff;
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 4px 12px rgba(0, 0, 128, 0.3);
@@ -473,6 +473,10 @@
         opacity: 0.7;
         cursor: not-allowed;
         transform: none;
+      }
+
+      svg {
+        color: #ffffff;
       }
 
       .spinning {
@@ -508,7 +512,7 @@
 
     .file-upload-wrapper {
       .file-upload-label {
-        min-height: 150px;
+        min-height: 130px;
 
         .file-upload-content {
           padding: 30px 15px;
@@ -529,7 +533,7 @@
           }
 
           .upload-hint {
-            font-size: 11px;
+            font-size: 0.8rem;
           }
         }
       }

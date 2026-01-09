@@ -394,17 +394,31 @@ const NavHomePage = () => {
       {accountType === AccountType.TRAINEE &&
         activeTrainer &&
         activeTrainer?.length ? (
-        <div className="upcoming_session" style={{ marginTop: width600 ? "15px" : "20px", marginBottom: width600 ? "15px" : "20px" }}>
-          <h2 className="text-center" style={{ marginBottom: width600 ? "15px" : "20px" }}>Coaches Online Now!</h2>
-          <div className="card trainer-bookings-card" style={{ 
-            borderRadius: "8px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            border: "none",
-            padding: width600 ? "10px 10px 5px 10px" : "15px 15px 8px 15px",
-            width: activeTrainer.length === 1 ? "fit-content" : "100%",
-            maxWidth: activeTrainer.length === 1 ? "400px" : "100%",
-            margin: activeTrainer.length === 1 ? "0 auto" : "0"
-          }}>
+        <div
+          className="upcoming_session"
+          style={{
+            marginTop: width600 ? "15px" : "20px",
+            marginBottom: width600 ? "15px" : "20px",
+          }}
+        >
+          <h2
+            className="text-center"
+            style={{ marginBottom: width600 ? "15px" : "20px" }}
+          >
+            Coaches Online Now!
+          </h2>
+          <div
+            className="card trainer-bookings-card"
+            style={{
+              borderRadius: "8px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              border: "none",
+              padding: width600 ? "8px 10px 6px 10px" : "12px 16px 8px 16px",
+              width: "100%",
+              maxWidth: "100%",
+              margin: "0",
+            }}
+          >
             <div className="banner_Slider">
               <Slider {...settings}>
                 {activeTrainer &&

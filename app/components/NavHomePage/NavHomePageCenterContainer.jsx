@@ -185,18 +185,6 @@ const allTabs = [
     component: MyClips,
   },
   {
-    name: "Schedule",
-    value: "schedule",
-    accessBy: [AccountType?.TRAINER],
-    component: Schedule,
-  },
-  {
-    name: "Upcoming Sessions",
-    value: "upcomingLesson",
-    accessBy: [AccountType?.TRAINEE, AccountType?.TRAINER],
-    component: BookingList,
-  },
-  {
     name: "Saved Lessons & Game Plan",
     value: "gamePlans",
     accessBy: [AccountType?.TRAINER, AccountType?.TRAINEE],
@@ -261,40 +249,7 @@ const NavHomePageCenterContainer = () => {
     }
   }
 
-  const [modal, setModal] = useState(false)
-
-  useEffect(() => {
-
-    const updateOrientation = () => {
-
-      let width = window.innerWidth;
-      let height = window.innerHeight;
-      if (width > height == false && activeTab === "upcomingLesson") {
-        //  
-        setModal(true)
-      } else {
-        //  
-        setModal(false)
-      }
-
-
-    };
-
-    const handleOrientationChange = () => {
-      updateOrientation();
-    };
-
-    // Add event listener for orientation change
-    window.addEventListener('resize', handleOrientationChange);
-
-    // Call updateOrientation once initially
-    updateOrientation();
-
-    // Clean up the event listener when the component unmounts
-    return () => {
-      window.removeEventListener('resize', handleOrientationChange);
-    };
-  }, [isMobile, activeTab]);
+  const [modal, setModal] = useState(false);
 
   return (
     <>
@@ -378,65 +333,38 @@ const NavHomePageCenterContainer = () => {
                   </NavItem>
                 )
             )}
-          </Nav> : <Nav tabs style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-
-            <div className="theme-tab">
-              <Nav tabs>
-                <div className="row mb-2" >
-                  <div className="col text-center" style={{ flexBasis: "auto" }} >
-                    <NavItem className="ml-1 text-center">
-                      <NavLink
-                        className={`button-effect ${activeTab === "myClips" ? "activelink" : ""
-                          }`}
-                        onClick={() => toggleTab("myClips")}
-                        style={{ width: '100%' }}
-                      >
-                        My Clips
-                      </NavLink>
-                    </NavItem>
+          </Nav> : (
+            <Nav tabs style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <div className="theme-tab">
+                <Nav tabs>
+                  <div className="row mb-2">
+                    <div className="col text-center" style={{ flexBasis: "auto" }}>
+                      <NavItem className="ml-1 text-center">
+                        <NavLink
+                          className={`button-effect ${activeTab === "myClips" ? "activelink" : ""}`}
+                          onClick={() => toggleTab("myClips")}
+                          style={{ width: "100%" }}
+                        >
+                          My Clips
+                        </NavLink>
+                      </NavItem>
+                    </div>
+                    <div className="col text-center" style={{ flexBasis: "auto" }}>
+                      <NavItem className="ml-1">
+                        <NavLink
+                          className={`button-effect ${activeTab === "gamePlans" ? "activelink" : ""}`}
+                          onClick={() => toggleTab("gamePlans")}
+                          style={{ width: "100%" }}
+                        >
+                          Saved Lessons & Game Plan
+                        </NavLink>
+                      </NavItem>
+                    </div>
                   </div>
-                  <div className="col text-center" style={{ flexBasis: "auto" }}>
-                    <NavItem className="ml-1">
-                      {accountType === "Trainer" && <NavLink
-                        className={`button-effect ${activeTab === "schedule" ? "activelink" : ""}`}
-                        onClick={() => toggleTab("schedule")}
-                        style={{ width: '100%' }}
-                      >
-                        Schedule
-                      </NavLink>}
-                    </NavItem>
-                  </div>
-                  {/* </div>
-                <div className="row" style={{ width: '100%', alignItems: 'center', margin: "0px" }}> */}
-                  <div className="col" style={{ flexBasis: "auto" }}>
-                    <NavItem className="ml-1">
-                      <NavLink
-                        className={`button-effect ${activeTab === "upcomingLesson" ? "activelink" : ""
-                          }`}
-                        onClick={() => toggleTab("upcomingLesson")}
-                        style={{ width: '100%' }}
-                      >
-                        Upcoming Sessions
-                      </NavLink>
-                    </NavItem>
-                  </div>
-                  <div className="col text-right" style={{ flexBasis: "auto" }}>
-
-                    <NavItem className="ml-1">
-                      <NavLink
-                        className={`button-effect ${activeTab === "gamePlans" ? "activelink" : ""
-                          }`}
-                        onClick={() => toggleTab("gamePlans")}
-                        style={{ width: '100%' }}
-                      >
-                        Saved Lessons & Game Plan
-                      </NavLink>
-                    </NavItem>
-                  </div>
-                </div>
-              </Nav>
-            </div>
-          </Nav>}
+                </Nav>
+              </div>
+            </Nav>
+          )}
         </div>
         <div className="file-tab Nav-Home" style={{ color: "black", overflowY: "auto", maxHeight: "calc(100vh - 200px)" }}>
 

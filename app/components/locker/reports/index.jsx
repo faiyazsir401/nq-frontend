@@ -27,6 +27,15 @@ import { Spinner } from "reactstrap";
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 
+const getReportDownloadName = (reportPath) => {
+  if (!reportPath || typeof reportPath !== "string") {
+    return "report.pdf";
+  }
+  const parts = reportPath.split("/");
+  const fileName = parts[parts.length - 1];
+  return fileName || "report.pdf";
+};
+
 const Reports = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
 
@@ -313,80 +322,68 @@ const Reports = ({ activeCenterContainerTab, trainee_id }) => {
                           }
                         }}
                       >
-                        {
-                          clp?.reportData?.length ?
-                          <> 
+                        {/* Image preview of the report cover has been removed for a cleaner locker view. */}
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                            padding: "12px 8px",
+                            minHeight: "120px",
+                          }}
+                        >
                           <img
-                              src={Utils.getImageUrlOfS3(clp?.reportData[0]?.imageUrl)}
-                              alt={clp?.reportData[0]?.title}
-                              style={{ 
-                                width: "100%",
-                                 height: "150px",
-                                  position: "relative",
-                                   objectFit: "contain",
-                                  minWidth: "110px",
-                                 }}
-                            />
-                            <div
+                            src="/icons/FileSee.png"
+                            alt="FileSee Icon"
+                            style={{ width: "40px", height: "40px", marginBottom: "4px" }}
+                          />
+                          <span style={{ fontSize: "0.9rem", fontWeight: 500 }}>
+                            View Game Plan
+                          </span>
+                          <div
                             className="download-delete"
                             style={{
-                              position: "absolute",
-                              top: "23.5%" ,
-                              right:"7.5% ",
                               display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "space-between",
-                              backgroundColor: "#333",
-                              color: "#fff",
-                              padding: "8px",
-                              fontSize : "16px",
-                              zIndex : '8'
+                              flexDirection: "row",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              gap: "12px",
+                              marginTop: "4px",
                             }}
                           >
                             <div
                               onClick={(e) => {
                                 e.stopPropagation();
-                                // handleReportDelete(clp?._id);
                                 setIsConfirmModalOpen(true);
                                 setSelectedReportId(clp?._id);
                               }}
                               style={{
-                                margin : '3px auto',
-                                cursor : 'pointer'
-
+                                cursor: "pointer",
+                                color: "#dc3545",
+                                fontSize: "16px",
                               }}
                             >
                               <FaTrash />
                             </div>
-                            <div
-                            style={{
-                                margin : '3px auto'
-                              }}
-                            >
+                            <div>
                               <a
-                                href={awsS3Url+clp?.session?.report} // Assuming this generates a URL for the PDF file
-                                download="file.pdf" // This specifies the filename for the downloaded file
+                                href={awsS3Url + clp?.session?.report}
+                                download={getReportDownloadName(clp?.session?.report)}
                                 onClick={(e) => e.stopPropagation()}
                                 style={{
-                                  color : '#fff',
-                                  fontSize : '16px'
+                                  color: "#007bff",
+                                  fontSize: "16px",
                                 }}
                                 target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <FaDownload />
                               </a>
                             </div>
                           </div>
-
-                          </>
-                             :
-                            <img
-                              src="/icons/FileSee.png"
-                              alt="FileSee Icon"
-                              style={{ width: "30px", height: "30px" }}
-                            />
-                        }
-                        {accountType === "Trainer" ? "" : ""}
+                        </div>
                       </dd>
                     </div>
                   </div>

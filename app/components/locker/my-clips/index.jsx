@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, X } from "react-feather";
+import { useEffect, useState, useRef } from "react";
+import { Link, X, ChevronLeft, ChevronRight } from "react-feather";
 import {
   deleteClip,
   myClips,
@@ -17,6 +17,7 @@ import { FaDownload, FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import ConfirmModal from "./confirmModal";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
+import { Spinner } from "reactstrap";
 import "../../trainer/dashboard/index.scss";
 import { commonState, getClipsAsync, getMyClipsAsync } from "../../../common/common.slice";
 import { masterState } from "../../master/master.slice";
@@ -27,13 +28,15 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
 
   const { isOpen } = useAppSelector(videouploadState);
-  const { clips } = useAppSelector(commonState);
-  const { myClips } = useAppSelector(commonState);
+  const { clips, myClips, status } = useAppSelector(commonState);
 
   const [activeTab, setActiveTab] = useState("media");
   const [sortedClips, setSortedClips] = useState([]);
   const [isOpenPlayVideo, setIsOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState("");
+  const [selectedClip, setSelectedClip] = useState(null);
+  const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
+  const [currentClipIndex, setCurrentClipIndex] = useState(null);
   const [reportsData, setReportsData] = useState([]);
   const { sidebarLockerActiveTab, accountType,userInfo } = useAppSelector(authState);
   const { masterData } = useAppSelector(masterState).master;
@@ -45,6 +48,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
     height: "587px",
   });
   const isMobileScreen= useMediaQuery(600)
+  const closeButtonRef = useRef(null);
   //  const { userInfo } = useAppSelector(authState);
 
   //  
@@ -103,6 +107,38 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
     if (!isOpen && activeCenterContainerTab === "myClips") getMyClips();
   }, [isOpen, activeCenterContainerTab]);
 
+  // Ensure focus stays inside modal when it opens
+  useEffect(() => {
+    if (isOpenPlayVideo && closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+  }, [isOpenPlayVideo]);
+
+  // Keyboard navigation for video slider (Esc / ← / →)
+  useEffect(() => {
+    if (!isOpenPlayVideo) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+        return;
+      }
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        handleNextClip();
+      }
+
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        handlePreviousClip();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpenPlayVideo, sortedClips, currentGroupIndex, currentClipIndex]);
+
   const handleVideoLoad = (event) => {
     const video = event.target;
     const aspectRatio = video.videoWidth / video.videoHeight;
@@ -141,6 +177,72 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const handleCloseModal = () => {
     setIsConfirmModalOpen(false);
     setSelectedId(null);
+  };
+
+  const openClipInModal = (groupIdx, clipIdx, clip) => {
+    setCurrentGroupIndex(groupIdx);
+    setCurrentClipIndex(clipIdx);
+    setSelectedVideo(Utils?.generateVideoURL(clip));
+    setSelectedClip(clip);
+    setIsOpen(true);
+  };
+
+  const findNextClipPosition = () => {
+    if (currentGroupIndex === null || currentClipIndex === null) return null;
+
+    let g = currentGroupIndex;
+    let c = currentClipIndex + 1;
+
+    while (g < sortedClips.length) {
+      const group = sortedClips[g];
+      const clipsInGroup = group?.clips || [];
+      if (c < clipsInGroup.length) {
+        return { groupIndex: g, clipIndex: c, clip: clipsInGroup[c] };
+      }
+      g += 1;
+      c = 0;
+    }
+    return null;
+  };
+
+  const findPreviousClipPosition = () => {
+    if (currentGroupIndex === null || currentClipIndex === null) return null;
+
+    let g = currentGroupIndex;
+    let c = currentClipIndex - 1;
+
+    while (g >= 0) {
+      const group = sortedClips[g];
+      const clipsInGroup = group?.clips || [];
+      if (c >= 0 && c < clipsInGroup.length) {
+        return { groupIndex: g, clipIndex: c, clip: clipsInGroup[c] };
+      }
+      g -= 1;
+      if (g >= 0) {
+        const prevGroup = sortedClips[g];
+        const prevClips = prevGroup?.clips || [];
+        c = prevClips.length - 1;
+      }
+    }
+    return null;
+  };
+
+  const handleNextClip = () => {
+    const next = findNextClipPosition();
+    if (!next) return;
+    setCurrentGroupIndex(next.groupIndex);
+    setCurrentClipIndex(next.clipIndex);
+    setSelectedVideo(Utils?.generateVideoURL(next.clip));
+    setSelectedClip(next.clip);
+  };
+
+  const handlePreviousClip = () => {
+    const prev = findPreviousClipPosition();
+    if (!prev) return;
+    setCurrentGroupIndex(prev.groupIndex);
+    setCurrentClipIndex(prev.clipIndex);
+    setSelectedVideo(Utils?.generateVideoURL(prev.clip));
+    setSelectedClip(prev.clip);
   };
 
   useEffect(() => {
@@ -183,7 +285,31 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   return (
     <>
       <div className="media-gallery portfolio-section grid-portfolio">
-        {(trainee_id?clips?.length:myClips.length) ? (
+        <div style={{ marginBottom: "15px", textAlign: "center" }}>
+          <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "4px" }}>
+            My Clips
+          </h2>
+          <p style={{ fontSize: "13px", color: "#666", margin: 0 }}>
+            Browse and manage your uploaded clips.
+          </p>
+        </div>
+        {status === "pending" ? (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexDirection: "column",
+              minHeight: "240px",
+              gap: "12px",
+            }}
+          >
+            <Spinner color="primary" style={{ width: "2.5rem", height: "2.5rem" }} />
+            <h5 style={{ color: "#666", margin: 0, fontSize: "14px" }}>
+              Loading your clips...
+            </h5>
+          </div>
+        ) : (trainee_id ? clips?.length : myClips.length) ? (
           sortedClips?.map((cl, ind) => (
             <div className={`collapse-block ${!cl?.show ? "" : "open"}`}>
      {accountType !== AccountType.TRAINER && <h5 className="block-title" onClick={() => { }}>
@@ -249,8 +375,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                 objectFit: "cover",
                               }}
                               onClick={() => {
-                                setSelectedVideo(Utils?.generateVideoURL(clp));
-                                setIsOpen(true);
+                                openClipInModal(ind, index, clp);
                               }}
                             >
                               <source src={Utils?.generateVideoURL(clp)} />
@@ -272,8 +397,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                                 zIndex: "8",
                               }}
                               onClick={() => {
-                                setSelectedVideo(Utils?.generateVideoURL(clp));
-                                setIsOpen(true);
+                                openClipInModal(ind, index, clp);
                               }}
                             >
                               <div
@@ -337,27 +461,151 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
 
       <Modal
         isOpen={isOpenPlayVideo}
-        // allowFullWidth={true}
         element={
           <>
             <div className="d-flex flex-column align-items-center p-3 justify-content-center h-100">
-              <div style={{ borderRadius: 5 }}>
+              <div
+                className="position-relative"
+                style={{ borderRadius: 5, maxWidth: "100%" }}
+              >
                 <div className="media-body media-body text-right">
-                  <div
+                  <button
+                    ref={closeButtonRef}
+                    type="button"
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => setIsOpen(false)}
+                    aria-label="Close video"
                   >
                     <X />
-                  </div>
+                  </button>
                 </div>
-                <video
-                  style={videoDimensions}
-                  autoPlay
-                  controls
-                  onLoadedData={handleVideoLoad}
-                >
-                  <source src={selectedVideo} type="video/mp4" />
-                </video>
+
+                {selectedClip && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: "10px",
+                      gap: "12px",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        margin: 0,
+                        fontSize: "16px",
+                        fontWeight: 600,
+                        color: "#fff",
+                        textAlign: "left",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        maxWidth: "260px",
+                      }}
+                    >
+                      {selectedClip.title}
+                    </h4>
+
+                    {selectedClip.user_id === userInfo._id && (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsConfirmModalOpen(true);
+                            setSelectedId(selectedClip?._id);
+                          }}
+                          style={{
+                            border: "none",
+                            background: "#dc3545",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            padding: "6px 10px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "12px",
+                            cursor: "pointer",
+                          }}
+                        >
+                          <FaTrash size={12} />
+                          <span>Delete</span>
+                        </button>
+                        <a
+                          href={Utils?.generateVideoURL(selectedClip)}
+                          download={true}
+                          onClick={(e) => e.stopPropagation()}
+                          style={{
+                            background: "#007bff",
+                            color: "#fff",
+                            borderRadius: "4px",
+                            padding: "6px 10px",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                            fontSize: "12px",
+                            textDecoration: "none",
+                          }}
+                          target="_self"
+                        >
+                          <FaDownload size={12} />
+                          <span>Download</span>
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="d-flex align-items-center justify-content-center">
+                  {/* Previous button */}
+                  <button
+                    type="button"
+                    className="icon-btn btn-sm btn-outline-light mr-2"
+                    onClick={handlePreviousClip}
+                    disabled={!findPreviousClipPosition()}
+                    aria-label="Previous clip"
+                    style={{
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ChevronLeft />
+                  </button>
+
+                  <video
+                    style={videoDimensions}
+                    autoPlay
+                    controls
+                    onLoadedData={handleVideoLoad}
+                  >
+                    <source src={selectedVideo} type="video/mp4" />
+                  </video>
+
+                  {/* Next button */}
+                  <button
+                    type="button"
+                    className="icon-btn btn-sm btn-outline-light ml-2"
+                    onClick={handleNextClip}
+                    disabled={!findNextClipPosition()}
+                    aria-label="Next clip"
+                    style={{
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ChevronRight />
+                  </button>
+                </div>
               </div>
             </div>
           </>

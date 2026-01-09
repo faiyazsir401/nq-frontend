@@ -21,6 +21,7 @@ import Script from "next/script";
 import { getMe } from "../app/components/auth/auth.api";
 import trackerAssist from '@openreplay/tracker-assist';
 import Tracker from '@openreplay/tracker';
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 
 export default function MyAppComponent({ Component, pageProps }) {
@@ -278,6 +279,7 @@ export default function MyAppComponent({ Component, pageProps }) {
                       <Component {...pageProps} />
                       {/* Global instant lesson request handler */}
                       <InstantLessonProvider />
+                      <SpeedInsights />
                     </ChatContextProvider>
                   </CustomizerContextProvider>
                   <ToastContainer
