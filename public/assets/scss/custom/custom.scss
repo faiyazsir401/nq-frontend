@@ -101,10 +101,17 @@ $canvas-z-index: 8;
   // margin-top: 0% !important;
   margin: auto;
   .modal-content {
-    background: rgba(255, 255, 255, 0.3) !important; /* Translucent white background */
-      backdrop-filter: blur(10px) !important; /* Apply blur effect */
+    background: #fff !important; /* Solid white background */
+    backdrop-filter: none !important; /* Remove blur effect */
     height: 100vh !important;
     overflow-x: auto !important;
+  }
+  
+  &.clip-selection-modal .modal-content {
+    background: #fff !important;
+    backdrop-filter: none !important;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   }
 }
 

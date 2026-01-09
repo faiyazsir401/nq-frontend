@@ -180,7 +180,7 @@ const RecentUsers = () => {
           maxHeight: "95%",
           marginTop: "5px",
           overflowY: "auto",
-          padding: width600 ? "8px" : "10px"
+          padding: width600 ? "12px 8px" : "15px 12px"
         }}
       >
         <div
@@ -193,7 +193,10 @@ const RecentUsers = () => {
               display: "flex",
               flexWrap: "nowrap",
               gap: width600 ? "12px" : "15px",
-              paddingTop: "5px",
+              paddingTop: width600 ? "8px" : "10px",
+              paddingBottom: width600 ? "8px" : "10px",
+              paddingLeft: width600 ? "5px" : "8px",
+              paddingRight: width600 ? "5px" : "8px",
               width: "100%",
               justifyContent: "flex-start",
               alignItems: "center",

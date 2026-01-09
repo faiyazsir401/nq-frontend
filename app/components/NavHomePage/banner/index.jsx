@@ -23,7 +23,10 @@ const OnlineUserCard = ({ trainer }) => {
             justifyContent: "center",
             alignItems: "center",
             padding: width600 ? "6px 8px" : "10px 12px",
-            width: "100%"
+            width: "100%",
+            maxWidth: "100%",
+            boxSizing: "border-box",
+            height: "100%"
         }}>
             <div style={{ 
                 width: width600 ? "60px" : "70px", 
@@ -31,7 +34,9 @@ const OnlineUserCard = ({ trainer }) => {
                 border: "2px solid rgb(0, 0, 128)", 
                 borderRadius: "5px", 
                 padding: "4px",
-                flexShrink: 0
+                flexShrink: 0,
+                boxSizing: "border-box",
+                backgroundColor: "#fff"
             }}>
                 <img
                     src={trainer.profile_picture ? Utils.getImageUrlOfS3(trainer.profile_picture) : "/assets/images/demoUser.png"}
@@ -42,7 +47,8 @@ const OnlineUserCard = ({ trainer }) => {
                         height: "100%",
                         objectFit: "cover",
                         borderRadius: "3px",
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
+                        display: "block"
                     }}
                     onError={(e) => {
                         e.target.src = "/assets/images/demoUser.png";
@@ -54,7 +60,9 @@ const OnlineUserCard = ({ trainer }) => {
                 flexDirection: "column",
                 gap: width600 ? "4px" : "6px",
                 flex: 1,
-                minWidth: 0
+                minWidth: 0,
+                maxWidth: "calc(100% - 80px)",
+                overflow: "hidden"
             }}>
                 <h4 style={{
                     fontSize: width600 ? "12px" : "13px",

@@ -204,8 +204,15 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
       <Modal 
         isOpen={isOpen} 
         overflowHidden 
+        className="clip-selection-modal"
         element={
-          <div className='d-flex flex-column' style={{ width: '100%', height: '100%', padding: '20px' }}>
+          <div className='d-flex flex-column' style={{ 
+            width: '100%', 
+            height: '100%', 
+            padding: '20px',
+            backgroundColor: '#fff',
+            borderRadius: '8px'
+          }}>
             {/* Header */}
             <div className='d-flex justify-content-between align-items-center mb-4'>
               <h2 className="mb-0" style={{ fontSize: isMobileScreen ? "18px" : "24px", fontWeight: "600" }}>

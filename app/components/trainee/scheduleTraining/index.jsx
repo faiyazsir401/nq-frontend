@@ -840,10 +840,13 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         id="dashboard"
         className="d-flex justify-content-center align-items-center dashboard-search-trainer"
         style={{ 
-          marginTop: isMobileScreen ? "3%" : "5%", 
-          marginBottom: isMobileScreen ? "3%" : "2%",
-          padding: isMobileScreen ? "0 15px" : "0",
-          width: "100%"
+          marginTop: isMobileScreen ? "20px" : "30px", 
+          marginBottom: isMobileScreen ? "20px" : "25px",
+          padding: isMobileScreen ? "0 15px" : "0 20px",
+          width: "100%",
+          maxWidth: isMobileScreen ? "100%" : "800px",
+          marginLeft: "auto",
+          marginRight: "auto"
         }}
       >
         <SearchableDropdown
@@ -905,21 +908,23 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         />
       </div>
       <div className="trainer-recommended Slider" style={{ 
-        height: isMobileScreen ? "80px" : "90px",
-        marginTop: isMobileScreen ? "15px" : "20px",
-        marginBottom: isMobileScreen ? "15px" : "20px"
+        marginTop: isMobileScreen ? "20px" : "25px",
+        marginBottom: isMobileScreen ? "20px" : "25px",
+        padding: isMobileScreen ? "0 10px" : "0 20px",
+        width: "100%"
       }}>
         <div className="row" style={{
-          width: openCloseToggleSideNav ? (isMobileScreen ? "90%" : "70%") : (isMobileScreen ? "95%" : "80%"),
+          width: "100%",
+          maxWidth: "100%",
           display:"flex",
           justifyContent:"center",
-          margin:"auto",
+          margin:"0 auto",
           transition: 'width 0.3s ease'
         }}>
-          <div className="col" style={{display:"flex",justifyContent:"center"}}>
-            <Slider {...settings}>
+          <div className="col" style={{display:"flex",justifyContent:"center", width: "100%", padding: "0"}}>
+            <Slider {...settings} style={{ width: "100%" }}>
               {data?.category?.map((item, index) => (
-                <div key={`slider-item-${index}`}>
+                <div key={`slider-item-${index}`} style={{ padding: isMobileScreen ? "0 5px" : "0 8px" }}>
                   <span
                     className="badge badge-light lg"
                     style={{
@@ -933,7 +938,9 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                       borderRadius: "20px",
                       whiteSpace: "nowrap",
                       transition: "all 0.3s ease",
-                      border: "1px solid #ddd"
+                      border: "1px solid #ddd",
+                      width: "fit-content",
+                      margin: "0 auto"
                     }}
                     onClick={() => {
                       debouncedSearchAPI.cancel();
@@ -959,23 +966,29 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         </div>
       </div>
 
-      <div className="text-center" style={{ marginTop: isMobileScreen ? "20px" : "30px" }}>
-        <h2 style={{ fontSize: isMobileScreen ? "20px" : "24px", fontWeight: "600", marginBottom: "20px" }}>Online Experts</h2>
+      <div style={{ marginTop: isMobileScreen ? "25px" : "35px", width: "100%", padding: isMobileScreen ? "0 10px" : "0 20px" }}>
+        <h2 style={{ 
+          fontSize: isMobileScreen ? "20px" : "24px", 
+          fontWeight: "600", 
+          marginBottom: "20px",
+          textAlign: "left",
+          paddingLeft: isMobileScreen ? "5px" : "10px"
+        }}>Online Experts</h2>
         <div
           className="Recommended"
           style={{ 
             display: "flex", 
             flexDirection: "row",
-            justifyContent:"center",
+            justifyContent:"flex-start",
             width: "100%",
-            padding: isMobileScreen ? "0 10px" : "0 20px"
+            padding: "0"
           }}
         >
           {activeTrainer && activeTrainer?.length ? (
               <>
                 <Row
                   lg={4}
-                  md={2}
+                  md={3}
                   sm={2}
                   xs={1}
                   style={{
@@ -983,7 +996,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                     flexDirection:"row",
                     width: "100%",
                     padding:"0px",
-                    justifyContent:"center",
+                    justifyContent:"flex-start",
                     margin: "0"
                   }}
                   className="recent-slider recent-chat"
@@ -992,9 +1005,9 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                  {activeTrainer?.map((data, index) => {
                     return (
                       <Col key={index} className="item" style={{
-                        maxWidth: isMobileScreen ? "150px" : "250px",
-                        minWidth: isMobileScreen ? "130px" : "200px",
-                        padding: isMobileScreen ? "10px" : "15px",
+                        maxWidth: isMobileScreen ? "180px" : "280px",
+                        minWidth: isMobileScreen ? "160px" : "240px",
+                        padding: isMobileScreen ? "8px" : "12px",
                         flex: "0 0 auto"
                       }}>
                         <Trainer
@@ -1021,7 +1034,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
               </>
             
           ) : (
-            <h3>There are no Active Experts</h3>
+            <h3 style={{ textAlign: "left", paddingLeft: isMobileScreen ? "5px" : "10px" }}>There are no Active Experts</h3>
           )}
           {/* <div
             className="card trainer-profile-card Home-main-Cont"
