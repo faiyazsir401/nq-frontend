@@ -17,6 +17,7 @@ import InstantLessonProvider from "../app/components/instant-lesson/InstantLesso
 import ErrorBoundary from "../app/components/common/ErrorBoundary";
 import { LOCAL_STORAGE_KEYS, routingPaths } from "../app/common/constants";
 import { bookingsAction } from "../app/components/common/common.slice";
+import UniversalLoader from "../app/common/UniversalLoader";
 import Script from "next/script";
 import { getMe } from "../app/components/auth/auth.api";
 import trackerAssist from '@openreplay/tracker-assist';
@@ -29,7 +30,6 @@ export default function MyAppComponent({ Component, pageProps }) {
   const path = router.asPath;
   const pathName = router.pathname;
   const [currentUser, setCurrentUser] = useState(undefined);
-  const [loader, setLoader] = useState(true);
   let componentMounted = true;
   const { handleLoading } = bookingsAction;
 
@@ -223,9 +223,8 @@ export default function MyAppComponent({ Component, pageProps }) {
 
     //   handlePublicRoutes(pathName, path, router);
     // }
-    // Page Loader
+    // Page Loader - control global loader via Redux
     setTimeout(() => {
-      setLoader(false);
       store.dispatch(handleLoading(false));
     }, 1500);
 
@@ -268,11 +267,7 @@ export default function MyAppComponent({ Component, pageProps }) {
           <ErrorBoundary>
             <AuthGuard>
               <SocketProvider>
-                {loader && (
-                  <div className="chitchat-loader">
-                    <img src="/assets/images/netquix_logo_beta.png" alt="images" />
-                  </div>
-                )}
+                <UniversalLoader />
                 <div>
                   <CustomizerContextProvider>
                     <ChatContextProvider>

@@ -91,14 +91,36 @@ export const addTraineeClipInBookedSessionAsync = createAsyncThunk(
 
 export const getScheduledMeetingDetailsAsync = createAsyncThunk(
   "get/scheduled/meetings",
-  async (payload) => {
+  async (payload, { getState }) => {
     try {
+      const state = getState();
+      const bookings = state?.bookings;
+
+      const requestedTab = payload?.status || null;
+      const cachedTab = bookings?.cachedTabBook || null;
+      const lastFetched = bookings?.lastFetchedTimestamp || null;
+
+      // If we already fetched this tab recently, reuse cached data
+      const CACHE_TTL_MS = 60 * 1000; // 1 minute cache to avoid aggressive refetching on tab changes
+      const isSameTab = requestedTab && cachedTab && requestedTab === cachedTab;
+      const isFresh =
+        typeof lastFetched === "number" &&
+        Date.now() - lastFetched < CACHE_TTL_MS;
+
+      if (isSameTab && isFresh && Array.isArray(bookings?.scheduledMeetingDetails)) {
+        return {
+          data: bookings.scheduledMeetingDetails,
+          cachedTabBook: requestedTab,
+          fromCache: true,
+        };
+      }
+
       const response = await getScheduledMeetingDetails(payload);
       // Include the payload (tabBook) in the response for caching
-      return { ...response, cachedTabBook: payload?.status || null };
+      return { ...response, cachedTabBook: requestedTab, fromCache: false };
     } catch (err) {
       if (!err.isUnauthorized) {
-        toast.error(err.response.data.error);
+        toast.error(err.response?.data?.error || "Something went wrong");
       }
       throw err;
     }

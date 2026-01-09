@@ -29,8 +29,20 @@ import ReminderSection from "../rightSidebar/reminderSection";
 import NoteSection from "../rightSidebar/noteSection";
 import FileSection from "../rightSidebar/fileSection";
 import AppListSection from "../rightSidebar/appList";
-import { Book, File, ChevronLeft, ChevronRight } from "react-feather";
-import BookLessonIcon from "../../public/assets/images/online-lesson.png"
+import {
+  Book,
+  File as FileIcon,
+  ChevronLeft,
+  ChevronRight,
+  Home as HomeIcon,
+  Calendar as CalendarIcon,
+  Bell as BellIcon,
+  Settings as SettingsIcon,
+  CreditCard as CreditCardIcon,
+  Users as UsersIcon,
+  MessageCircle as MessageCircleIcon,
+  LogOut as LogOutIcon,
+} from "react-feather";
 import {
   bookingsAction,
   bookingsState,
@@ -493,66 +505,94 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
 
           </ul> */}
               <ul className="sidebar-top">
-                <li onClick={() => { setActiveTab(topNavbarOptions?.HOME); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)) }}
+                {/* Locker / Home */}
+                <li
+                  onClick={() => {
+                    setActiveTab(topNavbarOptions?.HOME);
+                    dispatch(
+                      authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME)
+                    );
+                  }}
                 >
-
-                  <NavLink id="sidebar-item-home"
-                    className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.HOME ? "active" : ""
-                      }`}
+                  <NavLink
+                    id="sidebar-item-home"
+                    className={`icon-btn btn-light button-effect ${
+                      activeTab === topNavbarOptions?.HOME ? "active" : ""
+                    }`}
+                    aria-label="My Locker"
                   >
-                    <i className="fa fa-home" />
+                    <HomeIcon size={18} />
                   </NavLink>
-
                   <p className="menu-name px-2">My Locker</p>
                 </li>
 
-                {accountType === AccountType.TRAINEE && <li onClick={() => { setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
-                >
-
-                  <NavLink id="sidebar-item-booking"
-                    className={`icon-btn btn-light button-effect ${activeTab === topNavbarOptions?.UPCOMING_SESSION
-                      ? "active"
-                      : ""
-                      }`}
-                  // onClick={() => TogglTab(leftSideBarOptions.SCHEDULE_TRAINING)}
+                {/* Trainee: Upcoming Sessions */}
+                {accountType === AccountType.TRAINEE && (
+                  <li
+                    onClick={() => {
+                      setActiveTab(topNavbarOptions?.UPCOMING_SESSION);
+                      dispatch(
+                        authAction?.setTopNavbarActiveTab(
+                          topNavbarOptions?.UPCOMING_SESSION
+                        )
+                      );
+                    }}
                   >
-                    <i className="fa fa-calendar" />
-                  </NavLink>
-
-                  <p className="menu-name px-2">Upcoming Sessions</p>
-                </li>}
-                {accountType === AccountType?.TRAINEE && <li onClick={() => { setActiveTab(topNavbarOptions?.BOOK_LESSON); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON)) }}
-                >
-
-                  <NavLink id="sidebar-item-locker"
-                    className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.BOOK_LESSON ? "active" : ""
+                    <NavLink
+                      id="sidebar-item-booking"
+                      className={`icon-btn btn-light button-effect ${
+                        activeTab === topNavbarOptions?.UPCOMING_SESSION
+                          ? "active"
+                          : ""
                       }`}
-                    data-intro=""
+                      aria-label="Upcoming Sessions"
+                    >
+                      <CalendarIcon size={18} />
+                    </NavLink>
+                    <p className="menu-name px-2">Upcoming Sessions</p>
+                  </li>
+                )}
+
+                {/* Trainee: Book Expert */}
+                {accountType === AccountType?.TRAINEE && (
+                  <li
+                    onClick={() => {
+                      setActiveTab(topNavbarOptions?.BOOK_LESSON);
+                      dispatch(
+                        authAction?.setTopNavbarActiveTab(
+                          topNavbarOptions?.BOOK_LESSON
+                        )
+                      );
+                    }}
                   >
-                    {activeTab === topNavbarOptions?.BOOK_LESSON
-                      ? <img src={"../assets/images/online-lesson-white.png"} alt="Book Lesson" style={{ width: 20 }} />
-                      : <img src={"../assets/images/online-lesson.png"} alt="Book Lesson" style={{ width: 20 }} />
-                    }
+                    <NavLink
+                      id="sidebar-item-locker"
+                      className={`icon-btn btn-light button-effect step2 ${
+                        activeTab === topNavbarOptions?.BOOK_LESSON
+                          ? "active"
+                          : ""
+                      }`}
+                      data-intro=""
+                      aria-label="Book Expert"
+                    >
+                      <Book size={18} />
+                    </NavLink>
+                    <p className="menu-name px-2">Book Expert</p>
+                  </li>
+                )}
 
-                  </NavLink>
-
-                  <p className="menu-name px-2">Book Expert</p>
-                </li>}
+                {/* Shared: File / Locker */}
                 <li onClick={() => ToggleTab("file")}>
-
-                  <NavLink id="sidebar-item-locker"
-                    className={`icon-btn btn-light button-effect step2 ${activeTab === "file" ? "active" : ""
-                      }`}
-
+                  <NavLink
+                    id="sidebar-item-locker"
+                    className={`icon-btn btn-light button-effect step2 ${
+                      activeTab === "file" ? "active" : ""
+                    }`}
                     data-intro=""
+                    aria-label="My Uploads"
                   >
-                    {activeTab === "file"
-                      ? <img src="../assets/images/lockers-white.png" style={{ width: 20 }} />
-                      : <img src="../assets/images/lockers.png" style={{ width: 20 }} />
-                    }
-                    {/* <i className="fa fa-lock" /> */}
+                    <FileIcon size={18} />
                   </NavLink>
-
                   <p className="menu-name px-2">My Uploads</p>
                 </li>
                 {/* <li>
@@ -645,23 +685,33 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
               </Tooltip>
             </li> */}
 
-                {accountType === AccountType?.TRAINER && <li onClick={() => { setActiveTab(topNavbarOptions?.UPCOMING_SESSION); dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.UPCOMING_SESSION)) }}
-                >
-
-                  <NavLink id="sidebar-item-upcoming"
-                    className={`icon-btn btn-light button-effect step2 ${activeTab === topNavbarOptions?.UPCOMING_SESSION ? "active" : ""
-                      }`}
-                    data-intro=""
+                {/* Trainer: Upcoming Sessions */}
+                {accountType === AccountType?.TRAINER && (
+                  <li
+                    onClick={() => {
+                      setActiveTab(topNavbarOptions?.UPCOMING_SESSION);
+                      dispatch(
+                        authAction?.setTopNavbarActiveTab(
+                          topNavbarOptions?.UPCOMING_SESSION
+                        )
+                      );
+                    }}
                   >
-                    {activeTab === topNavbarOptions?.UPCOMING_SESSION
-                      ? <img src={"../assets/images/online-lesson-white.png"} alt="Book Lesson" style={{ width: 20 }} />
-                      : <img src={"../assets/images/online-lesson.png"} alt="Book Lesson" style={{ width: 20 }} />
-                    }
-
-                  </NavLink>
-
-                  <p className="menu-name px-2">Upcoming Sessions</p>
-                </li>}
+                    <NavLink
+                      id="sidebar-item-upcoming"
+                      className={`icon-btn btn-light button-effect step2 ${
+                        activeTab === topNavbarOptions?.UPCOMING_SESSION
+                          ? "active"
+                          : ""
+                      }`}
+                      data-intro=""
+                      aria-label="Upcoming Sessions"
+                    >
+                      <CalendarIcon size={18} />
+                    </NavLink>
+                    <p className="menu-name px-2">Upcoming Sessions</p>
+                  </li>
+                )}
 
                 <li onClick={() => {
 
@@ -670,11 +720,12 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                   <div >
 
                     <NavLink id="sidebar-item-notification"
-                      className={`icon-btn btn-light button-effect ${activeTab === "notification" ? "active" : ""
-                        }`}
-
+                      className={`icon-btn btn-light button-effect ${
+                        activeTab === "notification" ? "active" : ""
+                      }`}
+                      aria-label="Notifications"
                     >
-                      <i className="fa fa-bell" />
+                      <BellIcon size={18} />
                     </NavLink>
 
                   </div>
@@ -685,11 +736,13 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                 >
 
                   <NavLink id="sidebar-item-setting"
-                    className={`icon-btn btn-light button-effect step2 ${activeTab === "setting" ? "active" : ""
-                      }`}
+                    className={`icon-btn btn-light button-effect step2 ${
+                      activeTab === "setting" ? "active" : ""
+                    }`}
                     data-intro="You can change settings by clicking here"
+                    aria-label="Settings"
                   >
-                    <i className="fa fa-cog" />
+                    <SettingsIcon size={18} />
                   </NavLink>
 
                   <p className="menu-name px-2">Settings</p>
@@ -719,11 +772,14 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                 >
                   {/* <div className="dot-btn dot-danger grow"> */}
 
-                  <NavLink id="sidebar-item-setting"
-                    className={`icon-btn btn-light button-effect step2 ${activeTab === "transaction" ? "active" : ""
-                      }`}
+                  <NavLink
+                    id="sidebar-item-setting"
+                    className={`icon-btn btn-light button-effect step2 ${
+                      activeTab === "transaction" ? "active" : ""
+                    }`}
+                    aria-label="Transactions"
                   >
-                    <i class="fa fa-exchange" aria-hidden="true" />
+                    <CreditCardIcon size={18} />
                   </NavLink>
 
                   {/* </div> */}
@@ -733,14 +789,15 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                 {width < 800 && <>
                   {/* My Community */}
 
-                  <li onClick={() => ToggleTab("my_community")}
-                  >
-
-                    <NavLink id="sidebar-item-setting"
-                      className={`icon-btn btn-light button-effect step2 ${activeTab === "my_community" ? "active" : ""
-                        }`}
+                  <li onClick={() => ToggleTab("my_community")}>
+                    <NavLink
+                      id="sidebar-item-setting"
+                      className={`icon-btn btn-light button-effect step2 ${
+                        activeTab === "my_community" ? "active" : ""
+                      }`}
+                      aria-label="My Community"
                     >
-                      <i class="fa fa-users" aria-hidden="true" />
+                      <UsersIcon size={18} />
                     </NavLink>
 
                     {/* </div> */}
@@ -765,14 +822,15 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
 
                   {/* Contact Us */}
 
-                  <li onClick={() => ToggleTab("contact_us")}
-                  >
-
-                    <NavLink id="sidebar-item-setting"
-                      className={`icon-btn btn-light button-effect step2 ${activeTab === "contact_us" ? "active" : ""
-                        }`}
+                  <li onClick={() => ToggleTab("contact_us")}>
+                    <NavLink
+                      id="sidebar-item-setting"
+                      className={`icon-btn btn-light button-effect step2 ${
+                        activeTab === "contact_us" ? "active" : ""
+                      }`}
+                      aria-label="Contact Us"
                     >
-                      <i class="fa fa-commenting-o" aria-hidden="true" />
+                      <MessageCircleIcon size={18} />
                     </NavLink>
 
                     {/* </div> */}
@@ -797,15 +855,13 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                   </li>*/}
                 </>}
 
-                <li onClick={() => Logout()}
-                >
-
+                <li onClick={() => Logout()}>
                   <NavLink
                     id="sidebar-item-logout"
                     className="icon-btn btn-light"
+                    aria-label="Logout"
                   >
-                    {" "}
-                    <i className="fa fa-power-off"> </i>
+                    <LogOutIcon size={18} />
                   </NavLink>
 
                   <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}>Logout</p>

@@ -58,6 +58,7 @@ const NavHomePage = () => {
   const [activeTrainer, setActiveTrainer] = useState([]);
   const [friendRequests, setFriendRequests] = useState([]);
   const [filteredSessions, setFilteredSessions] = useState([]);
+  const [activeCenterTab, setActiveCenterTab] = useState("myClips");
   
   // Use refs to prevent duplicate API calls when switching tabs
   const hasFetchedFriendRequestsRef = useRef(false);
@@ -583,29 +584,31 @@ const NavHomePage = () => {
             gap: width600 ? "20px" : width1200 ? "15px" : "0px",
           }}
         >
-          <div
-            className={`${width600
-              ? "col-sm-12"
-              : width1200
-                ? "col-sm-6"
-                : width2000
-                  ? "col-sm-12"
-                  : ""
-              }`}
-            style={{
-              height: width600 ? "auto" : "400px",
-            }}
-          >
-            <div className="card trainer-profile-card Home-main-Cont" style={{ 
-              height: "100%", 
-              width: "100%", 
-              borderRadius: "8px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-              border: "none"
-            }}>
-              <UserInfoCard />
+          {activeCenterTab !== "myClips" && (
+            <div
+              className={`${width600
+                ? "col-sm-12"
+                : width1200
+                  ? "col-sm-6"
+                  : width2000
+                    ? "col-sm-12"
+                    : ""
+                }`}
+              style={{
+                height: width600 ? "auto" : "400px",
+              }}
+            >
+              <div className="card trainer-profile-card Home-main-Cont" style={{ 
+                height: "100%", 
+                width: "100%", 
+                borderRadius: "8px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                border: "none"
+              }}>
+                <UserInfoCard />
+              </div>
             </div>
-          </div>
+          )}
 
           {(width1000 && friendRequests && friendRequests.length > 0) ? (
             <div
@@ -814,7 +817,7 @@ const NavHomePage = () => {
               className="card-body"
               style={{ padding: width600 ? "10px" : "15px" }}
             >
-              <NavHomePageCenterContainer />
+              <NavHomePageCenterContainer onTabChange={setActiveCenterTab} />
             </div>
           </div>
         </div>

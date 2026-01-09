@@ -315,12 +315,32 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
     selected_category: null,
   });
 
+  // Debounced function to call API after user stops typing
+  const debouncedSearchAPI = useMemo(
+    () =>
+      debounce((searchValue) => {
+        if (searchValue && searchValue.trim()) {
+          dispatch(getTraineeWithSlotsAsync({ search: searchValue }));
+        }
+      }, 500), // 500ms delay - waits for user to stop typing
+    [dispatch]
+  );
+
+  // Cleanup debounced function on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearchAPI.cancel();
+    };
+  }, [debouncedSearchAPI]);
+
   useEffect(() => {
     selectedTrainerInfo &&
       setTrainerInfo(JSON.parse(JSON.stringify(selectedTrainerInfo)));
     if (selectedTrainerInfo?.selected_category) {
       debouncedSearchAPI.cancel();
-      dispatch(getTraineeWithSlotsAsync({ search: selectedTrainerInfo?.selected_category }));
+      dispatch(
+        getTraineeWithSlotsAsync({ search: selectedTrainerInfo?.selected_category })
+      );
       setParams({ search: selectedTrainerInfo?.selected_category });
     }
   }, [selectedTrainerInfo?.selected_category, dispatch, debouncedSearchAPI]);
@@ -358,24 +378,6 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   const closePopup = () => {
     setPopup(false);
   };
-
-  // Debounced function to call API after user stops typing
-  const debouncedSearchAPI = useMemo(
-    () =>
-      debounce((searchValue) => {
-        if (searchValue && searchValue.trim()) {
-          dispatch(getTraineeWithSlotsAsync({ search: searchValue }));
-    }
-      }, 500), // 500ms delay - waits for user to stop typing
-    [dispatch]
-  );
-
-  // Cleanup debounced function on unmount
-  useEffect(() => {
-    return () => {
-      debouncedSearchAPI.cancel();
-    };
-  }, [debouncedSearchAPI]); 
 
   // Use ref to prevent refetching on tab toggle
   const hasFetchedTrainersRef = useRef(false);

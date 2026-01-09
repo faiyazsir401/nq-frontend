@@ -175,13 +175,23 @@ const UploadClipCard = (props) => {
   const handleFileChange = async (e) => {
     if (e.target.files.length) {
       const newFiles = Array.from(e.target.files);
-      const invalidFiles = newFiles.filter(file => (file.size / 1024 / 1024) > 150);
+      const maxSizeMB = 50;
+      const invalidFiles = newFiles.filter(file => (file.size / 1024 / 1024) > maxSizeMB);
       
       if (invalidFiles.length > 0) {
-        alert("Some files exceed 150 MiB and will not be uploaded");
+        const fileNames = invalidFiles.map(f => f.name).join(", ");
+        const fileSizes = invalidFiles.map(f => `${(f.size / 1024 / 1024).toFixed(2)} MB`).join(", ");
+        toast.error(
+          `The following video${invalidFiles.length > 1 ? 's' : ''} exceed the maximum file size of ${maxSizeMB}MB and cannot be uploaded:\n\n${fileNames}\n\nFile sizes: ${fileSizes}\n\nPlease select smaller video files.`,
+          {
+            autoClose: 8000,
+            style: { whiteSpace: 'pre-line' }
+          }
+        );
+        return;
       }
 
-      const validFiles = newFiles.filter(file => (file.size / 1024 / 1024) <= 150);
+      const validFiles = newFiles.filter(file => (file.size / 1024 / 1024) <= maxSizeMB);
       const newVideos = [...videos];
       const newThumbnails = [...thumbnails];
       const newTitles = [...titles];
@@ -505,7 +515,7 @@ const UploadClipCard = (props) => {
                 <span className="upload-text-main">Click to select videos</span>
                 <span className="upload-text-sub">or drag and drop</span>
               </div>
-              <span className="upload-hint">Supports MP4, WebM, QuickTime (Max 150MB per file)</span>
+              <span className="upload-hint">Supports MP4, WebM, QuickTime (Max 50MB per file)</span>
             </div>
           </label>
           <input

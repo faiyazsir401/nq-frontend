@@ -192,7 +192,7 @@ const allTabs = [
   },
 ];
 
-const NavHomePageCenterContainer = () => {
+const NavHomePageCenterContainer = ({ onTabChange }) => {
   const dispatch = useAppDispatch();
   const { accountType, userInfo } = useAppSelector(authState);
   const [activeTab, setActiveTab] = useState("myClips");
@@ -205,8 +205,17 @@ const NavHomePageCenterContainer = () => {
   const toggleTab = (tabValue) => {
     if (!isScrolling) {
       setActiveTab(tabValue);
+      if (onTabChange) {
+        onTabChange(tabValue);
+      }
     }
   };
+
+  useEffect(() => {
+    if (onTabChange) {
+      onTabChange(activeTab);
+    }
+  }, [activeTab, onTabChange]);
 
   // Handle scroll events to prevent tab switching during scroll
   const handleScroll = () => {

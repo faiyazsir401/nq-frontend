@@ -535,10 +535,47 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     );
   };
 
-  const filteredMeetings =
-    scheduledMeetingDetails?.filter(
-      (booking) => booking?.status === tabBook
-    ) || [];
+  const filteredMeetings = scheduledMeetingDetails?.filter((booking) => {
+    // Check if meeting is completed (has ratings or status is completed)
+    const isCompleted = isMeetingCompleted(booking);
+    
+    // Check if meeting is cancelled
+    const isCancelled = booking?.status === BookedSession.canceled;
+    
+    // Get availability info to check if session is upcoming
+    const availabilityInfo = Utils.meetingAvailability(
+      booking?.booked_date,
+      booking?.session_start_time,
+      booking?.session_end_time,
+      userTimeZone,
+      booking?.start_time,
+      booking?.end_time
+    );
+    
+    const has24HoursPassed = availabilityInfo?.has24HoursPassedSinceBooking;
+    const isUpcomingSession = availabilityInfo?.isUpcomingSession;
+    
+    // Filter based on tab
+    switch (tabBook) {
+      case "upcoming":
+        // For upcoming: must be confirmed/booked, not completed, not cancelled, and actually upcoming
+        return (
+          (booking?.status === BookedSession.confirmed || booking?.status === BookedSession.booked) &&
+          !isCompleted &&
+          !isCancelled &&
+          isUpcomingSession &&
+          !has24HoursPassed
+        );
+      case "canceled":
+        // For canceled: must have canceled status
+        return isCancelled;
+      case "completed":
+        // For completed: must be completed (has ratings) or status is completed, or 24 hours have passed
+        return isCompleted || booking?.status === BookedSession.completed || has24HoursPassed;
+      default:
+        return booking?.status === tabBook;
+    }
+  }) || [];
 
   const emptyLabel =
     not_data_for_booking?.[tabBook] || "No sessions found for this filter";
