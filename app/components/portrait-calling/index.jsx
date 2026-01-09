@@ -1264,6 +1264,10 @@ const VideoCallUI = ({
         toggle={() => {
           setIsOpenConfirm(false);
         }}
+        centered
+        className="clip-exit-confirm-modal"
+        backdrop="static"
+        keyboard={false}
       >
         <ModalHeader
           toggle={() => {
@@ -1271,27 +1275,39 @@ const VideoCallUI = ({
             setSelectedClips([]);
           }}
           close={() => <></>}
+          className="clip-exit-confirm-modal__header"
         >
-          Confirm
+          <div className="clip-exit-confirm-modal__title">
+            <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span>Confirm Exit</span>
+          </div>
         </ModalHeader>
-        <ModalBody>Are you sure you want to exit clip analysis mode?</ModalBody>
-        <ModalFooter>
+        <ModalBody className="clip-exit-confirm-modal__body">
+          <p>Are you sure you want to exit clip analysis mode?</p>
+          <p className="clip-exit-confirm-modal__subtext">
+            Your selected clips will be cleared and you'll return to the regular call view.
+          </p>
+        </ModalBody>
+        <ModalFooter className="clip-exit-confirm-modal__footer">
+          <Button
+            color="secondary"
+            onClick={() => {
+              setIsOpenConfirm(false);
+            }}
+            className="clip-exit-confirm-modal__btn-cancel"
+          >
+            Cancel
+          </Button>
           <Button
             color="primary"
             onClick={() => {
               setSelectedClips([]);
               setIsOpenConfirm(false);
             }}
+            className="clip-exit-confirm-modal__btn-confirm"
           >
+            <i className="fa fa-check" aria-hidden="true" style={{ marginRight: "8px" }}></i>
             Confirm
-          </Button>{" "}
-          <Button
-            color="secondary"
-            onClick={() => {
-              setIsOpenConfirm(false);
-            }}
-          >
-            Cancel
           </Button>
         </ModalFooter>
       </Modal>
@@ -1300,58 +1316,99 @@ const VideoCallUI = ({
         isOpen={isOpen}
         element={
           <>
-            <div className="container media-gallery portfolio-section grid-portfolio">
-              <div className="theme-title  mb-5">
+            <div className="container media-gallery portfolio-section grid-portfolio clip-selection-modal">
+              <div className="theme-title mb-4">
                 <div className="media-body media-body text-right">
                   <div
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => {
                       setIsOpen(false);
                     }}
+                    style={{
+                      minWidth: "44px",
+                      minHeight: "44px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}
                   >
                     <X />
                   </div>
                 </div>
-                <div className="media d-flex flex-column  align-items-center">
-                  <div>
-                    <h2>
+                <div className="media d-flex flex-column align-items-center">
+                  <div style={{ textAlign: "center", padding: "0 1rem" }}>
+                    <h2 style={{ 
+                      fontSize: width1200 ? "18px" : "22px", 
+                      fontWeight: "600",
+                      marginBottom: "0.5rem",
+                      lineHeight: "1.4"
+                    }}>
                       Select one video to do a full-screen analysis or select
                       two videos to do a comparison.
                     </h2>
+                    {selectClips.length > 0 && (
+                      <div style={{ 
+                        marginTop: "1rem", 
+                        padding: "0.75rem 1rem", 
+                        backgroundColor: "#e8f5e9", 
+                        borderRadius: "8px",
+                        display: "inline-block"
+                      }}>
+                        <span style={{ fontSize: "14px", fontWeight: "600", color: "#2e7d32" }}>
+                          Selected: {selectClips.length}/2
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
               <div className="theme-tab">
-                <Nav tabs className="" style={{
+                <Nav tabs className="clip-selection-tabs" style={{
                   justifyContent: 'center',
-                  flexWrap: "nowrap",
-                  gap: "5px",
+                  flexWrap: width1200 ? "wrap" : "nowrap",
+                  gap: "8px",
+                  marginBottom: "1.5rem"
                 }}>
                   <NavItem className="mb-2" style={{
-                    width: "100%"
+                    width: width1200 ? "100%" : "auto",
+                    flex: width1200 ? "1 1 100%" : "1 1 auto"
                   }}>
                     <NavLink
                       className={`button-effect ${videoActiveTab === "media" ? "active" : ""
                         } select-clip-width`}
                       style={{
                         minWidth: "auto",
+                        padding: width1200 ? "0.75rem 1rem" : "0.75rem 1.5rem",
+                        fontSize: width1200 ? "14px" : "16px",
+                        fontWeight: "500",
+                        textAlign: "center",
+                        minHeight: "44px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
                       }}
                       onClick={() => setAideoActiveTab("media")}
                     >
                       My Videos
                     </NavLink>
                   </NavItem>
-                  <NavItem className="mb-2 " style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center"
+                  <NavItem className="mb-2" style={{
+                    width: width1200 ? "100%" : "auto",
+                    flex: width1200 ? "1 1 100%" : "1 1 auto"
                   }}>
                     <NavLink
                       className={`button-effect ${videoActiveTab === "trainee" ? "active" : ""
                         } select-clip-width`}
-
                       style={{
                         minWidth: "auto",
+                        padding: width1200 ? "0.75rem 1rem" : "0.75rem 1.5rem",
+                        fontSize: width1200 ? "14px" : "16px",
+                        fontWeight: "500",
+                        textAlign: "center",
+                        minHeight: "44px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
                       }}
                       onClick={() => setAideoActiveTab("trainee")}
                     >
@@ -1359,15 +1416,22 @@ const VideoCallUI = ({
                     </NavLink>
                   </NavItem>
                   <NavItem className="mb-2" style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "end"
+                    width: width1200 ? "100%" : "auto",
+                    flex: width1200 ? "1 1 100%" : "1 1 auto"
                   }}>
                     <NavLink
                       className={`button-effect ${videoActiveTab === "docs" ? "active" : ""
                         } select-clip-width`}
                       style={{
                         minWidth: "auto",
+                        padding: width1200 ? "0.75rem 1rem" : "0.75rem 1.5rem",
+                        fontSize: width1200 ? "14px" : "16px",
+                        fontWeight: "500",
+                        textAlign: "center",
+                        minHeight: "44px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
                       }}
                       onClick={() => setAideoActiveTab("docs")}
                     >
@@ -1384,11 +1448,15 @@ const VideoCallUI = ({
                   <TabPane tabId="media">
                     <div
                       className="media-gallery portfolio-section grid-portfolio"
-                      style={{ overflowY: "auto", height: "40dvh" }}
+                      style={{ 
+                        overflowY: "auto", 
+                        height: width1200 ? "50dvh" : "40dvh",
+                        padding: "0.5rem"
+                      }}
                     >
                       {clips?.length ? (
                         clips?.map((cl, ind) => (
-                          <div className={`collapse-block open`}>
+                          <div key={ind} className={`collapse-block open mb-3`}>
                             <h5
                               className="block-title"
                               onClick={() => {
@@ -1399,25 +1467,52 @@ const VideoCallUI = ({
                                 temp[ind].show = true;
                                 setClips([...temp]);
                               }}
+                              style={{
+                                fontSize: width1200 ? "16px" : "18px",
+                                fontWeight: "600",
+                                padding: "0.75rem 1rem",
+                                cursor: "pointer",
+                                minHeight: "44px",
+                                display: "flex",
+                                alignItems: "center"
+                              }}
                             >
                               {cl?._id}
                               <label className="badge badge-primary sm ml-2">
                                 {cl?.clips?.length}
                               </label>
                             </h5>
-                            {/*  NORMAL  STRUCTURE END  */}
                             <div className={`block-content`}>
-                              <div className="row" style={{ margin: 0 }}>
+                              <div 
+                                className="row" 
+                                style={{ 
+                                  margin: 0,
+                                  display: "grid",
+                                  gridTemplateColumns: "repeat(2, 1fr)",
+                                  gap: "15px",
+                                  padding: "0.5rem"
+                                }}
+                              >
                                 {cl?.clips.map((clp, index) => {
-                                  var sld = selectClips.find(
+                                  const sld = selectClips.find(
                                     (val) => val?._id === clp?._id
                                   );
+                                  const isMaxSelected = selectClips.length >= 2;
+                                  const isDisabled = isMaxSelected && !sld;
+                                  
                                   return (
                                     <div
                                       key={index}
-                                      className={`${width1200 ? "col-3" : "col-2"} p-1`}
-                                      style={{ borderRadius: 5 }}
+                                      style={{ 
+                                        borderRadius: "8px",
+                                        position: "relative",
+                                        cursor: isDisabled ? "not-allowed" : "pointer",
+                                        opacity: isDisabled ? 0.5 : 1,
+                                        transition: "all 0.3s ease"
+                                      }}
                                       onClick={() => {
+                                        if (isDisabled) return;
+                                        
                                         if (!sld && selectClips?.length < 2) {
                                           selectClips.push(clp);
                                           setSelectClips([...selectClips]);
@@ -1432,152 +1527,102 @@ const VideoCallUI = ({
                                         }
                                       }}
                                     >
-                                      <video
-                                        poster={Utils?.generateThumbnailURL(
-                                          clp
-                                        )}
+                                      {/* Clip Title */}
+                                      <h6
+                                        className="text-truncate mb-2"
                                         style={{
-                                          // border: `${sld ? "2px" : "0px"} solid green`,
-                                          // width: "98%",
-                                          // maxHeight: "150px",
-                                          // height: "100%",
-                                          marginBottom: "10px",
-                                          // height: "200px",
-                                          width: "100%",
-                                          border: sld
-                                            ? "4px solid green"
-                                            : "4px solid rgb(180, 187, 209)",
-                                          borderRadius: "5px",
-                                          objectFit: "cover",
-                                          aspectRatio: "1/1",
+                                          fontSize: "13px",
+                                          fontWeight: "500",
+                                          textAlign: "center",
+                                          padding: "0 5px",
+                                          marginBottom: "8px",
+                                          maxWidth: "100%",
+                                          color: isDisabled ? "#999" : "#333"
                                         }}
+                                        title={clp?.title || "Untitled"}
                                       >
-                                        <source
-                                          src={Utils?.generateVideoURL(clp)}
-                                          type="video/mp4"
-                                        />
-                                      </video>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <>
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "center",
-                              marginTop: "40px",
-                            }}
-                          >
-                            <h5 className="block-title"> No Data Found</h5>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    {clips && clips.length !== 0 && (
-                      <div className="d-flex justify-content-around w-100 p-3">
-                        <Button
-                          color="success"
-                          onClick={() => {
-                            if (selectClips && selectClips?.length) {
-                              setSelectedClips(selectClips);
-                              setClipSelectNote(false);
-                            }
-                            setIsOpen(false);
-                          }}
-                        >
-                          Select
-                        </Button>
-                      </div>
-                    )}
-                  </TabPane>
-                  <TabPane tabId="trainee">
-                    <div
-                      className="media-gallery portfolio-section grid-portfolio"
-                      style={{ overflowY: "auto", height: "40dvh" }}
-                    >
-                      {traineeClip?.length ? (
-                        traineeClip?.map((cl, ind) => (
-                          <div className={`collapse-block open`}>
-                            <h5
-                              className="block-title"
-                              onClick={() => {
-                                var temp = traineeClip;
-                                temp = temp.map((vl) => {
-                                  return { ...vl, show: false };
-                                });
-                                temp[ind].show = true;
-                                setTraineeClips([...temp]);
-                              }}
-                            >
-                              {/* {cl?._id?.fullname}
-                              <label className="badge badge-primary sm ml-2">
-                                {cl?.clips?.length}
-                              </label> */}
-                            </h5>
-                            {/*  NORMAL  STRUCTURE END  */}
-                            <div className={`block-content `}>
-                              <div className="row" style={{ margin: 0 }}>
-                                {cl?.clips.map((clp, index) => {
-                                  var sld = selectClips.find(
-                                    (val) => val?._id === clp?._id
-                                  );
-                                  return (
-                                    <div
-                                      key={index}
-                                      className={`${width1200 ? "col-3" : "col-2"} p-1`}
-                                      style={{ borderRadius: 5 }}
-                                      onClick={() => {
-                                        if (!sld && selectClips?.length < 2) {
-                                          selectClips.push(clp);
-                                          setSelectClips([...selectClips]);
-                                        } else {
-                                          var temp = JSON.parse(
-                                            JSON.stringify(selectClips)
-                                          );
-                                          temp = temp.filter(
-                                            (val) => val._id !== clp?._id
-                                          );
-                                          setSelectClips([...temp]);
-                                        }
-                                      }}
-                                    >
-                                      <video
-                                        poster={Utils?.generateThumbnailURL(
-                                          clp
-                                        )}
-                                        style={{
-                                          // border: `${sld ? "2px" : "0px"} solid green`,
-                                          // width: "98%",
-                                          // maxHeight: "150px",
-                                          // height: "100%",
-                                          marginBottom: "10px",
-
-                                          width: "100%",
-                                          border: sld
-                                            ? "4px solid green"
-                                            : clp.duringSession
-                                              ? "4px solid red"
+                                        {clp?.title && clp.title.length > 15 
+                                          ? `${clp.title.slice(0, 15)}...` 
+                                          : clp?.title || "Untitled"}
+                                      </h6>
+                                      
+                                      {/* Video Container */}
+                                      <div style={{ position: "relative" }}>
+                                        <video
+                                          poster={Utils?.generateThumbnailURL(clp)}
+                                          style={{
+                                            width: "100%",
+                                            aspectRatio: "1/1",
+                                            border: sld
+                                              ? "4px solid #28a745"
                                               : "4px solid rgb(180, 187, 209)",
-
-                                          borderRadius: "5px",
-                                          objectFit: "cover",
-                                          aspectRatio: "1/1",
-                                        }}
-                                        preload="none"
-                                      >
-                                        <source
-                                          src={Utils?.generateVideoURL(
-                                            clp
+                                            borderRadius: "8px",
+                                            objectFit: "cover",
+                                            pointerEvents: isDisabled ? "none" : "auto"
+                                          }}
+                                        >
+                                          <source
+                                            src={Utils?.generateVideoURL(clp)}
+                                            type="video/mp4"
+                                          />
+                                        </video>
+                                        
+                                        {/* Checkbox */}
+                                        <div
+                                          style={{
+                                            position: "absolute",
+                                            top: "8px",
+                                            right: "8px",
+                                            backgroundColor: sld ? "#28a745" : "white",
+                                            border: "2px solid",
+                                            borderColor: sld ? "#28a745" : "#b4bbd1",
+                                            borderRadius: "4px",
+                                            width: "24px",
+                                            height: "24px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            cursor: isDisabled ? "not-allowed" : "pointer",
+                                            zIndex: 10,
+                                            transition: "all 0.3s ease"
+                                          }}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (isDisabled) return;
+                                            
+                                            if (!sld && selectClips?.length < 2) {
+                                              selectClips.push(clp);
+                                              setSelectClips([...selectClips]);
+                                            } else {
+                                              var temp = JSON.parse(
+                                                JSON.stringify(selectClips)
+                                              );
+                                              temp = temp.filter(
+                                                (val) => val._id !== clp?._id
+                                              );
+                                              setSelectClips([...temp]);
+                                            }
+                                          }}
+                                        >
+                                          {sld && (
+                                            <svg
+                                              width="16"
+                                              height="16"
+                                              viewBox="0 0 16 16"
+                                              fill="none"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                              <path
+                                                d="M13.5 4L6 11.5L2.5 8"
+                                                stroke="white"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                            </svg>
                                           )}
-                                          // src={Utils?.generateVideoURL(clp)}
-                                          type="video/mp4"
-                                        />
-                                      </video>
+                                        </div>
+                                      </div>
                                     </div>
                                   );
                                 })}
@@ -1590,16 +1635,19 @@ const VideoCallUI = ({
                           style={{
                             display: "flex",
                             justifyContent: "center",
-                            marginTop: "40px",
+                            alignItems: "center",
+                            minHeight: "200px"
                           }}
                         >
-                          <h5 className="block-title"> No Data Found</h5>
+                          <h5 className="block-title">No Data Found</h5>
                         </div>
                       )}
                     </div>
-
-                    {traineeClip && traineeClip.length !== 0 && (
-                      <div className="d-flex justify-content-around w-100 p-3">
+                    {clips && clips.length !== 0 && (
+                      <div className="d-flex justify-content-center w-100 p-3" style={{
+                        borderTop: "1px solid #e0e0e0",
+                        gap: "1rem"
+                      }}>
                         <Button
                           color="success"
                           onClick={() => {
@@ -1609,8 +1657,247 @@ const VideoCallUI = ({
                             }
                             setIsOpen(false);
                           }}
+                          disabled={selectClips.length === 0}
+                          style={{
+                            minWidth: "120px",
+                            padding: "0.75rem 2rem",
+                            fontSize: "16px",
+                            fontWeight: "600",
+                            minHeight: "44px"
+                          }}
                         >
-                          Select
+                          Select {selectClips.length > 0 && `(${selectClips.length})`}
+                        </Button>
+                      </div>
+                    )}
+                  </TabPane>
+                  <TabPane tabId="trainee">
+                    <div
+                      className="media-gallery portfolio-section grid-portfolio"
+                      style={{ 
+                        overflowY: "auto", 
+                        height: width1200 ? "50dvh" : "40dvh",
+                        padding: "0.5rem"
+                      }}
+                    >
+                      {traineeClip?.length ? (
+                        traineeClip?.map((cl, ind) => (
+                          <div key={ind} className={`collapse-block open mb-3`}>
+                            <h5
+                              className="block-title"
+                              onClick={() => {
+                                var temp = traineeClip;
+                                temp = temp.map((vl) => {
+                                  return { ...vl, show: false };
+                                });
+                                temp[ind].show = true;
+                                setTraineeClips([...temp]);
+                              }}
+                              style={{
+                                fontSize: width1200 ? "16px" : "18px",
+                                fontWeight: "600",
+                                padding: "0.75rem 1rem",
+                                cursor: "pointer",
+                                minHeight: "44px",
+                                display: "flex",
+                                alignItems: "center"
+                              }}
+                            >
+                              {cl?._id?.fullname || "Enthusiast Clips"}
+                              {cl?.clips?.length && (
+                                <label className="badge badge-primary sm ml-2">
+                                  {cl?.clips?.length}
+                                </label>
+                              )}
+                            </h5>
+                            <div className={`block-content`}>
+                              <div 
+                                className="row" 
+                                style={{ 
+                                  margin: 0,
+                                  display: "grid",
+                                  gridTemplateColumns: "repeat(2, 1fr)",
+                                  gap: "15px",
+                                  padding: "0.5rem"
+                                }}
+                              >
+                                {cl?.clips.map((clp, index) => {
+                                  const sld = selectClips.find(
+                                    (val) => val?._id === clp?._id
+                                  );
+                                  const isMaxSelected = selectClips.length >= 2;
+                                  const isDisabled = isMaxSelected && !sld;
+                                  
+                                  return (
+                                    <div
+                                      key={index}
+                                      style={{ 
+                                        borderRadius: "8px",
+                                        position: "relative",
+                                        cursor: isDisabled ? "not-allowed" : "pointer",
+                                        opacity: isDisabled ? 0.5 : 1,
+                                        transition: "all 0.3s ease"
+                                      }}
+                                      onClick={() => {
+                                        if (isDisabled) return;
+                                        
+                                        if (!sld && selectClips?.length < 2) {
+                                          selectClips.push(clp);
+                                          setSelectClips([...selectClips]);
+                                        } else {
+                                          var temp = JSON.parse(
+                                            JSON.stringify(selectClips)
+                                          );
+                                          temp = temp.filter(
+                                            (val) => val._id !== clp?._id
+                                          );
+                                          setSelectClips([...temp]);
+                                        }
+                                      }}
+                                    >
+                                      {/* Clip Title */}
+                                      <h6
+                                        className="text-truncate mb-2"
+                                        style={{
+                                          fontSize: "13px",
+                                          fontWeight: "500",
+                                          textAlign: "center",
+                                          padding: "0 5px",
+                                          marginBottom: "8px",
+                                          maxWidth: "100%",
+                                          color: isDisabled ? "#999" : "#333"
+                                        }}
+                                        title={clp?.title || "Untitled"}
+                                      >
+                                        {clp?.title && clp.title.length > 15 
+                                          ? `${clp.title.slice(0, 15)}...` 
+                                          : clp?.title || "Untitled"}
+                                      </h6>
+                                      
+                                      {/* Video Container */}
+                                      <div style={{ position: "relative" }}>
+                                        <video
+                                          poster={Utils?.generateThumbnailURL(clp)}
+                                          style={{
+                                            width: "100%",
+                                            aspectRatio: "1/1",
+                                            border: sld
+                                              ? "4px solid #28a745"
+                                              : clp.duringSession
+                                                ? "4px solid #dc3545"
+                                                : "4px solid rgb(180, 187, 209)",
+                                            borderRadius: "8px",
+                                            objectFit: "cover",
+                                            pointerEvents: isDisabled ? "none" : "auto"
+                                          }}
+                                          preload="none"
+                                        >
+                                          <source
+                                            src={Utils?.generateVideoURL(clp)}
+                                            type="video/mp4"
+                                          />
+                                        </video>
+                                        
+                                        {/* Checkbox */}
+                                        <div
+                                          style={{
+                                            position: "absolute",
+                                            top: "8px",
+                                            right: "8px",
+                                            backgroundColor: sld ? "#28a745" : "white",
+                                            border: "2px solid",
+                                            borderColor: sld ? "#28a745" : "#b4bbd1",
+                                            borderRadius: "4px",
+                                            width: "24px",
+                                            height: "24px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            cursor: isDisabled ? "not-allowed" : "pointer",
+                                            zIndex: 10,
+                                            transition: "all 0.3s ease"
+                                          }}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (isDisabled) return;
+                                            
+                                            if (!sld && selectClips?.length < 2) {
+                                              selectClips.push(clp);
+                                              setSelectClips([...selectClips]);
+                                            } else {
+                                              var temp = JSON.parse(
+                                                JSON.stringify(selectClips)
+                                              );
+                                              temp = temp.filter(
+                                                (val) => val._id !== clp?._id
+                                              );
+                                              setSelectClips([...temp]);
+                                            }
+                                          }}
+                                        >
+                                          {sld && (
+                                            <svg
+                                              width="16"
+                                              height="16"
+                                              viewBox="0 0 16 16"
+                                              fill="none"
+                                              xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                              <path
+                                                d="M13.5 4L6 11.5L2.5 8"
+                                                stroke="white"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                              />
+                                            </svg>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            minHeight: "200px"
+                          }}
+                        >
+                          <h5 className="block-title">No Data Found</h5>
+                        </div>
+                      )}
+                    </div>
+                    {traineeClip && traineeClip.length !== 0 && (
+                      <div className="d-flex justify-content-center w-100 p-3" style={{
+                        borderTop: "1px solid #e0e0e0",
+                        gap: "1rem"
+                      }}>
+                        <Button
+                          color="success"
+                          onClick={() => {
+                            if (selectClips && selectClips?.length) {
+                              setSelectedClips(selectClips);
+                              setClipSelectNote(false);
+                            }
+                            setIsOpen(false);
+                          }}
+                          disabled={selectClips.length === 0}
+                          style={{
+                            minWidth: "120px",
+                            padding: "0.75rem 2rem",
+                            fontSize: "16px",
+                            fontWeight: "600",
+                            minHeight: "44px"
+                          }}
+                        >
+                          Select {selectClips.length > 0 && `(${selectClips.length})`}
                         </Button>
                       </div>
                     )}
@@ -1618,21 +1905,43 @@ const VideoCallUI = ({
                   <TabPane tabId="docs">
                     <div
                       className="media-gallery portfolio-section grid-portfolio"
-                      style={{ overflowY: "auto", height: "40dvh" }}
+                      style={{ 
+                        overflowY: "auto", 
+                        height: width1200 ? "50dvh" : "40dvh",
+                        padding: "0.5rem"
+                      }}
                     >
                       <div className={`collapse-block open`}>
-                        <div className={`block-content `}>
-                          <div className="row">
+                        <div className={`block-content`}>
+                          <div 
+                            className="row"
+                            style={{
+                              display: "grid",
+                              gridTemplateColumns: "repeat(2, 1fr)",
+                              gap: "15px",
+                              margin: 0
+                            }}
+                          >
                             {netquixVideos.map((clp, index) => {
-                              var sld = selectClips.find(
+                              const sld = selectClips.find(
                                 (val) => val?._id === clp?._id
                               );
+                              const isMaxSelected = selectClips.length >= 2;
+                              const isDisabled = isMaxSelected && !sld;
+                              
                               return clp?.file_name ? (
                                 <div
                                   key={index}
-                                  className={`${width1200 ? "col-3" : "col-2"} p-1`}
-                                  style={{ borderRadius: 5 }}
+                                  style={{ 
+                                    borderRadius: "8px",
+                                    position: "relative",
+                                    cursor: isDisabled ? "not-allowed" : "pointer",
+                                    opacity: isDisabled ? 0.5 : 1,
+                                    transition: "all 0.3s ease"
+                                  }}
                                   onClick={() => {
+                                    if (isDisabled) return;
+                                    
                                     if (!sld && selectClips?.length < 2) {
                                       selectClips.push(clp);
                                       setSelectClips([...selectClips]);
@@ -1647,25 +1956,101 @@ const VideoCallUI = ({
                                     }
                                   }}
                                 >
-                                  <video
-                                    // style={{ border: `${sld ? "2px" : "0px"} solid green`, width: "98%", maxHeight: "150px", height: "100%", marginBottom: "10px", display: "flex", justifyContent: "center" }}
+                                  {/* Clip Title */}
+                                  <h6
+                                    className="text-truncate mb-2"
                                     style={{
-                                      marginBottom: "10px",
-
-                                      width: "100%",
-                                      border: sld
-                                        ? "4px solid green"
-                                        : "4px solid rgb(180, 187, 209)",
-                                      borderRadius: "5px",
-                                      objectFit: "cover",
-                                      aspectRatio: "1/1",
+                                      fontSize: "13px",
+                                      fontWeight: "500",
+                                      textAlign: "center",
+                                      padding: "0 5px",
+                                      marginBottom: "8px",
+                                      maxWidth: "100%",
+                                      color: isDisabled ? "#999" : "#333"
                                     }}
+                                    title={clp?.title || "Untitled"}
                                   >
-                                    <source
-                                      src={Utils?.generateVideoURL(clp)}
-                                      type="video/mp4"
-                                    />
-                                  </video>
+                                    {clp?.title && clp.title.length > 15 
+                                      ? `${clp.title.slice(0, 15)}...` 
+                                      : clp?.title || "Untitled"}
+                                  </h6>
+                                  
+                                  {/* Video Container */}
+                                  <div style={{ position: "relative" }}>
+                                    <video
+                                      style={{
+                                        width: "100%",
+                                        aspectRatio: "1/1",
+                                        border: sld
+                                          ? "4px solid #28a745"
+                                          : "4px solid rgb(180, 187, 209)",
+                                        borderRadius: "8px",
+                                        objectFit: "cover",
+                                        pointerEvents: isDisabled ? "none" : "auto"
+                                      }}
+                                    >
+                                      <source
+                                        src={Utils?.generateVideoURL(clp)}
+                                        type="video/mp4"
+                                      />
+                                    </video>
+                                    
+                                    {/* Checkbox */}
+                                    <div
+                                      style={{
+                                        position: "absolute",
+                                        top: "8px",
+                                        right: "8px",
+                                        backgroundColor: sld ? "#28a745" : "white",
+                                        border: "2px solid",
+                                        borderColor: sld ? "#28a745" : "#b4bbd1",
+                                        borderRadius: "4px",
+                                        width: "24px",
+                                        height: "24px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        cursor: isDisabled ? "not-allowed" : "pointer",
+                                        zIndex: 10,
+                                        transition: "all 0.3s ease"
+                                      }}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (isDisabled) return;
+                                        
+                                        if (!sld && selectClips?.length < 2) {
+                                          selectClips.push(clp);
+                                          setSelectClips([...selectClips]);
+                                        } else {
+                                          var temp = JSON.parse(
+                                            JSON.stringify(selectClips)
+                                          );
+                                          temp = temp.filter(
+                                            (val) => val._id !== clp?._id
+                                          );
+                                          setSelectClips([...temp]);
+                                        }
+                                      }}
+                                    >
+                                      {sld && (
+                                        <svg
+                                          width="16"
+                                          height="16"
+                                          viewBox="0 0 16 16"
+                                          fill="none"
+                                          xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                          <path
+                                            d="M13.5 4L6 11.5L2.5 8"
+                                            stroke="white"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                          />
+                                        </svg>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
                               ) : null;
                             })}
@@ -1673,9 +2058,11 @@ const VideoCallUI = ({
                         </div>
                       </div>
                     </div>
-
                     {netquixVideos && netquixVideos?.length !== 0 && (
-                      <div className="d-flex justify-content-around w-100 p-3">
+                      <div className="d-flex justify-content-center w-100 p-3" style={{
+                        borderTop: "1px solid #e0e0e0",
+                        gap: "1rem"
+                      }}>
                         <Button
                           color="success"
                           onClick={() => {
@@ -1685,8 +2072,16 @@ const VideoCallUI = ({
                             }
                             setIsOpen(false);
                           }}
+                          disabled={selectClips.length === 0}
+                          style={{
+                            minWidth: "120px",
+                            padding: "0.75rem 2rem",
+                            fontSize: "16px",
+                            fontWeight: "600",
+                            minHeight: "44px"
+                          }}
                         >
-                          Select
+                          Select {selectClips.length > 0 && `(${selectClips.length})`}
                         </Button>
                       </div>
                     )}

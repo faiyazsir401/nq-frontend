@@ -1271,35 +1271,49 @@ export default function PracticeLiveExperience({
           toggle={() => {
             setIsOpenConfirm(false);
           }}
+          centered
+          className="clip-exit-confirm-modal"
+          backdrop="static"
+          keyboard={false}
         >
           <ModalHeader
             toggle={() => {
               setIsOpenConfirm(false);
             }}
             close={() => <></>}
+            className="clip-exit-confirm-modal__header"
           >
-            Confirm
+            <div className="clip-exit-confirm-modal__title">
+              <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+              <span>Confirm Exit</span>
+            </div>
           </ModalHeader>
-          <ModalBody>
-            Are you sure you want to exit clip analysis mode?
+          <ModalBody className="clip-exit-confirm-modal__body">
+            <p>Are you sure you want to exit clip analysis mode?</p>
+            <p className="clip-exit-confirm-modal__subtext">
+              Your selected clips will be cleared and you'll return to the regular call view.
+            </p>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className="clip-exit-confirm-modal__footer">
+            <Button
+              color="secondary"
+              onClick={() => {
+                setIsOpenConfirm(false);
+              }}
+              className="clip-exit-confirm-modal__btn-cancel"
+            >
+              Cancel
+            </Button>
             <Button
               color="primary"
               onClick={() => {
                 setSelectedClips([]);
                 setIsOpenConfirm(false);
               }}
+              className="clip-exit-confirm-modal__btn-confirm"
             >
+              <i className="fa fa-check" aria-hidden="true" style={{ marginRight: "8px" }}></i>
               Confirm
-            </Button>{" "}
-            <Button
-              color="secondary"
-              onClick={() => {
-                setIsOpenConfirm(false);
-              }}
-            >
-              Cancel
             </Button>
           </ModalFooter>
         </Modal>

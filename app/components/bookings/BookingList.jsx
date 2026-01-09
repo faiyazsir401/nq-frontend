@@ -42,7 +42,6 @@ import { Spinner } from "reactstrap";
 export var meetingRoom = () => <></>;
 
 const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
-  const [tabBook, setTabBook] = useState(bookingButton[0]);
   const [selectedClips, setSelectedClips] = useState([]);
   const [isOpenID, setIsOpenID] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -120,13 +119,13 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
   // });
 
   useEffect(() => {
-    if (activeCenterContainerTab === "upcomingLesson") {
+    if (activeCenterContainerTab === "upcomingLesson" && activeTabs) {
       const payload = {
-        status: tabBook,
+        status: activeTabs,
       };
       dispatch(getScheduledMeetingDetailsAsync(payload));
     }
-  }, [tabBook, activeCenterContainerTab, dispatch]);
+  }, [activeTabs, activeCenterContainerTab, dispatch]);
 
 
   const showRatingLabel = (ratingInfo) => {
@@ -241,7 +240,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             report={report}
             bookedSession={bookedSession}
             setBookedSession={setBookedSession}
-            tabBook={tabBook}
+            tabBook={activeTabs}
             setStartMeeting={MeetingSetter}
             startMeeting={startMeeting}
             handleAddRatingModelState={handleAddRatingModelState}
@@ -279,7 +278,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
             report={report}
             bookedSession={bookedSession}
             setBookedSession={setBookedSession}
-            tabBook={tabBook}
+            tabBook={activeTabs}
             setStartMeeting={MeetingSetter}
             startMeeting={startMeeting}
             handleAddRatingModelState={handleAddRatingModelState}
@@ -556,7 +555,7 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
     const isUpcomingSession = availabilityInfo?.isUpcomingSession;
     
     // Filter based on tab
-    switch (tabBook) {
+    switch (activeTabs) {
       case "upcoming":
         // For upcoming: must be confirmed/booked, not completed, not cancelled, and actually upcoming
         return (
@@ -573,12 +572,12 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
         // For completed: must be completed (has ratings) or status is completed, or 24 hours have passed
         return isCompleted || booking?.status === BookedSession.completed || has24HoursPassed;
       default:
-        return booking?.status === tabBook;
+        return booking?.status === activeTabs;
     }
   }) || [];
 
   const emptyLabel =
-    not_data_for_booking?.[tabBook] || "No sessions found for this filter";
+    not_data_for_booking?.[activeTabs] || "No sessions found for this filter";
 
   return (
     <div>

@@ -812,11 +812,17 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       }}
       className="bookings custom-scroll custom-trainee-dashboard booking-container"
       id="booking-lesson"
+      style={{
+        marginLeft: openCloseToggleSideNav ? (isMobileScreen ? '65px' : '105px') : '0px',
+        transition: 'margin-left 0.3s ease',
+        width: openCloseToggleSideNav ? (isMobileScreen ? 'calc(100% - 65px)' : 'calc(100% - 105px)') : '100%',
+        padding: isMobileScreen ? '10px' : '20px'
+      }}
     >
       <div className="row"  style={{margin:"0px"}}>
         <div className="trainer-recommended">
-          <h1 style={{ marginBottom: "10px",fontSize:isMobileScreen?"22px":"auto" }}>Book Your Session now</h1>
-          <p style={{fontSize:isMobileScreen?"14px":"20px"}}>
+          <h1 style={{ marginBottom: "10px",fontSize:isMobileScreen?"22px":"28px", fontWeight: "600" }}>Book Your Session now</h1>
+          <p style={{fontSize:isMobileScreen?"14px":"18px", lineHeight: "1.6", color: "#666"}}>
           Pick your favorite activity and then search for your Expert below. NetQwix is here to revolutionize the way you learn and connect LIVE on our cutting-edge platform.
           </p>
         </div>
@@ -898,8 +904,19 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
           activeTrainer={activeTrainer}
         />
       </div>
-      <div className="trainer-recommended Slider  " style={{ height: "90px" }}>
-        <div className="row" style={{margin:"0px",width:"60vw",display:"flex",justifyContent:"center",margin:"auto"}}>
+      <div className="trainer-recommended Slider" style={{ 
+        height: isMobileScreen ? "80px" : "90px",
+        marginTop: isMobileScreen ? "15px" : "20px",
+        marginBottom: isMobileScreen ? "15px" : "20px"
+      }}>
+        <div className="row" style={{
+          margin:"0px",
+          width: openCloseToggleSideNav ? (isMobileScreen ? "90%" : "70%") : (isMobileScreen ? "95%" : "80%"),
+          display:"flex",
+          justifyContent:"center",
+          margin:"auto",
+          transition: 'width 0.3s ease'
+        }}>
           <div className="col" style={{display:"flex",justifyContent:"center"}}>
             <Slider {...settings}>
               {data?.category?.map((item, index) => (
@@ -907,16 +924,17 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                   <span
                     className="badge badge-light lg"
                     style={{
-                      padding:isMobileScreen ? "10px":"18px", // Add your desired padding here
-                      alignItems:isMobileScreen ? "auto": "center",
-                      fontSize:isMobileScreen ? "auto": "14px",
-                      color: isMobileScreen ? "auto":"black",
-                      cursor:isMobileScreen ? "auto": "pointer",
-                      width:isMobileScreen ? "auto": "80%",
-                      height:isMobileScreen ? "auto": "0",
-                      display:isMobileScreen ? "auto": "flex",
-                      justifyContent: isMobileScreen ? "auto":"center", // Center content horizontally
-                      flexDirection: isMobileScreen ? "auto":"column",
+                      padding: isMobileScreen ? "8px 12px" : "12px 18px",
+                      fontSize: isMobileScreen ? "12px" : "14px",
+                      color: "black",
+                      cursor: "pointer",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      borderRadius: "20px",
+                      whiteSpace: "nowrap",
+                      transition: "all 0.3s ease",
+                      border: "1px solid #ddd"
                     }}
                     onClick={() => {
                       debouncedSearchAPI.cancel();
@@ -942,34 +960,44 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         </div>
       </div>
 
-      <div className="text-center">
-        <h2>Online Experts</h2>
+      <div className="text-center" style={{ marginTop: isMobileScreen ? "20px" : "30px" }}>
+        <h2 style={{ fontSize: isMobileScreen ? "20px" : "24px", fontWeight: "600", marginBottom: "20px" }}>Online Experts</h2>
         <div
           className="Recommended"
-          style={{ display: "flex", flexDirection: "row",justifyContent:"center" }}
+          style={{ 
+            display: "flex", 
+            flexDirection: "row",
+            justifyContent:"center",
+            width: "100%",
+            padding: isMobileScreen ? "0 10px" : "0 20px"
+          }}
         >
           {activeTrainer && activeTrainer?.length ? (
               <>
                 <Row
-            
                   lg={4}
-                  md={1}
-                  sm={1}
+                  md={2}
+                  sm={2}
                   xs={1}
                   style={{
                     display:'flex',
                     flexDirection:"row",
-                    // justifyContent:"center",
-                    width: isMobileScreen ? "100%" : "100%",
+                    width: "100%",
                     padding:"0px",
-                    justifyContent:"center"
+                    justifyContent:"center",
+                    margin: "0"
                   }}
                   className="recent-slider recent-chat"
                 >
                   
                  {activeTrainer?.map((data, index) => {
                     return (
-                      <Col key={index} className="item" style={{maxWidth:isMobileScreen?"130px":"230px",padding:"15px"}}>
+                      <Col key={index} className="item" style={{
+                        maxWidth: isMobileScreen ? "150px" : "250px",
+                        minWidth: isMobileScreen ? "130px" : "200px",
+                        padding: isMobileScreen ? "10px" : "15px",
+                        flex: "0 0 auto"
+                      }}>
                         <Trainer
                           trainer={data.trainer_info}
                           onClickFunc={() => {

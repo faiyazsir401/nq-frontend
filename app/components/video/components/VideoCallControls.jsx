@@ -237,6 +237,8 @@ export const VideoCallControls = ({
         }}
         centered
         className="clip-exit-confirm-modal"
+        backdrop="static"
+        keyboard={false}
       >
         <ModalHeader
           toggle={() => {

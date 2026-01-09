@@ -461,7 +461,11 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                 src="/assets/images/logo/netquix-logo.png"
                 alt="logo"
                 className="custom-image"
-
+                onClick={() => {
+                  router.push(routingPaths.dashboard);
+                  dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.HOME));
+                }}
+                style={{ cursor: "pointer" }}
               />
             </div>}
 
@@ -521,7 +525,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                     }`}
                     aria-label="My Locker"
                   >
-                    <HomeIcon size={18} />
+                    <HomeIcon size={22} />
                   </NavLink>
                   <p className="menu-name px-2">My Locker</p>
                 </li>
@@ -547,7 +551,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                       }`}
                       aria-label="Upcoming Sessions"
                     >
-                      <CalendarIcon size={18} />
+                      <CalendarIcon size={22} />
                     </NavLink>
                     <p className="menu-name px-2">Upcoming Sessions</p>
                   </li>
@@ -575,7 +579,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                       data-intro=""
                       aria-label="Book Expert"
                     >
-                      <Book size={18} />
+                      <Book size={22} />
                     </NavLink>
                     <p className="menu-name px-2">Book Expert</p>
                   </li>
@@ -591,7 +595,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                     data-intro=""
                     aria-label="My Uploads"
                   >
-                    <FileIcon size={18} />
+                    <FileIcon size={22} />
                   </NavLink>
                   <p className="menu-name px-2">My Uploads</p>
                 </li>
@@ -707,7 +711,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                       data-intro=""
                       aria-label="Upcoming Sessions"
                     >
-                      <CalendarIcon size={18} />
+                      <CalendarIcon size={22} />
                     </NavLink>
                     <p className="menu-name px-2">Upcoming Sessions</p>
                   </li>
@@ -725,7 +729,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                       }`}
                       aria-label="Notifications"
                     >
-                      <BellIcon size={18} />
+                      <BellIcon size={22} />
                     </NavLink>
 
                   </div>
@@ -742,7 +746,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                     data-intro="You can change settings by clicking here"
                     aria-label="Settings"
                   >
-                    <SettingsIcon size={18} />
+                    <SettingsIcon size={22} />
                   </NavLink>
 
                   <p className="menu-name px-2">Settings</p>
@@ -779,7 +783,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                     }`}
                     aria-label="Transactions"
                   >
-                    <CreditCardIcon size={18} />
+                    <CreditCardIcon size={22} />
                   </NavLink>
 
                   {/* </div> */}
@@ -797,7 +801,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                       }`}
                       aria-label="My Community"
                     >
-                      <UsersIcon size={18} />
+                      <UsersIcon size={22} />
                     </NavLink>
 
                     {/* </div> */}
@@ -830,7 +834,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                       }`}
                       aria-label="Contact Us"
                     >
-                      <MessageCircleIcon size={18} />
+                      <MessageCircleIcon size={22} />
                     </NavLink>
 
                     {/* </div> */}
@@ -861,7 +865,7 @@ const Index = ({ openCloseToggleSideNav, setOpenCloseToggleSideNav }) => {
                     className="icon-btn btn-light"
                     aria-label="Logout"
                   >
-                    <LogOutIcon size={18} />
+                    <LogOutIcon size={22} />
                   </NavLink>
 
                   <p className="menu-name px-2" style={{ color: "black", fontWeight: "500" }}>Logout</p>

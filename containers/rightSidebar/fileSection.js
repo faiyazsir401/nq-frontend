@@ -16,6 +16,7 @@ import { Utils } from "../../utils/utils";
 import { authAction, authState } from "../../app/components/auth/auth.slice";
 import { awsS3Url } from "../../utils/constant";
 import { useMediaQuery } from "../../app/hook/useMediaQuery";
+import { Spinner } from "reactstrap";
 
 const fiveImageGallary = [
   {
@@ -169,7 +170,7 @@ const FileSection = (props) => {
   const [currentReportData, setCurrentReportData] = useState({})
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
   const [screenShots, setScreenShots] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const width500 = useMediaQuery(500);
 
@@ -205,17 +206,22 @@ const FileSection = (props) => {
   }, []);
 
   const getMyClips = async () => {
-    setClips([])
-    setTraineeClips([])
-    var res = await myClips({})
-    let temp = res?.data
-    temp = temp.map(vl => { return { ...vl, show: false } })
-    if (temp.length > 0) temp[0].show = true
-    setClips([...temp])
-    var res2 = await traineeClips({})
-    setTraineeClips(res2?.data)
-    var res3 = await reports({})
-    setReportsData(res3?.result || [])
+    setIsLoading(true);
+    try {
+      setClips([])
+      setTraineeClips([])
+      var res = await myClips({})
+      let temp = res?.data
+      temp = temp.map(vl => { return { ...vl, show: false } })
+      if (temp.length > 0) temp[0].show = true
+      setClips([...temp])
+      var res2 = await traineeClips({})
+      setTraineeClips(res2?.data)
+      var res3 = await reports({})
+      setReportsData(res3?.result || [])
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => { setActiveTab("media") }, [])
@@ -302,6 +308,21 @@ const FileSection = (props) => {
       <div className="file-tab">
         <TabContent activeTab={activeTab} className="custom-scroll">
           <TabPane tabId="media">
+            {isLoading ? (
+              <div style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                minHeight: "240px",
+                gap: "12px"
+              }}>
+                <Spinner color="primary" style={{ width: "2.5rem", height: "2.5rem" }} />
+                <h5 style={{ color: "#666", margin: 0, fontSize: "14px" }}>
+                  Loading your clips...
+                </h5>
+              </div>
+            ) : (
             <div className="media-gallery portfolio-section grid-portfolio">
               {clips?.length ? clips?.map((cl, ind) =>
                 <div className={`collapse-block ${!cl?.show ? "" : "open"}`}>
@@ -358,7 +379,7 @@ const FileSection = (props) => {
                 </div>
               </>}
             </div>
-
+            )}
           </TabPane>
           <TabPane tabId="trainee">
             <div className="media-gallery portfolio-section grid-portfolio">

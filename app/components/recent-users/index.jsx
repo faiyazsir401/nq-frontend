@@ -180,23 +180,28 @@ const RecentUsers = () => {
           maxHeight: "95%",
           marginTop: "5px",
           overflowY: "auto",
-          padding: width600 ? "8px" : "10px"
+          padding: width600 ? "8px" : "10px",
+          overflowX: "hidden"
         }}
       >
         <div
           className="row"
-          style={{ justifyContent: "center", paddingTop: "5px" }}
+          style={{ justifyContent: "center", paddingTop: "5px", margin: "0" }}
         >
           <div
             className="recent-users"
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gridGap: width600 ? "12px" : "15px",
+              display: "flex",
+              flexWrap: "nowrap",
+              gap: width600 ? "12px" : "15px",
               paddingTop: "5px",
               width: "100%",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               alignItems: "center",
+              overflowX: "auto",
+              overflowY: "hidden",
+              scrollbarWidth: "thin",
+              scrollbarColor: "#ccc transparent"
             }}
           >
             {/* Render images dynamically */}
@@ -215,7 +220,8 @@ const RecentUsers = () => {
                     padding: width600 ? "8px 4px" : "10px",
                     borderRadius: "8px",
                     transition: "all 0.3s ease",
-                    width: "100%",
+                    minWidth: width600 ? "80px" : "100px",
+                    flexShrink: 0
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = "#f5f5f5";
@@ -303,7 +309,8 @@ const RecentUsers = () => {
                     padding: width600 ? "8px 4px" : "10px",
                     borderRadius: "8px",
                     transition: "all 0.3s ease",
-                    width: "100%",
+                    minWidth: width600 ? "80px" : "100px",
+                    flexShrink: 0
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = "#f5f5f5";

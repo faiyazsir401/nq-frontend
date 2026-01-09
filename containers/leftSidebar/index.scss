@@ -3,7 +3,25 @@
     margin-top: 10px;
     color: black;
     font-weight: 500;
+}
 
+// Active state styling for sidebar icons
+.sidebar-top .icon-btn.active {
+    background-color: #000080 !important;
+    color: white !important;
+    
+    svg {
+        color: white !important;
+        stroke: white !important;
+    }
+}
+
+// Ensure icons are properly sized
+.sidebar-top .icon-btn {
+    svg {
+        width: 22px;
+        height: 22px;
+    }
 }
 
 .card-body.change-number.Home {

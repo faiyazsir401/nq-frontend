@@ -162,21 +162,9 @@ const UpcomingSession = ({ accountType = null }) => {
               </Nav>
               <TabContent activeTab={activeTabs}>
                 {
-                  Array(bookingButton.length).fill().map((_, index) => <TabPane tabId={bookingButton[index]}>
-                  {activeTabs && scheduledMeetingDetails.length > 0 ? (
-                    <BookingList key={`${activeTabs}_${index}`} bookings={scheduledMeetingDetails} activeTabs={activeTabs}/>
-                  ) : (
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginTop: "40px",
-                      }}
-                    >
-                      <h5 className="block-title">
-                        {not_data_for_booking[activeTabs]}
-                      </h5>
-                    </div>
+                  Array(bookingButton.length).fill().map((_, index) => <TabPane key={`tab-pane-${bookingButton[index]}`} tabId={bookingButton[index]}>
+                  {activeTabs && (
+                    <BookingList key={`${activeTabs}_${index}`} activeCenterContainerTab="upcomingLesson" bookings={scheduledMeetingDetails} activeTabs={activeTabs}/>
                   )}
                 </TabPane>)
                 }
