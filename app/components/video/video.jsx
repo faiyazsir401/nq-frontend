@@ -78,6 +78,7 @@ import { useVideoPlayback } from "./hooks/useVideoPlayback";
 import { formatTime, calculateCanvasDimensions } from "./utils/videoUtils";
 import { VideoCallControls } from "./components/VideoCallControls";
 import { ClipsContainer } from "./components/ClipsContainer";
+import CenterMessage from "../common/CenterMessage";
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
 let canvasConfigs = {
@@ -2654,17 +2655,15 @@ useEffect(() => {
                 // top: height < 500 ? "-63px" : ""
               }}
             >
-              {displayMsg?.msg ? (
-                <div
-                  className="no-user-joined font-weight-bold text-center"
-                  style={{
-                    margin: displayMsg?.msg ? (width1000 ? "0px" : "10px") : "",
-                    zIndex: displayMsg?.msg ? 8 : 1,
-                    fontSize: width1000 ? "14px" : "20px",
+              {displayMsg?.showMsg && displayMsg?.msg ? (
+                <CenterMessage
+                  message={displayMsg.msg}
+                  type="waiting"
+                  showSpinner={true}
+                  style={{ 
+                    maxWidth: width1000 ? "90%" : "500px"
                   }}
-                >
-                  {displayMsg?.msg}
-                </div>
+                />
               ) : null}
               {selectedClips?.length ? (
                 <div
@@ -3585,17 +3584,15 @@ useEffect(() => {
                 // top: height < 500 ? "-63px" : ""
               }}
             >
-              {displayMsg?.msg ? (
-                <div
-                  className="no-user-joined font-weight-bold text-center"
-                  style={{
-                    margin: displayMsg?.msg ? (width1000 ? "0px" : "10px") : "",
-                    zIndex: displayMsg?.msg ? 8 : 1,
-                    fontSize: width1000 ? "14px" : "20px",
+              {displayMsg?.showMsg && displayMsg?.msg ? (
+                <CenterMessage
+                  message={displayMsg.msg}
+                  type="waiting"
+                  showSpinner={true}
+                  style={{ 
+                    maxWidth: width1000 ? "90%" : "500px"
                   }}
-                >
-                  {displayMsg?.msg}
-                </div>
+                />
               ) : null}
             
               {selectedClips?.length ? (

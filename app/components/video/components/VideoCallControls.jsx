@@ -12,6 +12,7 @@ import {
 import { FaLock, FaUnlock } from 'react-icons/fa';
 import { AccountType } from '../../../common/constants';
 import { Modal, ModalBody, ModalFooter, ModalHeader, Button } from 'reactstrap';
+import './VideoCallControls.scss';
 
 /**
  * Video call action buttons component
@@ -234,6 +235,8 @@ export const VideoCallControls = ({
         toggle={() => {
           setIsOpenConfirmProp(false);
         }}
+        centered
+        className="clip-exit-confirm-modal"
       >
         <ModalHeader
           toggle={() => {
@@ -241,11 +244,29 @@ export const VideoCallControls = ({
             setSelectedClips([]);
           }}
           close={() => <></>}
+          className="clip-exit-confirm-modal__header"
         >
-          Confirm
+          <div className="clip-exit-confirm-modal__title">
+            <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+            <span>Confirm Exit</span>
+          </div>
         </ModalHeader>
-        <ModalBody>Are you sure you want to exit clip analysis mode?</ModalBody>
-        <ModalFooter>
+        <ModalBody className="clip-exit-confirm-modal__body">
+          <p>Are you sure you want to exit clip analysis mode?</p>
+          <p className="clip-exit-confirm-modal__subtext">
+            Your selected clips will be cleared and you'll return to the regular call view.
+          </p>
+        </ModalBody>
+        <ModalFooter className="clip-exit-confirm-modal__footer">
+          <Button
+            color="secondary"
+            onClick={() => {
+              setIsOpenConfirmProp(false);
+            }}
+            className="clip-exit-confirm-modal__btn-cancel"
+          >
+            Cancel
+          </Button>
           <Button
             color="primary"
             onClick={() => {
@@ -253,16 +274,10 @@ export const VideoCallControls = ({
               setSelectedClips([]);
               setIsOpenConfirmProp(false);
             }}
+            className="clip-exit-confirm-modal__btn-confirm"
           >
+            <i className="fa fa-check" aria-hidden="true" style={{ marginRight: "8px" }}></i>
             Confirm
-          </Button>{' '}
-          <Button
-            color="secondary"
-            onClick={() => {
-              setIsOpenConfirmProp(false);
-            }}
-          >
-            Cancel
           </Button>
         </ModalFooter>
       </Modal>

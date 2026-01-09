@@ -76,30 +76,33 @@ const OnlineUserCard = ({ trainer }) => {
                     className="instant"
                     style={{
                         marginTop: width600 ? "4px" : "6px",
-                        background: "#dc3545",
+                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                         border: "none",
                         borderRadius: "4px",
                         padding: width600 ? "6px 8px" : "8px 12px",
                         cursor: "pointer",
                         transition: "all 0.3s ease",
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                        boxShadow: "0 2px 6px rgba(102, 126, 234, 0.4)"
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "#c82333";
+                        e.currentTarget.style.background = "linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)";
                         e.currentTarget.style.transform = "scale(1.02)";
+                        e.currentTarget.style.boxShadow = "0 4px 8px rgba(102, 126, 234, 0.6)";
                     }}
                     onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "#dc3545";
+                        e.currentTarget.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
                         e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 2px 6px rgba(102, 126, 234, 0.4)";
                     }}
                 >
                     <h5 style={{
                         fontSize: width600 ? "10px" : "12px",
-                        fontWeight: 600,
+                        fontWeight: 700,
                         margin: 0,
-                        color: "white",
+                        color: "#ffffff",
                         textAlign: "center",
-                        letterSpacing: "0.5px"
+                        letterSpacing: "0.8px",
+                        textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)"
                     }}>INSTANT LESSON</h5>
                 </div>
             </div>

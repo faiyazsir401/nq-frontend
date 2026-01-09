@@ -8,6 +8,7 @@ import { SocketContext } from "../socket/SocketProvider";
 import { EVENTS } from "../../../helpers/events";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import CenterMessage from "../common/CenterMessage";
 import "./InstantLessonModal.scss";
 
 const InstantLessonModal = () => {
@@ -311,25 +312,29 @@ const InstantLessonModal = () => {
 
             {isError && (
               <div className="error-message" role="alert">
+                <i className="fa fa-exclamation-triangle" aria-hidden="true" style={{ marginRight: "8px" }}></i>
                 {errorMessage || "An error occurred. Please try again."}
               </div>
             )}
 
             <div className="instant-lesson-content">
               <div className="trainee-info">
-                <img
-                  src={profilePicture}
-                  alt={traineeName}
-                  className="trainee-avatar"
-                  onError={(e) => {
-                    e.target.src = "/assets/images/demoUser.png";
-                  }}
-                />
+                <div className="trainee-avatar-wrapper">
+                  <img
+                    src={profilePicture}
+                    alt={traineeName}
+                    className="trainee-avatar"
+                    onError={(e) => {
+                      e.target.src = "/assets/images/demoUser.png";
+                    }}
+                  />
+                  <div className="avatar-ring"></div>
+                </div>
                 <div className="trainee-details">
                   <h4>{traineeName}</h4>
                   <p className="lesson-type">
                     <i className="fa fa-clock-o" aria-hidden="true"></i>
-                    {lessonTypeLabel}
+                    <span>{lessonTypeLabel}</span>
                   </p>
                 </div>
               </div>
@@ -337,17 +342,24 @@ const InstantLessonModal = () => {
               {!isExpired && (
                 <>
                   <div className="countdown-timer">
-                    <div className="timer-label">Time Remaining</div>
+                    <div className="timer-label">
+                      <i className="fa fa-hourglass-half" aria-hidden="true"></i>
+                      Time Remaining
+                    </div>
                     <div className={`timer-value ${timeRemaining <= 10 ? "timer-warning" : ""}`}>
                       {formatTime(timeRemaining)}
                     </div>
                   </div>
                   {uiState === UI_STATES.ACCEPTING && (
-                    <div className="waiting-message" style={{ marginTop: "15px", padding: "10px", background: "#e7f3ff", borderRadius: "5px", textAlign: "center" }}>
-                      <p style={{ margin: 0, color: "#0066cc", fontWeight: "500" }}>
-                        <i className="fa fa-clock-o" aria-hidden="true" style={{ marginRight: "5px" }}></i>
-                        Waiting for trainee to complete video selection...
-                      </p>
+                    <div className="waiting-message">
+                      <div className="waiting-message__content">
+                        <div className="waiting-spinner">
+                          <div className="spinner-dot"></div>
+                          <div className="spinner-dot"></div>
+                          <div className="spinner-dot"></div>
+                        </div>
+                        <p>Waiting for trainee to complete video selection...</p>
+                      </div>
                     </div>
                   )}
                 </>
@@ -355,6 +367,7 @@ const InstantLessonModal = () => {
 
               {isExpired && (
                 <div className="expired-message">
+                  <i className="fa fa-clock-o" aria-hidden="true"></i>
                   <p>The lesson request has expired.</p>
                 </div>
               )}

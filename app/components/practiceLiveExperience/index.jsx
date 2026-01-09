@@ -38,6 +38,7 @@ import GuideModal from "./GuideModal";
 import "./index.scss";
 import Notes from "./Notes";
 import { useMediaQuery } from "../../hook/useMediaQuery";
+import CenterMessage from "../common/CenterMessage";
 
 let storedLocalDrawPaths = { sender: [], receiver: [] };
 let selectedShape = null;
@@ -1599,16 +1600,12 @@ export default function PracticeLiveExperience({
               flexDirection: "column",
             }}
           >
-            {displayMsg?.msg && (
-              <div
-                className="no-user-joined font-weight-bold text-center"
-                style={{
-                  margin: displayMsg?.msg ? "auto" : "",
-                  zIndex: displayMsg?.msg ? 8 : 1,
-                }}
-              >
-                {displayMsg?.msg}
-              </div>
+            {displayMsg?.showMsg && displayMsg?.msg && (
+              <CenterMessage
+                message={displayMsg.msg}
+                type="waiting"
+                showSpinner={true}
+              />
             )}
 
             {selectedClips?.length ? (

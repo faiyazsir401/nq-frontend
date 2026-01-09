@@ -68,13 +68,24 @@
 }
 
 .error-message {
-  background: rgba(220, 53, 69, 0.2);
-  border: 1px solid rgba(220, 53, 69, 0.5);
-  border-radius: 6px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
+  background: rgba(220, 53, 69, 0.25);
+  border: 1px solid rgba(220, 53, 69, 0.6);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
   color: #fff;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+
+  i {
+    font-size: 1.1rem;
+  }
 }
 
 .expired-message {
@@ -145,20 +156,47 @@
   .trainee-info {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
     margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
     backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
 
-    .trainee-avatar {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .trainee-avatar-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      .trainee-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        position: relative;
+        z-index: 2;
+      }
+
+      .avatar-ring {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        animation: pulse-ring 2s infinite;
+        z-index: 1;
+      }
     }
 
     .trainee-details {
@@ -166,20 +204,26 @@
 
       h4 {
         margin: 0 0 0.5rem 0;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: 600;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
       .lesson-type {
         margin: 0;
-        font-size: 0.9rem;
-        opacity: 0.9;
+        font-size: 0.95rem;
+        opacity: 0.95;
         display: flex;
         align-items: center;
         gap: 0.5rem;
 
         i {
           font-size: 1rem;
+          opacity: 0.9;
+        }
+
+        span {
+          font-weight: 500;
         }
       }
     }
@@ -187,32 +231,145 @@
 
   .countdown-timer {
     text-align: center;
-    padding: 1.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
+    padding: 1.75rem;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
     backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 1rem;
 
     .timer-label {
-      font-size: 0.9rem;
-      opacity: 0.9;
-      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      opacity: 0.95;
+      margin-bottom: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1rem;
+      }
     }
 
     .timer-value {
-      font-size: 2.5rem;
+      font-size: 2.75rem;
       font-weight: 700;
       font-family: "Courier New", monospace;
       color: #fff;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       transition: all 0.3s ease;
+      line-height: 1;
 
       &.timer-warning {
         color: #ff6b6b;
         animation: blink 1s infinite;
+        text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
       }
     }
+  }
+
+  .waiting-message {
+    margin-top: 1rem;
+    padding: 1.25rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+
+    &__content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+
+      .waiting-spinner {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+
+        .spinner-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.9);
+          animation: dot-bounce 1.4s infinite ease-in-out both;
+
+          &:nth-child(1) {
+            animation-delay: -0.32s;
+          }
+
+          &:nth-child(2) {
+            animation-delay: -0.16s;
+          }
+        }
+      }
+
+      p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 500;
+        font-size: 1rem;
+        line-height: 1.5;
+      }
+    }
+  }
+
+  .expired-message {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+
+    i {
+      font-size: 2.5rem;
+      opacity: 0.8;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1.15rem;
+      opacity: 0.95;
+      font-weight: 500;
+    }
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dot-bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -245,6 +402,9 @@
     justify-content: center;
     gap: 0.5rem;
     position: relative;
+    // Touch-friendly on mobile
+    min-height: 44px;
+    -webkit-tap-highlight-color: transparent;
 
     i {
       font-size: 1rem;
@@ -353,11 +513,18 @@
   }
 }
 
-// Mobile responsive
-@media (max-width: 576px) {
+// Tablet responsive
+@media (max-width: 1024px) {
   .instant-lesson-modal {
-    width: 95%;
-    margin: 1rem;
+    max-width: 90%;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .instant-lesson-modal {
+    width: 90%;
+    margin: 1rem auto;
   }
 
   .instant-lesson-modal-body {
@@ -365,32 +532,174 @@
   }
 
   .instant-lesson-header {
+    margin-bottom: 1.25rem;
+
     .alert-icon {
       font-size: 2.5rem;
+      margin-bottom: 0.5rem;
     }
 
     h3 {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
     }
   }
 
   .instant-lesson-content {
     .trainee-info {
-      .trainee-avatar {
-        width: 50px;
-        height: 50px;
+      gap: 1rem;
+      padding: 1rem;
+
+      .trainee-avatar-wrapper {
+        .trainee-avatar {
+          width: 60px;
+          height: 60px;
+        }
+
+        .avatar-ring {
+          width: 70px;
+          height: 70px;
+        }
+      }
+
+      .trainee-details {
+        h4 {
+          font-size: 1.1rem;
+        }
+
+        .lesson-type {
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    .countdown-timer {
+      padding: 1.25rem;
+
+      .timer-label {
+        font-size: 0.8rem;
+      }
+
+      .timer-value {
+        font-size: 2.25rem;
+      }
+    }
+
+    .waiting-message {
+      padding: 1rem;
+
+      &__content {
+        gap: 0.75rem;
+
+        p {
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+
+  .instant-lesson-footer {
+    padding: 1rem 1.5rem;
+    gap: 0.75rem;
+
+    .btn {
+      padding: 0.65rem 1.25rem;
+      font-size: 0.95rem;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .instant-lesson-modal {
+    width: 95%;
+    margin: 0.5rem;
+  }
+
+  .instant-lesson-modal-body {
+    padding: 1.25rem;
+  }
+
+  .instant-lesson-header {
+    margin-bottom: 1rem;
+
+    .alert-icon {
+      font-size: 2rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
+
+  .instant-lesson-content {
+    .trainee-info {
+      flex-direction: column;
+      text-align: center;
+      gap: 0.75rem;
+      padding: 1rem;
+
+      .trainee-avatar-wrapper {
+        .trainee-avatar {
+          width: 55px;
+          height: 55px;
+        }
+
+        .avatar-ring {
+          width: 65px;
+          height: 65px;
+        }
       }
 
       .trainee-details {
         h4 {
           font-size: 1rem;
         }
+
+        .lesson-type {
+          font-size: 0.8rem;
+          justify-content: center;
+        }
       }
     }
 
     .countdown-timer {
+      padding: 1rem;
+
+      .timer-label {
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+      }
+
       .timer-value {
         font-size: 2rem;
+      }
+    }
+
+    .waiting-message {
+      padding: 0.875rem;
+
+      &__content {
+        gap: 0.5rem;
+
+        .waiting-spinner .spinner-dot {
+          width: 8px;
+          height: 8px;
+        }
+
+        p {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .expired-message {
+      padding: 1.5rem 1rem;
+
+      i {
+        font-size: 2rem;
+      }
+
+      p {
+        font-size: 1rem;
       }
     }
   }
@@ -398,9 +707,79 @@
   .instant-lesson-footer {
     padding: 1rem;
     flex-direction: column;
+    gap: 0.75rem;
 
     .btn {
       width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  .decline-confirm-modal {
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: 1rem;
+    }
+
+    .modal-footer {
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+
+      .btn {
+        width: 100%;
+        min-width: auto;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .instant-lesson-modal {
+    width: 98%;
+    margin: 0.25rem;
+  }
+
+  .instant-lesson-modal-body {
+    padding: 1rem;
+  }
+
+  .instant-lesson-header {
+    .alert-icon {
+      font-size: 1.75rem;
+    }
+
+    h3 {
+      font-size: 1rem;
+    }
+  }
+
+  .instant-lesson-content {
+    .trainee-info {
+      padding: 0.875rem;
+
+      .trainee-avatar-wrapper .trainee-avatar {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    .countdown-timer {
+      padding: 0.875rem;
+
+      .timer-value {
+        font-size: 1.75rem;
+      }
+    }
+  }
+
+  .instant-lesson-footer {
+    padding: 0.875rem;
+
+    .btn {
+      padding: 0.7rem 0.875rem;
+      font-size: 0.9rem;
     }
   }
 }

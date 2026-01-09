@@ -41,9 +41,10 @@ import { UpdateHourlyRateForm } from "../../app/components/trainer/settings/hour
 import TimePicker from "rc-time-picker";
 import { SettalInBankAccount } from "../../app/components/trainer/settings/settal_in_bank";
 import { settelReqestToBankAccount } from "../../app/components/trainer/trainer.api";
-import { updateAccountPrivacy } from "../../app/common/common.api";
+import { updateAccountPrivacy, getS3SignUrlForProfile, pushProfilePhotoToS3 } from "../../app/common/common.api";
 import ChangePhoneNumber from "../../app/components/change-number";
 import NotificationSettings from "../../app/components/notification-settings";
+import CropImage from "../../app/components/cards/user-card/crop-modal";
 
 const NOTIFICATION_TYPES = [
   "Promotional Email",
@@ -80,6 +81,11 @@ const SettingSection = (props) => {
     editStatus: false,
     profile_picture: undefined,
   });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [croppedImage, setCroppedImage] = useState(null);
+  const [displayedImage, setDisplayedImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [collapseShow, setCollapseShow] = useState({
     security: false,
     privacy: false,
@@ -176,6 +182,7 @@ const SettingSection = (props) => {
       profile_picture: userInfo.profile_picture,
     }));
     setWorkingHours(userInfo?.extraInfo?.working_hours);
+    setDisplayedImage(userInfo?.profile_picture);
   }, [userInfo]);
 
   // useEffect(())
@@ -279,26 +286,75 @@ const SettingSection = (props) => {
     config.wallpaper = wallpaper;
   };
 
-  const handelSelectFile = (event) => {
-    if (event && event.target && event.target.files && event.target.files[0]) {
-      const { files } = event.target;
-      const selectedFile = files[0];
-      if (selectedFile instanceof File) {
-        const fileSizeLessthan2Mb = Utils.fileSizeLessthan2Mb(selectedFile);
-        if (fileSizeLessthan2Mb) {
-          dispatch(uploadProfilePictureAsync({ files: selectedFile }));
-        } else {
-          setIsError(!fileSizeLessthan2Mb);
-        }
-      } else {
-        console.error("Invalid file selected.");
-      }
+  const handlePictureChange = (e) => {
+    try {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        const imageElement = new Image();
+        const imageUrl = reader.result?.toString() || "";
+        imageElement.src = imageUrl;
+
+        imageElement.addEventListener("load", (e) => {
+          const { naturalWidth, naturalHeight } = e.currentTarget;
+          const MIN_DIMENSION = 150;
+          if (naturalWidth < MIN_DIMENSION || naturalHeight < MIN_DIMENSION) {
+            toast.error("Image must be at least 150 x 150 pixels.");
+            return;
+          }
+        });
+        setSelectedImage(imageUrl);
+        setIsCropModalOpen(true);
+      });
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Error reading file:", error);
     }
-    event.stopPropagation();
+  };
+
+  const handleSavePicture = async (croppedImageBlob) => {
+    if (croppedImageBlob) {
+      const fileObj = Utils?.blobToFile(
+        croppedImageBlob,
+        `${profile?.username || userInfo?.fullname || 'profile'}.png`,
+        "image/png"
+      );
+      await handelSelectFile(fileObj, croppedImageBlob);
+    }
+  };
+
+  const handelSelectFile = async (fileObj, blob) => {
+    if (!fileObj || !blob) {
+      toast.error("Please select an image");
+      return;
+    }
+
+    try {
+      const payload = { filename: fileObj.name, fileType: fileObj.type };
+      const data = await getS3SignUrlForProfile(payload);
+
+      if (data?.url) {
+        await pushProfilePhotoToS3(data.url, blob, setUploadProgress, () => {
+          dispatch(getMeAsync());
+          setCroppedImage(null);
+          setSelectedImage(null);
+          setIsCropModalOpen(false);
+          toast.success("Profile picture updated successfully");
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to upload profile picture");
+      console.error("Error uploading:", error);
+    }
   };
 
   const handelClearFile = () => {
     setProfile({ ...profile, profile_picture: null });
+    setDisplayedImage(null);
+    setCroppedImage(null);
+    setSelectedImage(null);
     dispatch(removeProfilePicture(null));
   };
 
@@ -354,55 +410,128 @@ const SettingSection = (props) => {
         </div>
         <div className="profile-box">
           <div className={`media ${profile.editStatus ? "open" : ""}`}>
-            {profile.profile_picture && profile.editStatus ? (
-              <div className="border border-dark rounded mt-2">
-                <i
-                  className="fa fa-times pointer"
-                  aria-hidden="true"
-                  onClick={handelClearFile}
+            <div style={{ position: "relative", display: "inline-block" }}>
+              {profile.editStatus ? (
+                <div style={{ position: "relative" }}>
+                  {croppedImage ? (
+                    <div style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "50%",
+                      border: "2px solid #000080",
+                      padding: "2px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "#f0f0f0"
+                    }}>
+                      <span style={{ color: "#000080", fontWeight: "500", fontSize: "12px" }}>Uploading...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        style={{
+                          position: "relative",
+                          width: "80px",
+                          height: "80px",
+                          borderRadius: "50%",
+                          border: "2px solid #000080",
+                          padding: "2px",
+                          cursor: "pointer",
+                          overflow: "hidden"
+                        }}
+                        onMouseEnter={(e) => {
+                          const overlay = e.currentTarget.querySelector('.profile-edit-overlay-settings');
+                          if (overlay) overlay.style.opacity = "1";
+                        }}
+                        onMouseLeave={(e) => {
+                          const overlay = e.currentTarget.querySelector('.profile-edit-overlay-settings');
+                          if (overlay) overlay.style.opacity = "0";
+                        }}
+                        onClick={() => {
+                          document.getElementById("profilePictureInputSettings")?.click();
+                        }}
+                      >
+                        <img
+                          className={`bg-img rounded ${accountType === AccountType.TRAINEE ? "mt-2" : "mt-3"
+                            }`}
+                          src={
+                            displayedImage?.startsWith("blob:")
+                              ? displayedImage
+                              : (displayedImage
+                                ? Utils?.getImageUrlOfS3(displayedImage)
+                                : "/assets/images/avtar/user.png")
+                          }
+                          alt="Avatar"
+                          width={80}
+                          height={80}
+                          style={{
+                            borderRadius: "50%",
+                            objectFit: "cover",
+                            width: "100%",
+                            height: "100%",
+                            display: "block"
+                          }}
+                          onError={(e) => {
+                            e.target.src = "/assets/images/avtar/user.png";
+                          }}
+                        />
+                        <div
+                          className="profile-edit-overlay-settings"
+                          style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            opacity: 0,
+                            transition: "opacity 0.3s ease",
+                            backgroundColor: "rgba(0, 0, 0, 0.6)",
+                            borderRadius: "50%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                            pointerEvents: "none"
+                          }}
+                        >
+                          <Edit size={20} />
+                        </div>
+                      </div>
+                      <input
+                        id="profilePictureInputSettings"
+                        type="file"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={handlePictureChange}
+                      />
+                    </>
+                  )}
+                </div>
+              ) : (
+                <img
+                  className={`bg-img rounded ${accountType === AccountType.TRAINEE ? "mt-2" : "mt-3"
+                    }`}
+                  src={
+                    displayedImage
+                      ? Utils?.getImageUrlOfS3(displayedImage)
+                      : "/assets/images/avtar/user.png"
+                  }
+                  alt="Avatar"
+                  width={80}
+                  height={80}
                   style={{
-                    position: "absolute",
-                    left: accountType === AccountType.TRAINEE ? "14%" : "3%",
-                    top: "42%",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "2px solid #000080",
+                    padding: "2px"
+                  }}
+                  onError={(e) => {
+                    e.target.src = "/assets/images/avtar/user.png";
                   }}
                 />
-                <img
-                  className={`bg-img rounded ${accountType === !AccountType.TRAINEE && "mt-1"
-                    }`}
-                  src={Utils?.getImageUrlOfS3(profile?.profile_picture)}
-                  alt="Avatar"
-                  width={44}
-                  height={38}
-                />
-              </div>
-            ) : (
-              <div>
-                {profile.editStatus && !profile.profile_picture ? (
-                  <>
-                    <UploadFile
-                      isError={isError}
-                      onChange={handelSelectFile}
-                      values={profile && profile.profile_picture}
-                      key={"files"}
-                      name={"files"}
-                    />
-                  </>
-                ) : (
-                  <img
-                    className={`bg-img rounded ${accountType === AccountType.TRAINEE ? "mt-2" : "mt-3"
-                      }`}
-                    src={
-                      profile.profile_picture
-                        ? Utils?.getImageUrlOfS3(profile?.profile_picture)
-                        : "/assets/images/avtar/user.png"
-                    }
-                    alt="Avatar"
-                    width={44}
-                    height={40}
-                  />
-                )}
-              </div>
-            )}
+              )}
+            </div>
             {/* </div> */}
             <div className="details">
               <h5>{profile.username}</h5>
@@ -426,15 +555,33 @@ const SettingSection = (props) => {
                     onChange={(e) => ProfileHandle(e)}
                   />
                 </div>
-                {/* <div className="form-group mb-0">
-                  <input
-                    className="form-control"
-                    type="text"
-                    name="address"
-                    defaultValue={profile.address}
-                    onChange={(e) => ProfileHandle(e)}
-                  />
-                </div> */}
+                {profile.editStatus && (
+                  <div className="form-group mb-2 ml-2">
+                    <label> Profile Picture </label>
+                    <div style={{ marginTop: "8px" }}>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={() => {
+                          document.getElementById("profilePictureInputSettings")?.click();
+                        }}
+                        style={{ fontSize: "12px" }}
+                      >
+                        {croppedImage ? "Uploading..." : "Change Picture"}
+                      </button>
+                      {displayedImage && (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger ml-2"
+                          onClick={handelClearFile}
+                          style={{ fontSize: "12px" }}
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </form>
             </div>
             <div className="media-body">
@@ -1607,6 +1754,15 @@ const SettingSection = (props) => {
           </div>
         </div>
       )}
+      <CropImage
+        image={selectedImage}
+        isModalOpen={isCropModalOpen}
+        setIsModalOpen={setIsCropModalOpen}
+        croppedImage={croppedImage}
+        setCroppedImage={setCroppedImage}
+        setDisplayedImage={setDisplayedImage}
+        handleSavePicture={handleSavePicture}
+      />
     </div>
   );
 };

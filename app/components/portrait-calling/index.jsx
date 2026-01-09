@@ -21,6 +21,7 @@ import { pushProfilePhotoToS3 } from "../common/common.api";
 import { getReport, screenShotTake } from "../videoupload/videoupload.api";
 import html2canvas from "html2canvas";
 import ReportModal from "../video/reportModal";
+import CenterMessage from "../common/CenterMessage";
 import {
   Button,
   Modal,
@@ -1173,7 +1174,13 @@ const VideoCallUI = ({
         width: isLandscape ? "50%" : "100%",
       }}
     >
-      {displayMsg?.show ? <div style={{ textAlign: "center" }}>{displayMsg?.msg}</div> : null}
+      {displayMsg?.show && displayMsg?.msg && (
+        <CenterMessage
+          message={displayMsg.msg}
+          type="waiting"
+          showSpinner={true}
+        />
+      )}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
           timeRemaining={sessionEndTime}
@@ -1811,52 +1818,83 @@ const VideoCallUI = ({
       </Modal>
 
       {/* Grace Period Modal (-4 minutes) */}
-      <Modal isOpen={showGracePeriodModal} centered >
-        <ModalHeader>Thank you for using NetQwix!</ModalHeader>
-        <ModalBody>
-          <p>
-            We give our community a 5 minute grace period after each session to say good bye
-            and discuss the game plan moving forward.
-          </p>
-          <p>
-            The session will automatically close in {countdownMessage}.
-          </p>
+      <Modal isOpen={showGracePeriodModal} centered className="grace-period-modal">
+        <ModalHeader className="grace-period-modal__header">
+          <div className="grace-period-modal__title">
+            <i className="fa fa-heart" aria-hidden="true"></i>
+            <span>Thank you for using NetQwix!</span>
+          </div>
+        </ModalHeader>
+        <ModalBody className="grace-period-modal__body">
+          <div className="grace-period-modal__content">
+            <p className="grace-period-modal__main-text">
+              We give our community a 5 minute grace period after each session to say goodbye
+              and discuss the game plan moving forward.
+            </p>
+            <div className="grace-period-modal__countdown">
+              <i className="fa fa-clock-o" aria-hidden="true"></i>
+              <p className="grace-period-modal__countdown-text">
+                The session will automatically close in <strong>{countdownMessage}</strong>.
+              </p>
+            </div>
+          </div>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={() => { gracePeriodModalDismissedRef.current = true; setShowGracePeriodModal(false); }}>
-            OK
+        <ModalFooter className="grace-period-modal__footer">
+          <Button 
+            color="primary" 
+            onClick={() => { 
+              gracePeriodModalDismissedRef.current = true; 
+              setShowGracePeriodModal(false); 
+            }}
+            className="grace-period-modal__btn"
+          >
+            <i className="fa fa-check" aria-hidden="true" style={{ marginRight: "8px" }}></i>
+            Got it
           </Button>
         </ModalFooter>
       </Modal>
 
       {/* Session Ended Modal (-5 minutes) */}
-      <Modal isOpen={showSessionEndedModal} centered>
-        <ModalHeader>Your session has now ended.</ModalHeader>
-        <ModalBody>
-          <p>
-            Please make sure to rate your experience momentarily.
-          </p>
-          <p>
-            Visit your locker shortly to view your game plan.
-          </p>
-          <p>
-            Thank you for using NetQwix.
-          </p>
-          <p>
-            See you soon!
-          </p>
+      <Modal isOpen={showSessionEndedModal} centered className="session-ended-modal">
+        <ModalHeader className="session-ended-modal__header">
+          <div className="session-ended-modal__title">
+            <i className="fa fa-check-circle" aria-hidden="true"></i>
+            <span>Your session has now ended</span>
+          </div>
+        </ModalHeader>
+        <ModalBody className="session-ended-modal__body">
+          <div className="session-ended-modal__content">
+            <div className="session-ended-modal__icon-wrapper">
+              <i className="fa fa-calendar-check-o" aria-hidden="true"></i>
+            </div>
+            <p className="session-ended-modal__main-text">
+              Please make sure to rate your experience momentarily.
+            </p>
+            <p className="session-ended-modal__sub-text">
+              Visit your locker shortly to view your game plan.
+            </p>
+            <div className="session-ended-modal__footer-text">
+              <p>Thank you for using NetQwix.</p>
+              <p className="session-ended-modal__goodbye">See you soon!</p>
+            </div>
+          </div>
         </ModalBody>
-        <ModalFooter>
-          <Button color="primary" onClick={() => {
-            sessionEndedModalDismissedRef.current = true;
-            setShowSessionEndedModal(false);
-            if (accountType === AccountType.TRAINEE) {
-              setIsOpenRating(true);
-            } else {
-              setIsOpenReport(true)
-            }
-          }}>
-            OK
+        <ModalFooter className="session-ended-modal__footer">
+          <Button 
+            color="primary" 
+            onClick={() => {
+              sessionEndedModalDismissedRef.current = true;
+              setShowSessionEndedModal(false);
+              if (accountType === AccountType.TRAINEE) {
+                setIsOpenRating(true);
+              } else {
+                setIsOpenReport(true)
+              }
+            }}
+            className="session-ended-modal__btn"
+          >
+            <i className="fa fa-star" aria-hidden="true" style={{ marginRight: "8px" }}></i>
+            Rate Experience
           </Button>
         </ModalFooter>
       </Modal>
