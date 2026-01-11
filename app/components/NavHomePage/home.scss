@@ -310,6 +310,8 @@
 .banner_Slider {
   padding: 10px 0 0 0;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 
   .slick-slide {
     margin-bottom: 0 !important;
@@ -318,6 +320,8 @@
     > div {
       margin-bottom: 0 !important;
       height: auto !important;
+      max-width: 100%;
+      box-sizing: border-box;
     }
   }
 
@@ -325,6 +329,8 @@
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
     height: auto !important;
+    width: 100%;
+    max-width: 100%;
   }
 
   .slick-track {
@@ -333,6 +339,7 @@
     height: auto !important;
     display: flex !important;
     align-items: stretch !important;
+    width: 100% !important;
   }
 }
 

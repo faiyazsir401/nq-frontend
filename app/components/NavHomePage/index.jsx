@@ -35,8 +35,6 @@ import { fetchAllLatestOnlineUsers } from "../auth/auth.api";
 import { acceptFriendRequest, getFriendRequests, rejectFriendRequest } from "../../common/common.api";
 import { toast } from "react-toastify";
 import { Star } from "react-feather";
-import AddClip from "../bookings/start/AddClip";
-import { myClips } from "../../../containers/rightSidebar/fileSection.api";
 const NavHomePage = () => {
   const [progress, setProgress] = useState(0);
   const width2000 = useMediaQuery(2000);
@@ -61,27 +59,12 @@ const NavHomePage = () => {
   const [friendRequests, setFriendRequests] = useState([]);
   const [filteredSessions, setFilteredSessions] = useState([]);
   const [activeCenterTab, setActiveCenterTab] = useState("myClips");
-  const [clips, setClips] = useState([]);
   
   // Use refs to prevent duplicate API calls when switching tabs
   const hasFetchedFriendRequestsRef = useRef(false);
   const hasFetchedActiveTrainerRef = useRef(false);
   const hasFetchedScheduledMeetingsRef = useRef(false);
   
-  useEffect(() => {
-    if (accountType === AccountType.TRAINEE) {
-      getMyClips();
-    }
-  }, [accountType]);
-  
-  const getMyClips = async () => {
-    try {
-      var res = await myClips({});
-      setClips(res?.data);
-    } catch (error) {
-      console.error("Error fetching clips:", error);
-    }
-  };
   
   const getFriendRequestsApi = async () => {
     try {
@@ -436,14 +419,28 @@ const NavHomePage = () => {
               width: "100%",
               maxWidth: "100%",
               margin: "0",
+              boxSizing: "border-box",
+              overflow: "hidden"
             }}
           >
-            <div className="banner_Slider">
+            <div className="banner_Slider" style={{
+              width: "100%",
+              maxWidth: "100%",
+              boxSizing: "border-box"
+            }}>
               <Slider {...settings}>
                 {activeTrainer &&
                   activeTrainer?.map((info, index) => {
                     return (
-                      <div key={`slider-${info.trainer_info?._id}-${index}`}>
+                      <div 
+                        key={`slider-${info.trainer_info?._id}-${index}`}
+                        style={{
+                          padding: width600 ? "0 5px" : "0 8px",
+                          boxSizing: "border-box",
+                          maxWidth: width600 ? "280px" : "320px",
+                          width: "100%"
+                        }}
+                      >
                         <OnlineUserCard trainer={info.trainer_info} />
                       </div>
                     );
@@ -551,53 +548,7 @@ const NavHomePage = () => {
                 <div className="">
                   <div className="">
                     <div className="">{showRatingLabel(session.ratings)}</div>
-                    <div className="d-flex flex-wrap justify-content-center gap-2" style={{ marginTop: "8px" }}>
-                      {session.status !== "canceled" && (
-                        <button
-                          className={`btn btn-success button-effect btn-sm ${width600 ? "mr-1" : "mr-2"} btn_cancel my-1`}
-                          type="button"
-                          style={{
-                            paddingLeft: width600 ? "5px" : "auto",
-                            paddingRight: width600 ? "5px" : "auto"
-                          }}
-                          onClick={() => {
-                            if (session.trainee_clips?.length > 0) {
-                              setSelectedClips(session.trainee_clips);
-                            }
-                            setIsOpenID(session._id);
-                            setIsOpen(true);
-                          }}
-                        >
-                          Add Clip
-                        </button>
-                      )}
-                      {session.status === "booked" ? (
-                        <button
-                          className={`btn btn-dark button-effect btn-sm ${width600 ? "mr-1" : "mr-2"} btn_cancel my-1`}
-                          type="button"
-                          style={{
-                            cursor: "not-allowed",
-                            paddingLeft: width600 ? "5px" : "auto",
-                            paddingRight: width600 ? "5px" : "auto"
-                          }}
-                          disabled={true}
-                        >
-                          Booked
-                        </button>
-                      ) : session.status === "confirmed" ? (
-                        <button
-                          className={`btn btn-primary button-effect btn-sm ${width600 ? "mr-1" : "mr-2"} btn_cancel my-1`}
-                          type="button"
-                          style={{
-                            cursor: "not-allowed",
-                            paddingLeft: width600 ? "5px" : "auto",
-                            paddingRight: width600 ? "5px" : "auto"
-                          }}
-                          disabled={true}
-                        >
-                          Confirmed
-                        </button>
-                      ) : null}
+                    <div className="">
                       {renderBooking(
                         session,
                         session.status,
@@ -620,21 +571,6 @@ const NavHomePage = () => {
               </div>
             </div>
           ))}
-          {isOpenID && (
-            <AddClip
-              isOpen={isOpen}
-              onClose={() => {
-                setIsOpen(false);
-                setIsOpenID("");
-                dispatch(removeNewBookingData());
-              }}
-              trainer={filteredSessions.find(s => s._id === isOpenID)?.trainer_info?.fullname || "Trainer"}
-              selectedClips={selectedClips}
-              setSelectedClips={setSelectedClips}
-              clips={clips}
-              shareFunc={addTraineeClipInBookedSession}
-            />
-          )}
         </div>
       ) : null}
 
