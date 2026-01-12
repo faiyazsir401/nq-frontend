@@ -45,18 +45,20 @@ const RecentUsers = () => {
   const getRecentStudentApi = async () => {
     try {
       let res = await getRecentStudent();
-      setRecentStudent(res?.data);
+      setRecentStudent(res?.data || []);
     } catch (error) {
-       
+      console.error("Error fetching recent students:", error);
+      setRecentStudent([]);
     }
   };
 
   const getRecentTrainerApi = async () => {
     try {
       let res = await getRecentTrainers();
-      setRecentTrainer(res?.data);
+      setRecentTrainer(res?.data || []);
     } catch (error) {
-       
+      console.error("Error fetching recent trainers:", error);
+      setRecentTrainer([]);
     }
   };
   const getTraineeClipsApi = async (id) => {
@@ -324,7 +326,7 @@ const RecentUsers = () => {
                       }}
                       onClick={() => {
                         if (accountType === AccountType?.TRAINER) {
-                          handleStudentClick(item);
+                          handleStudentClick(item?._id || item?.id);
                           SetselectedStudentData({ ...item });
                         } else {
                           setTrainerInfo((prev) => ({
@@ -333,11 +335,11 @@ const RecentUsers = () => {
                             selected_category: null,
                           }));
                           setSelectedTrainer({
-                            id: item?.id,
-                            trainer_id: item?.id,
-                            data: trainer,
+                            id: item?.id || item?._id,
+                            trainer_id: item?.id || item?._id,
+                            data: item,
                           });
-                          dispatch(getTraineeWithSlotsAsync({ search: item?.fullname }));
+                          dispatch(getTraineeWithSlotsAsync({ search: item?.fullname || item?.fullName }));
                           setIsModalOpen(true);
                         }
                       }}
@@ -398,7 +400,7 @@ const RecentUsers = () => {
                           lineHeight: "1.3"
                         }}
                       >
-                        {item?.fullname || item.fullname}
+                        {item?.fullname || item?.fullName || 'Unknown'}
                       </h5>
                     </div>
                   </div>

@@ -1276,25 +1276,34 @@ const VideoCallUI = ({
           }}
           close={() => <></>}
           className="clip-exit-confirm-modal__header"
+          style={{ textAlign: "center" }}
         >
-          <div className="clip-exit-confirm-modal__title">
+          <div className="clip-exit-confirm-modal__title" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
             <i className="fa fa-exclamation-triangle" role="img" aria-label="Warning"></i>
             <span>Confirm Exit</span>
           </div>
         </ModalHeader>
-        <ModalBody className="clip-exit-confirm-modal__body">
-          <p>Are you sure you want to exit clip analysis mode?</p>
-          <p className="clip-exit-confirm-modal__subtext">
+        <ModalBody className="clip-exit-confirm-modal__body" style={{ textAlign: "center", padding: "1.5rem" }}>
+          <p style={{ margin: "0 0 1rem 0", fontSize: "1rem", color: "#333" }}>Are you sure you want to exit clip analysis mode?</p>
+          <p className="clip-exit-confirm-modal__subtext" style={{ margin: 0, fontSize: "0.9rem", color: "#666" }}>
             Your selected clips will be cleared and you'll return to the regular call view.
           </p>
         </ModalBody>
-        <ModalFooter className="clip-exit-confirm-modal__footer">
+        <ModalFooter className="clip-exit-confirm-modal__footer" style={{ display: "flex", justifyContent: "center", gap: "1rem", padding: "1rem 1.5rem" }}>
           <Button
             color="secondary"
             onClick={() => {
               setIsOpenConfirm(false);
             }}
             className="clip-exit-confirm-modal__btn-cancel"
+            style={{
+              backgroundColor: '#6c757d',
+              borderColor: '#6c757d',
+              color: '#ffffff',
+              minHeight: '44px',
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600'
+            }}
           >
             Cancel
           </Button>
@@ -1305,6 +1314,14 @@ const VideoCallUI = ({
               setIsOpenConfirm(false);
             }}
             className="clip-exit-confirm-modal__btn-confirm"
+            style={{
+              backgroundColor: '#007bff',
+              borderColor: '#007bff',
+              color: '#ffffff',
+              minHeight: '44px',
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600'
+            }}
           >
             <i className="fa fa-check" aria-hidden="true" style={{ marginRight: "8px" }}></i>
             Confirm
@@ -2170,31 +2187,43 @@ const VideoCallUI = ({
 
       <PermissionModal isOpen={permissionModal} errorMessage={errorMessageForPermission} />
 
-      <Modal isOpen={isConfirmModelOpen}>
-        <ModalHeader>
+      <Modal isOpen={isConfirmModelOpen} centered>
+        <ModalHeader style={{ textAlign: "center" }}>
           <h5
             style={{
-              fontSize: "22px !important"
+              fontSize: "1.5rem",
+              fontWeight: "600",
+              margin: 0
             }}
           >{`Are you sure you want to exit the session?`}</h5>
         </ModalHeader>
-        <ModalBody>
-          <div className="row"
-            style={{
-              justifyContent: "space-between"
-            }}
-          >
+        <ModalBody style={{ textAlign: "center", padding: "1.5rem" }}>
+          <p style={{ margin: "0 0 1.5rem 0", fontSize: "1rem", color: "#333" }}>
+            Exiting the session will end the call for all participants.
+          </p>
+          <div style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "1rem",
+            flexWrap: "wrap"
+          }}>
             <Button
-              className="mx-3"
-              color="primary"
+              color="secondary"
               onClick={() => {
                 setIsConfirmModelOpen(false)
+              }}
+              style={{
+                backgroundColor: '#6c757d',
+                borderColor: '#6c757d',
+                color: '#ffffff',
+                minHeight: '44px',
+                padding: '0.75rem 1.5rem',
+                fontWeight: '600'
               }}
             >
               Cancel
             </Button>
             <Button
-              className="mx-3"
               color="danger"
               onClick={() => {
                 cutCall();
@@ -2205,8 +2234,16 @@ const VideoCallUI = ({
                 }
 
               }}
+              style={{
+                backgroundColor: '#dc3545',
+                borderColor: '#dc3545',
+                color: '#ffffff',
+                minHeight: '44px',
+                padding: '0.75rem 1.5rem',
+                fontWeight: '600'
+              }}
             >
-              Yes
+              Yes, Exit
             </Button>
           </div>
         </ModalBody>

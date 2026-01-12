@@ -305,7 +305,14 @@ const InstantLessonTraineeModal = () => {
                       size="sm"
                       onClick={handleOpenVideoSelection}
                       disabled={isLoadingClips}
-                      style={{ width: "100%" }}
+                      style={{ 
+                        width: "100%",
+                        backgroundColor: '#007bff',
+                        borderColor: '#007bff',
+                        color: '#ffffff',
+                        minHeight: '44px',
+                        fontWeight: '600'
+                      }}
                     >
                       {selectedVideos.length === 0 ? "Select Videos" : "Add More Videos"}
                     </Button>
@@ -348,6 +355,13 @@ const InstantLessonTraineeModal = () => {
               color="secondary"
               onClick={handleCancel}
               className="cancel-btn"
+              style={{
+                backgroundColor: '#6c757d',
+                borderColor: '#6c757d',
+                color: '#ffffff',
+                minHeight: '44px',
+                fontWeight: '600'
+              }}
             >
               Cancel
             </Button>
@@ -356,10 +370,17 @@ const InstantLessonTraineeModal = () => {
               currentStep === INSTANT_LESSON_STEPS.COACH_ACCEPTED ||
               currentStep === INSTANT_LESSON_STEPS.JOIN_LESSON) && (
               <Button
-                color="success"
+                color="primary"
                 onClick={handleJoinLesson}
                 className="join-btn"
                 disabled={!canJoin}
+                style={{
+                  backgroundColor: '#007bff',
+                  borderColor: '#007bff',
+                  color: '#ffffff',
+                  minHeight: '44px',
+                  fontWeight: '600'
+                }}
               >
                 {canJoin ? (
                   <>

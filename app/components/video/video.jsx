@@ -2325,6 +2325,8 @@ const togglePlay = (num) => {
           toggle={() => {
             setIsOpenConfirm(false);
           }}
+          centered
+          className="clip-exit-confirm-modal"
         >
           <ModalHeader
             toggle={() => {
@@ -2332,13 +2334,38 @@ const togglePlay = (num) => {
               setSelectedClips([])
             }}
             close={() => <></>}
+            style={{ textAlign: "center" }}
           >
-            Confirm
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+              <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+              <span>Confirm Exit</span>
+            </div>
           </ModalHeader>
-          <ModalBody>
-            Are you sure you want to exit clip analysis mode?
+          <ModalBody style={{ textAlign: "center", padding: "1.5rem" }}>
+            <p style={{ margin: "0 0 1rem 0", fontSize: "1rem", color: "#333" }}>
+              Are you sure you want to exit clip analysis mode?
+            </p>
+            <p style={{ margin: 0, fontSize: "0.9rem", color: "#666" }}>
+              Your selected clips will be cleared and you'll return to the regular call view.
+            </p>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter style={{ display: "flex", justifyContent: "center", gap: "1rem", padding: "1rem 1.5rem" }}>
+            <Button
+              color="secondary"
+              onClick={() => {
+                setIsOpenConfirm(false);
+              }}
+              style={{
+                backgroundColor: '#6c757d',
+                borderColor: '#6c757d',
+                color: '#ffffff',
+                minHeight: '44px',
+                padding: '0.75rem 1.5rem',
+                fontWeight: '600'
+              }}
+            >
+              Cancel
+            </Button>
             <Button
               color="primary"
               onClick={() => {
@@ -2346,16 +2373,17 @@ const togglePlay = (num) => {
                 setSelectedClips([]);
                 setIsOpenConfirm(false);
               }}
-            >
-              Confirm
-            </Button>{" "}
-            <Button
-              color="secondary"
-              onClick={() => {
-                setIsOpenConfirm(false);
+              style={{
+                backgroundColor: '#007bff',
+                borderColor: '#007bff',
+                color: '#ffffff',
+                minHeight: '44px',
+                padding: '0.75rem 1.5rem',
+                fontWeight: '600'
               }}
             >
-              Cancel
+              <i className="fa fa-check" aria-hidden="true" style={{ marginRight: "8px" }}></i>
+              Confirm
             </Button>
           </ModalFooter>
         </Modal>
@@ -3445,27 +3473,44 @@ useEffect(() => {
             isCallEnded={isCallEnded}
           />
 
-          <Modal isOpen={isModelOpen}>
-            <ModalHeader>
-              <h2>Recording</h2>
+          <Modal isOpen={isModelOpen} centered>
+            <ModalHeader style={{ textAlign: "center" }}>
+              <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "600" }}>Recording</h2>
             </ModalHeader>
-            <ModalBody>
-              <div className="row">
+            <ModalBody style={{ textAlign: "center", padding: "1.5rem" }}>
+              <p style={{ margin: "0 0 1.5rem 0", fontSize: "1rem", color: "#333" }}>
+                Would you like to start recording this session?
+              </p>
+              <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
                 <Button
-                  className="mx-3 mt-1"
                   color="primary"
                   onClick={() => {
                     startRecording();
                     setIsModelOpen(false);
                   }}
+                  style={{
+                    backgroundColor: '#007bff',
+                    borderColor: '#007bff',
+                    color: '#ffffff',
+                    minHeight: '44px',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600'
+                  }}
                 >
                   Start Recording
                 </Button>
                 <Button
-                  className="mx-3 mt-1"
-                  color="primary"
+                  color="secondary"
                   onClick={() => {
                     setIsModelOpen(false);
+                  }}
+                  style={{
+                    backgroundColor: '#6c757d',
+                    borderColor: '#6c757d',
+                    color: '#ffffff',
+                    minHeight: '44px',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600'
                   }}
                 >
                   Cancel
@@ -4277,27 +4322,44 @@ useEffect(() => {
             isCallEnded={isCallEnded}
           />
 
-          <Modal isOpen={isModelOpen}>
-            <ModalHeader>
-              <h2>Recording</h2>
+          <Modal isOpen={isModelOpen} centered>
+            <ModalHeader style={{ textAlign: "center" }}>
+              <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "600" }}>Recording</h2>
             </ModalHeader>
-            <ModalBody>
-              <div className="row">
+            <ModalBody style={{ textAlign: "center", padding: "1.5rem" }}>
+              <p style={{ margin: "0 0 1.5rem 0", fontSize: "1rem", color: "#333" }}>
+                Would you like to start recording this session?
+              </p>
+              <div style={{ display: "flex", justifyContent: "center", gap: "1rem", flexWrap: "wrap" }}>
                 <Button
-                  className="mx-3 mt-1"
                   color="primary"
                   onClick={() => {
                     startRecording();
                     setIsModelOpen(false);
                   }}
+                  style={{
+                    backgroundColor: '#007bff',
+                    borderColor: '#007bff',
+                    color: '#ffffff',
+                    minHeight: '44px',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600'
+                  }}
                 >
                   Start Recording
                 </Button>
                 <Button
-                  className="mx-3 mt-1"
-                  color="primary"
+                  color="secondary"
                   onClick={() => {
                     setIsModelOpen(false);
+                  }}
+                  style={{
+                    backgroundColor: '#6c757d',
+                    borderColor: '#6c757d',
+                    color: '#ffffff',
+                    minHeight: '44px',
+                    padding: '0.75rem 1.5rem',
+                    fontWeight: '600'
                   }}
                 >
                   Cancel

@@ -152,13 +152,34 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
               />
             </div>}
 
-            <h3 className="fs-1 p-3 mb-2 rounded" style={{textAlign:"center"}}>
-              {isFromCall ? "Thank you for taking a session with " + trainer?.fullname : Message.successMessage.rating}
-            </h3>
-            <div className="container">
-              <div className="row">
-                <h4 className="col-6">{isFromCall ? "How would you rate your expert?" : "How was your session?"}</h4>
-                <div className="col">
+            <div style={{ 
+                display: "flex", 
+                flexDirection: "column", 
+                alignItems: "center", 
+                justifyContent: "center",
+                padding: "1.5rem 1rem",
+                textAlign: "center"
+            }}>
+              <h3 className="fs-1 mb-3" style={{
+                textAlign: "center",
+                fontSize: "1.5rem",
+                fontWeight: "600",
+                color: "#333",
+                marginBottom: "1rem"
+              }}>
+                {isFromCall ? "Thank you for taking a session with " + trainer?.fullname : Message.successMessage.rating}
+              </h3>
+            </div>
+            <div className="container" style={{ maxWidth: "600px", margin: "0 auto" }}>
+              <div className="row" style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "space-between",
+                marginBottom: "1rem",
+                padding: "0.75rem 0"
+              }}>
+                <h4 className="col-6" style={{ margin: 0, fontSize: "1rem", fontWeight: "500" }}>{isFromCall ? "How would you rate your expert?" : "How was your session?"}</h4>
+                <div className="col" style={{ display: "flex", justifyContent: "flex-end" }}>
                   <ColoredRating
                     initialRating={values.sessionRating}
                     key={"sessionRating"}
@@ -176,9 +197,14 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                   }
                 />
               </div>
-              <div className="row mt-3 mb-3">
-                <h4 className="col-6">{isFromCall ? "How strongly would you recommend " + trainer?.fullname : "Please rate Audio/Video connection"}</h4>
-                <div className="col">
+              <div className="row mt-3 mb-3" style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "space-between",
+                padding: "0.75rem 0"
+              }}>
+                <h4 className="col-6" style={{ margin: 0, fontSize: "1rem", fontWeight: "500" }}>{isFromCall ? "How strongly would you recommend " + trainer?.fullname : "Please rate Audio/Video connection"}</h4>
+                <div className="col" style={{ display: "flex", justifyContent: "flex-end" }}>
                   <ColoredRating
                     key={"audioVideoRating"}
                     initialRating={values.audioVideoRating}
@@ -202,11 +228,16 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                 <></>
               ) : (
                 <>
-                  <div className="row mt-3 mb-3">
-                    <h4 className="col-6">
+                  <div className="row mt-3 mb-3" style={{ 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "space-between",
+                    padding: "0.75rem 0"
+                  }}>
+                    <h4 className="col-6" style={{ margin: 0, fontSize: "1rem", fontWeight: "500" }}>
                       {isFromCall ? "Please rate your audio/video connection?" : "How strongly would you like to recommend?"}
                     </h4>
-                    <div className="col">
+                    <div className="col" style={{ display: "flex", justifyContent: "flex-end" }}>
                       <ColoredRating
                         initialRating={values.recommendRating}
                         key={"recommandRating"}
@@ -285,7 +316,20 @@ const Ratings = ({ onClose, booking_id, accountType, tabBook, isFromCall, traine
                 />
               </div>
               <div className="d-flex justify-content-center mt-4">
-                <button type="submit" className="btn btn-primary">
+                <button 
+                  type="submit" 
+                  className="btn btn-primary"
+                  style={{
+                    backgroundColor: '#007bff',
+                    borderColor: '#007bff',
+                    color: '#ffffff',
+                    minHeight: '44px',
+                    padding: '0.75rem 2rem',
+                    fontWeight: '600',
+                    borderRadius: '8px',
+                    fontSize: '1rem'
+                  }}
+                >
                   Submit
                 </button>
               </div>

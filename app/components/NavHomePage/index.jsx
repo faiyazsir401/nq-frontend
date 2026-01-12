@@ -145,50 +145,57 @@ const NavHomePage = () => {
 
   var settings = {
     autoplay: true,
-    infinite: true, // Changed to false to prevent duplication
+    infinite: activeTrainer?.length > 1,
     speed: 2000,
-    slidesToShow: Math.min(2, activeTrainer?.length || 1), // Dynamic based on available data
+    slidesToShow: 1, // Always show one trainer per slide
     slidesToScroll: 1,
     swipeToSlide: true,
     autoplaySpeed: 3000,
     arrows: activeTrainer?.length > 1, // Only show arrows if more than 1 item
-    dots: false,
+    dots: activeTrainer?.length > 1, // Show dots if more than 1 item
     responsive: [
       {
         breakpoint: 1366,
         settings: {
           autoplay: true,
-          slidesToShow: Math.min(3, activeTrainer?.length || 1),
+          slidesToShow: 1,
           slidesToScroll: 1,
-          infinite: false,
+          infinite: activeTrainer?.length > 1,
           arrows: activeTrainer?.length > 1,
+          dots: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 800,
         settings: {
           autoplay: true,
-          slidesToShow: Math.min(2, activeTrainer?.length || 1),
-          infinite: true,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: activeTrainer?.length > 1,
           arrows: activeTrainer?.length > 1,
+          dots: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 768,
         settings: {
           autoplay: true,
-          slidesToShow: Math.min(2, activeTrainer?.length || 1),
-          infinite: true,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: activeTrainer?.length > 1,
           arrows: activeTrainer?.length > 1,
+          dots: activeTrainer?.length > 1,
         },
       },
       {
         breakpoint: 700,
         settings: {
           autoplay: true,
-          slidesToShow: Math.min(1, activeTrainer?.length || 1),
-          infinite: true,
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: activeTrainer?.length > 1,
           arrows: activeTrainer?.length > 1,
+          dots: activeTrainer?.length > 1,
         },
       },
     ],
@@ -435,13 +442,21 @@ const NavHomePage = () => {
                       <div 
                         key={`slider-${info.trainer_info?._id}-${index}`}
                         style={{
-                          padding: width600 ? "0 5px" : "0 8px",
+                          padding: width600 ? "0 10px" : "0 15px",
                           boxSizing: "border-box",
-                          maxWidth: width600 ? "280px" : "320px",
-                          width: "100%"
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center"
                         }}
                       >
-                        <OnlineUserCard trainer={info.trainer_info} />
+                        <div style={{
+                          width: "100%",
+                          maxWidth: width600 ? "100%" : "400px",
+                          margin: "0 auto"
+                        }}>
+                          <OnlineUserCard trainer={info.trainer_info} />
+                        </div>
                       </div>
                     );
                   })}

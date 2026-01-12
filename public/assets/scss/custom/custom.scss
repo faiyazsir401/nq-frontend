@@ -719,6 +719,90 @@ slick-slider .slick-list,
   }
 }
 
+// Recent users slider height fix
+.recent-users-slider .slick-track,
+.recent-users-slider .slick-list {
+  height: auto !important;
+  min-height: 180px;
+}
+
+@media (max-width: 576px) {
+  .recent-users-slider .slick-track,
+  .recent-users-slider .slick-list {
+    min-height: 160px;
+  }
+}
+
+// Coaches online now slider styling
+.banner_Slider {
+  .slick-dots {
+    bottom: -35px !important;
+    li {
+      button:before {
+        font-size: 12px !important;
+        color: #000080 !important;
+        opacity: 0.5 !important;
+      }
+      &.slick-active button:before {
+        opacity: 1 !important;
+        color: #000080 !important;
+      }
+    }
+  }
+  
+  .slick-arrow {
+    z-index: 1;
+    width: 35px;
+    height: 35px;
+    background: #fff !important;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    
+    &:before {
+      color: #000080;
+      font-size: 20px;
+      opacity: 1;
+    }
+    
+    &:hover {
+      background: #000080 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 128, 0.3);
+      
+      &:before {
+        color: #fff;
+      }
+    }
+  }
+  
+  .slick-prev {
+    left: -15px;
+  }
+  
+  .slick-next {
+    right: -15px;
+  }
+  
+  @media (max-width: 700px) {
+    .slick-prev {
+      left: -10px;
+    }
+    
+    .slick-next {
+      right: -10px;
+    }
+    
+    .slick-arrow {
+      width: 30px;
+      height: 30px;
+      
+      &:before {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
 // trainer-recommended
 .trainer-recommended {
   max-width: 100%;

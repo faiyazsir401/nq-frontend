@@ -374,13 +374,23 @@ const InstantLessonModal = () => {
             </div>
           </ModalBody>
 
-          <ModalFooter className="instant-lesson-footer">
+          <ModalFooter className="instant-lesson-footer" style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
             <Button
               color="danger"
               onClick={handleDeclineClick}
               className="decline-btn"
               disabled={buttonsDisabled}
               aria-label="Decline lesson request"
+              style={{
+                backgroundColor: '#dc3545',
+                borderColor: '#dc3545',
+                color: '#ffffff',
+                minHeight: '44px',
+                padding: '0.75rem 1.5rem',
+                fontWeight: '600',
+                flex: '1',
+                maxWidth: '200px'
+              }}
             >
               {uiState === UI_STATES.DECLINING ? (
                 <>
@@ -394,11 +404,21 @@ const InstantLessonModal = () => {
               )}
             </Button>
             <Button
-              color="success"
+              color="primary"
               onClick={handleAccept}
               className="accept-btn"
               disabled={buttonsDisabled}
               aria-label="Accept lesson request"
+              style={{
+                backgroundColor: '#007bff',
+                borderColor: '#007bff',
+                color: '#ffffff',
+                minHeight: '44px',
+                padding: '0.75rem 1.5rem',
+                fontWeight: '600',
+                flex: '1',
+                maxWidth: '200px'
+              }}
             >
               {uiState === UI_STATES.ACCEPTING ? (
                 <>
@@ -408,7 +428,7 @@ const InstantLessonModal = () => {
               ) : (
                 <>
                   <i className="fa fa-check" aria-hidden="true"></i> {getAcceptButtonText()}
-                </>
+              </>
               )}
             </Button>
           </ModalFooter>
@@ -423,17 +443,44 @@ const InstantLessonModal = () => {
             className="decline-confirm-modal"
             backdrop="static"
           >
-            <ModalHeader toggle={handleDeclineCancel}>
-              Confirm Decline
+            <ModalHeader toggle={handleDeclineCancel} style={{ textAlign: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                <i className="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                <span>Confirm Decline</span>
+              </div>
             </ModalHeader>
-            <ModalBody>
-              <p>Are you sure you want to decline this lesson request from <strong>{traineeName}</strong>?</p>
+            <ModalBody style={{ textAlign: "center", padding: "1.5rem" }}>
+              <p style={{ margin: 0, fontSize: "1rem", color: "#333", lineHeight: "1.6" }}>
+                Are you sure you want to decline this lesson request from <strong style={{ color: "#667eea" }}>{traineeName}</strong>?
+              </p>
             </ModalBody>
-            <ModalFooter>
-              <Button color="secondary" onClick={handleDeclineCancel}>
+            <ModalFooter style={{ display: "flex", justifyContent: "center", gap: "1rem", padding: "1rem 1.5rem" }}>
+              <Button 
+                color="secondary" 
+                onClick={handleDeclineCancel}
+                style={{
+                  backgroundColor: '#6c757d',
+                  borderColor: '#6c757d',
+                  color: '#ffffff',
+                  minHeight: '44px',
+                  padding: '0.75rem 1.5rem',
+                  fontWeight: '600'
+                }}
+              >
                 Cancel
               </Button>
-              <Button color="danger" onClick={handleDeclineConfirm}>
+              <Button 
+                color="danger" 
+                onClick={handleDeclineConfirm}
+                style={{
+                  backgroundColor: '#dc3545',
+                  borderColor: '#dc3545',
+                  color: '#ffffff',
+                  minHeight: '44px',
+                  padding: '0.75rem 1.5rem',
+                  fontWeight: '600'
+                }}
+              >
                 Yes, Decline
               </Button>
             </ModalFooter>

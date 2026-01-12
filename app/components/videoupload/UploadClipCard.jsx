@@ -625,6 +625,13 @@ const UploadClipCard = (props) => {
             color="primary"
             onClick={handleUpload}
             disabled={isUploading}
+            style={{
+              backgroundColor: '#007bff',
+              borderColor: '#007bff',
+              color: '#ffffff',
+              minHeight: '44px',
+              fontWeight: '600'
+            }}
           >
             {isUploading ? (
               <>
