@@ -287,10 +287,10 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
       <div className="media-gallery portfolio-section grid-portfolio">
         <div style={{ marginBottom: "15px", textAlign: "center" }}>
           <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "4px" }}>
-            My Clips
+            {trainee_id ? "Student Clips" : "My Clips"}
           </h2>
           <p style={{ fontSize: "13px", color: "#666", margin: 0 }}>
-            Browse and manage your uploaded clips.
+            {trainee_id ? "View clips from this student." : "Browse and manage your uploaded clips."}
           </p>
         </div>
         {status === "pending" ? (

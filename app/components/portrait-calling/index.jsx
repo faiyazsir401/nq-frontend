@@ -979,46 +979,54 @@ const VideoCallUI = ({
     });
   };
   
-  // Start lesson countdown based on backend timer info
-  const startLessonTimer = useCallback(({ sessionId, startedAt, duration }) => {
-    if (!sessionId || !startedAt || !duration) return;
+  // Start lesson countdown based on backend timer info (authoritative)
+  const startLessonTimer = useCallback(
+    ({ sessionId, startedAt, duration }) => {
+      if (!sessionId || !startedAt || !duration) return;
 
-    if (lessonTimerIntervalRef.current) {
-      clearInterval(lessonTimerIntervalRef.current);
-      lessonTimerIntervalRef.current = null;
-    }
-
-    const updateTimer = () => {
-      const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
-      const remainingSeconds = Math.max(0, duration - elapsedSeconds);
-
-      setAuthoritativeTimer({
-        sessionId,
-        startedAt,
-        duration,
-        remainingSeconds,
-      });
-
-      if (remainingSeconds <= 0 && lessonTimerIntervalRef.current) {
+      // Clear any previous timer
+      if (lessonTimerIntervalRef.current) {
         clearInterval(lessonTimerIntervalRef.current);
         lessonTimerIntervalRef.current = null;
       }
-    };
 
-    updateTimer();
-    lessonTimerIntervalRef.current = setInterval(updateTimer, 1000);
-  }, []);
+      const updateTimer = () => {
+        const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
+        const remainingSeconds = Math.max(0, duration - elapsedSeconds);
 
-  // Listen for backend "both joined" and timer events
+        setAuthoritativeTimer({
+          sessionId,
+          startedAt,
+          duration,
+          remainingSeconds,
+        });
+
+        if (remainingSeconds <= 0 && lessonTimerIntervalRef.current) {
+          clearInterval(lessonTimerIntervalRef.current);
+          lessonTimerIntervalRef.current = null;
+        }
+      };
+
+      // Hide any "waiting" messages once the authoritative timer starts
+      setDisplayMsg({ show: false, msg: "" });
+
+      updateTimer();
+      lessonTimerIntervalRef.current = setInterval(updateTimer, 1000);
+    },
+    []
+  );
+
+  // Listen for backend "both joined" event (no timer start here)
   useEffect(() => {
-    const handleBothJoin = (data) => {
-      const { timerStarted } = data || {};
+    if (!socket) return;
 
-      // If backend started an authoritative timer, sync to it
-      if (timerStarted && timerStarted.sessionId === id) {
-        const { sessionId, startedAt, duration } = timerStarted;
-        startLessonTimer({ sessionId, startedAt, duration });
-      }
+    const handleBothJoin = (data) => {
+      // Optional UI state: both parties have joined, but timer may not be started yet.
+      // Do NOT start any local timer here – wait for TIMER_STARTED from backend.
+      setDisplayMsg({
+        show: true,
+        msg: "Both participants joined. Waiting for session to start...",
+      });
 
       if (accountType === AccountType.TRAINER && data?.socketReq?.newEndTime) {
         const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(
@@ -1036,7 +1044,27 @@ const VideoCallUI = ({
     return () => {
       socket.off("ON_BOTH_JOIN", handleBothJoin);
     };
-  }, [socket, id, accountType, time_zone, startLessonTimer]);
+  }, [socket, accountType, time_zone]);
+
+  // Listen for backend TIMER_STARTED event – this is the ONLY place we start the timer
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleTimerStarted = (timerData) => {
+      const { sessionId, startedAt, duration } = timerData || {};
+
+      if (sessionId !== id) return;
+
+      // Backend is authoritative: use its startedAt and duration
+      startLessonTimer({ sessionId, startedAt, duration });
+    };
+
+    socket.on("TIMER_STARTED", handleTimerStarted);
+
+    return () => {
+      socket.off("TIMER_STARTED", handleTimerStarted);
+    };
+  }, [socket, id, startLessonTimer]);
 
   // Listen to socket events with proper cleanup
   useEffect(() => {

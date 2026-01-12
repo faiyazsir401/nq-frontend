@@ -23,7 +23,7 @@ const placeholderImageUrl = "/assets/images/demoUser.png"; // Placeholder image 
 
 // Array.from({ length: 10 }, () => placeholderImageUrl)
 
-const RecentUsers = () => {
+const RecentUsers = ({ onTraineeSelect }) => {
   const [accountType, setAccountType] = useState("");
   const [recentStudent, setRecentStudent] = useState([]);
   const [recentTrainer, setRecentTrainer] = useState([]);
@@ -326,7 +326,13 @@ const RecentUsers = () => {
                       }}
                       onClick={() => {
                         if (accountType === AccountType?.TRAINER) {
-                          handleStudentClick(item?._id || item?.id);
+                          const traineeId = item?._id || item?.id;
+                          // Call the callback to set trainee in locker page
+                          if (onTraineeSelect) {
+                            onTraineeSelect(traineeId);
+                          }
+                          // Also open the modal for detailed view
+                          handleStudentClick(traineeId);
                           SetselectedStudentData({ ...item });
                         } else {
                           setTrainerInfo((prev) => ({

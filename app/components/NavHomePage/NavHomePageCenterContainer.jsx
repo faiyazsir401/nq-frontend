@@ -192,12 +192,19 @@ const allTabs = [
   },
 ];
 
-const NavHomePageCenterContainer = ({ onTabChange }) => {
+const NavHomePageCenterContainer = ({ onTabChange, selectedTraineeId, onClearTrainee }) => {
   const dispatch = useAppDispatch();
   const { accountType, userInfo } = useAppSelector(authState);
   const [activeTab, setActiveTab] = useState("myClips");
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollTimeoutRef = useRef(null);
+
+  // Clear trainee selection when switching tabs away from myClips
+  useEffect(() => {
+    if (activeTab !== "myClips" && selectedTraineeId && onClearTrainee) {
+      onClearTrainee();
+    }
+  }, [activeTab, selectedTraineeId, onClearTrainee]);
 
   const isMobile = useMediaQuery(599)
 
@@ -387,6 +394,7 @@ const NavHomePageCenterContainer = ({ onTabChange }) => {
                       <el.component
                         key={index}
                         activeCenterContainerTab={activeTab}
+                        trainee_id={el?.value === "myClips" ? selectedTraineeId : null}
                       />
                     ) : (
                       <h1>{el?.name}</h1>

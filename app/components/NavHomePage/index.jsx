@@ -59,6 +59,7 @@ const NavHomePage = () => {
   const [friendRequests, setFriendRequests] = useState([]);
   const [filteredSessions, setFilteredSessions] = useState([]);
   const [activeCenterTab, setActiveCenterTab] = useState("myClips");
+  const [selectedTraineeId, setSelectedTraineeId] = useState(null);
   
   // Use refs to prevent duplicate API calls when switching tabs
   const hasFetchedFriendRequestsRef = useRef(false);
@@ -814,7 +815,12 @@ const NavHomePage = () => {
                   padding: "10px"
                 }}
               >
-                <RecentUsers />
+                <RecentUsers 
+                  onTraineeSelect={(traineeId) => {
+                    setSelectedTraineeId(traineeId);
+                    setActiveCenterTab("myClips");
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -847,7 +853,11 @@ const NavHomePage = () => {
               className="card-body"
               style={{ padding: width600 ? "10px" : "15px" }}
             >
-              <NavHomePageCenterContainer onTabChange={setActiveCenterTab} />
+              <NavHomePageCenterContainer 
+                onTabChange={setActiveCenterTab} 
+                selectedTraineeId={selectedTraineeId}
+                onClearTrainee={() => setSelectedTraineeId(null)}
+              />
             </div>
           </div>
         </div>
