@@ -1,6 +1,13 @@
 .recent-user-modal.modal-dialog{
     max-width: 100% !important;
     margin:0 !important;
+    height: 90vh !important;
+    max-height: 90vh !important;
+}
+.recent-user-modal .modal-content{
+    height: 90vh !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
 }
 .recent-user.custom-trainer-scroll{
     height: 100vh !important;

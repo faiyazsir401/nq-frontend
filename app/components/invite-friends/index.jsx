@@ -19,23 +19,6 @@ const InviteFriendsCard = () => {
     (email) => email && !emailRegex.test(email)
   );
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const text = e.target.result;
-        const emails = text
-          .split(/\r?\n|,/)
-          .map((email) => email.trim())
-          .filter((email) => emailRegex.test(email));
-        setUserEmails((prev) =>
-          prev ? `${prev}, ${emails.join(", ")}` : emails.join(", ")
-        );
-      };
-      reader.readAsText(file);
-    }
-  };
 
   const sendInvitation = async () => {
     setLoading(true);
@@ -172,33 +155,6 @@ const InviteFriendsCard = () => {
             {err}
           </p>
         )}
-
-        <div
-          style={{
-            borderRadius: "8px",
-            border: "1px dashed #c0c0c0",
-            padding: "10px 12px",
-            marginBottom: "10px",
-            background: "#fafafa",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              marginBottom: "6px",
-              color: "#555",
-            }}
-          >
-            Or upload a CSV file with one email per line.
-          </div>
-          <input
-            type="file"
-            accept=".csv"
-            className="file-upload"
-            onChange={handleFileUpload}
-            style={{ fontSize: "12px" }}
-          />
-        </div>
 
         <div className="button-container text-center">
           <button

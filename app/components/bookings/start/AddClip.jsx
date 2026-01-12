@@ -216,7 +216,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
             {/* Header */}
             <div className='d-flex justify-content-between align-items-center mb-4'>
               <h2 className="mb-0" style={{ fontSize: isMobileScreen ? "18px" : "24px", fontWeight: "600" }}>
-                Feel free to share up to 2 clips with {trainer}
+                Add 2 clips
               </h2>
               <div
                 className="icon-btn btn-sm btn-outline-light close-apps pointer"
@@ -226,6 +226,25 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                 <X />
               </div>
             </div>
+
+            {/* Share Button - Moved to top */}
+            {clips?.length && (
+              <div className="d-flex justify-content-center w-100 mb-3">
+                <Button
+                  color="success"
+                  onClick={handleShare}
+                  disabled={selectedClipsCopy.length === 0}
+                  style={{
+                    minWidth: "120px",
+                    padding: "10px 30px",
+                    fontSize: "16px",
+                    fontWeight: "600"
+                  }}
+                >
+                  Share {selectedClipsCopy.length > 0 && `(${selectedClipsCopy.length})`}
+                </Button>
+              </div>
+            )}
 
             {/* Selected Clips Counter */}
             {selectedClipsCopy.length > 0 && (
@@ -450,25 +469,6 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                 </div>
               )}
             </div>
-
-            {/* Share Button */}
-            {clips?.length && (
-              <div className="d-flex justify-content-center w-100 p-3" style={{ borderTop: "1px solid #e0e0e0" }}>
-                <Button
-                  color="success"
-                  onClick={handleShare}
-                  disabled={selectedClipsCopy.length === 0}
-                  style={{
-                    minWidth: "120px",
-                    padding: "10px 30px",
-                    fontSize: "16px",
-                    fontWeight: "600"
-                  }}
-                >
-                  Share {selectedClipsCopy.length > 0 && `(${selectedClipsCopy.length})`}
-                </Button>
-              </div>
-            )}
           </div>
         }
       />

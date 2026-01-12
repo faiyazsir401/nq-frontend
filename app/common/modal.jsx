@@ -31,7 +31,6 @@ const Modal = ({
         minHeight: minHeight ? "100vh" : null,
       }}
       onClick={(e) => {
-        // Only close if clicking the backdrop (modal itself), not the content
         if (e.target === e.currentTarget && toggle) {
           toggle();
         }
