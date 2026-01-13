@@ -396,12 +396,14 @@ const VideoCallUI = ({
     };
   }, [socket, accountType, cutCall]);
 
-  // 30-second warning before lesson ends (backend-driven)
+  // Listen for LESSON_TIME_WARNING event (30 seconds remaining)
+  // Backend emits this when exactly 30 seconds remain in the session
   useEffect(() => {
     if (!socket) return;
 
     const handleLessonTimeWarning = ({ sessionId, remainingSeconds }) => {
       if (sessionId !== id) return;
+      
       toast.warning(
         `Only ${remainingSeconds} seconds remaining in this lesson.`,
       );
@@ -417,18 +419,21 @@ const VideoCallUI = ({
     };
   }, [socket, id]);
 
-  // Lesson time ended - stop authoritative timer and end the session (backend-driven)
+  // Listen for LESSON_TIME_ENDED event - session time is up
+  // Backend emits this when the session duration has elapsed
   useEffect(() => {
     if (!socket) return;
 
     const handleLessonTimeEnded = ({ sessionId }) => {
       if (sessionId !== id) return;
 
+      // Stop the timer interval
       if (lessonTimerIntervalRef.current) {
         clearInterval(lessonTimerIntervalRef.current);
         lessonTimerIntervalRef.current = null;
       }
 
+      // Update timer state to show 0 remaining
       setAuthoritativeTimer((prev) =>
         prev && prev.sessionId === sessionId
           ? { ...prev, remainingSeconds: 0 }
@@ -436,7 +441,8 @@ const VideoCallUI = ({
       );
 
       toast.info("Lesson time has ended.");
-      // End the call from frontend when backend declares time over
+      
+      // End the call when backend declares time over
       cutCall(true);
     };
 
@@ -984,24 +990,25 @@ const VideoCallUI = ({
     ({ sessionId, startedAt, duration }) => {
       if (!sessionId || !startedAt || !duration) return;
 
-      // Clear any previous timer
       if (lessonTimerIntervalRef.current) {
         clearInterval(lessonTimerIntervalRef.current);
         lessonTimerIntervalRef.current = null;
       }
 
       const updateTimer = () => {
-        const elapsedSeconds = Math.floor((Date.now() - startedAt) / 1000);
-        const remainingSeconds = Math.max(0, duration - elapsedSeconds);
+        const currentTime = Date.now();
+
+        const elapsed = Math.floor((currentTime - startedAt) / 1000);
+        const remaining = Math.max(0, duration - elapsed);
 
         setAuthoritativeTimer({
           sessionId,
           startedAt,
           duration,
-          remainingSeconds,
+          remainingSeconds: remaining,
         });
 
-        if (remainingSeconds <= 0 && lessonTimerIntervalRef.current) {
+        if (remaining <= 0 && lessonTimerIntervalRef.current) {
           clearInterval(lessonTimerIntervalRef.current);
           lessonTimerIntervalRef.current = null;
         }
@@ -1009,21 +1016,17 @@ const VideoCallUI = ({
 
       // Hide any "waiting" messages once the authoritative timer starts
       setDisplayMsg({ show: false, msg: "" });
-
       updateTimer();
-      lessonTimerIntervalRef.current = setInterval(updateTimer, 1000);
+            lessonTimerIntervalRef.current = setInterval(updateTimer, 1000);
     },
     []
   );
 
-  // Listen for backend "both joined" event (no timer start here)
   useEffect(() => {
     if (!socket) return;
 
     const handleBothJoin = (data) => {
-      // Optional UI state: both parties have joined, but timer may not be started yet.
-      // Do NOT start any local timer here – wait for TIMER_STARTED from backend.
-      setDisplayMsg({
+        setDisplayMsg({
         show: true,
         msg: "Both participants joined. Waiting for session to start...",
       });
@@ -1042,12 +1045,13 @@ const VideoCallUI = ({
     socket.on("ON_BOTH_JOIN", handleBothJoin);
 
     return () => {
-      socket.off("ON_BOTH_JOIN", handleBothJoin);
+      if (socket) {
+        socket.off("ON_BOTH_JOIN", handleBothJoin);
+      }
     };
   }, [socket, accountType, time_zone]);
 
-  // Listen for backend TIMER_STARTED event – this is the ONLY place we start the timer
-  useEffect(() => {
+    useEffect(() => {
     if (!socket) return;
 
     const handleTimerStarted = (timerData) => {
@@ -1055,14 +1059,15 @@ const VideoCallUI = ({
 
       if (sessionId !== id) return;
 
-      // Backend is authoritative: use its startedAt and duration
-      startLessonTimer({ sessionId, startedAt, duration });
+     startLessonTimer({ sessionId, startedAt, duration });
     };
 
     socket.on("TIMER_STARTED", handleTimerStarted);
 
     return () => {
-      socket.off("TIMER_STARTED", handleTimerStarted);
+      if (socket) {
+        socket.off("TIMER_STARTED", handleTimerStarted);
+      }
     };
   }, [socket, id, startLessonTimer]);
 
