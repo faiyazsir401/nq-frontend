@@ -9,6 +9,7 @@ import {
   getRecentTrainers,  // Import new API function
 } from "../../NavHomePage/navHomePage.api";
 import { Utils } from "../../../../utils/utils";
+import { useMediaQuery } from "../../../hook/useMediaQuery";
 
 const StudentRecord = (props) => {  // Pass props to the component
   const [accountType, setAccountType] = useState("");
@@ -18,6 +19,7 @@ const StudentRecord = (props) => {  // Pass props to the component
   const [selectedCourseIndex, setSelectedCourseIndex] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStudentData, SetselectedStudentData] = useState({});
+  const width600 = useMediaQuery(600);
 
   const handleCourseClick = (course, index, id) => {
     setIsOpen(true);
@@ -70,12 +72,22 @@ const StudentRecord = (props) => {  // Pass props to the component
 
   return (
     <div>
-      <div className="col-11 ml-2">
+      <div className="col-11 ml-2" style={{ width: "100%", padding: width600 ? "8px" : "0" }}>
         <div className="dot-btn dot-success mt-4"></div>
-        <h3 className="ml-1 text-uppercase mb-1"> {props.friends ? 'Experts' : 'Students'} </h3>
+        <h3 className="ml-1 text-uppercase mb-1" style={{ 
+          fontSize: width600 ? "18px" : "22px",
+          display: "block",
+          width: "100%"
+        }}> {props.friends ? 'Experts' : 'Students'} </h3>
       </div>
 
-      <div className={`col-12`} style={{ display: "flex", flexWrap: "wrap" }}>
+      <div className={`col-12`} style={{ 
+        display: "flex", 
+        flexWrap: "wrap",
+        gap: width600 ? "12px" : "16px",
+        justifyContent: width600 ? "center" : "flex-start",
+        padding: width600 ? "8px" : "0"
+      }}>
         {recentStudent?.map((data, index) => {
           return (
             <div
@@ -83,7 +95,11 @@ const StudentRecord = (props) => {  // Pass props to the component
               className={`col-lg-2 col-sm-12 ${
                 selectedCourseIndex === index ? "selected-course" : ""
               }`}
-              style={{ maxWidth: "237px", minWidth: "237px" }}
+              style={{ 
+                maxWidth: width600 ? "150px" : "237px", 
+                minWidth: width600 ? "150px" : "237px",
+                flex: width600 ? "0 0 auto" : "none"
+              }}
             >
               <div
                 className="card m-2"
@@ -100,9 +116,12 @@ const StudentRecord = (props) => {  // Pass props to the component
                 <div
                   className="Top-img"
                   style={{
-                    maxHeight: "200px",
+                    maxHeight: width600 ? "150px" : "200px",
                     overflow: "hidden",
-                    minHeight: "200px",
+                    minHeight: width600 ? "150px" : "200px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
                   }}
                 >
                   <img
@@ -113,14 +132,14 @@ const StudentRecord = (props) => {  // Pass props to the component
                     }
                     alt="Card image cap"
                     style={{
-                      padding: "10px",
+                      padding: width600 ? "8px" : "10px",
                       borderRadius: "20px",
                       height: "100%",
                       objectFit: "cover",
-                      maxHeight: "200px",
-                      minHeight: "200px",
-                      maxWidth: "190px",
-                      minWidth: "190px",
+                      maxHeight: width600 ? "150px" : "200px",
+                      minHeight: width600 ? "150px" : "200px",
+                      maxWidth: width600 ? "134px" : "190px",
+                      minWidth: width600 ? "134px" : "190px",
                     }}
                     onError={(e) => {
                       e.target.src = "/assets/images/demoUser.png"; // Set default image on error
@@ -128,10 +147,14 @@ const StudentRecord = (props) => {  // Pass props to the component
                   />
                 </div>
 
-                <div className="card-body">
+                <div className="card-body" style={{ padding: width600 ? "8px" : "15px" }}>
                   <h5
                     className="card-title text-truncate"
-                    style={{ textAlign: "center" }}
+                    style={{ 
+                      textAlign: "center",
+                      fontSize: width600 ? "13px" : "16px",
+                      marginBottom: "0"
+                    }}
                   >
                     {data?.fullname}
                   </h5>

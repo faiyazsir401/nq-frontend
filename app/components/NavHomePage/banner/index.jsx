@@ -19,10 +19,10 @@ const OnlineUserCard = ({ trainer }) => {
         <div className="trainer-card" style={{
             display: "flex",
             flexDirection: "column",
-            gap: width600 ? "10px" : "12px",
+            gap: width600 ? "12px" : "14px",
             justifyContent: "flex-start",
             alignItems: "center",
-            padding: width600 ? "15px 10px" : "18px 15px",
+            padding: width600 ? "16px 12px" : "20px 18px",
             width: "100%",
             maxWidth: "100%",
             boxSizing: "border-box",
@@ -31,12 +31,12 @@ const OnlineUserCard = ({ trainer }) => {
             borderRadius: "8px",
             border: "1px solid #e0e0e0",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            minHeight: width600 ? "200px" : "220px",
+            minHeight: width600 ? "240px" : "250px",
             touchAction: "manipulation" /* Better touch handling */
         }}>
             <div style={{ 
-                width: width600 ? "90px" : "110px", 
-                height: width600 ? "90px" : "110px", 
+                width: width600 ? "100px" : "120px", 
+                height: width600 ? "100px" : "120px", 
                 border: width600 ? "3px solid rgb(0, 0, 128)" : "4px solid rgb(0, 0, 128)", 
                 borderRadius: "50%", 
                 padding: "3px",
@@ -45,7 +45,8 @@ const OnlineUserCard = ({ trainer }) => {
                 backgroundColor: "#fff",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center"
+                justifyContent: "center",
+                marginBottom: width600 ? "4px" : "0"
             }}>
                 <img
                     src={trainer.profile_picture ? Utils.getImageUrlOfS3(trainer.profile_picture) : "/assets/images/demoUser.png"}
@@ -67,13 +68,14 @@ const OnlineUserCard = ({ trainer }) => {
             <div className="card-info" style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: width600 ? "6px" : "8px",
+                gap: width600 ? "8px" : "10px",
                 width: "100%",
                 alignItems: "center",
-                textAlign: "center"
+                textAlign: "center",
+                padding: width600 ? "0 4px" : "0"
             }}>
                 <h4 style={{
-                    fontSize: width600 ? "15px" : "17px",
+                    fontSize: width600 ? "16px" : "18px",
                     fontWeight: 600,
                     margin: 0,
                     color: "#333",
@@ -81,30 +83,36 @@ const OnlineUserCard = ({ trainer }) => {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     width: "100%",
-                    textAlign: "center"
+                    textAlign: "center",
+                    lineHeight: "1.3"
                 }}>{trainer?.fullName || trainer?.fullname}</h4>
                 <h4 style={{
-                    fontSize: width600 ? "13px" : "15px",
+                    fontSize: width600 ? "14px" : "16px",
                     fontWeight: 500,
                     margin: 0,
                     color: "#666",
-                    textAlign: "center"
+                    textAlign: "center",
+                    lineHeight: "1.3"
                 }}>Price: ${trainer?.extraInfo?.hourly_rate || 0}</h4>
                 <div 
                     onClick={handleTraineInstantLesson} 
                     className="instant"
                     style={{
-                        marginTop: width600 ? "8px" : "10px",
+                        marginTop: width600 ? "10px" : "12px",
                         background: "#ff6b6b",
                         border: "none",
                         borderRadius: "6px",
-                        padding: width600 ? "10px 14px" : "12px 18px",
+                        padding: width600 ? "12px 16px" : "14px 20px",
                         cursor: "pointer",
                         transition: "all 0.3s ease",
                         boxShadow: "0 2px 6px rgba(255, 107, 107, 0.4)",
                         width: "100%",
                         maxWidth: "100%",
-                        touchAction: "manipulation" /* Better touch handling */
+                        touchAction: "manipulation", /* Better touch handling */
+                        minHeight: width600 ? "44px" : "auto",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
                     }}
                     onMouseEnter={(e) => {
                         e.currentTarget.style.background = "#ff5252";
@@ -126,13 +134,14 @@ const OnlineUserCard = ({ trainer }) => {
                     }}
                 >
                     <h5 style={{
-                        fontSize: width600 ? "12px" : "14px",
+                        fontSize: width600 ? "13px" : "15px",
                         fontWeight: 700,
                         margin: 0,
                         color: "#ffffff",
                         textAlign: "center",
                         letterSpacing: "0.8px",
-                        textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)"
+                        textShadow: "0 1px 2px rgba(0, 0, 0, 0.2)",
+                        lineHeight: "1.2"
                     }}>INSTANT LESSON</h5>
                 </div>
             </div>

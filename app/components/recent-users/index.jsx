@@ -307,9 +307,12 @@ const RecentUsers = ({ onTraineeSelect }) => {
         }
       `}</style>
       <div className="card rounded trainer-profile-card Select Recent Student" style={{ 
-        height: accountType === AccountType?.TRAINEE ? (width600 ? "260px" : "280px") : "100%",
-        minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "260px" : "280px") : "auto",
-        maxHeight: accountType === AccountType?.TRAINEE ? (width600 ? "260px" : "280px") : "none"
+        height: accountType === AccountType?.TRAINEE ? (width600 ? "auto" : "280px") : "100%",
+        minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "280px" : "280px") : "auto",
+        maxHeight: accountType === AccountType?.TRAINEE ? (width600 ? "none" : "280px") : "none",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "visible"
       }}>
       {trainerInfo && trainerInfo.userInfo ? (
         <Modal
@@ -379,8 +382,13 @@ const RecentUsers = ({ onTraineeSelect }) => {
           fontSize: width600 ? "18px" : "20px",
           fontWeight: "600",
           color: "#333",
-          marginBottom: "15px",
-          paddingTop: "15px"
+          marginBottom: width600 ? "10px" : "15px",
+          paddingTop: width600 ? "12px" : "15px",
+          paddingLeft: width600 ? "8px" : "0",
+          paddingRight: width600 ? "8px" : "0",
+          display: "block",
+          width: "100%",
+          boxSizing: "border-box"
         }}
       >
         Recent {accountType === AccountType?.TRAINER ? "Students" : "Experts"}
@@ -389,12 +397,14 @@ const RecentUsers = ({ onTraineeSelect }) => {
         className="card-body Recent"
         style={{
           width: "100%",
-          marginTop: "5px",
-          padding: width600 ? "12px 8px" : "15px 12px",
+          marginTop: "0px",
+          padding: width600 ? "8px 6px" : "15px 12px",
           overflow: "hidden",
-          height: accountType === AccountType?.TRAINEE ? "calc(100% - 60px)" : "auto",
+          height: accountType === AccountType?.TRAINEE ? (width600 ? "auto" : "calc(100% - 60px)") : "auto",
+          minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "200px" : "auto") : "auto",
           display: "flex",
-          flexDirection: "column"
+          flexDirection: "column",
+          flex: "1"
         }}
       >
         {/* Box container with proper styling */}
@@ -407,8 +417,9 @@ const RecentUsers = ({ onTraineeSelect }) => {
             padding: width600 ? "15px 10px" : "20px 15px",
             position: "relative",
             overflow: "hidden",
-            height: accountType === AccountType?.TRAINEE ? (width600 ? "180px" : "200px") : "auto",
+            height: accountType === AccountType?.TRAINEE ? (width600 ? "auto" : "200px") : "auto",
             minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "180px" : "200px") : "180px",
+            maxHeight: accountType === AccountType?.TRAINEE ? (width600 ? "none" : "200px") : "none",
             flex: accountType === AccountType?.TRAINEE ? "1" : "none"
           }}
         >

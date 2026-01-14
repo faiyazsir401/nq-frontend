@@ -470,12 +470,13 @@ const NavHomePage = () => {
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               border: "none",
-              padding: width600 ? "8px 10px 6px 10px" : "12px 16px 8px 16px",
+              padding: width600 ? "12px 8px" : "12px 16px 8px 16px",
               width: "100%",
               maxWidth: "100%",
               margin: "0",
               boxSizing: "border-box",
-              overflow: "hidden"
+              overflow: "hidden",
+              minHeight: width600 ? "280px" : "auto"
             }}
           >
             <div className="banner_Slider" style={{
@@ -599,14 +600,17 @@ const NavHomePage = () => {
                       <div 
                         key={`slider-${info.trainer_info?._id}-${index}`}
                         style={{
-                          padding: width600 ? "0 5px" : "0 10px",
+                          padding: width600 ? "0 8px" : "0 10px",
                           boxSizing: "border-box",
-                          height: "100%"
+                          height: "100%",
+                          minHeight: width600 ? "260px" : "auto"
                         }}
                       >
                         <div style={{
                           width: "100%",
-                          height: "100%"
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "stretch"
                         }}>
                           <OnlineUserCard trainer={info.trainer_info} />
                         </div>

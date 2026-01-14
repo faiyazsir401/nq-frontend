@@ -98,11 +98,14 @@ const RecentStudent = () => {
             width: '100%', 
             marginTop: width600 ? '16px' : '32px', 
             boxShadow: 'rgba(0, 0, 0, 0.24) 0px 3px 8px',
-            border: 'none'
+            border: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'visible'
           }}
         >
-          <div className="card-body" style={{ padding: width600 ? '12px' : '20px' }}>
-            <div style={{ justifyContent: 'center', marginBottom: '15px' }}>
+          <div className="card-body" style={{ padding: width600 ? '12px 8px' : '20px', display: 'flex', flexDirection: 'column', flex: '1' }}>
+            <div style={{ justifyContent: 'center', marginBottom: width600 ? '12px' : '15px', width: '100%' }}>
               <h2 
                 className="Recent-Heading" 
                 style={{ 
@@ -110,7 +113,11 @@ const RecentStudent = () => {
                   fontSize: width600 ? '18px' : '22px',
                   fontWeight: '600',
                   color: '#333',
-                  marginBottom: '0'
+                  marginBottom: '0',
+                  paddingTop: width600 ? '8px' : '0',
+                  display: 'block',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
               >
                 {headingText}
