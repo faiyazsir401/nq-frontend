@@ -19,10 +19,10 @@ const OnlineUserCard = ({ trainer }) => {
         <div className="trainer-card" style={{
             display: "flex",
             flexDirection: "column",
-            gap: width600 ? "8px" : "10px",
+            gap: width600 ? "10px" : "12px",
             justifyContent: "flex-start",
             alignItems: "center",
-            padding: width600 ? "12px 8px" : "15px 12px",
+            padding: width600 ? "15px 10px" : "18px 15px",
             width: "100%",
             maxWidth: "100%",
             boxSizing: "border-box",
@@ -31,12 +31,13 @@ const OnlineUserCard = ({ trainer }) => {
             borderRadius: "8px",
             border: "1px solid #e0e0e0",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            minHeight: width600 ? "180px" : "200px"
+            minHeight: width600 ? "200px" : "220px",
+            touchAction: "manipulation" /* Better touch handling */
         }}>
             <div style={{ 
-                width: width600 ? "80px" : "100px", 
-                height: width600 ? "80px" : "100px", 
-                border: "3px solid rgb(0, 0, 128)", 
+                width: width600 ? "90px" : "110px", 
+                height: width600 ? "90px" : "110px", 
+                border: width600 ? "3px solid rgb(0, 0, 128)" : "4px solid rgb(0, 0, 128)", 
                 borderRadius: "50%", 
                 padding: "3px",
                 flexShrink: 0,
@@ -72,35 +73,38 @@ const OnlineUserCard = ({ trainer }) => {
                 textAlign: "center"
             }}>
                 <h4 style={{
-                    fontSize: width600 ? "14px" : "16px",
+                    fontSize: width600 ? "15px" : "17px",
                     fontWeight: 600,
                     margin: 0,
                     color: "#333",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
-                    width: "100%"
+                    width: "100%",
+                    textAlign: "center"
                 }}>{trainer?.fullName || trainer?.fullname}</h4>
                 <h4 style={{
-                    fontSize: width600 ? "12px" : "14px",
+                    fontSize: width600 ? "13px" : "15px",
                     fontWeight: 500,
                     margin: 0,
-                    color: "#666"
+                    color: "#666",
+                    textAlign: "center"
                 }}>Price: ${trainer?.extraInfo?.hourly_rate || 0}</h4>
                 <div 
                     onClick={handleTraineInstantLesson} 
                     className="instant"
                     style={{
-                        marginTop: width600 ? "6px" : "8px",
+                        marginTop: width600 ? "8px" : "10px",
                         background: "#ff6b6b",
                         border: "none",
                         borderRadius: "6px",
-                        padding: width600 ? "8px 12px" : "10px 16px",
+                        padding: width600 ? "10px 14px" : "12px 18px",
                         cursor: "pointer",
                         transition: "all 0.3s ease",
                         boxShadow: "0 2px 6px rgba(255, 107, 107, 0.4)",
                         width: "100%",
-                        maxWidth: "100%"
+                        maxWidth: "100%",
+                        touchAction: "manipulation" /* Better touch handling */
                     }}
                     onMouseEnter={(e) => {
                         e.currentTarget.style.background = "#ff5252";
@@ -112,9 +116,17 @@ const OnlineUserCard = ({ trainer }) => {
                         e.currentTarget.style.transform = "scale(1)";
                         e.currentTarget.style.boxShadow = "0 2px 6px rgba(255, 107, 107, 0.4)";
                     }}
+                    onTouchStart={(e) => {
+                        e.currentTarget.style.background = "#ff5252";
+                        e.currentTarget.style.transform = "scale(0.98)";
+                    }}
+                    onTouchEnd={(e) => {
+                        e.currentTarget.style.background = "#ff6b6b";
+                        e.currentTarget.style.transform = "scale(1)";
+                    }}
                 >
                     <h5 style={{
-                        fontSize: width600 ? "11px" : "13px",
+                        fontSize: width600 ? "12px" : "14px",
                         fontWeight: 700,
                         margin: 0,
                         color: "#ffffff",

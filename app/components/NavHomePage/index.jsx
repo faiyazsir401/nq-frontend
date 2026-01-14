@@ -152,13 +152,22 @@ const NavHomePage = () => {
     slidesToScroll: 1,
     dots: false,
     arrows: true,
-    swipeToSlide: true,
+    swipe: true, // Enable touch/swipe
+    swipeToSlide: true, // Allow swiping to slide
+    touchMove: true, // Enable touch move
+    touchThreshold: 5, // Sensitivity for touch
+    draggable: true, // Enable dragging
     responsive: [
       {
         breakpoint: 1200,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: true,
         },
       },
       {
@@ -166,6 +175,11 @@ const NavHomePage = () => {
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: true,
         },
       },
       {
@@ -173,6 +187,11 @@ const NavHomePage = () => {
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: true,
         },
       },
     ],
@@ -466,15 +485,33 @@ const NavHomePage = () => {
               position: "relative"
             }}>
               <style>{`
+                .banner_Slider {
+                  position: relative;
+                  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                }
+                .banner_Slider .slick-list {
+                  margin: 0 -10px;
+                  touch-action: pan-y pinch-zoom; /* Enable touch gestures */
+                }
+                .banner_Slider .slick-track {
+                  touch-action: pan-y pinch-zoom;
+                }
+                .banner_Slider .slick-slide {
+                  padding: 0 10px;
+                  touch-action: pan-y pinch-zoom;
+                }
                 .banner_Slider .slick-prev,
                 .banner_Slider .slick-next {
-                  z-index: 1;
+                  z-index: 10;
                   width: 35px;
                   height: 35px;
                   background: #fff !important;
                   border-radius: 50%;
                   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                   transition: all 0.3s ease;
+                  display: flex !important;
+                  align-items: center;
+                  justify-content: center;
                 }
                 .banner_Slider .slick-prev:hover,
                 .banner_Slider .slick-next:hover {
@@ -492,28 +529,62 @@ const NavHomePage = () => {
                   color: #fff;
                 }
                 .banner_Slider .slick-prev {
-                  left: -15px;
+                  left: -10px;
                 }
                 .banner_Slider .slick-next {
-                  right: -15px;
+                  right: -10px;
                 }
-                .banner_Slider .slick-list {
-                  margin: 0 -10px;
-                }
-                .banner_Slider .slick-slide {
-                  padding: 0 10px;
+                .banner_Slider .slick-prev.slick-disabled,
+                .banner_Slider .slick-next.slick-disabled {
+                  opacity: 0.3;
+                  cursor: not-allowed;
                 }
                 @media (max-width: 600px) {
+                  .banner_Slider .slick-list {
+                    margin: 0 -5px;
+                  }
+                  .banner_Slider .slick-slide {
+                    padding: 0 5px;
+                  }
                   .banner_Slider .slick-prev {
-                    left: -10px;
+                    left: -5px;
                   }
                   .banner_Slider .slick-next {
-                    right: -10px;
+                    right: -5px;
                   }
                   .banner_Slider .slick-prev,
                   .banner_Slider .slick-next {
-                    width: 30px;
-                    height: 30px;
+                    width: 32px;
+                    height: 32px;
+                    background: rgba(255, 255, 255, 0.95) !important;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                  }
+                  .banner_Slider .slick-prev:before,
+                  .banner_Slider .slick-next:before {
+                    font-size: 18px;
+                    color: #000080;
+                  }
+                  .banner_Slider .slick-prev:active,
+                  .banner_Slider .slick-next:active {
+                    transform: scale(0.95);
+                    background: #000080 !important;
+                  }
+                  .banner_Slider .slick-prev:active:before,
+                  .banner_Slider .slick-next:active:before {
+                    color: #fff;
+                  }
+                }
+                @media (max-width: 480px) {
+                  .banner_Slider .slick-prev {
+                    left: -3px;
+                  }
+                  .banner_Slider .slick-next {
+                    right: -3px;
+                  }
+                  .banner_Slider .slick-prev,
+                  .banner_Slider .slick-next {
+                    width: 28px;
+                    height: 28px;
                   }
                   .banner_Slider .slick-prev:before,
                   .banner_Slider .slick-next:before {

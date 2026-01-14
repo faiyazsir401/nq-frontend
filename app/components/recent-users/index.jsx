@@ -104,15 +104,19 @@ const RecentUsers = ({ onTraineeSelect }) => {
   const [categoryList, setCategoryList] = useState([]);
   const dispatch = useAppDispatch()
 
-  // Slider settings for recent users - horizontal scroll
+  // Slider settings for recent users - horizontal scroll with touch/swipe support
   const sliderSettings = {
     dots: false,
     infinite: false,
     speed: 500,
-    slidesToShow: width600 ? 3 : 6,
+    slidesToShow: width600 ? 2.5 : 6,
     slidesToScroll: 1,
-    swipeToSlide: true,
-    arrows: true,
+    swipe: true, // Enable touch/swipe
+    swipeToSlide: true, // Allow swiping to slide
+    touchMove: true, // Enable touch move
+    touchThreshold: 5, // Sensitivity for touch
+    draggable: true, // Enable dragging
+    arrows: true, // Always show arrows
     variableWidth: false,
     adaptiveHeight: false,
     responsive: [
@@ -121,6 +125,11 @@ const RecentUsers = ({ onTraineeSelect }) => {
         settings: {
           slidesToShow: 5,
           slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: true,
         },
       },
       {
@@ -128,13 +137,23 @@ const RecentUsers = ({ onTraineeSelect }) => {
         settings: {
           slidesToShow: 4,
           slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: true,
         },
       },
       {
         breakpoint: 600,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 2.5,
           slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: true,
         },
       },
       {
@@ -142,6 +161,11 @@ const RecentUsers = ({ onTraineeSelect }) => {
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: true,
         },
       },
     ],
@@ -165,30 +189,38 @@ const RecentUsers = ({ onTraineeSelect }) => {
         .recent-users-slider {
           width: 100%;
           overflow: hidden;
+          position: relative;
+          -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
         .recent-users-slider .slick-list {
           overflow: visible;
           margin: 0 -8px;
+          touch-action: pan-y pinch-zoom; /* Enable touch gestures */
         }
         .recent-users-slider .slick-track {
           display: flex;
           align-items: stretch;
+          touch-action: pan-y pinch-zoom;
         }
         .recent-users-slider .slick-slide {
           padding: 0 8px;
+          touch-action: pan-y pinch-zoom;
         }
         .recent-users-slider .slick-slide > div {
           height: 100%;
         }
         .recent-users-slider .slick-prev,
         .recent-users-slider .slick-next {
-          z-index: 1;
+          z-index: 10;
           width: 35px;
           height: 35px;
           background: #fff !important;
           border-radius: 50%;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
           transition: all 0.3s ease;
+          display: flex !important;
+          align-items: center;
+          justify-content: center;
         }
         .recent-users-slider .slick-prev:hover,
         .recent-users-slider .slick-next:hover {
@@ -206,22 +238,67 @@ const RecentUsers = ({ onTraineeSelect }) => {
           color: #fff;
         }
         .recent-users-slider .slick-prev {
-          left: -15px;
+          left: -10px;
         }
         .recent-users-slider .slick-next {
-          right: -15px;
+          right: -10px;
         }
+        .recent-users-slider .slick-prev.slick-disabled,
+        .recent-users-slider .slick-next.slick-disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+        /* Mobile optimizations */
         @media (max-width: 600px) {
+          .recent-users-slider {
+            padding: 0 5px;
+          }
+          .recent-users-slider .slick-list {
+            margin: 0 -4px;
+          }
+          .recent-users-slider .slick-slide {
+            padding: 0 4px;
+          }
           .recent-users-slider .slick-prev {
-            left: -10px;
+            left: -5px;
           }
           .recent-users-slider .slick-next {
-            right: -10px;
+            right: -5px;
           }
           .recent-users-slider .slick-prev,
           .recent-users-slider .slick-next {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+          }
+          .recent-users-slider .slick-prev:before,
+          .recent-users-slider .slick-next:before {
+            font-size: 18px;
+            color: #000080;
+          }
+          .recent-users-slider .slick-prev:active,
+          .recent-users-slider .slick-next:active {
+            transform: scale(0.95);
+            background: #000080 !important;
+          }
+          .recent-users-slider .slick-prev:active:before,
+          .recent-users-slider .slick-next:active:before {
+            color: #fff;
+          }
+        }
+        /* Very small screens */
+        @media (max-width: 480px) {
+          .recent-users-slider .slick-prev {
+            left: -3px;
+          }
+          .recent-users-slider .slick-next {
+            right: -3px;
+          }
+          .recent-users-slider .slick-prev,
+          .recent-users-slider .slick-next {
+            width: 28px;
+            height: 28px;
           }
           .recent-users-slider .slick-prev:before,
           .recent-users-slider .slick-next:before {
@@ -230,9 +307,9 @@ const RecentUsers = ({ onTraineeSelect }) => {
         }
       `}</style>
       <div className="card rounded trainer-profile-card Select Recent Student" style={{ 
-        height: accountType === AccountType?.TRAINEE ? "280px" : "100%",
-        minHeight: accountType === AccountType?.TRAINEE ? "280px" : "auto",
-        maxHeight: accountType === AccountType?.TRAINEE ? "280px" : "none"
+        height: accountType === AccountType?.TRAINEE ? (width600 ? "260px" : "280px") : "100%",
+        minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "260px" : "280px") : "auto",
+        maxHeight: accountType === AccountType?.TRAINEE ? (width600 ? "260px" : "280px") : "none"
       }}>
       {trainerInfo && trainerInfo.userInfo ? (
         <Modal
@@ -330,8 +407,8 @@ const RecentUsers = ({ onTraineeSelect }) => {
             padding: width600 ? "15px 10px" : "20px 15px",
             position: "relative",
             overflow: "hidden",
-            height: accountType === AccountType?.TRAINEE ? "200px" : "auto",
-            minHeight: accountType === AccountType?.TRAINEE ? "200px" : "180px",
+            height: accountType === AccountType?.TRAINEE ? (width600 ? "180px" : "200px") : "auto",
+            minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "180px" : "200px") : "180px",
             flex: accountType === AccountType?.TRAINEE ? "1" : "none"
           }}
         >
@@ -349,12 +426,13 @@ const RecentUsers = ({ onTraineeSelect }) => {
                         textAlign: "center",
                         overflow: "hidden",
                         cursor: "pointer",
-                        padding: width600 ? "8px 4px" : "10px",
+                        padding: width600 ? "10px 6px" : "10px",
                         borderRadius: "10px",
                         transition: "all 0.3s ease",
                         backgroundColor: "#fafafa",
                         border: "1px solid #f0f0f0",
-                        minHeight: width600 ? "120px" : "140px"
+                        minHeight: width600 ? "140px" : "140px",
+                        touchAction: "manipulation" /* Better touch handling */
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = "#f5f5f5";
@@ -396,12 +474,12 @@ const RecentUsers = ({ onTraineeSelect }) => {
                     >
                       <div
                         style={{
-                          width: width600 ? "70px" : "80px",
-                          height: width600 ? "70px" : "80px",
+                          width: width600 ? "65px" : "80px",
+                          height: width600 ? "65px" : "80px",
                           borderRadius: "50%",
-                          border: width600 ? "2px solid rgb(0, 0, 128)" : "3px solid rgb(0, 0, 128)",
+                          border: width600 ? "2.5px solid rgb(0, 0, 128)" : "3px solid rgb(0, 0, 128)",
                           padding: "2px",
-                          marginBottom: width600 ? "8px" : "10px",
+                          marginBottom: width600 ? "6px" : "10px",
                           transition: "all 0.3s ease",
                           display: "flex",
                           alignItems: "center",
@@ -409,6 +487,7 @@ const RecentUsers = ({ onTraineeSelect }) => {
                           overflow: "hidden",
                           backgroundColor: "#fff",
                           boxSizing: "border-box",
+                          flexShrink: 0
                         }}
                       >
                         <img
@@ -439,7 +518,7 @@ const RecentUsers = ({ onTraineeSelect }) => {
                         style={{
                           maxWidth: "100%",
                           marginBottom: "0px",
-                          fontSize: width600 ? "11px" : "13px",
+                          fontSize: width600 ? "12px" : "13px",
                           fontWeight: "500",
                           color: "#333",
                           overflow: "hidden",
