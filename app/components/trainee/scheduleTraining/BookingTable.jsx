@@ -675,14 +675,24 @@ const BookingTable = ({
               {/* Banner right styles */}
               <button
                 style={{
-                  backgroundColor: "#28a745",
+                  backgroundColor: "#ff6b6b",
                   color: "#fff",
                   padding: "0.7rem 1rem",
                   borderRadius: "5px",
                   margin: "5px auto",
                   width: "100%",
                   fontSize: "1rem",
-                  border: "1px solid #28a745",
+                  border: "1px solid #ff6b6b",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 6px rgba(255, 107, 107, 0.4)"
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#ff5252";
+                  e.currentTarget.style.boxShadow = "0 4px 8px rgba(255, 107, 107, 0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#ff6b6b";
+                  e.currentTarget.style.boxShadow = "0 2px 6px rgba(255, 107, 107, 0.4)";
                 }}
                 onClick={() => {
                   setIsInstantLessonModalOpen(true);

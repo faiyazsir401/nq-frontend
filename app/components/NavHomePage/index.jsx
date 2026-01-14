@@ -145,9 +145,37 @@ const NavHomePage = () => {
   }, []);
 
   var settings = {
-    autoplay: true,
+    autoplay: false,
     infinite: activeTrainer?.length > 1,
-    speed: 2000,
+    speed: 500,
+    slidesToShow: width600 ? 1 : width900 ? 2 : 3,
+    slidesToScroll: 1,
+    dots: false,
+    arrows: true,
+    swipeToSlide: true,
+    responsive: [
+      {
+        breakpoint: 1200,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 900,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
     slidesToShow: 1, // Always show one trainer per slide
     slidesToScroll: 1,
     swipeToSlide: true,
@@ -434,8 +462,65 @@ const NavHomePage = () => {
             <div className="banner_Slider" style={{
               width: "100%",
               maxWidth: "100%",
-              boxSizing: "border-box"
+              boxSizing: "border-box",
+              position: "relative"
             }}>
+              <style>{`
+                .banner_Slider .slick-prev,
+                .banner_Slider .slick-next {
+                  z-index: 1;
+                  width: 35px;
+                  height: 35px;
+                  background: #fff !important;
+                  border-radius: 50%;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                  transition: all 0.3s ease;
+                }
+                .banner_Slider .slick-prev:hover,
+                .banner_Slider .slick-next:hover {
+                  background: #000080 !important;
+                  box-shadow: 0 4px 12px rgba(0, 0, 128, 0.3);
+                }
+                .banner_Slider .slick-prev:before,
+                .banner_Slider .slick-next:before {
+                  color: #000080;
+                  font-size: 20px;
+                  opacity: 1;
+                }
+                .banner_Slider .slick-prev:hover:before,
+                .banner_Slider .slick-next:hover:before {
+                  color: #fff;
+                }
+                .banner_Slider .slick-prev {
+                  left: -15px;
+                }
+                .banner_Slider .slick-next {
+                  right: -15px;
+                }
+                .banner_Slider .slick-list {
+                  margin: 0 -10px;
+                }
+                .banner_Slider .slick-slide {
+                  padding: 0 10px;
+                }
+                @media (max-width: 600px) {
+                  .banner_Slider .slick-prev {
+                    left: -10px;
+                  }
+                  .banner_Slider .slick-next {
+                    right: -10px;
+                  }
+                  .banner_Slider .slick-prev,
+                  .banner_Slider .slick-next {
+                    width: 30px;
+                    height: 30px;
+                  }
+                  .banner_Slider .slick-prev:before,
+                  .banner_Slider .slick-next:before {
+                    font-size: 16px;
+                  }
+                }
+              `}</style>
               <Slider {...settings}>
                 {activeTrainer &&
                   activeTrainer?.map((info, index) => {
@@ -443,18 +528,14 @@ const NavHomePage = () => {
                       <div 
                         key={`slider-${info.trainer_info?._id}-${index}`}
                         style={{
-                          padding: width600 ? "0 10px" : "0 15px",
+                          padding: width600 ? "0 5px" : "0 10px",
                           boxSizing: "border-box",
-                          width: "100%",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center"
+                          height: "100%"
                         }}
                       >
                         <div style={{
                           width: "100%",
-                          maxWidth: width600 ? "100%" : "400px",
-                          margin: "0 auto"
+                          height: "100%"
                         }}>
                           <OnlineUserCard trainer={info.trainer_info} />
                         </div>

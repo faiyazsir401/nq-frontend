@@ -1664,7 +1664,7 @@ const VideoCallUI = ({
                                             >
                                               <path
                                                 d="M13.5 4L6 11.5L2.5 8"
-                                                stroke="white"
+                                                stroke="black"
                                                 strokeWidth="2"
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
@@ -1895,7 +1895,7 @@ const VideoCallUI = ({
                                             >
                                               <path
                                                 d="M13.5 4L6 11.5L2.5 8"
-                                                stroke="white"
+                                                stroke="black"
                                                 strokeWidth="2"
                                                 strokeLinecap="round"
                                                 strokeLinejoin="round"
@@ -2092,7 +2092,7 @@ const VideoCallUI = ({
                                         >
                                           <path
                                             d="M13.5 4L6 11.5L2.5 8"
-                                            stroke="white"
+                                            stroke="black"
                                             strokeWidth="2"
                                             strokeLinecap="round"
                                             strokeLinejoin="round"

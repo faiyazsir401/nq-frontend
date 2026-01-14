@@ -18,25 +18,33 @@ const OnlineUserCard = ({ trainer }) => {
     return (<>
         <div className="trainer-card" style={{
             display: "flex",
-            flexDirection: "row",
-            gap: width600 ? "8px" : "12px",
-            justifyContent: "center",
+            flexDirection: "column",
+            gap: width600 ? "8px" : "10px",
+            justifyContent: "flex-start",
             alignItems: "center",
-            padding: width600 ? "6px 8px" : "10px 12px",
+            padding: width600 ? "12px 8px" : "15px 12px",
             width: "100%",
             maxWidth: "100%",
             boxSizing: "border-box",
-            height: "100%"
+            height: "100%",
+            backgroundColor: "#fff",
+            borderRadius: "8px",
+            border: "1px solid #e0e0e0",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+            minHeight: width600 ? "180px" : "200px"
         }}>
             <div style={{ 
-                width: width600 ? "60px" : "70px", 
-                height: width600 ? "60px" : "70px", 
-                border: "2px solid rgb(0, 0, 128)", 
-                borderRadius: "5px", 
-                padding: "4px",
+                width: width600 ? "80px" : "100px", 
+                height: width600 ? "80px" : "100px", 
+                border: "3px solid rgb(0, 0, 128)", 
+                borderRadius: "50%", 
+                padding: "3px",
                 flexShrink: 0,
                 boxSizing: "border-box",
-                backgroundColor: "#fff"
+                backgroundColor: "#fff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
             }}>
                 <img
                     src={trainer.profile_picture ? Utils.getImageUrlOfS3(trainer.profile_picture) : "/assets/images/demoUser.png"}
@@ -46,7 +54,7 @@ const OnlineUserCard = ({ trainer }) => {
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
-                        borderRadius: "3px",
+                        borderRadius: "50%",
                         transition: 'all 0.3s ease',
                         display: "block"
                     }}
@@ -58,23 +66,23 @@ const OnlineUserCard = ({ trainer }) => {
             <div className="card-info" style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: width600 ? "4px" : "6px",
-                flex: 1,
-                minWidth: 0,
-                maxWidth: "calc(100% - 80px)",
-                overflow: "hidden"
+                gap: width600 ? "6px" : "8px",
+                width: "100%",
+                alignItems: "center",
+                textAlign: "center"
             }}>
                 <h4 style={{
-                    fontSize: width600 ? "12px" : "13px",
+                    fontSize: width600 ? "14px" : "16px",
                     fontWeight: 600,
                     margin: 0,
                     color: "#333",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
-                    textOverflow: "ellipsis"
+                    textOverflow: "ellipsis",
+                    width: "100%"
                 }}>{trainer?.fullName || trainer?.fullname}</h4>
                 <h4 style={{
-                    fontSize: width600 ? "11px" : "12px",
+                    fontSize: width600 ? "12px" : "14px",
                     fontWeight: 500,
                     margin: 0,
                     color: "#666"
@@ -83,28 +91,30 @@ const OnlineUserCard = ({ trainer }) => {
                     onClick={handleTraineInstantLesson} 
                     className="instant"
                     style={{
-                        marginTop: width600 ? "4px" : "6px",
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        marginTop: width600 ? "6px" : "8px",
+                        background: "#ff6b6b",
                         border: "none",
-                        borderRadius: "4px",
-                        padding: width600 ? "6px 8px" : "8px 12px",
+                        borderRadius: "6px",
+                        padding: width600 ? "8px 12px" : "10px 16px",
                         cursor: "pointer",
                         transition: "all 0.3s ease",
-                        boxShadow: "0 2px 6px rgba(102, 126, 234, 0.4)"
+                        boxShadow: "0 2px 6px rgba(255, 107, 107, 0.4)",
+                        width: "100%",
+                        maxWidth: "100%"
                     }}
                     onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%)";
+                        e.currentTarget.style.background = "#ff5252";
                         e.currentTarget.style.transform = "scale(1.02)";
-                        e.currentTarget.style.boxShadow = "0 4px 8px rgba(102, 126, 234, 0.6)";
+                        e.currentTarget.style.boxShadow = "0 4px 8px rgba(255, 107, 107, 0.6)";
                     }}
                     onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+                        e.currentTarget.style.background = "#ff6b6b";
                         e.currentTarget.style.transform = "scale(1)";
-                        e.currentTarget.style.boxShadow = "0 2px 6px rgba(102, 126, 234, 0.4)";
+                        e.currentTarget.style.boxShadow = "0 2px 6px rgba(255, 107, 107, 0.4)";
                     }}
                 >
                     <h5 style={{
-                        fontSize: width600 ? "10px" : "12px",
+                        fontSize: width600 ? "11px" : "13px",
                         fontWeight: 700,
                         margin: 0,
                         color: "#ffffff",

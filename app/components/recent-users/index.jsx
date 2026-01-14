@@ -45,7 +45,12 @@ const RecentUsers = ({ onTraineeSelect }) => {
   const getRecentStudentApi = async () => {
     try {
       let res = await getRecentStudent();
-      setRecentStudent(res?.data || []);
+      // API returns { status: "SUCCESS", data: [...] }
+      // axiosInstance returns response.data, so res is { status: "SUCCESS", data: [...] }
+      // We need to access res.data to get the array
+      const students = (res?.data && Array.isArray(res.data)) ? res.data : (Array.isArray(res) ? res : []);
+      setRecentStudent(students);
+      console.log("Recent students fetched:", students.length, "students");
     } catch (error) {
       console.error("Error fetching recent students:", error);
       setRecentStudent([]);
@@ -99,27 +104,29 @@ const RecentUsers = ({ onTraineeSelect }) => {
   const [categoryList, setCategoryList] = useState([]);
   const dispatch = useAppDispatch()
 
-  // Slider settings for recent users
+  // Slider settings for recent users - horizontal scroll
   const sliderSettings = {
     dots: false,
     infinite: false,
     speed: 500,
-    slidesToShow: width600 ? 3 : 5,
+    slidesToShow: width600 ? 3 : 6,
     slidesToScroll: 1,
     swipeToSlide: true,
     arrows: true,
+    variableWidth: false,
+    adaptiveHeight: false,
     responsive: [
       {
         breakpoint: 1200,
         settings: {
-          slidesToShow: 4,
+          slidesToShow: 5,
           slidesToScroll: 1,
         },
       },
       {
         breakpoint: 900,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 4,
           slidesToScroll: 1,
         },
       },
@@ -142,10 +149,37 @@ const RecentUsers = ({ onTraineeSelect }) => {
 
   // Get the current list based on account type
   const currentList = accountType === AccountType?.TRAINER ? recentStudent : recentTrainer;
+  
+  // Debug: Log current list to verify data
+  useEffect(() => {
+    if (currentList && currentList.length > 0) {
+      console.log("Current list to display:", currentList.length, "items", currentList);
+    } else {
+      console.log("No items to display. Account type:", accountType, "Recent student count:", recentStudent.length, "Recent trainer count:", recentTrainer.length);
+    }
+  }, [currentList, accountType, recentStudent.length, recentTrainer.length]);
 
   return (
     <>
       <style>{`
+        .recent-users-slider {
+          width: 100%;
+          overflow: hidden;
+        }
+        .recent-users-slider .slick-list {
+          overflow: visible;
+          margin: 0 -8px;
+        }
+        .recent-users-slider .slick-track {
+          display: flex;
+          align-items: stretch;
+        }
+        .recent-users-slider .slick-slide {
+          padding: 0 8px;
+        }
+        .recent-users-slider .slick-slide > div {
+          height: 100%;
+        }
         .recent-users-slider .slick-prev,
         .recent-users-slider .slick-next {
           z-index: 1;
@@ -195,7 +229,11 @@ const RecentUsers = ({ onTraineeSelect }) => {
           }
         }
       `}</style>
-      <div className="card rounded trainer-profile-card Select Recent Student" style={{ height: "100%" }}>
+      <div className="card rounded trainer-profile-card Select Recent Student" style={{ 
+        height: accountType === AccountType?.TRAINEE ? "280px" : "100%",
+        minHeight: accountType === AccountType?.TRAINEE ? "280px" : "auto",
+        maxHeight: accountType === AccountType?.TRAINEE ? "280px" : "none"
+      }}>
       {trainerInfo && trainerInfo.userInfo ? (
         <Modal
           className="recent-user-modal"
@@ -274,9 +312,12 @@ const RecentUsers = ({ onTraineeSelect }) => {
         className="card-body Recent"
         style={{
           width: "100%",
-          maxHeight: "95%",
           marginTop: "5px",
-          padding: width600 ? "12px 8px" : "15px 12px"
+          padding: width600 ? "12px 8px" : "15px 12px",
+          overflow: "hidden",
+          height: accountType === AccountType?.TRAINEE ? "calc(100% - 60px)" : "auto",
+          display: "flex",
+          flexDirection: "column"
         }}
       >
         {/* Box container with proper styling */}
@@ -288,11 +329,14 @@ const RecentUsers = ({ onTraineeSelect }) => {
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
             padding: width600 ? "15px 10px" : "20px 15px",
             position: "relative",
-            overflow: "hidden"
+            overflow: "hidden",
+            height: accountType === AccountType?.TRAINEE ? "200px" : "auto",
+            minHeight: accountType === AccountType?.TRAINEE ? "200px" : "180px",
+            flex: accountType === AccountType?.TRAINEE ? "1" : "none"
           }}
         >
           {currentList && currentList.length > 0 ? (
-            <div className="recent-users-slider" style={{ position: "relative" }}>
+            <div className="recent-users-slider" style={{ position: "relative", width: "100%" }}>
               <Slider {...sliderSettings}>
                 {currentList.map((item, index) => (
                   <div key={index} style={{ padding: width600 ? "0 5px" : "0 8px" }}>
