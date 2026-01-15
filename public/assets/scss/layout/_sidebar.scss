@@ -34,8 +34,24 @@
         gap: 23px;
         padding-top: 20px;
         height: 100%;
-        overflow: auto;
+        overflow-y: auto;
+        overflow-x: visible !important;
         padding-bottom: 75px;
+        
+        // Ensure icons are always visible
+        .icon-btn {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          
+          svg {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+          }
+        }
       }
 
       .sidebar-top,
@@ -349,8 +365,8 @@
           gap: 16px;
           padding-top: 15px;
           height: 100%;
-          overflow: auto;
-          overflow-x: clip;
+          overflow-y: auto;
+          overflow-x: visible !important;
           align-items: center;
           padding-bottom: 70px;
 
@@ -361,6 +377,21 @@
             font-weight: 500;
             font-family: "Roboto", sans-serif;
             font-size: 10px;
+          }
+          
+          // Ensure icons are always visible
+          .icon-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            
+            svg {
+              display: block !important;
+              visibility: visible !important;
+              opacity: 1 !important;
+            }
           }
 
 
@@ -397,6 +428,94 @@
     .main-nav {
         border-right: 1px solid $border-color;
         padding: 15px 0;
+        min-width: 65px !important;
+        width: 65px !important;
+        
+        .sidebar-main {
+          .sidebar-top {
+            overflow-x: visible !important;
+            overflow-y: auto !important;
+            
+            li {
+              width: 100% !important;
+              display: flex !important;
+              flex-direction: column !important;
+              align-items: center !important;
+              justify-content: center !important;
+            }
+            
+            .icon-btn {
+              min-width: 40px !important;
+              min-height: 40px !important;
+              width: 40px !important;
+              height: 40px !important;
+              display: flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              visibility: visible !important;
+              opacity: 1 !important;
+              
+              svg {
+                width: 20px !important;
+                height: 20px !important;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+              }
+            }
+          }
+        }
+    }
+  }
+}
+
+// Additional responsive fixes for various phone sizes
+@media (max-width: 400px) {
+  .chitchat-container {
+    .main-nav {
+      min-width: 60px !important;
+      width: 60px !important;
+      
+      .sidebar-main {
+        .sidebar-top {
+          .icon-btn {
+            min-width: 38px !important;
+            min-height: 38px !important;
+            width: 38px !important;
+            height: 38px !important;
+            
+            svg {
+              width: 18px !important;
+              height: 18px !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 350px) {
+  .chitchat-container {
+    .main-nav {
+      min-width: 55px !important;
+      width: 55px !important;
+      
+      .sidebar-main {
+        .sidebar-top {
+          .icon-btn {
+            min-width: 36px !important;
+            min-height: 36px !important;
+            width: 36px !important;
+            height: 36px !important;
+            
+            svg {
+              width: 16px !important;
+              height: 16px !important;
+            }
+          }
+        }
+      }
     }
   }
 }

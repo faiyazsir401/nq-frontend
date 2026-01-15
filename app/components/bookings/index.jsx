@@ -29,6 +29,8 @@ import { Utils } from "../../../utils/utils";
 import Modal from "../../common/modal";
 import StartMeeting from "./start";
 import { SocketContext } from "../socket";
+import { EVENTS } from "../../../helpers/events";
+import { notificiationTitles } from "../../../utils/constant";
 import Ratings from "./ratings";
 import Rating from "react-rating";
 import { Star, X } from "react-feather";
@@ -181,6 +183,55 @@ const Bookings = ({ accountType = null }) => {
       dispatch(getScheduledMeetingDetailsAsync());
     }
   }, [tabBook, accountType, dispatch, scheduledMeetingDetails, lastFetchedTimestamp, cachedTabBook]);
+
+  // Silent refresh for upcoming sessions when new bookings are created
+  // Listen to socket events for booking updates
+  useEffect(() => {
+    if (!socket) return;
+
+    // Listen for new booking notifications to silently refresh
+    const handleBookingUpdate = () => {
+      // Silently refresh without showing loading state
+      if (accountType === AccountType.TRAINER) {
+        if (tabBook) {
+          const payload = {
+            status: tabBook,
+          };
+          // Force refresh by bypassing cache
+          dispatch(getScheduledMeetingDetailsAsync(payload));
+        }
+      } else {
+        dispatch(getScheduledMeetingDetailsAsync());
+      }
+    };
+
+    // Listen for push notifications that indicate new bookings
+    const handleNotification = (notification) => {
+      // Only refresh if it's a booking-related notification
+      if (
+        notification.title === notificiationTitles.newBookingRequest ||
+        notification.title === notificiationTitles.sessionStrated ||
+        notification.title === notificiationTitles.sessionConfirmation
+      ) {
+        // Small delay to ensure backend has processed the booking
+        setTimeout(() => {
+          handleBookingUpdate();
+        }, 500);
+      }
+    };
+
+    socket.on(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE, handleNotification);
+
+    // Also listen for instant lesson events that might create bookings
+    socket.on(EVENTS.INSTANT_LESSON.ACCEPT, handleBookingUpdate);
+
+    return () => {
+      if (socket) {
+        socket.off(EVENTS.PUSH_NOTIFICATIONS.ON_RECEIVE, handleNotification);
+        socket.off(EVENTS.INSTANT_LESSON.ACCEPT, handleBookingUpdate);
+      }
+    };
+  }, [socket, accountType, tabBook, dispatch]);
 
   useEffect(() => {
     if (bookedSession.id) {

@@ -131,9 +131,12 @@ const VideoCallUI = ({
   const [sessionEndTime, setSessionEndTime] = useState(null)
   const [showGracePeriodModal, setShowGracePeriodModal] = useState(false);
   const [showSessionEndedModal, setShowSessionEndedModal] = useState(false);
+  const [show30SecondWarning, setShow30SecondWarning] = useState(false);
   const [countdownMessage, setCountdownMessage] = useState("");
+  const [remainingSeconds, setRemainingSeconds] = useState(30);
   const gracePeriodModalDismissedRef = useRef(false);
   const sessionEndedModalDismissedRef = useRef(false);
+  const warning30SecondIntervalRef = useRef(null);
   const [lockPoint, setLockPoint] = useState(0);
 
   // Authoritative lesson timer (backend-driven)
@@ -401,13 +404,36 @@ const VideoCallUI = ({
   useEffect(() => {
     if (!socket) return;
 
-    const handleLessonTimeWarning = ({ sessionId, remainingSeconds }) => {
+    const handleLessonTimeWarning = ({ sessionId, remainingSeconds: secondsRemaining }) => {
       if (sessionId !== id) return;
       
+      // Show 30-second warning modal
+      setRemainingSeconds(secondsRemaining);
+      setShow30SecondWarning(true);
+      
+      // Start countdown timer
+      if (warning30SecondIntervalRef.current) {
+        clearInterval(warning30SecondIntervalRef.current);
+      }
+      
+      warning30SecondIntervalRef.current = setInterval(() => {
+        setRemainingSeconds((prev) => {
+          if (prev <= 1) {
+            if (warning30SecondIntervalRef.current) {
+              clearInterval(warning30SecondIntervalRef.current);
+              warning30SecondIntervalRef.current = null;
+            }
+            setShow30SecondWarning(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      // Also show toast as backup notification
       toast.warning(
-        `Only ${remainingSeconds} seconds remaining in this lesson.`,
+        `Only ${secondsRemaining} seconds remaining in this lesson.`,
       );
-      // Optional: open an extend-time CTA that calls extendSessionTime()
     };
 
     socket.on("LESSON_TIME_WARNING", handleLessonTimeWarning);
@@ -415,6 +441,10 @@ const VideoCallUI = ({
     return () => {
       if (socket) {
         socket.off("LESSON_TIME_WARNING", handleLessonTimeWarning);
+      }
+      if (warning30SecondIntervalRef.current) {
+        clearInterval(warning30SecondIntervalRef.current);
+        warning30SecondIntervalRef.current = null;
       }
     };
   }, [socket, id]);
@@ -2280,6 +2310,80 @@ const VideoCallUI = ({
             </Button>
           </div>
         </ModalBody>
+      </Modal>
+
+      {/* 30-Second Warning Modal */}
+      <Modal isOpen={show30SecondWarning} centered backdrop="static" keyboard={false}>
+        <ModalHeader style={{ 
+          backgroundColor: remainingSeconds <= 10 ? '#dc3545' : '#ffc107',
+          color: '#ffffff',
+          borderBottom: 'none'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <i className="fa fa-exclamation-triangle" aria-hidden="true" style={{ fontSize: '24px' }}></i>
+            <span style={{ fontSize: '18px', fontWeight: '600' }}>Session Ending Soon</span>
+          </div>
+        </ModalHeader>
+        <ModalBody style={{ padding: '2rem', textAlign: 'center' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <i 
+              className="fa fa-clock-o" 
+              aria-hidden="true" 
+              style={{ 
+                fontSize: '48px', 
+                color: remainingSeconds <= 10 ? '#dc3545' : '#ffc107',
+                marginBottom: '1rem'
+              }}
+            ></i>
+            <h3 style={{ 
+              color: remainingSeconds <= 10 ? '#dc3545' : '#333',
+              marginBottom: '1rem',
+              fontWeight: '600'
+            }}>
+              Session ending in {remainingSeconds} seconds
+            </h3>
+            <p style={{ color: '#666', fontSize: '16px', lineHeight: '1.6' }}>
+              Your session time is almost up. The call will end automatically when the timer reaches zero.
+            </p>
+          </div>
+          {remainingSeconds <= 10 && (
+            <div style={{
+              backgroundColor: '#fff3cd',
+              border: '1px solid #ffc107',
+              borderRadius: '8px',
+              padding: '1rem',
+              marginTop: '1rem'
+            }}>
+              <p style={{ margin: 0, color: '#856404', fontWeight: '500' }}>
+                ⚠️ Less than 10 seconds remaining!
+              </p>
+            </div>
+          )}
+        </ModalBody>
+        <ModalFooter style={{ 
+          borderTop: 'none',
+          justifyContent: 'center',
+          padding: '1rem 2rem'
+        }}>
+          <Button 
+            color="secondary" 
+            onClick={() => { 
+              setShow30SecondWarning(false);
+              if (warning30SecondIntervalRef.current) {
+                clearInterval(warning30SecondIntervalRef.current);
+                warning30SecondIntervalRef.current = null;
+              }
+            }}
+            style={{
+              minWidth: '120px',
+              padding: '0.75rem 1.5rem',
+              fontWeight: '600'
+            }}
+          >
+            <i className="fa fa-times" aria-hidden="true" style={{ marginRight: '8px' }}></i>
+            Close
+          </Button>
+        </ModalFooter>
       </Modal>
 
       {/* Grace Period Modal (-4 minutes) */}

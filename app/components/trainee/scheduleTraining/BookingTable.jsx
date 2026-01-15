@@ -684,15 +684,15 @@ const BookingTable = ({
                   fontSize: "1rem",
                   border: "1px solid #ff6b6b",
                   transition: "all 0.3s ease",
-                  boxShadow: "0 2px 6px rgba(255, 107, 107, 0.4)"
+                  boxShadow: "0 2px 6px rgba(249, 0, 0, 0.4)"
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = "#ff5252";
-                  e.currentTarget.style.boxShadow = "0 4px 8px rgba(255, 107, 107, 0.6)";
+                  e.currentTarget.style.boxShadow = "0 4px 8px rgba(249, 0, 0, 0.6)";
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = "#ff6b6b";
-                  e.currentTarget.style.boxShadow = "0 2px 6px rgba(255, 107, 107, 0.4)";
+                  e.currentTarget.style.boxShadow = "0 2px 6px rgba(249, 0, 0, 0.4)";
                 }}
                 onClick={() => {
                   setIsInstantLessonModalOpen(true);

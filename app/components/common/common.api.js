@@ -39,38 +39,52 @@ export const getScheduledMeetingDetails = async (payload) => {
     });
     
 
-    let filteredData = response.data.data;
+    let filteredData = response.data?.data || [];
+
+    // Edge case: Handle empty or invalid response
+    if (!Array.isArray(filteredData)) {
+      console.warn("getScheduledMeetingDetails: Invalid data format received");
+      return { ...response.data, data: [] };
+    }
 
     // Convert times for the filtered data
     filteredData = convertTimesForDataArray(filteredData);
 
     // Iterate through the data and update statuses if needed
     filteredData = filteredData.map((item, index) => {
+      // Edge case: Skip invalid items
+      if (!item || !item._id) {
+        console.warn("Skipping invalid booking item at index:", index);
+        return item;
+      }
+
       if (item.status === "booked" || item.status === "confirmed") {
-        const availabilityInfo = Utils.meetingAvailability(
-          item.booked_date,
-          item.session_start_time,
-          item.session_end_time,
-          item.time_zone, // Assuming `userTimeZone` is `item.time_zone`
-          item.start_time,
-          item.end_time
-        );
-        const { has24HoursPassedSinceBooking } = availabilityInfo;
-
-        const accountType = store.getState().auth.accountType;
-
-        const isMeetingCompleted = (detail) => {
-          return (
-            detail &&
-            detail.ratings &&
-            detail.ratings[accountType.toLowerCase()] &&
-            detail.ratings[accountType.toLowerCase()].sessionRating
+        try {
+          const availabilityInfo = Utils.meetingAvailability(
+            item.booked_date,
+            item.session_start_time,
+            item.session_end_time,
+            item.time_zone, // Assuming `userTimeZone` is `item.time_zone`
+            item.start_time,
+            item.end_time
           );
-        };
+          const { has24HoursPassedSinceBooking } = availabilityInfo || {};
 
-        // Check if the meeting is done, and if so, update its status to completed
-        if (isMeetingCompleted(item) || has24HoursPassedSinceBooking) {
-          item.status = "completed"; // Update the status to completed
+          const accountType = store.getState()?.auth?.accountType;
+
+          const isMeetingCompleted = (detail) => {
+            if (!detail || !detail.ratings || !accountType) return false;
+            const ratingInfo = detail.ratings[accountType.toLowerCase()];
+            return ratingInfo && ratingInfo.sessionRating;
+          };
+
+          // Check if the meeting is done, and if so, update its status to completed
+          if (isMeetingCompleted(item) || has24HoursPassedSinceBooking) {
+            item.status = "completed"; // Update the status to completed
+          }
+        } catch (error) {
+          console.warn("Error processing booking availability:", item._id, error);
+          // Continue with original item if error occurs
         }
       }
       return item;
@@ -92,6 +106,42 @@ export const getScheduledMeetingDetails = async (payload) => {
       filteredData = filteredData.filter((item) => item.status === "completed");
     }
 
+    // Sort by latest bookings first (most recent createdAt or booked_date first)
+    // This ensures new bookings appear at the top
+    filteredData.sort((a, b) => {
+      // Try to use createdAt first (most accurate), fallback to booked_date
+      // Edge case: Handle invalid dates
+      let dateA = 0;
+      try {
+        if (a.createdAt) {
+          const parsed = new Date(a.createdAt).getTime();
+          dateA = isNaN(parsed) ? 0 : parsed;
+        } else if (a.booked_date) {
+          const parsed = new Date(a.booked_date).getTime();
+          dateA = isNaN(parsed) ? 0 : parsed;
+        }
+      } catch (e) {
+        console.warn("Error parsing date for booking:", a._id, e);
+        dateA = 0;
+      }
+
+      let dateB = 0;
+      try {
+        if (b.createdAt) {
+          const parsed = new Date(b.createdAt).getTime();
+          dateB = isNaN(parsed) ? 0 : parsed;
+        } else if (b.booked_date) {
+          const parsed = new Date(b.booked_date).getTime();
+          dateB = isNaN(parsed) ? 0 : parsed;
+        }
+      } catch (e) {
+        console.warn("Error parsing date for booking:", b._id, e);
+        dateB = 0;
+      }
+      
+      // Sort descending (newest first)
+      return dateB - dateA;
+    });
     
     return { ...response.data, data: filteredData };
   } catch (error) {

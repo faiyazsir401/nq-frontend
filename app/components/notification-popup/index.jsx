@@ -16,6 +16,7 @@ import { authState } from "../auth/auth.slice";
 import { BookedSession, bookingButton } from "../../common/constants";
 import { getScheduledMeetingDetails } from "../common/common.api";
 import { navigateToMeeting } from "../../../utils/utils";
+import { toast } from "react-toastify";
 
 const initialModelValue = {
   title: "",
@@ -42,6 +43,8 @@ const NotificationPopup = () => {
   const [hasShownPopup, setHasShownPopup] = useState(false);
   const [lastNotificationId, setLastNotificationId] = useState(null);
   const autoCloseTimerRef = useRef(null);
+  const countdownTimerRef = useRef(null);
+  const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
     if (!socket) {
@@ -75,6 +78,11 @@ const NotificationPopup = () => {
         clearTimeout(autoCloseTimerRef.current);
         autoCloseTimerRef.current = null;
       }
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      setCountdown(10);
     };
   }, [userInfo?._id]);
 
@@ -218,12 +226,39 @@ const NotificationPopup = () => {
       SetIsOpen(true);
       setHasShownPopup(true);
       setLastNotificationId(notification._id);
+      setCountdown(10);
+      
+      // Clear any existing timers
       if (autoCloseTimerRef.current) {
         clearTimeout(autoCloseTimerRef.current);
       }
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+      }
+      
+      // Start countdown timer
+      countdownTimerRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            if (countdownTimerRef.current) {
+              clearInterval(countdownTimerRef.current);
+              countdownTimerRef.current = null;
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      
+      // Auto-close after 10 seconds
       autoCloseTimerRef.current = setTimeout(() => {
         SetIsOpen(false);
-      }, 3000);
+        setCountdown(10);
+        if (countdownTimerRef.current) {
+          clearInterval(countdownTimerRef.current);
+          countdownTimerRef.current = null;
+        }
+      }, 10000);
     }
   };
 
@@ -232,6 +267,11 @@ const NotificationPopup = () => {
       clearTimeout(autoCloseTimerRef.current);
       autoCloseTimerRef.current = null;
     }
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setCountdown(10);
     SetIsOpen((prev) => !prev);
   };
 
@@ -251,7 +291,42 @@ const NotificationPopup = () => {
         element={
           <>
             <Modal isOpen={isOpen} toggle={toggle} centered={true}>
-              <ModalHeader toggle={toggle}>{modelObj?.title}</ModalHeader>
+              <ModalHeader 
+                toggle={toggle}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span>{modelObj?.title}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "normal",
+                      color: countdown <= 3 ? "#dc3545" : "#666",
+                    }}
+                  >
+                    Auto-closes in: {countdown}s
+                  </span>
+                  <button
+                    onClick={toggle}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      fontSize: "20px",
+                      cursor: "pointer",
+                      padding: "0 5px",
+                      color: "#666",
+                      lineHeight: "1",
+                    }}
+                    aria-label="Close notification"
+                  >
+                    ×
+                  </button>
+                </div>
+              </ModalHeader>
               <ModalBody>{modelObj?.description}</ModalBody>
               <ModalFooter>
                 <Button
