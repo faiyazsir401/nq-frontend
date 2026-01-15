@@ -16,7 +16,6 @@ import { useMediaQuery } from "../../hook/useMediaQuery";
 import BookingTable from "../trainee/scheduleTraining/BookingTable.jsx";
 import { TrainerDetails } from "../trainer/trainerDetails.jsx";
 import { getTraineeWithSlotsAsync } from "../trainee/trainee.slice";
-import Slider from "react-slick";
 
 // const placeholderImageUrl = '/assets/images/avtar/user.png'; // Placeholder image path
 const placeholderImageUrl = "/assets/images/demoUser.png"; // Placeholder image path
@@ -35,6 +34,7 @@ const RecentUsers = ({ onTraineeSelect }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStudentData, SetselectedStudentData] = useState({});
   const width600 = useMediaQuery(600);
+  const width900 = useMediaQuery(900);
 
   useEffect(() => {
     getRecentStudentApi();
@@ -104,212 +104,159 @@ const RecentUsers = ({ onTraineeSelect }) => {
   const [categoryList, setCategoryList] = useState([]);
   const dispatch = useAppDispatch()
 
-  // Slider settings for recent users - horizontal scroll with touch/swipe support
-  const sliderSettings = {
-    dots: false,
-    infinite: false,
-    speed: 500,
-    slidesToShow: width600 ? 2.5 : 6,
-    slidesToScroll: 1,
-    swipe: true, // Enable touch/swipe
-    swipeToSlide: true, // Allow swiping to slide
-    touchMove: true, // Enable touch move
-    touchThreshold: 5, // Sensitivity for touch
-    draggable: true, // Enable dragging
-    arrows: true, // Always show arrows
-    variableWidth: false,
-    adaptiveHeight: false,
-    responsive: [
-      {
-        breakpoint: 1200,
-        settings: {
-          slidesToShow: 5,
-          slidesToScroll: 1,
-          swipe: true,
-          swipeToSlide: true,
-          touchMove: true,
-          draggable: true,
-          arrows: true,
-        },
-      },
-      {
-        breakpoint: 900,
-        settings: {
-          slidesToShow: 4,
-          slidesToScroll: 1,
-          swipe: true,
-          swipeToSlide: true,
-          touchMove: true,
-          draggable: true,
-          arrows: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2.5,
-          slidesToScroll: 1,
-          swipe: true,
-          swipeToSlide: true,
-          touchMove: true,
-          draggable: true,
-          arrows: true,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-          swipe: true,
-          swipeToSlide: true,
-          touchMove: true,
-          draggable: true,
-          arrows: true,
-        },
-      },
-    ],
+  // Responsive helpers for grid layout
+  const getGridColumns = () => {
+    if (width600) return "repeat(2, 1fr)";
+    if (width900) return "repeat(3, 1fr)";
+    return "repeat(5, 1fr)";
   };
+
+  const getImageSize = () => {
+    if (width600) return { width: "65px", height: "65px" };
+    if (width900) return { width: "75px", height: "75px" };
+    return { width: "80px", height: "80px" };
+  };
+
+  const imageSize = getImageSize();
 
   // Get the current list based on account type
   const currentList = accountType === AccountType?.TRAINER ? recentStudent : recentTrainer;
-  
-  // Debug: Log current list to verify data
-  useEffect(() => {
-    if (currentList && currentList.length > 0) {
-      console.log("Current list to display:", currentList.length, "items", currentList);
-    } else {
-      console.log("No items to display. Account type:", accountType, "Recent student count:", recentStudent.length, "Recent trainer count:", recentTrainer.length);
-    }
-  }, [currentList, accountType, recentStudent.length, recentTrainer.length]);
 
   return (
     <>
       <style>{`
-        .recent-users-slider {
+        .recent-users-container {
           width: 100%;
-          overflow: hidden;
-          position: relative;
-          -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-        }
-        .recent-users-slider .slick-list {
-          overflow: visible;
-          margin: 0 -8px;
-          touch-action: pan-y pinch-zoom; /* Enable touch gestures */
-        }
-        .recent-users-slider .slick-track {
           display: flex;
-          align-items: stretch;
-          touch-action: pan-y pinch-zoom;
+          flex-direction: column;
         }
-        .recent-users-slider .slick-slide {
-          padding: 0 8px;
-          touch-action: pan-y pinch-zoom;
+
+        .recent-users-box {
+          background-color: #fff;
+          border-radius: 12px;
+          border: 1px solid #e0e0e0;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          padding: 16px 12px;
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
         }
-        .recent-users-slider .slick-slide > div {
-          height: 100%;
+
+        .recent-users-grid {
+          display: grid;
+          gap: 14px;
+          width: 100%;
+          box-sizing: border-box;
+          padding-top: 8px;
+          overflow-y: auto;
         }
-        .recent-users-slider .slick-prev,
-        .recent-users-slider .slick-next {
-          z-index: 10;
-          width: 35px;
-          height: 35px;
-          background: #fff !important;
-          border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+        .recent-users-item {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          cursor: pointer;
+          padding: 10px 6px;
+          border-radius: 10px;
           transition: all 0.3s ease;
-          display: flex !important;
+          background-color: #fafafa;
+          border: 1px solid #f0f0f0;
+          min-height: 130px;
+        }
+
+        .recent-users-item:hover {
+          background-color: #f5f5f5;
+          transform: translateY(-4px);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+          border-color: #000080;
+        }
+
+        .recent-users-avatar {
+          border-radius: 50%;
+          border: 3px solid rgb(0, 0, 128);
+          padding: 2px;
+          margin-bottom: 8px;
+          display: flex;
           align-items: center;
           justify-content: center;
+          overflow: hidden;
+          background-color: #fff;
+          box-sizing: border-box;
+          flex-shrink: 0;
         }
-        .recent-users-slider .slick-prev:hover,
-        .recent-users-slider .slick-next:hover {
-          background: #000080 !important;
-          box-shadow: 0 4px 12px rgba(0, 0, 128, 0.3);
+
+        .recent-users-avatar img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          object-fit: cover;
+          object-position: center;
+          display: block;
         }
-        .recent-users-slider .slick-prev:before,
-        .recent-users-slider .slick-next:before {
-          color: #000080;
-          font-size: 20px;
-          opacity: 1;
+
+        .recent-users-name {
+          max-width: 100%;
+          margin-bottom: 0px;
+          font-weight: 500;
+          color: #333;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 100%;
+          padding: 0 4px;
+          line-height: 1.3;
         }
-        .recent-users-slider .slick-prev:hover:before,
-        .recent-users-slider .slick-next:hover:before {
-          color: #fff;
+
+        .recent-users-empty {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 40px 20px;
+          color: #999;
+          font-size: 14px;
+          text-align: center;
         }
-        .recent-users-slider .slick-prev {
-          left: -10px;
-        }
-        .recent-users-slider .slick-next {
-          right: -10px;
-        }
-        .recent-users-slider .slick-prev.slick-disabled,
-        .recent-users-slider .slick-next.slick-disabled {
-          opacity: 0.3;
-          cursor: not-allowed;
-        }
-        /* Mobile optimizations */
+
+        /* Mobile */
         @media (max-width: 600px) {
-          .recent-users-slider {
-            padding: 0 5px;
+          .recent-users-box {
+            padding: 14px 8px;
           }
-          .recent-users-slider .slick-list {
-            margin: 0 -4px;
+
+          .recent-users-grid {
+            gap: 12px;
+            max-height: 60vh;
           }
-          .recent-users-slider .slick-slide {
-            padding: 0 4px;
+
+          .recent-users-item {
+            min-height: 120px;
           }
-          .recent-users-slider .slick-prev {
-            left: -5px;
-          }
-          .recent-users-slider .slick-next {
-            right: -5px;
-          }
-          .recent-users-slider .slick-prev,
-          .recent-users-slider .slick-next {
-            width: 32px;
-            height: 32px;
-            background: rgba(255, 255, 255, 0.95) !important;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-          }
-          .recent-users-slider .slick-prev:before,
-          .recent-users-slider .slick-next:before {
-            font-size: 18px;
-            color: #000080;
-          }
-          .recent-users-slider .slick-prev:active,
-          .recent-users-slider .slick-next:active {
-            transform: scale(0.95);
-            background: #000080 !important;
-          }
-          .recent-users-slider .slick-prev:active:before,
-          .recent-users-slider .slick-next:active:before {
-            color: #fff;
+
+          .recent-users-name {
+            font-size: 12px;
           }
         }
-        /* Very small screens */
-        @media (max-width: 480px) {
-          .recent-users-slider .slick-prev {
-            left: -3px;
+
+        /* Tablet */
+        @media (min-width: 601px) and (max-width: 900px) {
+          .recent-users-grid {
+            max-height: 65vh;
           }
-          .recent-users-slider .slick-next {
-            right: -3px;
-          }
-          .recent-users-slider .slick-prev,
-          .recent-users-slider .slick-next {
-            width: 28px;
-            height: 28px;
-          }
-          .recent-users-slider .slick-prev:before,
-          .recent-users-slider .slick-next:before {
-            font-size: 16px;
+        }
+
+        /* Desktop */
+        @media (min-width: 901px) {
+          .recent-users-grid {
+            max-height: 70vh;
           }
         }
       `}</style>
       <div className="card rounded trainer-profile-card Select Recent Student" style={{ 
-        height: accountType === AccountType?.TRAINEE ? (width600 ? "auto" : "280px") : "100%",
-        minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "280px" : "280px") : "auto",
-        maxHeight: accountType === AccountType?.TRAINEE ? (width600 ? "none" : "280px") : "none",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         overflow: "visible"
@@ -400,167 +347,94 @@ const RecentUsers = ({ onTraineeSelect }) => {
           marginTop: "0px",
           padding: width600 ? "8px 6px" : "15px 12px",
           overflow: "hidden",
-          height: accountType === AccountType?.TRAINEE ? (width600 ? "auto" : "calc(100% - 60px)") : "auto",
-          minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "200px" : "auto") : "auto",
           display: "flex",
           flexDirection: "column",
           flex: "1"
         }}
       >
-        {/* Box container with proper styling */}
-        <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            border: "1px solid #e0e0e0",
-            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            padding: width600 ? "15px 10px" : "20px 15px",
-            position: "relative",
-            overflow: "hidden",
-            height: accountType === AccountType?.TRAINEE ? (width600 ? "auto" : "200px") : "auto",
-            minHeight: accountType === AccountType?.TRAINEE ? (width600 ? "180px" : "200px") : "180px",
-            maxHeight: accountType === AccountType?.TRAINEE ? (width600 ? "none" : "200px") : "none",
-            flex: accountType === AccountType?.TRAINEE ? "1" : "none"
-          }}
-        >
+        <div className="recent-users-container">
+          <div className="recent-users-box">
           {currentList && currentList.length > 0 ? (
-            <div className="recent-users-slider" style={{ position: "relative", width: "100%" }}>
-              <Slider {...sliderSettings}>
-                {currentList.map((item, index) => (
-                  <div key={index} style={{ padding: width600 ? "0 5px" : "0 8px" }}>
-                    <div
+            <div
+              className="recent-users-grid"
+              style={{ gridTemplateColumns: getGridColumns() }}
+            >
+              {currentList.map((item, index) => (
+                <div
+                  key={index}
+                  className="recent-users-item"
+                  onClick={() => {
+                    if (accountType === AccountType?.TRAINER) {
+                      const traineeId = item?._id || item?.id;
+                      if (onTraineeSelect) {
+                        onTraineeSelect(traineeId);
+                      }
+                      handleStudentClick(traineeId);
+                      SetselectedStudentData({ ...item });
+                    } else {
+                      setTrainerInfo((prev) => ({
+                        ...prev,
+                        userInfo: item,
+                        selected_category: null,
+                      }));
+                      setSelectedTrainer({
+                        id: item?.id || item?._id,
+                        trainer_id: item?.id || item?._id,
+                        data: item,
+                      });
+                      dispatch(getTraineeWithSlotsAsync({ search: item?.fullname || item?.fullName }));
+                      setIsModalOpen(true);
+                    }
+                  }}
+                >
+                  <div
+                    className="recent-users-avatar"
+                    style={{
+                      width: imageSize.width,
+                      height: imageSize.height,
+                    }}
+                  >
+                    <img
+                      className="Image-Division"
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        textAlign: "center",
-                        overflow: "hidden",
-                        cursor: "pointer",
-                        padding: width600 ? "10px 6px" : "10px",
-                        borderRadius: "10px",
-                        transition: "all 0.3s ease",
-                        backgroundColor: "#fafafa",
-                        border: "1px solid #f0f0f0",
-                        minHeight: width600 ? "140px" : "140px",
-                        touchAction: "manipulation" /* Better touch handling */
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        objectPosition: "center",
+                        display: "block",
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#f5f5f5";
-                        e.currentTarget.style.transform = "translateY(-4px)";
-                        e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
-                        e.currentTarget.style.borderColor = "#000080";
+                      src={
+                        Utils?.getImageUrlOfS3(item?.profile_picture || item.profile_picture) ||
+                        "/assets/images/demoUser.png"
+                      }
+                      alt={
+                        accountType === AccountType?.TRAINER
+                          ? `Recent Student ${index + 1}`
+                          : `Recent Expert ${index + 1}`
+                      }
+                      onError={(e) => {
+                        e.target.src = "/assets/images/demoUser.png";
                       }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#fafafa";
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.boxShadow = "none";
-                        e.currentTarget.style.borderColor = "#f0f0f0";
-                      }}
-                      onClick={() => {
-                        if (accountType === AccountType?.TRAINER) {
-                          const traineeId = item?._id || item?.id;
-                          // Call the callback to set trainee in locker page
-                          if (onTraineeSelect) {
-                            onTraineeSelect(traineeId);
-                          }
-                          // Also open the modal for detailed view
-                          handleStudentClick(traineeId);
-                          SetselectedStudentData({ ...item });
-                        } else {
-                          setTrainerInfo((prev) => ({
-                            ...prev,
-                            userInfo: item,
-                            selected_category: null,
-                          }));
-                          setSelectedTrainer({
-                            id: item?.id || item?._id,
-                            trainer_id: item?.id || item?._id,
-                            data: item,
-                          });
-                          dispatch(getTraineeWithSlotsAsync({ search: item?.fullname || item?.fullName }));
-                          setIsModalOpen(true);
-                        }
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: width600 ? "65px" : "80px",
-                          height: width600 ? "65px" : "80px",
-                          borderRadius: "50%",
-                          border: width600 ? "2.5px solid rgb(0, 0, 128)" : "3px solid rgb(0, 0, 128)",
-                          padding: "2px",
-                          marginBottom: width600 ? "6px" : "10px",
-                          transition: "all 0.3s ease",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          overflow: "hidden",
-                          backgroundColor: "#fff",
-                          boxSizing: "border-box",
-                          flexShrink: 0
-                        }}
-                      >
-                        <img
-                          className="Image-Division"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            borderRadius: "50%",
-                            objectFit: "cover",
-                            objectPosition: "center",
-                            display: "block",
-                          }}
-                          src={
-                            Utils?.getImageUrlOfS3(item?.profile_picture || item.profile_picture) ||
-                            "/assets/images/demoUser.png"
-                          }
-                          alt={
-                            accountType === AccountType?.TRAINER
-                              ? `Recent Student ${index + 1}`
-                              : `Recent Expert ${index + 1}`
-                          }
-                          onError={(e) => {
-                            e.target.src = "/assets/images/demoUser.png";
-                          }}
-                        />
-                      </div>
-                      <h5
-                        style={{
-                          maxWidth: "100%",
-                          marginBottom: "0px",
-                          fontSize: width600 ? "12px" : "13px",
-                          fontWeight: "500",
-                          color: "#333",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          width: "100%",
-                          padding: "0 4px",
-                          lineHeight: "1.3"
-                        }}
-                      >
-                        {item?.fullname || item?.fullName || 'Unknown'}
-                      </h5>
-                    </div>
+                    />
                   </div>
-                ))}
-              </Slider>
+                  <h5
+                    className="recent-users-name"
+                    style={{
+                      fontSize: width600 ? "12px" : "13px",
+                    }}
+                  >
+                    {item?.fullname || item?.fullName || 'Unknown'}
+                  </h5>
+                </div>
+              ))}
             </div>
           ) : (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: "40px 20px",
-                color: "#999",
-                fontSize: "14px"
-              }}
-            >
+            <div className="recent-users-empty">
               No recent {accountType === AccountType?.TRAINER ? "students" : "experts"} found
             </div>
           )}
+        </div>
         </div>
       </div>
       {accountType === AccountType?.TRAINER && (
