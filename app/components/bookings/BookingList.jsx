@@ -533,47 +533,25 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
 
   const filteredMeetings =
     scheduledMeetingDetails?.filter((booking) => {
-      // Check if meeting is completed (has ratings or status is completed)
       const isCompleted = isMeetingCompleted(booking);
-
-      // Check if meeting is cancelled
       const isCancelled = booking?.status === BookedSession.canceled;
 
-      // Get availability info to check if session is upcoming
-      const availabilityInfo = Utils.meetingAvailability(
-        booking?.booked_date,
-        booking?.session_start_time,
-        booking?.session_end_time,
-        userTimeZone,
-        booking?.start_time,
-        booking?.end_time
-      );
-
-      const has24HoursPassed = availabilityInfo?.has24HoursPassedSinceBooking;
-      const isUpcomingSession = availabilityInfo?.isUpcomingSession;
-
-      // Filter based on tab
       switch (activeTabs) {
         case "upcoming":
-          // For upcoming: must be confirmed/booked, not completed, not cancelled, and actually upcoming
+          // Align with API semantics: show all meetings whose status is booked/confirmed.
+          // Time-based logic (isUpcomingSession/has24HoursPassed) was hiding valid rows.
           return (
-            (booking?.status === BookedSession.confirmed ||
-              booking?.status === BookedSession.booked) &&
-            !isCompleted &&
-            !isCancelled &&
-            isUpcomingSession &&
-            !has24HoursPassed
+            booking?.status === BookedSession.confirmed ||
+            booking?.status === BookedSession.booked
           );
+
         case "canceled":
-          // For canceled: must have canceled status
           return isCancelled;
+
         case "completed":
-          // For completed: must be completed (has ratings) or status is completed, or 24 hours have passed
-          return (
-            isCompleted ||
-            booking?.status === BookedSession.completed ||
-            has24HoursPassed
-          );
+          // Completed if API marks it so or we detect completion from ratings.
+          return isCompleted || booking?.status === BookedSession.completed;
+
         default:
           return booking?.status === activeTabs;
       }
