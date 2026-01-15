@@ -77,17 +77,13 @@ export const getScheduledMeetingDetails = async (payload) => {
     });
 
     // Filter based on the status provided in payload
+    // Note: For "upcoming", we return all confirmed/booked meetings and let the component filter by time
+    // This is because the component has better logic to check if meetings are actually upcoming
     if (payload?.status === "upcoming") {
+      // Return all confirmed/booked meetings - let component filter by actual time
       filteredData = filteredData.filter(
         (item) => {
-
-          // First check if status is booked or confirmed
-          if (item.status !== "booked" && item.status !== "confirmed") {
-            return false;
-          }
-          
-          
-          return true;
+          return item.status === "booked" || item.status === "confirmed";
         }
       );
     } else if (payload?.status === "canceled") {
