@@ -22,7 +22,8 @@ import "../../trainer/dashboard/index.scss";
 import { commonState, getClipsAsync, getMyClipsAsync } from "../../../common/common.slice";
 import { masterState } from "../../master/master.slice";
 import { MY_CLIPS_LABEL_LIMIT } from "../../../../utils/constant";
-import { AccountType } from "../../../common/constants";
+import { AccountType, topNavbarOptions } from "../../../common/constants";
+import { authAction } from "../../auth/auth.slice";
 
 const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
@@ -383,61 +384,6 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                             >
                               <source src={Utils?.generateVideoURL(clp)} />
                             </video>
-                            {clp.user_id === userInfo?._id &&
-                            <div
-                              className="download-delete"
-                              style={{
-                                position: "absolute",
-                                top: "4px",
-                                right: "4px",
-                                display: "flex",
-                                flexDirection: "column",
-                                justifyContent: "space-between",
-                                backgroundColor: "#333",
-                                color: "#fff",
-                                
-                                fontSize: "16px",
-                                zIndex: "8",
-                              }}
-                              onClick={() => {
-                                openClipInModal(ind, index, clp);
-                              }}
-                            >
-                              <div
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  // handleDelete(clp?._id);
-                                  setIsConfirmModalOpen(true);
-                                  setSelectedId(clp?._id);
-                                }}
-                                style={{
-                                  padding: isMobileScreen?"5px":"8px",
-                                  paddingBottom:isMobileScreen?"0px":"2px",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <FaTrash  size={isMobileScreen?15:17}/>
-                              </div>
-                              <div
-                                style={{
-                                  paddingTop:"0px",
-                                  cursor: "pointer",
-                                }}
-                              >
-                                <a
-                                  href={Utils?.generateVideoURL(clp)}
-                                  download={true}
-                                  onClick={(e) => e.stopPropagation()}
-                                  style={{
-                                    color: "#fff",
-                                    fontSize: "16px",
-                                  }}
-                                  target="_self"
-                                >
-                                  <FaDownload size={isMobileScreen?15:17}/>
-                                </a>
-                              </div>
-                            </div>}
                           </div>
                         </Tooltip>
                       </div>
@@ -538,11 +484,12 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(255,255,255,0.1)",
-                      border: "none",
+                      backgroundColor: "rgba(0, 0, 128, 0.8)",
+                      border: "2px solid #000080",
                       padding: "10px",
                       opacity: !findPreviousClipPosition() ? 0.5 : 1,
-                      cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer"
+                      cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
                     }}
                   >
                     <ChevronLeft size={20} color="#fff" />
@@ -570,82 +517,65 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(255,255,255,0.1)",
-                      border: "none",
+                      backgroundColor: "rgba(0, 0, 128, 0.8)",
+                      border: "2px solid #000080",
                       padding: "10px",
                       opacity: !findNextClipPosition() ? 0.5 : 1,
-                      cursor: !findNextClipPosition() ? "not-allowed" : "pointer"
+                      cursor: !findNextClipPosition() ? "not-allowed" : "pointer",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
                     }}
                   >
                     <ChevronRight size={20} color="#fff" />
                   </button>
                 </div>
 
-                {/* Action buttons at bottom */}
-                {selectedClip?.user_id === userInfo?._id && (
-                  <div
+                {/* Action button at bottom */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    paddingTop: "15px",
+                    borderTop: "1px solid rgba(255,255,255,0.1)"
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsOpen(false);
+                      dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON));
+                    }}
                     style={{
+                      border: "none",
+                      background: "#ff6b6b",
+                      color: "#fff",
+                      borderRadius: "6px",
+                      padding: "12px 24px",
                       display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
-                      gap: "12px",
-                      paddingTop: "15px",
-                      borderTop: "1px solid rgba(255,255,255,0.1)"
+                      gap: "8px",
+                      fontSize: "15px",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      transition: "all 0.3s ease",
+                      boxShadow: "0 2px 8px rgba(255, 107, 107, 0.4)",
+                      width: "100%",
+                      maxWidth: "400px",
+                      justifyContent: "center"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = "#ff5252";
+                      e.target.style.boxShadow = "0 4px 12px rgba(255, 107, 107, 0.6)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = "#ff6b6b";
+                      e.target.style.boxShadow = "0 2px 8px rgba(255, 107, 107, 0.4)";
                     }}
                   >
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsConfirmModalOpen(true);
-                        setSelectedId(selectedClip?._id);
-                      }}
-                      style={{
-                        border: "none",
-                        background: "#dc3545",
-                        color: "#fff",
-                        borderRadius: "6px",
-                        padding: "10px 20px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        cursor: "pointer",
-                        transition: "all 0.3s ease"
-                      }}
-                      onMouseEnter={(e) => e.target.style.background = "#c82333"}
-                      onMouseLeave={(e) => e.target.style.background = "#dc3545"}
-                    >
-                      <FaTrash size={14} />
-                      <span>Delete</span>
-                    </button>
-                    <a
-                      href={Utils?.generateVideoURL(selectedClip)}
-                      download={true}
-                      onClick={(e) => e.stopPropagation()}
-                      style={{
-                        background: "#007bff",
-                        color: "#fff",
-                        borderRadius: "6px",
-                        padding: "10px 20px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        textDecoration: "none",
-                        transition: "all 0.3s ease"
-                      }}
-                      onMouseEnter={(e) => e.target.style.background = "#0056b3"}
-                      onMouseLeave={(e) => e.target.style.background = "#007bff"}
-                      target="_self"
-                    >
-                      <FaDownload size={14} />
-                      <span>Download</span>
-                    </a>
-                  </div>
-                )}
+                    <span>Book An Instant Lesson Now!</span>
+                  </button>
+                </div>
               </div>
             </div>
           </>
