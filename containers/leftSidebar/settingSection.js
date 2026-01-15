@@ -41,7 +41,8 @@ import { UpdateHourlyRateForm } from "../../app/components/trainer/settings/hour
 import TimePicker from "rc-time-picker";
 import { SettalInBankAccount } from "../../app/components/trainer/settings/settal_in_bank";
 import { settelReqestToBankAccount } from "../../app/components/trainer/trainer.api";
-import { updateAccountPrivacy, getS3SignUrlForProfile, pushProfilePhotoToS3 } from "../../app/common/common.api";
+import { updateAccountPrivacy } from "../../app/common/common.api";
+import { getS3SignUrlForProfile, pushProfilePhotoToS3 } from "../../app/components/common/common.api";
 import ChangePhoneNumber from "../../app/components/change-number";
 import NotificationSettings from "../../app/components/notification-settings";
 import CropImage from "../../app/components/cards/user-card/crop-modal";
