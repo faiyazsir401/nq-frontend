@@ -19,46 +19,50 @@ const OnlineUserCard = ({ trainer }) => {
         <div className="trainer-card" style={{
             display: "flex",
             flexDirection: "column",
-            gap: width600 ? "12px" : "14px",
+            gap: width600 ? "10px" : "12px",
             justifyContent: "flex-start",
             alignItems: "center",
-            padding: width600 ? "16px 12px" : "20px 18px",
+            padding: width600 ? "14px 10px" : "18px 16px",
             width: "100%",
             maxWidth: "100%",
             boxSizing: "border-box",
-            height: "100%",
+            height: "auto",
             backgroundColor: "#fff",
             borderRadius: "8px",
             border: "1px solid #e0e0e0",
             boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
-            minHeight: width600 ? "240px" : "250px",
-            touchAction: "manipulation" /* Better touch handling */
+            minHeight: "auto",
+            touchAction: "manipulation"
         }}>
             <div style={{ 
-                width: width600 ? "100px" : "120px", 
-                height: width600 ? "100px" : "120px", 
+                width: width600 ? "90px" : "110px", 
+                height: width600 ? "90px" : "110px", 
                 border: width600 ? "3px solid rgb(0, 0, 128)" : "4px solid rgb(0, 0, 128)", 
                 borderRadius: "50%", 
-                padding: "3px",
+                padding: "0",
                 flexShrink: 0,
                 boxSizing: "border-box",
                 backgroundColor: "#fff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                marginBottom: width600 ? "4px" : "0"
+                overflow: "hidden",
+                marginBottom: width600 ? "6px" : "8px",
+                position: "relative"
             }}>
                 <img
                     src={trainer.profile_picture ? Utils.getImageUrlOfS3(trainer.profile_picture) : "/assets/images/demoUser.png"}
                     alt="trainer_image"
-                    className="rounded"
                     style={{
                         width: "100%",
                         height: "100%",
                         objectFit: "cover",
+                        objectPosition: "center",
                         borderRadius: "50%",
                         transition: 'all 0.3s ease',
-                        display: "block"
+                        display: "block",
+                        margin: "0",
+                        padding: "0"
                     }}
                     onError={(e) => {
                         e.target.src = "/assets/images/demoUser.png";
@@ -68,16 +72,19 @@ const OnlineUserCard = ({ trainer }) => {
             <div className="card-info" style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: width600 ? "8px" : "10px",
+                gap: width600 ? "6px" : "8px",
                 width: "100%",
                 alignItems: "center",
                 textAlign: "center",
-                padding: width600 ? "0 4px" : "0"
+                padding: "0",
+                flex: "1",
+                justifyContent: "flex-start"
             }}>
                 <h4 style={{
-                    fontSize: width600 ? "16px" : "18px",
+                    fontSize: width600 ? "14px" : "16px",
                     fontWeight: 600,
                     margin: 0,
+                    padding: "0 4px",
                     color: "#333",
                     whiteSpace: "nowrap",
                     overflow: "hidden",
@@ -87,9 +94,10 @@ const OnlineUserCard = ({ trainer }) => {
                     lineHeight: "1.3"
                 }}>{trainer?.fullName || trainer?.fullname}</h4>
                 <h4 style={{
-                    fontSize: width600 ? "14px" : "16px",
+                    fontSize: width600 ? "12px" : "14px",
                     fontWeight: 500,
                     margin: 0,
+                    padding: "0 4px",
                     color: "#666",
                     textAlign: "center",
                     lineHeight: "1.3"
@@ -98,21 +106,22 @@ const OnlineUserCard = ({ trainer }) => {
                     onClick={handleTraineInstantLesson} 
                     className="instant"
                     style={{
-                        marginTop: width600 ? "10px" : "12px",
+                        marginTop: width600 ? "8px" : "10px",
                         background: "#ff6b6b",
                         border: "none",
                         borderRadius: "6px",
-                        padding: width600 ? "12px 16px" : "14px 20px",
+                        padding: width600 ? "10px 12px" : "12px 16px",
                         cursor: "pointer",
                         transition: "all 0.3s ease",
                         boxShadow: "0 2px 6px rgba(255, 107, 107, 0.4)",
                         width: "100%",
                         maxWidth: "100%",
-                        touchAction: "manipulation", /* Better touch handling */
-                        minHeight: width600 ? "44px" : "auto",
+                        touchAction: "manipulation",
+                        minHeight: width600 ? "40px" : "44px",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center"
+                        justifyContent: "center",
+                        flexShrink: 0
                     }}
                     onMouseEnter={(e) => {
                         e.currentTarget.style.background = "#ff5252";

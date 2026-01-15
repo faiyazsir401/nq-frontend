@@ -470,13 +470,14 @@ const NavHomePage = () => {
               borderRadius: "8px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               border: "none",
-              padding: width600 ? "12px 8px" : "12px 16px 8px 16px",
+              padding: width600 ? "10px 6px" : "12px 16px 8px 16px",
               width: "100%",
               maxWidth: "100%",
               margin: "0",
               boxSizing: "border-box",
-            overflow: "visible",
-            minHeight: width600 ? "260px" : "260px"
+              overflow: "visible",
+              height: "auto",
+              minHeight: "auto",
             }}
           >
             <div className="banner_Slider" style={{
@@ -493,6 +494,7 @@ const NavHomePage = () => {
                 .banner_Slider .slick-list {
                   margin: 0 -10px;
                   touch-action: pan-y pinch-zoom; /* Enable touch gestures */
+                  overflow: visible; /* Allow full card (image + text + button) to be visible */
                 }
                 .banner_Slider .slick-track {
                   touch-action: pan-y pinch-zoom;
