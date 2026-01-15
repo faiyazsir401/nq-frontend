@@ -436,6 +436,7 @@ const NavHomePage = () => {
               width: "100%",
               maxWidth: "100%",
               margin: "0",
+              height: "280px", 
               boxSizing: "border-box",
               overflow: "visible",
               display: "flex",
