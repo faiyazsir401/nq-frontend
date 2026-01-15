@@ -529,16 +529,87 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                   </button>
                 </div>
 
-                {/* Action button at bottom */}
+                {/* Action buttons at bottom */}
                 <div
                   style={{
                     display: "flex",
+                    flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
+                    gap: "12px",
                     paddingTop: "15px",
                     borderTop: "1px solid rgba(255,255,255,0.1)"
                   }}
                 >
+                  {/* Delete and Download buttons - only for user's own clips */}
+                  {selectedClip?.user_id === userInfo?._id && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "12px",
+                        width: "100%",
+                        maxWidth: "400px"
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsConfirmModalOpen(true);
+                          setSelectedId(selectedClip?._id);
+                        }}
+                        style={{
+                          border: "none",
+                          background: "#dc3545",
+                          color: "#fff",
+                          borderRadius: "6px",
+                          padding: "10px 20px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          fontSize: "14px",
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                          flex: "1"
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = "#c82333"}
+                        onMouseLeave={(e) => e.target.style.background = "#dc3545"}
+                      >
+                        <FaTrash size={14} />
+                        <span>Delete</span>
+                      </button>
+                      <a
+                        href={Utils?.generateVideoURL(selectedClip)}
+                        download={true}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          background: "#007bff",
+                          color: "#fff",
+                          borderRadius: "6px",
+                          padding: "10px 20px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          fontSize: "14px",
+                          fontWeight: 500,
+                          textDecoration: "none",
+                          transition: "all 0.3s ease",
+                          flex: "1"
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = "#0056b3"}
+                        onMouseLeave={(e) => e.target.style.background = "#007bff"}
+                        target="_self"
+                      >
+                        <FaDownload size={14} />
+                        <span>Download</span>
+                      </a>
+                    </div>
+                  )}
+                  
+                  {/* Book An Instant Lesson Now button - for everyone */}
                   <button
                     type="button"
                     onClick={(e) => {

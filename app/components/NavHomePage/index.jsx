@@ -146,20 +146,58 @@ const NavHomePage = () => {
 
   var settings = {
     autoplay: false,
-    infinite: activeTrainer?.length > 1,
-    speed: 500,
-    slidesToShow: width600 ? 1 : width900 ? 2 : 3,
+    infinite: false,
+    speed: 400,
+    slidesToShow: width600 ? 2.5 : width900 ? 3 : 4,
     slidesToScroll: 1,
     dots: false,
-    arrows: true,
-    swipe: true, // Enable touch/swipe
-    swipeToSlide: true, // Allow swiping to slide
-    touchMove: true, // Enable touch move
-    touchThreshold: 5, // Sensitivity for touch
-    draggable: true, // Enable dragging
+    arrows: activeTrainer?.length > (width600 ? 2.5 : width900 ? 3 : 4),
+    swipe: true,
+    swipeToSlide: true,
+    touchMove: true,
+    touchThreshold: 5,
+    draggable: true,
+    variableWidth: false,
+    adaptiveHeight: true,
     responsive: [
       {
         breakpoint: 1200,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: activeTrainer?.length > 3,
+        },
+      },
+      {
+        breakpoint: 900,
+        settings: {
+          slidesToShow: 2.5,
+          slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: activeTrainer?.length > 2.5,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2.5,
+          slidesToScroll: 1,
+          swipe: true,
+          swipeToSlide: true,
+          touchMove: true,
+          draggable: true,
+          arrows: activeTrainer?.length > 2.5,
+        },
+      },
+      {
+        breakpoint: 480,
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
@@ -167,83 +205,7 @@ const NavHomePage = () => {
           swipeToSlide: true,
           touchMove: true,
           draggable: true,
-          arrows: true,
-        },
-      },
-      {
-        breakpoint: 900,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          swipe: true,
-          swipeToSlide: true,
-          touchMove: true,
-          draggable: true,
-          arrows: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          swipe: true,
-          swipeToSlide: true,
-          touchMove: true,
-          draggable: true,
-          arrows: true,
-        },
-      },
-    ],
-    slidesToShow: 1, // Always show one trainer per slide
-    slidesToScroll: 1,
-    swipeToSlide: true,
-    autoplaySpeed: 3000,
-    arrows: activeTrainer?.length > 1, // Only show arrows if more than 1 item
-    dots: activeTrainer?.length > 1, // Show dots if more than 1 item
-    responsive: [
-      {
-        breakpoint: 1366,
-        settings: {
-          autoplay: true,
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          infinite: activeTrainer?.length > 1,
-          arrows: activeTrainer?.length > 1,
-          dots: activeTrainer?.length > 1,
-        },
-      },
-      {
-        breakpoint: 800,
-        settings: {
-          autoplay: true,
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          infinite: activeTrainer?.length > 1,
-          arrows: activeTrainer?.length > 1,
-          dots: activeTrainer?.length > 1,
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          autoplay: true,
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          infinite: activeTrainer?.length > 1,
-          arrows: activeTrainer?.length > 1,
-          dots: activeTrainer?.length > 1,
-        },
-      },
-      {
-        breakpoint: 700,
-        settings: {
-          autoplay: true,
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          infinite: activeTrainer?.length > 1,
-          arrows: activeTrainer?.length > 1,
-          dots: activeTrainer?.length > 1,
+          arrows: activeTrainer?.length > 2,
         },
       },
     ],
@@ -476,15 +438,16 @@ const NavHomePage = () => {
               margin: "0",
               boxSizing: "border-box",
               overflow: "visible",
-              height: "auto",
-              minHeight: "auto",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
             <div className="banner_Slider" style={{
               width: "100%",
               maxWidth: "100%",
               boxSizing: "border-box",
-              position: "relative"
+              position: "relative",
+              flex: "1"
             }}>
               <style>{`
                 .banner_Slider {
@@ -495,6 +458,13 @@ const NavHomePage = () => {
                   margin: 0 -10px;
                   touch-action: pan-y pinch-zoom; /* Enable touch gestures */
                   overflow: visible; /* Allow full card (image + text + button) to be visible */
+                }
+                .banner_Slider .slick-slide {
+                  height: auto;
+                }
+                .banner_Slider .slick-slide > div {
+                  height: 100%;
+                  display: flex;
                 }
                 .banner_Slider .slick-track {
                   touch-action: pan-y pinch-zoom;
@@ -706,12 +676,26 @@ const NavHomePage = () => {
                         className={`d-flex ${width600 ? "flex-column" : "flex-row"
                           }`}
                       >
-                        <div className="">Time :</div>
+                        <div className="">Session Requested Time :</div>
                         <dt className="ml-1">{`${formatTimeInLocalZone(
                           session.start_time
                         )} - ${formatTimeInLocalZone(session.end_time)}`}</dt>
                       </div>
                     </div>
+
+                    {session.createdAt && (
+                      <div className="" style={{ marginTop: width600 ? "8px" : "0" }}>
+                        <div
+                          className={`d-flex ${width600 ? "flex-column" : "flex-row"
+                            }`}
+                        >
+                          <div className="">Booked At :</div>
+                          <dt className="ml-1">
+                            {Utils.getDateInFormat(session.createdAt)} {formatTimeInLocalZone(session.createdAt)}
+                          </dt>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

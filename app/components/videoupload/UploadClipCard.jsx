@@ -510,12 +510,11 @@ const UploadClipCard = (props) => {
         <div className="file-upload-wrapper">
           <label htmlFor="fileUpload" className="file-upload-label">
             <div className="file-upload-content">
-              <Upload size={24} className="upload-icon-large" />
+              <Upload size={20} className="upload-icon-large" />
               <div className="upload-text">
-                <span className="upload-text-main">Click to select videos</span>
-                <span className="upload-text-sub">or drag and drop</span>
+                <span className="upload-text-main">Click to select videos or drag and drop</span>
               </div>
-              <span className="upload-hint">Supports MP4, WebM, QuickTime (Max 50MB per file)</span>
+              <span className="upload-hint">MP4, WebM, QuickTime (Max 50MB)</span>
             </div>
           </label>
           <input

@@ -441,7 +441,7 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                                   >
                                     <path
                                       d="M13.5 4L6 11.5L2.5 8"
-                                      stroke="white"
+                                      stroke="black"
                                       strokeWidth="2"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
@@ -550,11 +550,12 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(255,255,255,0.1)",
-                      border: "none",
+                      backgroundColor: "rgba(0, 0, 128, 0.8)",
+                      border: "2px solid #000080",
                       padding: "10px",
                       opacity: !findPreviousClipPosition() ? 0.5 : 1,
-                      cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer"
+                      cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
                     }}
                   >
                     <ChevronLeft size={20} color="#fff" />
@@ -582,11 +583,12 @@ const AddClip = ({ isOpen, onClose, trainer, selectedClips, clips, setSelectedCl
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(255,255,255,0.1)",
-                      border: "none",
+                      backgroundColor: "rgba(0, 0, 128, 0.8)",
+                      border: "2px solid #000080",
                       padding: "10px",
                       opacity: !findNextClipPosition() ? 0.5 : 1,
-                      cursor: !findNextClipPosition() ? "not-allowed" : "pointer"
+                      cursor: !findNextClipPosition() ? "not-allowed" : "pointer",
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
                     }}
                   >
                     <ChevronRight size={20} color="#fff" />

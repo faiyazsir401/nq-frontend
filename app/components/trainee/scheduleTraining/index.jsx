@@ -80,13 +80,29 @@ const settings = {
   slidesToScroll: 1,
   swipetoslide: true,
   autoplaySpeed: 1000,
+  swipe: true,
+  touchMove: true,
+  draggable: true,
   // arrows:false,
   responsive: [
     {
-      breakpoint: 1000,
+      breakpoint: 1024,
       settings: {
         autoplay: false,
         slidesToShow: 4,
+        swipe: true,
+        touchMove: true,
+        draggable: true,
+      },
+    },
+    {
+      breakpoint: 768,
+      settings: {
+        autoplay: false,
+        slidesToShow: 3,
+        swipe: true,
+        touchMove: true,
+        draggable: true,
       },
     },
     {
@@ -94,6 +110,9 @@ const settings = {
       settings: {
         autoplay: false,
         slidesToShow: 2,
+        swipe: true,
+        touchMove: true,
+        draggable: true,
       },
     },
     {
@@ -101,6 +120,9 @@ const settings = {
       settings: {
         autoplay: false,
         slidesToShow: 1,
+        swipe: true,
+        touchMove: true,
+        draggable: true,
       },
     },
   ],
@@ -171,6 +193,8 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
   const [userEmail, setUserEmail] = useState("");
   const [err, setErr] = useState({ email: false, video: false });
   const isMobileScreen = useMediaQuery(768);
+  const isTabletScreen = useMediaQuery(1024);
+  const isSmallMobile = useMediaQuery(480);
   const handleSelectClip = () => {
     setIsModalOpen(true);
   };
@@ -813,17 +837,33 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       className="bookings custom-scroll custom-trainee-dashboard booking-container"
       id="booking-lesson"
       style={{
-        marginLeft: openCloseToggleSideNav ? (isMobileScreen ? '65px' : '105px') : '0px',
+        marginLeft: openCloseToggleSideNav ? (isSmallMobile ? '60px' : isMobileScreen ? '65px' : isTabletScreen ? '90px' : '105px') : '0px',
         transition: 'margin-left 0.3s ease',
-        width: openCloseToggleSideNav ? (isMobileScreen ? 'calc(100% - 65px)' : 'calc(100% - 105px)') : '100%',
-        padding: isMobileScreen ? '10px' : '20px'
+        width: openCloseToggleSideNav ? (isSmallMobile ? 'calc(100% - 60px)' : isMobileScreen ? 'calc(100% - 65px)' : isTabletScreen ? 'calc(100% - 90px)' : 'calc(100% - 105px)') : '100%',
+        padding: isSmallMobile ? '8px' : isMobileScreen ? '10px' : isTabletScreen ? '15px' : '20px',
+        boxSizing: 'border-box'
       }}
     >
-      <div className="row"  style={{margin:"0px"}}>
+      <div className="row" style={{ margin: "0px", padding: isMobileScreen ? "0 10px" : "0 15px" }}>
         <div className="trainer-recommended">
-          <h1 style={{ marginBottom: "10px",fontSize:isMobileScreen?"22px":"28px", fontWeight: "600" }}>Book Your Session now</h1>
-          <p style={{fontSize:isMobileScreen?"14px":"18px", lineHeight: "1.6", color: "#666"}}>
-          Pick your favorite activity and then search for your Expert below. NetQwix is here to revolutionize the way you learn and connect LIVE on our cutting-edge platform.
+          <h1 style={{ 
+            marginBottom: isSmallMobile ? "8px" : isMobileScreen ? "10px" : "12px",
+            fontSize: isSmallMobile ? "18px" : isMobileScreen ? "22px" : isTabletScreen ? "24px" : "28px", 
+            fontWeight: "600",
+            textAlign: isMobileScreen ? "center" : "left",
+            padding: isMobileScreen ? "0 5px" : "0"
+          }}>
+            Book Your Session now
+          </h1>
+          <p style={{
+            fontSize: isSmallMobile ? "12px" : isMobileScreen ? "14px" : isTabletScreen ? "16px" : "18px", 
+            lineHeight: "1.6", 
+            color: "#666",
+            textAlign: isMobileScreen ? "center" : "left",
+            padding: isMobileScreen ? "0 5px" : "0",
+            marginBottom: isMobileScreen ? "15px" : "20px"
+          }}>
+            Pick your favorite activity and then search for your Expert below. NetQwix is here to revolutionize the way you learn and connect LIVE on our cutting-edge platform.
           </p>
         </div>
       </div>
@@ -840,11 +880,11 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         id="dashboard"
         className="d-flex justify-content-center align-items-center dashboard-search-trainer"
         style={{ 
-          marginTop: isMobileScreen ? "20px" : "30px", 
-          marginBottom: isMobileScreen ? "20px" : "25px",
-          padding: isMobileScreen ? "0 15px" : "0 20px",
+          marginTop: isSmallMobile ? "15px" : isMobileScreen ? "20px" : isTabletScreen ? "25px" : "30px", 
+          marginBottom: isSmallMobile ? "15px" : isMobileScreen ? "20px" : isTabletScreen ? "22px" : "25px",
+          padding: isSmallMobile ? "0 10px" : isMobileScreen ? "0 15px" : isTabletScreen ? "0 18px" : "0 20px",
           width: "100%",
-          maxWidth: isMobileScreen ? "100%" : "800px",
+          maxWidth: isSmallMobile ? "100%" : isMobileScreen ? "100%" : isTabletScreen ? "90%" : "800px",
           marginLeft: "auto",
           marginRight: "auto"
         }}
@@ -908,28 +948,31 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         />
       </div>
       <div className="trainer-recommended Slider" style={{ 
-        marginTop: isMobileScreen ? "20px" : "25px",
-        marginBottom: isMobileScreen ? "20px" : "25px",
-        padding: isMobileScreen ? "0 10px" : "0 20px",
-        width: "100%"
+        marginTop: isSmallMobile ? "15px" : isMobileScreen ? "20px" : isTabletScreen ? "22px" : "25px",
+        marginBottom: isSmallMobile ? "15px" : isMobileScreen ? "20px" : isTabletScreen ? "22px" : "25px",
+        padding: isSmallMobile ? "0 8px" : isMobileScreen ? "0 10px" : isTabletScreen ? "0 15px" : "0 20px",
+        width: "100%",
+        overflow: "hidden"
       }}>
         <div className="row" style={{
           width: "100%",
           maxWidth: "100%",
-          display:"flex",
-          justifyContent:"center",
-          margin:"0 auto",
+          display: "flex",
+          justifyContent: "center",
+          margin: "0 auto",
           transition: 'width 0.3s ease'
         }}>
-          <div className="col" style={{display:"flex",justifyContent:"center", width: "100%", padding: "0"}}>
+          <div className="col" style={{ display: "flex", justifyContent: "center", width: "100%", padding: "0" }}>
             <Slider {...settings} style={{ width: "100%" }}>
               {data?.category?.map((item, index) => (
-                <div key={`slider-item-${index}`} style={{ padding: isMobileScreen ? "0 5px" : "0 8px" }}>
+                <div key={`slider-item-${index}`} style={{ 
+                  padding: isSmallMobile ? "0 4px" : isMobileScreen ? "0 5px" : isTabletScreen ? "0 6px" : "0 8px" 
+                }}>
                   <span
                     className="badge badge-light lg"
                     style={{
-                      padding: isMobileScreen ? "8px 12px" : "12px 18px",
-                      fontSize: isMobileScreen ? "12px" : "14px",
+                      padding: isSmallMobile ? "6px 10px" : isMobileScreen ? "8px 12px" : isTabletScreen ? "10px 15px" : "12px 18px",
+                      fontSize: isSmallMobile ? "11px" : isMobileScreen ? "12px" : isTabletScreen ? "13px" : "14px",
                       color: "black",
                       cursor: "pointer",
                       display: "flex",
@@ -966,22 +1009,31 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         </div>
       </div>
 
-      <div style={{ marginTop: isMobileScreen ? "25px" : "35px", width: "100%", padding: isMobileScreen ? "0 10px" : "0 20px" }}>
+      <div style={{ 
+        marginTop: isSmallMobile ? "20px" : isMobileScreen ? "25px" : isTabletScreen ? "30px" : "35px", 
+        width: "100%", 
+        padding: isSmallMobile ? "0 8px" : isMobileScreen ? "0 10px" : isTabletScreen ? "0 15px" : "0 20px" 
+      }}>
         <h2 style={{ 
-          fontSize: isMobileScreen ? "20px" : "24px", 
+          fontSize: isSmallMobile ? "18px" : isMobileScreen ? "20px" : isTabletScreen ? "22px" : "24px", 
           fontWeight: "600", 
-          marginBottom: "20px",
-          textAlign: "left",
-          paddingLeft: isMobileScreen ? "5px" : "10px"
-        }}>Online Experts</h2>
+          marginBottom: isSmallMobile ? "15px" : isMobileScreen ? "18px" : isTabletScreen ? "20px" : "20px",
+          textAlign: isMobileScreen ? "center" : "left",
+          paddingLeft: isSmallMobile ? "5px" : isMobileScreen ? "5px" : isTabletScreen ? "8px" : "10px"
+        }}>
+          Online Experts
+        </h2>
         <div
           className="Recommended"
           style={{ 
             display: "flex", 
             flexDirection: "row",
-            justifyContent:"flex-start",
+            justifyContent: isMobileScreen ? "center" : "flex-start",
             width: "100%",
-            padding: "0"
+            padding: "0",
+            overflowX: isMobileScreen ? "auto" : "visible",
+            overflowY: "hidden",
+            WebkitOverflowScrolling: "touch"
           }}
         >
           {activeTrainer && activeTrainer?.length ? (
@@ -992,12 +1044,14 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                   sm={2}
                   xs={1}
                   style={{
-                    display:'flex',
-                    flexDirection:"row",
+                    display: 'flex',
+                    flexDirection: "row",
                     width: "100%",
-                    padding:"0px",
-                    justifyContent:"flex-start",
-                    margin: "0"
+                    padding: "0px",
+                    justifyContent: isMobileScreen ? "flex-start" : "flex-start",
+                    margin: "0",
+                    flexWrap: isSmallMobile ? "nowrap" : "wrap",
+                    overflowX: isSmallMobile ? "auto" : "visible"
                   }}
                   className="recent-slider recent-chat"
                 >
@@ -1005,10 +1059,10 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
                  {activeTrainer?.map((data, index) => {
                     return (
                       <Col key={index} className="item" style={{
-                        maxWidth: isMobileScreen ? "180px" : "280px",
-                        minWidth: isMobileScreen ? "160px" : "240px",
-                        padding: isMobileScreen ? "8px" : "12px",
-                        flex: "0 0 auto"
+                        maxWidth: isSmallMobile ? "150px" : isMobileScreen ? "180px" : isTabletScreen ? "220px" : "280px",
+                        minWidth: isSmallMobile ? "140px" : isMobileScreen ? "160px" : isTabletScreen ? "200px" : "240px",
+                        padding: isSmallMobile ? "6px" : isMobileScreen ? "8px" : isTabletScreen ? "10px" : "12px",
+                        flex: isSmallMobile ? "0 0 auto" : "0 0 auto"
                       }}>
                         <Trainer
                           trainer={data.trainer_info}
@@ -1034,7 +1088,15 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
               </>
             
           ) : (
-            <h3 style={{ textAlign: "left", paddingLeft: isMobileScreen ? "5px" : "10px" }}>There are no Active Experts</h3>
+            <h3 style={{ 
+              textAlign: isMobileScreen ? "center" : "left", 
+              paddingLeft: isSmallMobile ? "5px" : isMobileScreen ? "5px" : isTabletScreen ? "8px" : "10px",
+              fontSize: isSmallMobile ? "14px" : isMobileScreen ? "16px" : isTabletScreen ? "18px" : "20px",
+              color: "#666",
+              margin: isMobileScreen ? "20px auto" : "20px 0"
+            }}>
+              There are no Active Experts
+            </h3>
           )}
           {/* <div
             className="card trainer-profile-card Home-main-Cont"
@@ -1052,7 +1114,7 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
           </div> */}
         </div>
       </div>
-      <div style={{ height: "11vh" }} />
+      <div style={{ height: isSmallMobile ? "8vh" : isMobileScreen ? "10vh" : "11vh" }} />
     </div>
   );
 
