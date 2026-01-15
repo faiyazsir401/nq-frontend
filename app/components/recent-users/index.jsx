@@ -16,6 +16,7 @@ import { useMediaQuery } from "../../hook/useMediaQuery";
 import BookingTable from "../trainee/scheduleTraining/BookingTable.jsx";
 import { TrainerDetails } from "../trainer/trainerDetails.jsx";
 import { getTraineeWithSlotsAsync } from "../trainee/trainee.slice";
+import Slider from "react-slick";
 
 // const placeholderImageUrl = '/assets/images/avtar/user.png'; // Placeholder image path
 const placeholderImageUrl = "/assets/images/demoUser.png"; // Placeholder image path
@@ -33,6 +34,7 @@ const RecentUsers = ({ onTraineeSelect }) => {
   const [recentStudentClips, setRecentStudentClips] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStudentData, SetselectedStudentData] = useState({});
+  const [imageLoadingStates, setImageLoadingStates] = useState({});
   const width600 = useMediaQuery(600);
   const width900 = useMediaQuery(900);
 
@@ -41,6 +43,21 @@ const RecentUsers = ({ onTraineeSelect }) => {
     getRecentTrainerApi();
     setAccountType(localStorage.getItem(LOCAL_STORAGE_KEYS?.ACC_TYPE));
   }, []);
+
+  // Initialize loading states when list changes
+  useEffect(() => {
+    const currentList = accountType === AccountType?.TRAINER ? recentStudent : recentTrainer;
+    if (currentList && currentList.length > 0) {
+      const initialLoadingStates = {};
+      currentList.forEach((item) => {
+        const itemId = item?._id || item?.id;
+        if (itemId) {
+          initialLoadingStates[itemId] = true; // Start with loading state
+        }
+      });
+      setImageLoadingStates((prev) => ({ ...prev, ...initialLoadingStates }));
+    }
+  }, [recentStudent, recentTrainer, accountType]);
 
   const getRecentStudentApi = async () => {
     try {
@@ -104,13 +121,7 @@ const RecentUsers = ({ onTraineeSelect }) => {
   const [categoryList, setCategoryList] = useState([]);
   const dispatch = useAppDispatch()
 
-  // Responsive helpers for grid layout
-  const getGridColumns = () => {
-    if (width600) return "repeat(2, 1fr)";
-    if (width900) return "repeat(3, 1fr)";
-    return "repeat(5, 1fr)";
-  };
-
+  // Responsive helpers
   const getImageSize = () => {
     if (width600) return { width: "65px", height: "65px" };
     if (width900) return { width: "75px", height: "75px" };
@@ -119,12 +130,148 @@ const RecentUsers = ({ onTraineeSelect }) => {
 
   const imageSize = getImageSize();
 
+  // Slider settings for recent users - horizontal scroll with touch/swipe support
+  const sliderSettings = {
+    dots: false,
+    infinite: false,
+    speed: 400,
+    slidesToShow: width600 ? 3 : width900 ? 5 : 6,
+    slidesToScroll: 1,
+    swipe: true,
+    swipeToSlide: true,
+    touchMove: true,
+    touchThreshold: 5,
+    draggable: true,
+    arrows: true,
+    variableWidth: false,
+    adaptiveHeight: false,
+    responsive: [
+      {
+        breakpoint: 1200,
+        settings: {
+          slidesToShow: 5,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 900,
+        settings: {
+          slidesToShow: 4,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 2.5,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
+
   // Get the current list based on account type
   const currentList = accountType === AccountType?.TRAINER ? recentStudent : recentTrainer;
+
+  // Handle image load state
+  const handleImageLoad = (itemId) => {
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [itemId]: false,
+    }));
+  };
+
+  const handleImageLoadStart = (itemId) => {
+    setImageLoadingStates((prev) => ({
+      ...prev,
+      [itemId]: true,
+    }));
+  };
 
   return (
     <>
       <style>{`
+        .recent-users-slider {
+          width: 100%;
+          overflow: hidden;
+          position: relative;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .recent-users-slider .slick-list {
+          overflow: visible;
+          margin: 0 -6px;
+          touch-action: pan-y pinch-zoom;
+        }
+
+        .recent-users-slider .slick-track {
+          display: flex;
+          align-items: stretch;
+          touch-action: pan-y pinch-zoom;
+        }
+
+        .recent-users-slider .slick-slide {
+          padding: 0 6px;
+          touch-action: pan-y pinch-zoom;
+        }
+
+        .recent-users-slider .slick-slide > div {
+          height: 100%;
+        }
+
+        .recent-users-slider .slick-prev,
+        .recent-users-slider .slick-next {
+          z-index: 2;
+          width: 32px;
+          height: 32px;
+          background: #fff !important;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          transition: all 0.3s ease;
+          display: flex !important;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .recent-users-slider .slick-prev:hover,
+        .recent-users-slider .slick-next:hover {
+          background: #000080 !important;
+          box-shadow: 0 4px 12px rgba(0, 0, 128, 0.3);
+        }
+
+        .recent-users-slider .slick-prev:before,
+        .recent-users-slider .slick-next:before {
+          color: #000080;
+          font-size: 18px;
+          opacity: 1;
+        }
+
+        .recent-users-slider .slick-prev:hover:before,
+        .recent-users-slider .slick-next:hover:before {
+          color: #fff;
+        }
+
+        .recent-users-slider .slick-prev {
+          left: -6px;
+        }
+
+        .recent-users-slider .slick-next {
+          right: -6px;
+        }
+
+        .recent-users-slider .slick-prev.slick-disabled,
+        .recent-users-slider .slick-next.slick-disabled {
+          opacity: 0.3;
+          cursor: not-allowed;
+        }
+
         .recent-users-container {
           width: 100%;
           display: flex;
@@ -138,7 +285,6 @@ const RecentUsers = ({ onTraineeSelect }) => {
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
           padding: 16px 12px;
           position: relative;
-          overflow: hidden;
           display: flex;
           flex-direction: column;
           flex: 1;
@@ -150,7 +296,6 @@ const RecentUsers = ({ onTraineeSelect }) => {
           width: 100%;
           box-sizing: border-box;
           padding-top: 8px;
-          overflow-y: auto;
         }
 
         .recent-users-item {
@@ -196,6 +341,50 @@ const RecentUsers = ({ onTraineeSelect }) => {
           object-fit: cover;
           object-position: center;
           display: block;
+          transition: opacity 0.3s ease;
+        }
+
+        .recent-users-avatar img.loaded {
+          opacity: 1;
+        }
+
+        .recent-users-avatar img.loading {
+          opacity: 0;
+        }
+
+        .recent-users-skeleton {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: linear-gradient(
+            90deg,
+            #f0f0f0 25%,
+            #e0e0e0 50%,
+            #f0f0f0 75%
+          );
+          background-size: 200% 100%;
+          animation: skeleton-loading 1.5s ease-in-out infinite;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+
+        @keyframes skeleton-loading {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+
+        .recent-users-avatar-wrapper {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .recent-users-name {
@@ -227,11 +416,6 @@ const RecentUsers = ({ onTraineeSelect }) => {
             padding: 14px 8px;
           }
 
-          .recent-users-grid {
-            gap: 12px;
-            max-height: 60vh;
-          }
-
           .recent-users-item {
             min-height: 120px;
           }
@@ -243,16 +427,10 @@ const RecentUsers = ({ onTraineeSelect }) => {
 
         /* Tablet */
         @media (min-width: 601px) and (max-width: 900px) {
-          .recent-users-grid {
-            max-height: 65vh;
-          }
         }
 
         /* Desktop */
         @media (min-width: 901px) {
-          .recent-users-grid {
-            max-height: 70vh;
-          }
         }
       `}</style>
       <div className="card rounded trainer-profile-card Select Recent Student" style={{ 
@@ -355,79 +533,87 @@ const RecentUsers = ({ onTraineeSelect }) => {
         <div className="recent-users-container">
           <div className="recent-users-box">
           {currentList && currentList.length > 0 ? (
-            <div
-              className="recent-users-grid"
-              style={{ gridTemplateColumns: getGridColumns() }}
-            >
-              {currentList.map((item, index) => (
-                <div
-                  key={index}
-                  className="recent-users-item"
-                  onClick={() => {
-                    if (accountType === AccountType?.TRAINER) {
-                      const traineeId = item?._id || item?.id;
-                      if (onTraineeSelect) {
-                        onTraineeSelect(traineeId);
-                      }
-                      handleStudentClick(traineeId);
-                      SetselectedStudentData({ ...item });
-                    } else {
-                      setTrainerInfo((prev) => ({
-                        ...prev,
-                        userInfo: item,
-                        selected_category: null,
-                      }));
-                      setSelectedTrainer({
-                        id: item?.id || item?._id,
-                        trainer_id: item?.id || item?._id,
-                        data: item,
-                      });
-                      dispatch(getTraineeWithSlotsAsync({ search: item?.fullname || item?.fullName }));
-                      setIsModalOpen(true);
-                    }
-                  }}
-                >
-                  <div
-                    className="recent-users-avatar"
-                    style={{
-                      width: imageSize.width,
-                      height: imageSize.height,
-                    }}
-                  >
-                    <img
-                      className="Image-Division"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                        objectPosition: "center",
-                        display: "block",
+            <div className="recent-users-slider">
+              <Slider {...sliderSettings}>
+                {currentList.map((item, index) => (
+                  <div key={index}>
+                    <div
+                      className="recent-users-item"
+                      onClick={() => {
+                        if (accountType === AccountType?.TRAINER) {
+                          const traineeId = item?._id || item?.id;
+                          if (onTraineeSelect) {
+                            onTraineeSelect(traineeId);
+                          }
+                          handleStudentClick(traineeId);
+                          SetselectedStudentData({ ...item });
+                        } else {
+                          setTrainerInfo((prev) => ({
+                            ...prev,
+                            userInfo: item,
+                            selected_category: null,
+                          }));
+                          setSelectedTrainer({
+                            id: item?.id || item?._id,
+                            trainer_id: item?.id || item?._id,
+                            data: item,
+                          });
+                          dispatch(getTraineeWithSlotsAsync({ search: item?.fullname || item?.fullName }));
+                          setIsModalOpen(true);
+                        }
                       }}
-                      src={
-                        Utils?.getImageUrlOfS3(item?.profile_picture || item.profile_picture) ||
-                        "/assets/images/demoUser.png"
-                      }
-                      alt={
-                        accountType === AccountType?.TRAINER
-                          ? `Recent Student ${index + 1}`
-                          : `Recent Expert ${index + 1}`
-                      }
-                      onError={(e) => {
-                        e.target.src = "/assets/images/demoUser.png";
-                      }}
-                    />
+                    >
+                      <div
+                        className="recent-users-avatar"
+                        style={{
+                          width: imageSize.width,
+                          height: imageSize.height,
+                        }}
+                      >
+                        <div className="recent-users-avatar-wrapper">
+                          {(imageLoadingStates[item?._id || item?.id] !== false) && (
+                            <div className="recent-users-skeleton" />
+                          )}
+                          <img
+                            className={`Image-Division ${imageLoadingStates[item?._id || item?.id] === false ? 'loaded' : 'loading'}`}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              borderRadius: "50%",
+                              objectFit: "cover",
+                              objectPosition: "center",
+                              display: "block",
+                            }}
+                            src={
+                              Utils?.getImageUrlOfS3(item?.profile_picture || item.profile_picture) ||
+                              "/assets/images/demoUser.png"
+                            }
+                            alt={
+                              accountType === AccountType?.TRAINER
+                                ? `Recent Student ${index + 1}`
+                                : `Recent Expert ${index + 1}`
+                            }
+                            onLoadStart={() => handleImageLoadStart(item?._id || item?.id)}
+                            onLoad={() => handleImageLoad(item?._id || item?.id)}
+                            onError={(e) => {
+                              e.target.src = "/assets/images/demoUser.png";
+                              handleImageLoad(item?._id || item?.id);
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <h5
+                        className="recent-users-name"
+                        style={{
+                          fontSize: width600 ? "12px" : "13px",
+                        }}
+                      >
+                        {item?.fullname || item?.fullName || 'Unknown'}
+                      </h5>
+                    </div>
                   </div>
-                  <h5
-                    className="recent-users-name"
-                    style={{
-                      fontSize: width600 ? "12px" : "13px",
-                    }}
-                  >
-                    {item?.fullname || item?.fullName || 'Unknown'}
-                  </h5>
-                </div>
-              ))}
+                ))}
+              </Slider>
             </div>
           ) : (
             <div className="recent-users-empty">

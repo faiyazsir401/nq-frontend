@@ -475,8 +475,8 @@ const NavHomePage = () => {
               maxWidth: "100%",
               margin: "0",
               boxSizing: "border-box",
-              overflow: "hidden",
-              minHeight: width600 ? "280px" : "auto"
+            overflow: "visible",
+            minHeight: width600 ? "260px" : "260px"
             }}
           >
             <div className="banner_Slider" style={{
@@ -600,15 +600,15 @@ const NavHomePage = () => {
                       <div 
                         key={`slider-${info.trainer_info?._id}-${index}`}
                         style={{
-                          padding: width600 ? "0 8px" : "0 10px",
+                          padding: width600 ? "0 4px" : "0 10px",
                           boxSizing: "border-box",
-                          height: "100%",
-                          minHeight: width600 ? "260px" : "auto"
+                          height: "auto",
+                          minHeight: "0"
                         }}
                       >
                         <div style={{
                           width: "100%",
-                          height: "100%",
+                          height: "auto",
                           display: "flex",
                           alignItems: "stretch"
                         }}>
