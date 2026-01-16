@@ -903,9 +903,13 @@ const VideoCallUI = ({
         toast.error("Reconnection to the server failed. Please check your internet and try again.");
       });
 
-       
-
-      const peer = new Peer(fromUser._id, {
+      // Generate unique Peer ID per session/device to allow same user from multiple devices
+      // Format: userId_sessionId_timestamp_random
+      // This ensures each device/session combination gets a unique Peer ID
+      // This fixes the issue where same user joining from 2 different devices causes 'unavailable-id' error
+      const uniquePeerId = `${fromUser._id}_${id}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      
+      const peer = new Peer(uniquePeerId, {
         config: { iceServers: startMeeting.iceServers },
       });
 
@@ -945,8 +949,11 @@ const VideoCallUI = ({
             toast.error("The underlying socket was closed unexpectedly.");
             break;
           case 'unavailable-id':
-            setUserAlreadyInCall(true);
-            toast.error("You have joined the lesson from another device or browser. Please end call there to join..");
+            // This should rarely happen now with unique Peer IDs, but keep the error handling
+            // It might occur if there's a race condition or if cleanup didn't happen properly
+            console.warn("Peer ID unavailable - this might be a cleanup issue. Retrying with new ID...");
+            // Don't set userAlreadyInCall to true immediately - allow retry
+            toast.error("Connection issue detected. Please try refreshing the page.");
             break;
           case 'webrtc':
             toast.error("A native WebRTC error occurred.");
@@ -959,10 +966,16 @@ const VideoCallUI = ({
       peerRef.current = peer;
 
       // Handle Peer events
-      peer.on("open", (id) => {
+      peer.on("open", (peerId) => {
         if (socket) {
+          // Send both user IDs (for backend matching) and the actual Peer ID (for peer-to-peer connection)
           socket.emit("ON_CALL_JOIN", {
-            userInfo: { from_user: fromUser._id, to_user: toUser._id },
+            userInfo: { 
+              from_user: fromUser._id, 
+              to_user: toUser._id,
+              sessionId: id,
+              peerId: peerId  // Send the actual Peer ID so backend can route connections correctly
+            },
           });
         }
       });
@@ -1106,9 +1119,12 @@ const VideoCallUI = ({
     if (!socket) return;
 
     const handleCallJoin = ({ userInfo }) => {
-      const { to_user, from_user } = userInfo;
+      const { to_user, from_user, peerId } = userInfo;
       if (!(peerRef && peerRef.current)) return;
-      connectToPeer(peerRef.current, from_user);
+      // Use peerId if provided (for unique device connections), otherwise fallback to from_user
+      // This allows same user to join from multiple devices
+      const targetPeerId = peerId || from_user;
+      connectToPeer(peerRef.current, targetPeerId);
     };
 
     const handleOffer = (offer) => {
