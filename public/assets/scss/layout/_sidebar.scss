@@ -60,8 +60,16 @@
           &.active {
             background-color: $primary-color !important;
 
+            // Ensure any icon inside the active sidebar button is visible on dark blue
             i {
               color: $white;
+            }
+
+            svg,
+            svg * {
+              color: $white !important;
+              stroke: $white !important;
+              fill: $white !important;
             }
           }
         }
