@@ -52,6 +52,21 @@ const StartMeeting = ({
     );
   }
 
+  // Validate required props before rendering
+  const fromUser = accountType === AccountType.TRAINEE ? traineeInfo : trainerInfo;
+  const toUser = accountType === AccountType.TRAINEE ? trainerInfo : traineeInfo;
+
+  if (!fromUser || !toUser || !fromUser._id || !toUser._id) {
+    return (
+      <div style={{ padding: '20px', textAlign: 'center' }}>
+        <p>Loading user information... Please wait.</p>
+        <p style={{ fontSize: '14px', color: '#666', marginTop: '10px' }}>
+          If this message persists, please refresh the page.
+        </p>
+      </div>
+    );
+  }
+
   const mediaQuery = window.matchMedia("(min-width: 768px)");
 
   return (
@@ -61,10 +76,8 @@ const StartMeeting = ({
         isClose={isClose}
         accountType={accountType}
         bIndex={bIndex}
-        fromUser={
-          accountType === AccountType.TRAINEE ? traineeInfo : trainerInfo
-        }
-        toUser={accountType === AccountType.TRAINEE ? trainerInfo : traineeInfo}
+        fromUser={fromUser}
+        toUser={toUser}
         session_end_time={session_end_time}
       />
     </div>
