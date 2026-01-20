@@ -176,8 +176,53 @@ const VideoCallUI = ({
   // Add this function to extend the session time
   const extendSessionTime = async () => {
     try {
-      // Parse session start time
-      const [startHours, startMinutes] = session_start_time.split(':').map(Number);
+      // Validate required props before proceeding
+      if (!session_start_time || !session_end_time || !id) {
+        console.warn("Cannot extend session: missing required time information", {
+          session_start_time,
+          session_end_time,
+          id
+        });
+        return;
+      }
+
+      // Parse session start time with validation
+      if (typeof session_start_time !== 'string' || !session_start_time.includes(':')) {
+        console.error("Invalid session_start_time format:", session_start_time);
+        return;
+      }
+
+      const startTimeParts = session_start_time.split(':');
+      if (startTimeParts.length !== 2) {
+        console.error("Invalid session_start_time format:", session_start_time);
+        return;
+      }
+
+      const [startHours, startMinutes] = startTimeParts.map(Number);
+      
+      if (isNaN(startHours) || isNaN(startMinutes) || startHours < 0 || startHours > 23 || startMinutes < 0 || startMinutes > 59) {
+        console.error("Invalid session_start_time values:", { startHours, startMinutes });
+        return;
+      }
+
+      // Parse session end time with validation
+      if (typeof session_end_time !== 'string' || !session_end_time.includes(':')) {
+        console.error("Invalid session_end_time format:", session_end_time);
+        return;
+      }
+
+      const endTimeParts = session_end_time.split(':');
+      if (endTimeParts.length !== 2) {
+        console.error("Invalid session_end_time format:", session_end_time);
+        return;
+      }
+
+      const [endHours, endMinutes] = endTimeParts.map(Number);
+      
+      if (isNaN(endHours) || isNaN(endMinutes) || endHours < 0 || endHours > 23 || endMinutes < 0 || endMinutes > 59) {
+        console.error("Invalid session_end_time values:", { endHours, endMinutes });
+        return;
+      }
 
       // Create Date object for session_start_time
       const now = new Date();
@@ -200,8 +245,7 @@ const VideoCallUI = ({
         return;
       }
 
-      // Parse session end time
-      const [endHours, endMinutes] = session_end_time.split(':').map(Number);
+      // Create Date object for session end time
       const endTime = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -213,21 +257,37 @@ const VideoCallUI = ({
       // Add the time elapsed to session end time
       const newEndTime = new Date(endTime.getTime() + timeElapsed);
 
+      // Validate newEndTime
+      if (isNaN(newEndTime.getTime())) {
+        console.error("Invalid newEndTime calculated:", newEndTime);
+        return;
+      }
+
       // Format new end time to HH:MM
       const newEndHours = String(newEndTime.getHours()).padStart(2, '0');
       const newEndMinutes = String(newEndTime.getMinutes()).padStart(2, '0');
       const newEndTimeStr = `${newEndHours}:${newEndMinutes}`;
 
-      const [hours, minutes] = newEndTimeStr.split(":").map(Number);
+      // Use DateTime from luxon to format ISO string
+      let testEndTime;
+      try {
+        const newTestEndTime = DateTime.fromJSDate(newEndTime);
+        
+        if (!newTestEndTime.isValid) {
+          console.error("Invalid DateTime created from newEndTime:", newEndTime);
+          return;
+        }
 
+        testEndTime = newTestEndTime.toISO({
+          suppressMilliseconds: false,
+          includeOffset: false,
+        }) + "Z";
+      } catch (luxonError) {
+        console.error("Error creating DateTime:", luxonError);
+        // Fallback to manual ISO string creation
+        testEndTime = newEndTime.toISOString();
+      }
 
-
-      const newTestEndTime =DateTime.fromJSDate(newEndTime)
-      
-      const testEndTime = newTestEndTime.toISO({
-        suppressMilliseconds: false,
-        includeOffset: false,
-      }) + "Z";
       // Update local display of session_end_time for UI purposes
       setSessionEndTime(newEndTimeStr);
 
@@ -241,48 +301,59 @@ const VideoCallUI = ({
        
     } catch (error) {
       console.error("Error extending session time:", error);
+      // Show user-friendly error message
+      toast.error("Failed to extend session time. Please try again.", {
+        autoClose: 3000,
+      });
     }
   };
 
 
   const getMyClips = async () => {
-    var res = await myClips({});
-    setClips(res?.data);
-    var trainee_clips = await myClips({ trainee_id: traineeInfo._id });
-
-    let sharedClips = [];
-    var arr = trainee_clips?.data || [];
-    let res3 = await traineeClips({});
-    const clipsSharedByTrainee = res3?.data
-     
-    for (let index = 0; index < clipsSharedByTrainee?.length; index++) {
-      if (clipsSharedByTrainee[index]._id._id === traineeInfo._id) {
-
-        clipsSharedByTrainee[index].clips.map((clip) => {
-          // Check if the current clip's _id matches the given id
-          if (clip._id === id) {
-            // Add the extra field 'duringSession' to the clip
-             
-            sharedClips.push(clip.clips._id)
-          }
-          // return clip; // Return the modified or unmodified clip
-        });
+    try {
+      // Validate traineeInfo before proceeding
+      if (!traineeInfo || !traineeInfo._id) {
+        console.warn("Cannot get clips: traineeInfo is missing");
+        return;
       }
+
+      var res = await myClips({});
+      setClips(res?.data);
+      var trainee_clips = await myClips({ trainee_id: traineeInfo._id });
+
+      let sharedClips = [];
+      var arr = trainee_clips?.data || [];
+      let res3 = await traineeClips({});
+      const clipsSharedByTrainee = res3?.data || [];
+     
+      for (let index = 0; index < clipsSharedByTrainee?.length; index++) {
+        if (clipsSharedByTrainee[index]?._id?._id === traineeInfo._id) {
+          clipsSharedByTrainee[index]?.clips?.map((clip) => {
+            // Check if the current clip's _id matches the given id
+            if (clip?._id === id && clip?.clips?._id) {
+              // Add the extra field 'duringSession' to the clip
+              sharedClips.push(clip.clips._id);
+            }
+            // return clip; // Return the modified or unmodified clip
+          });
+        }
+      }
+
+      arr[0]?.clips?.forEach(item => {
+        if (sharedClips.includes(item._id)) {
+          item.duringSession = true; // Add the duringSession field with value `true`
+        } else {
+          item.duringSession = false; // Optionally, you can set it to false or leave it undefined
+        }
+      });
+
+      setTraineeClips(arr);
+    } catch (error) {
+      console.error("Error getting clips:", error);
+      toast.error("Failed to load clips. Please try again.", {
+        autoClose: 3000,
+      });
     }
-
-
-     
-
-    arr[0]?.clips?.forEach(item => {
-      if (sharedClips.includes(item._id)) {
-        item.duringSession = true; // Add the duringSession field with value `true`
-      } else {
-        item.duringSession = false; // Optionally, you can set it to false or leave it undefined
-      }
-    });
-     
-
-    setTraineeClips(arr);
   };
 
   // Define cleanupFunction early (needed by cutCall)
@@ -1247,16 +1318,14 @@ const VideoCallUI = ({
   // Add this useEffect to handle session extension when both parties join
   useEffect(() => {
     if (extended_session_end_time) {
-       
-      setSessionEndTime(extended_session_end_time)
+      setSessionEndTime(extended_session_end_time);
     } else {
-      if (isTraineeJoined && accountType === AccountType.TRAINEE) {
+      if (isTraineeJoined && accountType === AccountType.TRAINEE && session_start_time && session_end_time && id) {
         extendSessionTime();
         setIsSessionExtended(true);
       }
     }
-
-  }, [isTraineeJoined]);
+  }, [isTraineeJoined, extended_session_end_time, session_start_time, session_end_time, id, accountType]);
 
    
    

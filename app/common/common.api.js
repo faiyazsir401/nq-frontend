@@ -262,6 +262,11 @@ export const updateNotificationSettings = async (payload) => {
 
 export const updateExtendedSessionTime = async (payload) => {
   try {
+    // Validate payload before making request
+    if (!payload || !payload.sessionId) {
+      throw new Error("Invalid payload: sessionId is required");
+    }
+
     const response = await axiosInstance({
       url: `/common/extend-session-end-time`,
       method: "post",
@@ -277,7 +282,19 @@ export const updateExtendedSessionTime = async (payload) => {
     
     return response.data;
   } catch (err) {
-    throw err;
+    // Log error for debugging
+    console.error("Error updating extended session time:", err);
+    // Re-throw with more context if needed
+    if (err.response) {
+      // Server responded with error status
+      throw new Error(err.response.data?.message || err.response.data?.error || "Failed to extend session time");
+    } else if (err.request) {
+      // Request was made but no response received
+      throw new Error("Network error: Unable to connect to server");
+    } else {
+      // Something else happened
+      throw err;
+    }
   }
 };
 
