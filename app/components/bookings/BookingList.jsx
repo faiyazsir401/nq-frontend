@@ -553,7 +553,11 @@ const BookingList = ({ activeCenterContainerTab, activeTabs }) => {
           return isCompleted || booking?.status === BookedSession.completed;
 
         default:
-          return booking?.status === activeTabs;
+          // Fallback: never surface cancelled sessions in generic filters
+          return (
+            booking?.status === activeTabs &&
+            booking?.status !== BookedSession.canceled
+          );
       }
     }) || [];
 

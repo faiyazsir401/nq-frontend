@@ -171,7 +171,7 @@ export const HandleVideoCall = ({
     width768,
     width900,
     width1000,
-    timeDifference,
+    timeDifference, // legacy time difference based on session_end_time
     height,
     setSelectedClips,
     setIsMuted,
@@ -223,6 +223,15 @@ export const HandleVideoCall = ({
   const [remoteStream, setRemoteStream] = useState(null);
   const [localStream, setLocalStream] = useState(null);
 
+  // Authoritative lesson timer state (backend-driven)
+  const [lessonTimerStatus, setLessonTimerStatus] = useState("waiting"); // "waiting" | "running" | "paused" | "ended"
+  const [lessonTimer, setLessonTimer] = useState(null); // { startedAt, duration, remainingAtStart }
+  const lessonTimerIntervalRef = useRef(null);
+  const [lessonTimeDisplay, setLessonTimeDisplay] = useState("");
+  const [trainerConnected, setTrainerConnected] = useState(true);
+  const [traineeConnected, setTraineeConnected] = useState(false);
+  const [lessonStatusBanner, setLessonStatusBanner] = useState("");
+
   const errorHandling = (err) => toast.error(err);
   const [sketchPickerColor, setSketchPickerColor] = useState({
     r: 241,
@@ -235,6 +244,235 @@ export const HandleVideoCall = ({
   // Initialize hooks
   // Note: Some hooks need to be initialized after certain state is set up
   // We'll integrate them as we refactor the component
+
+  // ---------- Authoritative lesson timer helpers ----------
+
+  const clearLessonTimerInterval = () => {
+    if (lessonTimerIntervalRef.current) {
+      clearInterval(lessonTimerIntervalRef.current);
+      lessonTimerIntervalRef.current = null;
+    }
+  };
+
+  const formatRemainingTime = (totalSeconds) => {
+    const seconds = Math.max(0, Math.floor(totalSeconds || 0));
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    const pad = (num) => (num < 10 ? `0${num}` : `${num}`);
+
+    if (hours > 0) {
+      return `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+    }
+    return `${pad(minutes)}:${pad(secs)}`;
+  };
+
+  const startLessonCountdown = useCallback((payload) => {
+    if (!payload) return;
+
+    const { startedAt, duration, remainingSeconds, sessionId } = payload;
+    if (!startedAt || !duration) return;
+
+    // Use remainingSeconds from backend as the authoritative starting point
+    const remainingAtStart =
+      typeof remainingSeconds === "number" && remainingSeconds > 0
+        ? remainingSeconds
+        : duration;
+
+    clearLessonTimerInterval();
+
+    setLessonTimer({
+      startedAt,
+      duration,
+      remainingAtStart,
+      sessionId,
+    });
+    setLessonTimerStatus("running");
+
+    // Initial display update
+    const now = Date.now();
+    const elapsed = Math.floor((now - startedAt) / 1000);
+    const remaining = Math.max(0, remainingAtStart - elapsed);
+    setLessonTimeDisplay(formatRemainingTime(remaining));
+
+    // Smooth local countdown driven by backend timestamps
+    lessonTimerIntervalRef.current = setInterval(() => {
+      const current = Date.now();
+      const elapsedSeconds = Math.floor((current - startedAt) / 1000);
+      const remainingSecondsLocal = Math.max(0, remainingAtStart - elapsedSeconds);
+      setLessonTimeDisplay(formatRemainingTime(remainingSecondsLocal));
+
+      if (remainingSecondsLocal <= 0) {
+        clearLessonTimerInterval();
+      }
+    }, 1000);
+  }, []);
+
+  // Keep a small banner in sync with timer + presence
+  useEffect(() => {
+    if (lessonTimerStatus === "waiting") {
+      if (!trainerConnected || !traineeConnected) {
+        setLessonStatusBanner(
+          "Waiting for the other participant. Lesson will start when both are connected."
+        );
+      } else {
+        setLessonStatusBanner("");
+      }
+      return;
+    }
+
+    if (lessonTimerStatus === "paused") {
+      setLessonStatusBanner(
+        accountType === AccountType.TRAINER
+          ? "You disconnected earlier. Timer is paused until you rejoin."
+          : "Trainer disconnected. Lesson timer is paused until they rejoin."
+      );
+      return;
+    }
+
+    if (lessonTimerStatus === "running") {
+      if (accountType === AccountType.TRAINER && !traineeConnected) {
+        setLessonStatusBanner(
+          "Trainee disconnected. Lesson timer is still running."
+        );
+      } else if (accountType === AccountType.TRAINEE && !trainerConnected) {
+        setLessonStatusBanner(
+          "Trainer is reconnecting. Please wait; timer state is managed by the system."
+        );
+      } else {
+        setLessonStatusBanner("Session in progress. Lesson timer is running.");
+      }
+      return;
+    }
+
+    if (lessonTimerStatus === "ended") {
+      setLessonStatusBanner("Lesson time has ended.");
+      return;
+    }
+  }, [lessonTimerStatus, trainerConnected, traineeConnected, accountType]);
+
+  // Listen to backend timer + presence events
+  useEffect(() => {
+    if (!socket || !id) return;
+
+    // Request current state on (re)connect
+    socket.emit("LESSON_STATE_REQUEST", { sessionId: id });
+
+    const handleStateSync = (state) => {
+      if (!state || state.sessionId !== id) return;
+
+      const {
+        status,
+        remainingSeconds,
+        startedAt,
+        duration,
+        trainerConnected: trainerConn,
+        traineeConnected: traineeConn,
+      } = state;
+
+      setTrainerConnected(!!trainerConn);
+      setTraineeConnected(!!traineeConn);
+      setLessonTimerStatus(status || "waiting");
+
+      clearLessonTimerInterval();
+
+      if (status === "running" && startedAt && duration) {
+        startLessonCountdown({
+          startedAt,
+          duration,
+          remainingSeconds,
+          sessionId: id,
+        });
+      } else if (status === "paused") {
+        const remaining = Math.max(0, Math.floor(remainingSeconds || 0));
+        setLessonTimer({
+          startedAt: null,
+          duration: duration || remaining,
+          remainingAtStart: remaining,
+          sessionId: id,
+        });
+        setLessonTimeDisplay(formatRemainingTime(remaining));
+      } else if (status === "ended") {
+        setLessonTimeDisplay(formatRemainingTime(0));
+      } else {
+        // waiting
+        setLessonTimeDisplay("");
+      }
+    };
+
+    const handleTimerStarted = (data) => {
+      if (!data || data.sessionId !== id) return;
+      setLessonTimerStatus("running");
+      startLessonCountdown({
+        startedAt: data.startedAt,
+        duration: data.duration,
+        remainingSeconds: data.remainingSeconds,
+        sessionId: data.sessionId,
+      });
+    };
+
+    const handleTimerPaused = (data) => {
+      if (!data || data.sessionId !== id) return;
+      clearLessonTimerInterval();
+      const remaining = Math.max(0, Math.floor(data.remainingSeconds || 0));
+      setLessonTimerStatus("paused");
+      setLessonTimer({
+        startedAt: null,
+        duration: remaining,
+        remainingAtStart: remaining,
+        sessionId: data.sessionId,
+      });
+      setLessonTimeDisplay(formatRemainingTime(remaining));
+    };
+
+    const handleTimerResumed = (data) => {
+      if (!data || data.sessionId !== id) return;
+      setLessonTimerStatus("running");
+      startLessonCountdown({
+        startedAt: data.startedAt,
+        duration: data.duration,
+        remainingSeconds: data.remainingSeconds,
+        sessionId: data.sessionId,
+      });
+    };
+
+    const handleTimerEnded = (data) => {
+      if (!data || data.sessionId !== id) return;
+      clearLessonTimerInterval();
+      setLessonTimerStatus("ended");
+      setLessonTimeDisplay(formatRemainingTime(0));
+    };
+
+    const handleParticipantStatusChanged = (data) => {
+      if (!data || data.sessionId !== id) return;
+      const { role, status } = data;
+      const isConnected = status === "connected";
+
+      if (role === "trainer") {
+        setTrainerConnected(isConnected);
+      } else if (role === "trainee") {
+        setTraineeConnected(isConnected);
+      }
+    };
+
+    socket.on("LESSON_STATE_SYNC", handleStateSync);
+    socket.on("TIMER_STARTED", handleTimerStarted);
+    socket.on("LESSON_TIME_PAUSED", handleTimerPaused);
+    socket.on("LESSON_TIME_RESUMED", handleTimerResumed);
+    socket.on("LESSON_TIME_ENDED", handleTimerEnded);
+    socket.on("PARTICIPANT_STATUS_CHANGED", handleParticipantStatusChanged);
+
+    return () => {
+      clearLessonTimerInterval();
+      socket.off("LESSON_STATE_SYNC", handleStateSync);
+      socket.off("TIMER_STARTED", handleTimerStarted);
+      socket.off("LESSON_TIME_PAUSED", handleTimerPaused);
+      socket.off("LESSON_TIME_RESUMED", handleTimerResumed);
+      socket.off("LESSON_TIME_ENDED", handleTimerEnded);
+      socket.off("PARTICIPANT_STATUS_CHANGED", handleParticipantStatusChanged);
+    };
+  }, [socket, id, startLessonCountdown]);
 
 
   /**
@@ -3021,7 +3259,14 @@ useEffect(() => {
                   }}
                 >
                   <h3 style={{ fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)' }}>Time remaining</h3>
-                  <h2 style={{ fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)' }}> {timeDifference}</h2>
+                  <h2 style={{ fontSize: 'calc(14px + 2*(100vw - 320px) / 1600)' }}>
+                    {lessonTimeDisplay || timeDifference}
+                  </h2>
+                  {lessonStatusBanner && (
+                    <p style={{ fontSize: '12px', marginTop: '4px' }}>
+                      {lessonStatusBanner}
+                    </p>
+                  )}
                 </div>
               </div>
 }
@@ -4056,7 +4301,14 @@ useEffect(() => {
                   }}
                 >
                   <h3>Time remaining</h3>
-                  <h2 style={{ fontSize: "18px" }}> {timeDifference}</h2>
+                  <h2 style={{ fontSize: "18px" }}>
+                    {lessonTimeDisplay || timeDifference}
+                  </h2>
+                  {lessonStatusBanner && (
+                    <p style={{ fontSize: "12px", marginTop: "4px" }}>
+                      {lessonStatusBanner}
+                    </p>
+                  )}
                 </div>
               </div>}
 
