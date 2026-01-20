@@ -1,4 +1,4 @@
-import { Edit2, RefreshCw, X } from "react-feather";
+import { Edit2, RefreshCw, X, Type } from "react-feather";
 import Image from "next/image";
 import { SketchPicker } from "react-color";
 import { useEffect, useState } from "react";
@@ -49,6 +49,7 @@ export const CanvasMenuBar = ({
   isFullScreen
 }) => {
   const [displayColorPicker, setDisplayColorPicker] = useState(false);
+  const [displayLineWidthPicker, setDisplayLineWidthPicker] = useState(false);
   const [activeTab, setActiveTab] = useState(null);
   const [videoActiveTab, setAideoActiveTab] = useState("media");
   const [clips, setClips] = useState([]);
@@ -185,10 +186,87 @@ export const CanvasMenuBar = ({
             </div>
           </Popover>
 
-          {/* {displayColorPicker ?
-             */}
+          {/* Line Width Picker */}
+          <Popover
+            className="line-width-picker-popover"
+            isOpen={displayLineWidthPicker}
+            positions={["left", "right"]}
+            padding={10}
+            reposition={true}
+            onClickOutside={() => setDisplayLineWidthPicker(false)}
+            content={() => (
+              <div style={{ padding: "10px", background: "white", borderRadius: "4px", boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
+                <div style={{ marginBottom: "8px", fontWeight: "bold", fontSize: "12px" }}>Line Width</div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={canvasConfigs?.sender?.lineWidth || 3}
+                  onChange={(e) => {
+                    const newWidth = parseInt(e.target.value);
+                    const payload = {
+                      ...canvasConfigs,
+                      sender: {
+                        ...canvasConfigs.sender,
+                        lineWidth: newWidth,
+                      },
+                    };
+                    setCanvasConfigs(payload);
+                    canvasConfigs = payload;
+                  }}
+                  style={{ width: "150px" }}
+                />
+                <div style={{ textAlign: "center", marginTop: "4px", fontSize: "11px" }}>
+                  {canvasConfigs?.sender?.lineWidth || 3}px
+                </div>
+              </div>
+            )}
+          >
+            <div
+              className="icon-btn  button-effect btn-sm"
+              onClick={() => {
+                setDisplayLineWidthPicker((prevVal) => !prevVal);
+              }}
+              style={{
+                height: "24px",
+                width: "24px",
+                padding: isSmallScreen ? "12px" : "5px",
+                margin: "5px",
+                marginLeft: "2px",
+              }}
+              title="Line Width"
+            >
+              <div style={{ 
+                width: "12px", 
+                height: `${Math.max(2, (canvasConfigs?.sender?.lineWidth || 3) / 2)}px`, 
+                background: canvasConfigs?.sender?.strokeStyle || "#000",
+                borderRadius: "2px",
+                margin: "auto"
+              }} />
+            </div>
+          </Popover>
+          {/* Text Tool */}
+          <div
+            className={`icon-btn  button-effect btn-sm ${SHAPES.TEXT === activeTab
+              ? "btn-outline-primary"
+              : "btn-outline-light"
+              }`}
+            style={{
+              height: "24px",
+              width: "24px",
+              padding: isSmallScreen ? "12px" : "5px",
+              margin: "5px",
+              marginLeft: "2px",
+            }}
+            onClick={() => {
+              menuSelector(SHAPES.TEXT)
+            }}
+            title="Add Text Annotation"
+          >
+            <Type height={18} width={18} style={{minWidth:"12px"}}/>
+          </div>
 
-          {/* : null} */}
+          {/* Free Hand Tool */}
           <div
             className={`icon-btn  button-effect btn-sm ${SHAPES.FREE_HAND === activeTab
               ? "btn-outline-primary"
@@ -205,6 +283,7 @@ export const CanvasMenuBar = ({
             onClick={() => {
               menuSelector(SHAPES.FREE_HAND)
             }}
+            title="Free Hand Drawing"
           >
             <Edit2 height={20} width={20} style={{minWidth:"12px"}}/>
           </div>
@@ -297,6 +376,7 @@ export const CanvasMenuBar = ({
             <i className="fa fa-square-o" />
           </div>
 
+          {/* Arrow Tools */}
           <div
             style={{
               height: "24px",
@@ -312,9 +392,74 @@ export const CanvasMenuBar = ({
             onClick={() => {
               menuSelector(SHAPES.ARROW_RIGHT)
             }}
+            title="Right Arrow"
           >
             <i className="fa fa-long-arrow-right" />
           </div>
+          
+          {!isMobileScreen && (
+            <>
+              <div
+                style={{
+                  height: "24px",
+                  width: "24px",
+                  padding: isSmallScreen ? "12px" : "5px",
+                  margin: "5px",
+                  marginLeft: "2px",
+                }}
+                className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.ARROW_UP
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+                  }`}
+                onClick={() => {
+                  menuSelector(SHAPES.ARROW_UP)
+                }}
+                title="Up Arrow"
+              >
+                <i className="fa fa-long-arrow-up" />
+              </div>
+              
+              <div
+                style={{
+                  height: "24px",
+                  width: "24px",
+                  padding: isSmallScreen ? "12px" : "5px",
+                  margin: "5px",
+                  marginLeft: "2px",
+                }}
+                className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.ARROW_DOWN
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+                  }`}
+                onClick={() => {
+                  menuSelector(SHAPES.ARROW_DOWN)
+                }}
+                title="Down Arrow"
+              >
+                <i className="fa fa-long-arrow-down" />
+              </div>
+              
+              <div
+                style={{
+                  height: "24px",
+                  width: "24px",
+                  padding: isSmallScreen ? "12px" : "5px",
+                  margin: "5px",
+                  marginLeft: "2px",
+                }}
+                className={`icon-btn  button-effect btn-sm ${activeTab === SHAPES.ARROW_LEFT
+                  ? "btn-outline-primary"
+                  : "btn-outline-light"
+                  }`}
+                onClick={() => {
+                  menuSelector(SHAPES.ARROW_LEFT)
+                }}
+                title="Left Arrow"
+              >
+                <i className="fa fa-long-arrow-left" />
+              </div>
+            </>
+          )}
 
           {!isMobileScreen &&
             <>

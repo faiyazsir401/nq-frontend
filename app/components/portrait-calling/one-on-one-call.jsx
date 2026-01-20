@@ -9,6 +9,7 @@ import { SocketContext } from "../socket";
 
 const OneOnOneCall = ({
   timeRemaining,
+  bothUsersJoined = false,
   selectedUser,
   setSelectedUser,
   localVideoRef,
@@ -57,7 +58,7 @@ const OneOnOneCall = ({
   return (
     <>
       <div className="d-flex w-100 justify-content-end mr-5 mt-2">
-      {timeRemaining && <TimeRemaining timeRemaining={timeRemaining} />}
+      {timeRemaining && <TimeRemaining timeRemaining={timeRemaining} bothUsersJoined={bothUsersJoined} />}
       </div>
 
       <div className="video-section">

@@ -71,12 +71,12 @@ const ActionButtons = ({
           <MicOff size={16} />
         </div>
       </Tooltip>
-      <Tooltip>
+      <Tooltip title={isVideoOff ? "Turn on video" : "Turn off video"}>
         <div
           className={`button video-toggle ${isVideoOff ? "off" : ""}`}
           onClick={() => {
             if (stream) {
-              //  
+              // Toggle video tracks - accessible to both trainer and trainee
               stream.getVideoTracks().forEach((track) => {
                 track.enabled = !track.enabled; // Toggle camera state
               });

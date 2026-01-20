@@ -630,18 +630,18 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       fontWeight: 600,
                       cursor: "pointer",
                       transition: "all 0.3s ease",
-                      boxShadow: "0 2px 8px rgba(255, 107, 107, 0.4)",
+                      boxShadow: "0 2px 8px rgba(251, 0, 0, 0.4)",
                       width: "100%",
                       maxWidth: "400px",
                       justifyContent: "center"
                     }}
                     onMouseEnter={(e) => {
                       e.target.style.background = "#ff5252";
-                      e.target.style.boxShadow = "0 4px 12px rgba(255, 107, 107, 0.6)";
+                      e.target.style.boxShadow = "0 4px 12px rgba(255, 0, 0, 0.6)";
                     }}
                     onMouseLeave={(e) => {
                       e.target.style.background = "#ff6b6b";
-                      e.target.style.boxShadow = "0 2px 8px rgba(255, 107, 107, 0.4)";
+                      e.target.style.boxShadow = "0 2px 8px rgba(224, 0, 0, 0.4)";
                     }}
                   >
                     <span>Book An Instant Lesson Now!</span>

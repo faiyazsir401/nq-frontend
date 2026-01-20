@@ -161,7 +161,11 @@ export const SHAPES = {
   RECTANGLE: "rectangle",
   TRIANGLE: "triangle",
   ARROW_RIGHT: "arrow_right",
+  ARROW_UP: "arrow_up",
+  ARROW_DOWN: "arrow_down",
+  ARROW_LEFT: "arrow_left",
   TWO_SIDE_ARROW: "two_side_arrow",
+  TEXT: "text",
 };
 
 export const TRAINER_AMOUNT_USD = 10;

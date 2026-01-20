@@ -93,6 +93,7 @@ const VideoCallUI = ({
   const { startMeeting } = useAppSelector(bookingsState);
   const [selectedClips, setSelectedClips] = useState([]);
   const [isTraineeJoined, setIsTraineeJoined] = useState(false);
+  const [bothUsersJoined, setBothUsersJoined] = useState(false);
   const [permissionModal, setPermissionModal] = useState(true);
   const [localStream, setLocalStream] = useState(null);
   const [displayMsg, setDisplayMsg] = useState({ show: false, msg: "" });
@@ -986,6 +987,16 @@ const VideoCallUI = ({
         call.answer(stream);
         call.on("stream", (remoteStream) => {
           setIsTraineeJoined(true);
+          // Check if both users are now joined (local user + remote user)
+          // For trainer: they joined when handleStartCall ran, trainee joins here
+          // For trainee: they joined when handleStartCall ran, trainer joins here
+          if (accountType === AccountType.TRAINER) {
+            // Trainer is already in call, trainee just joined
+            setBothUsersJoined(true);
+          } else {
+            // Trainee is already in call, trainer just joined
+            setBothUsersJoined(true);
+          }
           setDisplayMsg({ show: false, msg: "" });
           setRemoteStream(remoteStream);
         });
@@ -1019,6 +1030,8 @@ const VideoCallUI = ({
         clearTimeout(timeoutId);
       }
       setIsTraineeJoined(true);
+      // Both users are now connected (local user + remote user)
+      setBothUsersJoined(true);
        
       if (remoteVideoRef?.current) {
         remoteVideoRef.current.srcObject = remoteStream;
@@ -1071,8 +1084,11 @@ const VideoCallUI = ({
     const handleBothJoin = (data) => {
         setDisplayMsg({
         show: true,
-        msg: "Both participants joined. Waiting for session to start...",
+        msg: "Both participants joined. Session timer starting...",
       });
+
+      // Mark that both users have joined - timer can now start
+      setBothUsersJoined(true);
 
       if (accountType === AccountType.TRAINER && data?.socketReq?.newEndTime) {
         const convertedExtendedEndTime = CovertTimeAccordingToTimeZone(
@@ -1263,6 +1279,7 @@ const VideoCallUI = ({
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
           timeRemaining={sessionEndTime}
+          bothUsersJoined={bothUsersJoined}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
           selectedClips={selectedClips}
@@ -1292,6 +1309,7 @@ const VideoCallUI = ({
       ) : (
         <OneOnOneCall
           timeRemaining={sessionEndTime}
+          bothUsersJoined={bothUsersJoined}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
           localVideoRef={localVideoRef}

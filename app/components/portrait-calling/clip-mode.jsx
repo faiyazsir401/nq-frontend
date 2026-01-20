@@ -65,6 +65,8 @@ let storedLocalDrawPaths = {
 let lastDrawingStep;
 
 let anglePoint = { canvas1: null, canvas2: null };
+let textInputs = { canvas1: [], canvas2: [] }; // Store text annotations
+let textInputState = { canvas1: null, canvas2: null }; // Current text input state
 let extraStream;
 let localVideoRef;
 let Peer;
@@ -1032,6 +1034,7 @@ const VideoContainer = ({
 
 const ClipModeCall = ({
   timeRemaining,
+  bothUsersJoined = false,
   isMaximized,
   setIsMaximized,
   selectedClips,
@@ -1085,6 +1088,9 @@ const ClipModeCall = ({
   const [isPlaying2, setIsPlaying2] = useState(false); // Track video playback state
   const [isFullscreen, setIsFullscreen] = useState(false); // Track fullscreen state
   const [selectedUser, setSelectedUser] = useState(null);
+  const [showTextInput, setShowTextInput] = useState(false);
+  const [textInputPosition, setTextInputPosition] = useState({ x: 0, y: 0, canvasIndex: 1 });
+  const [textInputValue, setTextInputValue] = useState("");
 
   function handleUserClick(id) {
     if (accountType === AccountType.TRAINER) {
@@ -1579,10 +1585,60 @@ const ClipModeCall = ({
       if (canvas1 && context1 && video1) {
         context1.fillStyle = "rgba(255, 255, 255, 0.5)";
         context1.fillRect(0, 0, canvas1.width, canvas1.height);
+        // Render text annotations for canvas1
+        if (textInputs.canvas1 && textInputs.canvas1.length > 0) {
+          textInputs.canvas1.forEach((textItem) => {
+            if (textItem.text) {
+              context1.save();
+              context1.font = `${textItem.fontSize || 18}px Arial`;
+              context1.fillStyle = textItem.color || canvasConfigs.sender.strokeStyle;
+              context1.textBaseline = "top";
+              // Draw background for better visibility
+              const metrics = context1.measureText(textItem.text);
+              const padding = 4;
+              context1.fillStyle = "rgba(0, 0, 0, 0.5)";
+              context1.fillRect(
+                textItem.x - padding,
+                textItem.y - padding,
+                metrics.width + padding * 2,
+                (textItem.fontSize || 18) + padding * 2
+              );
+              // Draw text
+              context1.fillStyle = textItem.color || canvasConfigs.sender.strokeStyle;
+              context1.fillText(textItem.text, textItem.x, textItem.y);
+              context1.restore();
+            }
+          });
+        }
       }
       if (canvas2 && context2 && video2) {
         context2.fillStyle = "rgba(255, 255, 255, 0.5)";
         context2.fillRect(0, 0, canvas2.width, canvas2.height);
+        // Render text annotations for canvas2
+        if (textInputs.canvas2 && textInputs.canvas2.length > 0) {
+          textInputs.canvas2.forEach((textItem) => {
+            if (textItem.text) {
+              context2.save();
+              context2.font = `${textItem.fontSize || 18}px Arial`;
+              context2.fillStyle = textItem.color || canvasConfigs.sender.strokeStyle;
+              context2.textBaseline = "top";
+              // Draw background for better visibility
+              const metrics = context2.measureText(textItem.text);
+              const padding = 4;
+              context2.fillStyle = "rgba(0, 0, 0, 0.5)";
+              context2.fillRect(
+                textItem.x - padding,
+                textItem.y - padding,
+                metrics.width + padding * 2,
+                (textItem.fontSize || 18) + padding * 2
+              );
+              // Draw text
+              context2.fillStyle = textItem.color || canvasConfigs.sender.strokeStyle;
+              context2.fillText(textItem.text, textItem.x, textItem.y);
+              context2.restore();
+            }
+          });
+        }
       }
       requestAnimationFrame(drawFrame);
     };
@@ -1612,6 +1668,27 @@ const ClipModeCall = ({
         const mousePos = event.type.includes("touchstart")
           ? getTouchPos(event, canvas)
           : getMousePositionOnCanvas(event, canvas);
+
+        // Handle text annotation
+        if (selectedShape === SHAPES.TEXT) {
+          // For text, show input prompt at click position
+          const canvas = canvasIndex === 1 ? canvasRef?.current : canvasRef2?.current;
+          if (canvas) {
+            const rect = canvas.getBoundingClientRect();
+            setTextInputPosition({
+              x: rect.left + mousePos.x * (rect.width / canvas.width),
+              y: rect.top + mousePos.y * (rect.height / canvas.height),
+              canvasIndex: canvasIndex,
+              canvasX: mousePos.x,
+              canvasY: mousePos.y
+            });
+            setTextInputValue("");
+            setShowTextInput(true);
+          }
+          isDrawing = false;
+          state.mousedown[`canvas${canvasIndex}`] = false;
+          return;
+        }
 
         context.strokeStyle = canvasConfigs.sender.strokeStyle;
         context.lineWidth = canvasConfigs.sender.lineWidth;
@@ -1769,41 +1846,27 @@ const ClipModeCall = ({
           break;
         }
         case SHAPES.ARROW_RIGHT: {
-          const arrowSize = 10;
-          const direction = Math.atan2(
-            currPos[`canvas${canvasIndex}`].y -
-            startPos[`canvas${canvasIndex}`].y,
-            currPos[`canvas${canvasIndex}`].x -
-            startPos[`canvas${canvasIndex}`].x
-          );
-          const arrowheadX =
-            currPos[`canvas${canvasIndex}`].x + length * Math.cos(direction);
-          const arrowheadY =
-            currPos[`canvas${canvasIndex}`].y + length * Math.sin(direction);
-          context.moveTo(
-            startPos[`canvas${canvasIndex}`].x,
-            startPos[`canvas${canvasIndex}`].y
-          );
+          const x1 = startPos[`canvas${canvasIndex}`].x;
+          const y1 = startPos[`canvas${canvasIndex}`].y;
+          const x2 = currPos[`canvas${canvasIndex}`].x;
+          const y2 = currPos[`canvas${canvasIndex}`].y;
+          const arrowSize = 12;
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          
+          // Draw main line
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          
+          // Draw arrowhead
+          context.moveTo(x2, y2);
           context.lineTo(
-            currPos[`canvas${canvasIndex}`].x,
-            currPos[`canvas${canvasIndex}`].y
+            x2 - arrowSize * Math.cos(angle - Math.PI / 6),
+            y2 - arrowSize * Math.sin(angle - Math.PI / 6)
           );
-          context.moveTo(arrowheadX, arrowheadY);
+          context.moveTo(x2, y2);
           context.lineTo(
-            currPos[`canvas${canvasIndex}`].x -
-            arrowSize * Math.cos(direction - Math.PI / 6),
-            currPos[`canvas${canvasIndex}`].y -
-            arrowSize * Math.sin(direction - Math.PI / 6)
-          );
-          context.moveTo(
-            currPos[`canvas${canvasIndex}`].x,
-            currPos[`canvas${canvasIndex}`].y
-          );
-          context.lineTo(
-            currPos[`canvas${canvasIndex}`].x -
-            arrowSize * Math.cos(direction + Math.PI / 6),
-            currPos[`canvas${canvasIndex}`].y -
-            arrowSize * Math.sin(direction + Math.PI / 6)
+            x2 - arrowSize * Math.cos(angle + Math.PI / 6),
+            y2 - arrowSize * Math.sin(angle + Math.PI / 6)
           );
           context.stroke();
           break;
@@ -1841,6 +1904,57 @@ const ClipModeCall = ({
           context.moveTo(arrowPoints[2].x, arrowPoints[2].y);
           context.lineTo(x1, y1);
           context.lineTo(arrowPoints[3].x, arrowPoints[3].y);
+          context.stroke();
+          break;
+        }
+        case SHAPES.ARROW_UP: {
+          const x1 = startPos[`canvas${canvasIndex}`].x;
+          const y1 = startPos[`canvas${canvasIndex}`].y;
+          const x2 = currPos[`canvas${canvasIndex}`].x;
+          const y2 = currPos[`canvas${canvasIndex}`].y;
+          const size = 12;
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          // Draw arrowhead pointing up
+          context.moveTo(x2, y2);
+          context.lineTo(x2 - size * Math.cos(angle - Math.PI / 6), y2 - size * Math.sin(angle - Math.PI / 6));
+          context.moveTo(x2, y2);
+          context.lineTo(x2 - size * Math.cos(angle + Math.PI / 6), y2 - size * Math.sin(angle + Math.PI / 6));
+          context.stroke();
+          break;
+        }
+        case SHAPES.ARROW_DOWN: {
+          const x1 = startPos[`canvas${canvasIndex}`].x;
+          const y1 = startPos[`canvas${canvasIndex}`].y;
+          const x2 = currPos[`canvas${canvasIndex}`].x;
+          const y2 = currPos[`canvas${canvasIndex}`].y;
+          const size = 12;
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          // Draw arrowhead pointing down
+          context.moveTo(x2, y2);
+          context.lineTo(x2 - size * Math.cos(angle - Math.PI / 6), y2 - size * Math.sin(angle - Math.PI / 6));
+          context.moveTo(x2, y2);
+          context.lineTo(x2 - size * Math.cos(angle + Math.PI / 6), y2 - size * Math.sin(angle + Math.PI / 6));
+          context.stroke();
+          break;
+        }
+        case SHAPES.ARROW_LEFT: {
+          const x1 = startPos[`canvas${canvasIndex}`].x;
+          const y1 = startPos[`canvas${canvasIndex}`].y;
+          const x2 = currPos[`canvas${canvasIndex}`].x;
+          const y2 = currPos[`canvas${canvasIndex}`].y;
+          const size = 12;
+          const angle = Math.atan2(y2 - y1, x2 - x1);
+          context.moveTo(x1, y1);
+          context.lineTo(x2, y2);
+          // Draw arrowhead pointing left
+          context.moveTo(x2, y2);
+          context.lineTo(x2 - size * Math.cos(angle - Math.PI / 6), y2 - size * Math.sin(angle - Math.PI / 6));
+          context.moveTo(x2, y2);
+          context.lineTo(x2 - size * Math.cos(angle + Math.PI / 6), y2 - size * Math.sin(angle + Math.PI / 6));
           context.stroke();
           break;
         }
@@ -1895,15 +2009,35 @@ const ClipModeCall = ({
             currPos[`canvas${canvasIndex}`],
             mousePos)
            
-          // Optionally, display the angle computed (you can use context.fillText)
-          context.fillStyle = canvasConfigs.sender.strokeStyle;
-          context.font = "16px Arial";
+          // Enhanced angle display with better positioning and background
+          const angleText = `${computedAngle.toFixed(1)}°`;
+          const textX = currPos[`canvas${canvasIndex}`].x;
+          const textY = currPos[`canvas${canvasIndex}`].y;
+          
+          // Draw background for better visibility
+          context.save();
+          context.font = "bold 18px Arial";
+          const metrics = context.measureText(angleText);
+          const textWidth = metrics.width;
+          const textHeight = 20;
+          const padding = 6;
+          
+          // Calculate position to avoid overlap
+          let displayX = textX + 15;
+          let displayY = textY - 15;
           if (completeComputedAngle > 180) {
-            context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x - 60, currPos[`canvas${canvasIndex}`].y + 20);
-          } else {
-            context.fillText(`${computedAngle.toFixed(2)}°`, currPos[`canvas${canvasIndex}`].x + 10, currPos[`canvas${canvasIndex}`].y - 20);
-
+            displayX = textX - textWidth - 15;
+            displayY = textY + 15;
           }
+          
+          // Draw semi-transparent background
+          context.fillStyle = "rgba(0, 0, 0, 0.6)";
+          context.fillRect(displayX - padding, displayY - textHeight - padding, textWidth + padding * 2, textHeight + padding * 2);
+          
+          // Draw angle text
+          context.fillStyle = "#FFFFFF";
+          context.fillText(angleText, displayX, displayY);
+          context.restore();
 
         }
 
@@ -2138,7 +2272,7 @@ const ClipModeCall = ({
         {drawingMode && accountType === AccountType.TRAINER  ? (
           <></>
         ) : (
-          timeRemaining &&  <TimeRemaining timeRemaining={timeRemaining} />
+          timeRemaining &&  <TimeRemaining timeRemaining={timeRemaining} bothUsersJoined={bothUsersJoined} />
         )}
       </div>
       <div
@@ -2369,6 +2503,107 @@ const ClipModeCall = ({
               muted={true}
             />
           </>
+        )}
+
+        {/* Text Input Modal */}
+        {showTextInput && (
+          <div
+            style={{
+              position: "fixed",
+              top: textInputPosition.y,
+              left: textInputPosition.x,
+              zIndex: 10000,
+              background: "white",
+              padding: "8px 12px",
+              borderRadius: "4px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              minWidth: "200px",
+            }}
+          >
+            <input
+              type="text"
+              value={textInputValue}
+              onChange={(e) => setTextInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && textInputValue.trim()) {
+                  // Add text annotation
+                  const canvasIndex = textInputPosition.canvasIndex;
+                  textInputs[`canvas${canvasIndex}`].push({
+                    text: textInputValue.trim(),
+                    x: textInputPosition.canvasX,
+                    y: textInputPosition.canvasY,
+                    color: canvasConfigs.sender.strokeStyle,
+                    fontSize: 18,
+                  });
+                  sendDrawEvent(canvasIndex);
+                  setShowTextInput(false);
+                  setTextInputValue("");
+                } else if (e.key === "Escape") {
+                  setShowTextInput(false);
+                  setTextInputValue("");
+                }
+              }}
+              placeholder="Enter text..."
+              autoFocus
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                padding: "6px 8px",
+                fontSize: "14px",
+                outline: "none",
+              }}
+            />
+            <div style={{ display: "flex", gap: "4px", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => {
+                  if (textInputValue.trim()) {
+                    const canvasIndex = textInputPosition.canvasIndex;
+                    textInputs[`canvas${canvasIndex}`].push({
+                      text: textInputValue.trim(),
+                      x: textInputPosition.canvasX,
+                      y: textInputPosition.canvasY,
+                      color: canvasConfigs.sender.strokeStyle,
+                      fontSize: 18,
+                    });
+                    sendDrawEvent(canvasIndex);
+                  }
+                  setShowTextInput(false);
+                  setTextInputValue("");
+                }}
+                style={{
+                  padding: "4px 12px",
+                  background: "#007bff",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                }}
+              >
+                Add
+              </button>
+              <button
+                onClick={() => {
+                  setShowTextInput(false);
+                  setTextInputValue("");
+                }}
+                style={{
+                  padding: "4px 12px",
+                  background: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </>

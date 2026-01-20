@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 
-const Timer = (session_end_time) => {
+const Timer = (session_end_time, bothUsersJoined = false) => {
   const [timeDifference, setTimeDifference] = useState("");
 
   useEffect(() => {
+    // Only start timer when both users have joined
+    if (!bothUsersJoined) {
+      setTimeDifference("Waiting for both users...");
+      return;
+    }
+
     const now = new Date();
     // Check if session_end_time is a string and includes the colon ":"
     
@@ -60,11 +66,12 @@ const Timer = (session_end_time) => {
     } else {
       console.error("Invalid session_end_time:", session_end_time);
       // Handle the case where session_end_time is invalid
+      setTimeDifference("Invalid time");
     }
 
 
 
-  }, [session_end_time]);
+  }, [session_end_time, bothUsersJoined]);
 
   return timeDifference;
 };
