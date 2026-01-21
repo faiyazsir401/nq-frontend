@@ -112,41 +112,6 @@ export const HandleVideoCall = ({
   session_end_time,
   bIndex,
 }) => {
-  // Early validation: return early if required props are missing
-  if (!fromUser || !toUser || !fromUser._id || !toUser._id) {
-    console.error('[HandleVideoCall] Missing required props: fromUser or toUser is invalid', { fromUser, toUser });
-    return (
-      <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        minHeight: '100vh',
-        padding: '20px',
-        textAlign: 'center'
-      }}>
-        <h3 style={{ color: '#d32f2f', marginBottom: '10px' }}>Unable to start video call</h3>
-        <p style={{ color: '#666', marginBottom: '20px' }}>
-          User information is missing. Please try refreshing the page.
-        </p>
-        <button
-          onClick={() => window.location.reload()}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#1976d2',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '14px',
-          }}
-        >
-          Refresh Page
-        </button>
-      </div>
-    );
-  }
-
   //   
   // const dispatch = useAppDispatch();
   const socket = useContext(SocketContext);

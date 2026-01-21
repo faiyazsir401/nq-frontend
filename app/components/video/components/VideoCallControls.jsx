@@ -70,10 +70,13 @@ export const VideoCallControls = ({
       localStream.getVideoTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
-      socket.emit(EVENTS.VIDEO_CALL.STOP_FEED, {
-        userInfo: { from_user: fromUser._id, to_user: toUser._id },
-        feedStatus: !isFeedStopped,
-      });
+      // Emit feed status only when socket and user info are valid
+      if (socket && fromUser?._id && toUser?._id && EVENTS?.VIDEO_CALL?.STOP_FEED) {
+        socket.emit(EVENTS.VIDEO_CALL.STOP_FEED, {
+          userInfo: { from_user: fromUser._id, to_user: toUser._id },
+          feedStatus: !isFeedStopped,
+        });
+      }
       setIsFeedStopped(!isFeedStopped);
     }
   };

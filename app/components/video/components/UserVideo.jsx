@@ -24,6 +24,11 @@ export const UserVideo = ({
   className,
   onClick,
 }) => {
+  // If user data is missing, avoid rendering to prevent runtime errors
+  if (!user) {
+    return null;
+  }
+
   const showPlaceholder = displayMsg?.msg || isRemoteVideoOff || isFeedStopped;
 
   return (
@@ -37,7 +42,7 @@ export const UserVideo = ({
         ref={videoRef}
         playsInline
         autoPlay
-        muted={user.isLocal}
+        muted={!!user.isLocal}
         style={{
           width: '100%',
           position:
@@ -90,18 +95,20 @@ export const UserVideo = ({
                 borderRadius: '5%',
               }}
             />
-            <span style={{ color: 'white' }}>{user.fullname}</span>
+            <span style={{ color: 'white' }}>{user.fullname || ''}</span>
           </div>
         ) : (
           <div
             className="container-raj"
             style={{
               backgroundColor: Utils.charBasedColors(
-                Utils.capitalizeFirstChar(user.fullname)
+                Utils.capitalizeFirstChar(user.fullname || 'User')
               ),
             }}
           >
-            <h1 className="text-box-raj">{getInitials(user.fullname)}</h1>
+            <h1 className="text-box-raj">
+              {getInitials(user.fullname || 'User')}
+            </h1>
           </div>
         )}
       </div>

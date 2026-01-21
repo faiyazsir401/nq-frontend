@@ -21,6 +21,9 @@ const VideoCallLayout = ({
   onVideoClick,
   height,
 }) => {
+  const safeToUserName = toUser?.fullname || '';
+  const safeFromUserName = fromUser?.fullname || '';
+
   return (
     <div className="row" id="bookings" style={{ height: '100%' }}>
       {/* User Video 1 - Remote User */}
@@ -93,21 +96,21 @@ const VideoCallLayout = ({
                   height: height < 500 ? '60px' : '100px',
                   borderRadius: '5%',
                 }}
-                alt={toUser?.fullname}
+                alt={safeToUserName}
               />
-              <span style={{ color: 'white' }}>{toUser?.fullname}</span>
+              <span style={{ color: 'white' }}>{safeToUserName}</span>
             </div>
           ) : (
             <div
               className="container-raj"
               style={{
                 backgroundColor: Utils.charBasedColors(
-                  Utils.capitalizeFirstChar(toUser.fullname)
+                  Utils.capitalizeFirstChar(safeToUserName || 'User')
                 ),
               }}
             >
               <h1 className="text-box-raj">
-                {getInitials(toUser?.fullname)}
+                {getInitials(safeToUserName || 'User')}
               </h1>
             </div>
           )}
@@ -165,7 +168,7 @@ const VideoCallLayout = ({
             borderRadius: '10px',
           }}
         >
-          {fromUser.profile_picture ? (
+          {fromUser?.profile_picture ? (
             <div
               style={{
                 display: 'flex',
@@ -182,21 +185,21 @@ const VideoCallLayout = ({
                   height: height < 500 ? '60px' : '100px',
                   borderRadius: '5%',
                 }}
-                alt={fromUser?.fullname}
+                alt={safeFromUserName}
               />
-              <span style={{ color: 'white' }}>{fromUser?.fullname}</span>
+              <span style={{ color: 'white' }}>{safeFromUserName}</span>
             </div>
           ) : (
             <div
               className="container-raj"
               style={{
                 backgroundColor: Utils.charBasedColors(
-                  Utils.capitalizeFirstChar(fromUser.fullname)
+                  Utils.capitalizeFirstChar(safeFromUserName || 'User')
                 ),
               }}
             >
               <h1 className="text-box-raj">
-                {getInitials(fromUser.fullname)}
+                {getInitials(safeFromUserName || 'User')}
               </h1>
             </div>
           )}
