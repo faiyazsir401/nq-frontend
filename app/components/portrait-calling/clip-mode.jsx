@@ -312,57 +312,52 @@ const VideoContainer = ({
   };
 
   useEffect(() => {
-    const video = videoRef?.current;
+    if (!socket) return;
 
-    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+    const handlePlayPause = (data) => {
+      const video = videoRef?.current;
+
       console.log("📡 [VideoContainer] Received ON_VIDEO_PLAY_PAUSE event", {
         receivedData: data,
         clipId: clip?._id,
         isMatch: data?.videoId === clip?._id,
         shouldPlay: data?.isPlaying,
         videoPaused: video?.paused,
-        index
+        index,
       });
-      
-      if (data?.videoId === clip?._id && data?.isPlaying) {
-        // Only play if the video matches and the action is play
-        if (video?.paused) {
+
+      if (data?.videoId !== clip?._id || !video) return;
+
+      if (data.isPlaying) {
+        if (video.paused) {
           console.log("▶️ [VideoContainer] Playing video from socket event", {
             clipId: clip?._id,
             currentTime: video.currentTime,
-            index
+            index,
           });
-          video.play();
-          setIsPlaying(true);
-        } else {
-          console.log("ℹ️ [VideoContainer] Video already playing, no action needed", {
-            clipId: clip?._id,
-            index
-          });
+          video
+            .play()
+            .then(() => setIsPlaying(true))
+            .catch((err) =>
+              console.warn("VideoContainer play error from socket", err)
+            );
         }
-      }
-    });
-
-    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
-      if (data?.videoId === clip?._id && !data?.isPlaying) {
-        if (video?.play) {
+      } else {
+        if (!video.paused) {
           console.log("⏸️ [VideoContainer] Pausing video from socket event", {
             clipId: clip?._id,
             currentTime: video.currentTime,
-            index
+            index,
           });
           video.pause();
           setIsPlaying(false);
-        } else {
-          console.log("ℹ️ [VideoContainer] Video already paused, no action needed", {
-            clipId: clip?._id,
-            index
-          });
         }
       }
-    });
+    };
 
-    socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
+    const handleTime = (data) => {
+      const video = videoRef?.current;
+
       console.log("📡 [VideoContainer] Received ON_VIDEO_TIME event", {
         receivedData: data,
         clipId: clip?._id,
@@ -370,20 +365,20 @@ const VideoContainer = ({
         isTrainee: accountType === AccountType.TRAINEE,
         currentTime: video?.currentTime,
         newTime: data?.progress,
-        index
+        index,
       });
-      
-      if (data?.videoId === clip?._id && accountType === AccountType.TRAINEE) {
-        const oldTime = video?.currentTime;
+
+      if (data?.videoId === clip?._id && accountType === AccountType.TRAINEE && video) {
+        const oldTime = video.currentTime;
         video.currentTime = data.progress;
         console.log("⏩ [VideoContainer] Video time synced from socket", {
           clipId: clip?._id,
           from: oldTime,
           to: data.progress,
-          index
+          index,
         });
       }
-    });
+    };
     const handleZoomPanChange = (data) => {
       console.log("📡 [VideoContainer] Received ON_VIDEO_ZOOM_PAN event", {
         receivedData: data,
@@ -426,16 +421,18 @@ const VideoContainer = ({
       }
     };
 
-    // Listen for the ON_VIDEO_ZOOM_PAN event from the socket
+    // Listen for events from the socket
+    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, handlePlayPause);
+    socket?.on(EVENTS?.ON_VIDEO_TIME, handleTime);
     socket?.on(EVENTS?.ON_VIDEO_ZOOM_PAN, handleZoomPanChange);
 
     // Clean up on unmount
     return () => {
-      socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
-      socket?.off(EVENTS?.ON_VIDEO_TIME);
-      socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
+      socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE, handlePlayPause);
+      socket?.off(EVENTS?.ON_VIDEO_TIME, handleTime);
+      socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN, handleZoomPanChange);
     };
-  }, [socket, clip?._id, videoRef]);
+  }, [socket, clip?._id, videoRef, accountType, scale, translate]);
   //  
   // useEffect(() => {
   //   const video = videoRef?.current;
@@ -1119,113 +1116,115 @@ const ClipModeCall = ({
   };
 
   useEffect(() => {
-    const video1 = videoRef.current;
-    const video2 = videoRef2.current;
+    if (!socket) return;
 
-    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
+    const handlePlayPause = (data) => {
+      const video1 = videoRef.current;
+      const video2 = videoRef2.current;
+
       console.log("📡 [ClipModeCall] Received ON_VIDEO_PLAY_PAUSE event (dual)", {
         receivedData: data,
         isBoth: data?.both,
         shouldPlay: data?.isPlaying,
         video1Paused: video1?.paused,
         video2Paused: video2?.paused,
-        accountType
+        accountType,
       });
-      
-      if (data?.both && data?.isPlaying) {
-        // Only play if the video matches and the action is play
-        if (video1?.paused) {
-          console.log("▶️ [ClipModeCall] Playing both videos from socket event");
-          video1.play();
-          video2.play();
-          setIsPlayingBoth(true);
-        } else {
-          console.log("ℹ️ [ClipModeCall] Videos already playing, no action needed");
-        }
-      }
-    });
 
-    socket?.on(EVENTS?.ON_VIDEO_PLAY_PAUSE, (data) => {
-      if (data?.both && !data?.isPlaying) {
-        if (video1?.play) {
-          console.log("⏸️ [ClipModeCall] Pausing both videos from socket event");
-          video1.pause();
-          video2.pause();
-          setIsPlayingBoth(false);
-        } else {
-          console.log("ℹ️ [ClipModeCall] Videos already paused, no action needed");
-        }
-      }
-    });
+      if (!data?.both || !video1 || !video2) return;
 
-    socket?.on(EVENTS?.ON_VIDEO_TIME, (data) => {
+      if (data.isPlaying) {
+        console.log("▶️ [ClipModeCall] Playing both videos from socket event");
+        video1.play()?.catch((err) => console.warn("Video1 play error", err));
+        video2.play()?.catch((err) => console.warn("Video2 play error", err));
+        setIsPlayingBoth(true);
+      } else {
+        console.log("⏸️ [ClipModeCall] Pausing both videos from socket event");
+        video1.pause();
+        video2.pause();
+        setIsPlayingBoth(false);
+      }
+    };
+
+    const handleTime = (data) => {
+      const video1 = videoRef.current;
+      const video2 = videoRef2.current;
+
       console.log("📡 [ClipModeCall] Received ON_VIDEO_TIME event (dual)", {
         receivedData: data,
         isBoth: data?.both,
         isTrainee: accountType === AccountType.TRAINEE,
         video1Time: video1?.currentTime,
         video2Time: video2?.currentTime,
-        newTime: data?.progress
+        newTime: data?.progress,
       });
-      
-      if (data?.both && accountType === AccountType.TRAINEE) {
-        const oldTime1 = video1.currentTime;
-        const oldTime2 = video2.currentTime;
-        
-        video1.currentTime = data.progress;
-        video2.currentTime = data.progress;
-        
-        console.log("⏩ [ClipModeCall] Both videos synced from socket", {
-          from: { video1: oldTime1, video2: oldTime2 },
-          to: data.progress
-        });
-      }
-    });
 
-    socket?.on(EVENTS.TOGGLE_DRAWING_MODE, (data) => {
+      if (!data?.both || accountType !== AccountType.TRAINEE || !video1 || !video2) {
+        return;
+      }
+
+      const oldTime1 = video1.currentTime;
+      const oldTime2 = video2.currentTime;
+
+      video1.currentTime = data.progress;
+      video2.currentTime = data.progress;
+
+      console.log("⏩ [ClipModeCall] Both videos synced from socket", {
+        from: { video1: oldTime1, video2: oldTime2 },
+        to: data.progress,
+      });
+    };
+
+    const handleToggleDrawingMode = (data) => {
       if (accountType === AccountType.TRAINEE) {
         setDrawingMode(data.drawingMode);
       }
-    });
+    };
 
-    socket?.on(EVENTS.TOGGLE_FULL_SCREEN, (data) => {
+    const handleToggleFullscreen = (data) => {
       if (accountType === AccountType.TRAINEE) {
         setIsMaximized(data.isMaximized);
       }
-    });
+    };
 
-    socket?.on(EVENTS.TOGGLE_LOCK_MODE, (data) => {
+    const handleToggleLockMode = (data) => {
       console.log("📡 [ClipModeCall] Received TOGGLE_LOCK_MODE event", {
         receivedData: data,
         isTrainee: accountType === AccountType.TRAINEE,
         currentLockState: isLock,
-        newLockState: data.isLockMode
+        newLockState: data.isLockMode,
       });
-      
+
       if (accountType === AccountType.TRAINEE) {
         console.log("🔒 [ClipModeCall] Updating lock mode from socket", {
           from: isLock,
-          to: data.isLockMode
+          to: data.isLockMode,
         });
         setIsLock(data.isLockMode);
       }
-    });
+    };
 
-    socket.on(EVENTS.ON_CLEAR_CANVAS, () => {
+    const handleClearCanvasSocket = () => {
       clearCanvas();
-    });
+    };
+
+    socket.on(EVENTS.ON_VIDEO_PLAY_PAUSE, handlePlayPause);
+    socket.on(EVENTS.ON_VIDEO_TIME, handleTime);
+    socket.on(EVENTS.TOGGLE_DRAWING_MODE, handleToggleDrawingMode);
+    socket.on(EVENTS.TOGGLE_FULL_SCREEN, handleToggleFullscreen);
+    socket.on(EVENTS.TOGGLE_LOCK_MODE, handleToggleLockMode);
+    socket.on(EVENTS.ON_CLEAR_CANVAS, handleClearCanvasSocket);
 
     // Clean up on unmount
     return () => {
-      socket?.off(EVENTS?.ON_VIDEO_PLAY_PAUSE);
-      socket?.off(EVENTS?.ON_VIDEO_TIME);
-      socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN);
-      socket?.off(EVENTS?.TOGGLE_DRAWING_MODE);
-      socket?.off(EVENTS?.TOGGLE_FULL_SCREEN);
-      socket?.off(EVENTS?.ON_CLEAR_CANVAS);
-      socket?.off(EVENTS?.TOGGLE_LOCK_MODE);
+      socket.off(EVENTS.ON_VIDEO_PLAY_PAUSE, handlePlayPause);
+      socket.off(EVENTS.ON_VIDEO_TIME, handleTime);
+      socket.off(EVENTS.TOGGLE_DRAWING_MODE, handleToggleDrawingMode);
+      socket.off(EVENTS.TOGGLE_FULL_SCREEN, handleToggleFullscreen);
+      socket.off(EVENTS.TOGGLE_LOCK_MODE, handleToggleLockMode);
+      socket.off(EVENTS.ON_CLEAR_CANVAS, handleClearCanvasSocket);
     };
-  }, [socket, videoRef, videoRef2]);
+  }, [socket, videoRef, videoRef2, accountType, isLock]);
 
   // Play/pause video
   const togglePlayPause = () => {

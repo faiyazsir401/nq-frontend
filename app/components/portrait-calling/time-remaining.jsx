@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const FIVE_MINUTES_IN_SECONDS = 5 * 60;
-const THIRTY_SECONDS_IN_SECONDS = 30;
+const FIFTEEN_SECONDS_IN_SECONDS = 30;
 
 const formatSecondsToMMSS = (seconds) => {
   if (typeof seconds !== "number" || Number.isNaN(seconds) || seconds < 0) {
@@ -24,7 +24,7 @@ const TimeRemaining = ({ timeRemaining, bothUsersJoined = false }) => {
   const fiveMinTimeoutRef = useRef(null);
   const thirtySecTimeoutRef = useRef(null);
 
-  // Derive remaining seconds from the provided timeRemaining (expected in seconds)
+  // Derive remaining seconds from the provided timeRemaining
   useEffect(() => {
     // Clear any active timeouts when dependencies change
     if (fiveMinTimeoutRef.current) {
@@ -47,63 +47,163 @@ const TimeRemaining = ({ timeRemaining, bothUsersJoined = false }) => {
       return;
     }
 
-    if (typeof timeRemaining !== "number") {
-      // Fallback for unexpected type
-      setDisplayTime("--:--");
-      setTimerColor("#28a745");
+    // Case 1: timeRemaining is a string "HH:MM" → treat as end time
+    if (typeof timeRemaining === "string" && timeRemaining.includes(":")) {
+      const [endHours, endMinutes] = timeRemaining.split(":").map(Number);
+      if (
+        Number.isNaN(endHours) ||
+        Number.isNaN(endMinutes) ||
+        endHours < 0 ||
+        endHours > 23 ||
+        endMinutes < 0 ||
+        endMinutes > 59
+      ) {
+        setDisplayTime("--:--");
+        return;
+      }
+
+      const now = new Date();
+      const endTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        endHours,
+        endMinutes
+      );
+
+      const updateFromNow = () => {
+        const current = new Date();
+        const diffMs = endTime - current;
+        const remainingSeconds = Math.max(
+          0,
+          Math.floor(diffMs / 1000)
+        );
+
+        // Update display string
+        setDisplayTime(formatSecondsToMMSS(remainingSeconds));
+
+        // Dynamic color based on remaining time
+        if (remainingSeconds > FIVE_MINUTES_IN_SECONDS) {
+          setTimerColor("#28a745"); // green
+        } else if (remainingSeconds > 60) {
+          setTimerColor("#ff9800"); // orange
+        } else {
+          setTimerColor("#f44336"); // red
+        }
+
+        const previous = lastRemainingSecondsRef.current;
+        lastRemainingSecondsRef.current = remainingSeconds;
+
+        // Trigger "5 minutes left" popup once when crossing 5 minutes
+        if (
+          previous != null &&
+          previous > FIVE_MINUTES_IN_SECONDS &&
+          remainingSeconds <= FIVE_MINUTES_IN_SECONDS &&
+          remainingSeconds > 0
+        ) {
+          setShowFiveMinPopup(true);
+          if (fiveMinTimeoutRef.current) {
+            clearTimeout(fiveMinTimeoutRef.current);
+          }
+          fiveMinTimeoutRef.current = setTimeout(() => {
+            setShowFiveMinPopup(false);
+            fiveMinTimeoutRef.current = null;
+          }, 5000);
+        }
+
+        // Trigger "15 seconds left" popup once when crossing 15 seconds
+        if (
+          previous != null &&
+          previous > FIFTEEN_SECONDS_IN_SECONDS &&
+          remainingSeconds <= FIFTEEN_SECONDS_IN_SECONDS &&
+          remainingSeconds > 0
+        ) {
+          setShowThirtySecPopup(true);
+          if (thirtySecTimeoutRef.current) {
+            clearTimeout(thirtySecTimeoutRef.current);
+          }
+          thirtySecTimeoutRef.current = setTimeout(() => {
+            setShowThirtySecPopup(false);
+            thirtySecTimeoutRef.current = null;
+          }, 3000);
+        }
+      };
+
+      updateFromNow();
+      const intervalId = setInterval(updateFromNow, 1000);
+
+      return () => {
+        clearInterval(intervalId);
+        if (fiveMinTimeoutRef.current) {
+          clearTimeout(fiveMinTimeoutRef.current);
+          fiveMinTimeoutRef.current = null;
+        }
+        if (thirtySecTimeoutRef.current) {
+          clearTimeout(thirtySecTimeoutRef.current);
+          thirtySecTimeoutRef.current = null;
+        }
+      };
+    }
+
+    // Case 2: timeRemaining is already a number of seconds
+    if (typeof timeRemaining === "number") {
+      const remainingSeconds = Math.max(0, Math.floor(timeRemaining));
+
+      // Update display string
+      setDisplayTime(formatSecondsToMMSS(remainingSeconds));
+
+      // Dynamic color based on remaining time
+      if (remainingSeconds > FIVE_MINUTES_IN_SECONDS) {
+        setTimerColor("#28a745"); // green
+      } else if (remainingSeconds > 60) {
+        setTimerColor("#ff9800"); // orange
+      } else {
+        setTimerColor("#f44336"); // red
+      }
+
+      const previous = lastRemainingSecondsRef.current;
+      lastRemainingSecondsRef.current = remainingSeconds;
+
+      // Trigger "5 minutes left" popup once when crossing 5 minutes
+      if (
+        previous != null &&
+        previous > FIVE_MINUTES_IN_SECONDS &&
+        remainingSeconds <= FIVE_MINUTES_IN_SECONDS &&
+        remainingSeconds > 0
+      ) {
+        setShowFiveMinPopup(true);
+        if (fiveMinTimeoutRef.current) {
+          clearTimeout(fiveMinTimeoutRef.current);
+        }
+        fiveMinTimeoutRef.current = setTimeout(() => {
+          setShowFiveMinPopup(false);
+          fiveMinTimeoutRef.current = null;
+        }, 5000);
+      }
+
+      // Trigger "15 seconds left" popup once when crossing 15 seconds
+      if (
+        previous != null &&
+        previous > FIFTEEN_SECONDS_IN_SECONDS &&
+        remainingSeconds <= FIFTEEN_SECONDS_IN_SECONDS &&
+        remainingSeconds > 0
+      ) {
+        setShowThirtySecPopup(true);
+        if (thirtySecTimeoutRef.current) {
+          clearTimeout(thirtySecTimeoutRef.current);
+        }
+        thirtySecTimeoutRef.current = setTimeout(() => {
+          setShowThirtySecPopup(false);
+          thirtySecTimeoutRef.current = null;
+        }, 3000);
+      }
+
       return;
     }
 
-    const remainingSeconds = Math.max(0, Math.floor(timeRemaining));
-
-    // Update display string
-    setDisplayTime(formatSecondsToMMSS(remainingSeconds));
-
-    // Dynamic color based on remaining time
-    if (remainingSeconds > FIVE_MINUTES_IN_SECONDS) {
-      setTimerColor("#28a745"); // green
-    } else if (remainingSeconds > 60) {
-      setTimerColor("#ff9800"); // orange
-    } else {
-      setTimerColor("#f44336"); // red
-    }
-
-    const previous = lastRemainingSecondsRef.current;
-    lastRemainingSecondsRef.current = remainingSeconds;
-
-    // Trigger "5 minutes left" popup once when crossing 5 minutes
-    if (
-      previous != null &&
-      previous > FIVE_MINUTES_IN_SECONDS &&
-      remainingSeconds <= FIVE_MINUTES_IN_SECONDS &&
-      remainingSeconds > 0
-    ) {
-      setShowFiveMinPopup(true);
-      if (fiveMinTimeoutRef.current) {
-        clearTimeout(fiveMinTimeoutRef.current);
-      }
-      fiveMinTimeoutRef.current = setTimeout(() => {
-        setShowFiveMinPopup(false);
-        fiveMinTimeoutRef.current = null;
-      }, 5000);
-    }
-
-    // Trigger "30 seconds left" popup once when crossing 30 seconds
-    if (
-      previous != null &&
-      previous > THIRTY_SECONDS_IN_SECONDS &&
-      remainingSeconds <= THIRTY_SECONDS_IN_SECONDS &&
-      remainingSeconds > 0
-    ) {
-      setShowThirtySecPopup(true);
-      if (thirtySecTimeoutRef.current) {
-        clearTimeout(thirtySecTimeoutRef.current);
-      }
-      thirtySecTimeoutRef.current = setTimeout(() => {
-        setShowThirtySecPopup(false);
-        thirtySecTimeoutRef.current = null;
-      }, 5000);
-    }
+    // Fallback for unexpected type
+    setDisplayTime("--:--");
+    setTimerColor("#28a745");
   }, [timeRemaining, bothUsersJoined]);
 
   return (

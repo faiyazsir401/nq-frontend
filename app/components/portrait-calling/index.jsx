@@ -100,7 +100,8 @@ const VideoCallUI = ({
   const [remoteStream, setRemoteStream] = useState(null);
   const [micStream, setMicStream] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(51 * 60 + 3); // 51:03 in seconds
+  // Remaining lesson time in seconds (used by TimeRemaining component)
+  const [timeRemaining, setTimeRemaining] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isShowVideos, setIsShowVideos] = useState(true);
   const [isMaximized, setIsMaximized] = useState(false);
@@ -129,7 +130,8 @@ const VideoCallUI = ({
   const [isConfirmModelOpen, setIsConfirmModelOpen] = useState(false);
   const [showScreenshotButton, setShowScreenshotButton] = useState(false)
   const [isSessionExtended, setIsSessionExtended] = useState(false);
-  const [sessionEndTime, setSessionEndTime] = useState(null)
+  // Session end time in HH:MM (authoritative end-time based on booking/extension)
+  const [sessionEndTime, setSessionEndTime] = useState(null);
   const [showGracePeriodModal, setShowGracePeriodModal] = useState(false);
   const [showSessionEndedModal, setShowSessionEndedModal] = useState(false);
   const [show30SecondWarning, setShow30SecondWarning] = useState(false);
@@ -1327,6 +1329,54 @@ const VideoCallUI = ({
     }
   }, [isTraineeJoined, extended_session_end_time, session_start_time, session_end_time, id, accountType]);
 
+  // Keep numeric countdown in sync with the current session end time,
+  // and only start counting down once both users have joined.
+  useEffect(() => {
+    // Reset when users are not both joined
+    if (!bothUsersJoined) {
+      setTimeRemaining(null);
+      return;
+    }
+
+    if (typeof sessionEndTime !== "string" || !sessionEndTime.includes(":")) {
+      return;
+    }
+
+    const [endHours, endMinutes] = sessionEndTime.split(":").map(Number);
+    if (
+      Number.isNaN(endHours) ||
+      Number.isNaN(endMinutes) ||
+      endHours < 0 ||
+      endHours > 23 ||
+      endMinutes < 0 ||
+      endMinutes > 59
+    ) {
+      return;
+    }
+
+    const updateRemaining = () => {
+      const now = new Date();
+      const endTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        endHours,
+        endMinutes
+      );
+      const diffMs = endTime.getTime() - now.getTime();
+      const remainingSeconds = Math.max(0, Math.floor(diffMs / 1000));
+      setTimeRemaining(remainingSeconds);
+    };
+
+    // Initial compute and interval
+    updateRemaining();
+    const intervalId = setInterval(updateRemaining, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [bothUsersJoined, sessionEndTime]);
+
    
    
   return (
@@ -1347,7 +1397,7 @@ const VideoCallUI = ({
       )}
       {selectedClips && selectedClips.length > 0 ? (
         <ClipModeCall
-          timeRemaining={sessionEndTime}
+          timeRemaining={timeRemaining}
           bothUsersJoined={bothUsersJoined}
           isMaximized={isMaximized}
           setIsMaximized={setIsMaximized}
@@ -1377,7 +1427,7 @@ const VideoCallUI = ({
         />
       ) : (
         <OneOnOneCall
-          timeRemaining={sessionEndTime}
+          timeRemaining={timeRemaining}
           bothUsersJoined={bothUsersJoined}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}

@@ -37,6 +37,8 @@
 
   border-radius: 20px;
   border: 2px solid white;
+  position: relative;
+  overflow: hidden; // ensure inner video/thumb never overflows rounded corners
 }
 
 .profile-box.mini {
@@ -44,7 +46,8 @@
   right: 10px;
   width: 100px;
   height: 150px;
-
+  padding: 0; // let video fill the box exactly
+  overflow: hidden;
 }
 
 .profile-box.mini-landscape {
@@ -56,10 +59,15 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  padding: 0; // remove base padding for tight fit
+  overflow: hidden;
 }
 
 .profile-box.mini-landscape img {
- height: 120px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
 }
 
 .profile-box.mini1 .profile-img {
