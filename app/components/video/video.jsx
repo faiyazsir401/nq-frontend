@@ -921,10 +921,14 @@ useEffect(() => {
     // Additional socket event listeners for video controls
     socket.on(EVENTS.ON_VIDEO_SELECT, ({ type, videos, mainScreen }) => {
       if (type === "clips") {
-        setSelectedClips([...videos]);
-        if (videos?.length) {
+        // Handle both empty array (exit clip mode) and array with clips
+        // Empty array means exit clip mode and return to default camera view
+        const clipsArray = Array.isArray(videos) ? [...videos] : [];
+        setSelectedClips(clipsArray);
+        if (clipsArray?.length > 0) {
           resetInitialPinnedUser()
         } else {
+          // Clear clip mode and return to default view
           setInitialPinnedUser()
         }
       } else {
@@ -2579,7 +2583,9 @@ const togglePlay = (num) => {
           <ModalHeader
             toggle={() => {
               setIsOpenConfirm(false);
-              setSelectedClips([])
+              // Clear clips and emit socket event to sync with student
+              setSelectedClips([]);
+              emitVideoSelectEvent("clips", [], pinnedUser);
             }}
             close={() => <></>}
             style={{ textAlign: "center" }}
@@ -2618,7 +2624,9 @@ const togglePlay = (num) => {
               color="primary"
               onClick={() => {
                 setInitialPinnedUser();
+                // Clear clips and emit socket event to sync with student
                 setSelectedClips([]);
+                emitVideoSelectEvent("clips", [], pinnedUser);
                 setIsOpenConfirm(false);
               }}
               style={{

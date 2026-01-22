@@ -15,6 +15,10 @@ const FooterLanding = (masterRecords) => {
     };
   }, []);
   return (
+    // Also the annotation options should also be in the default mode where the video of the student and the teacher is one the main screen so the teacher can annotate on the screen also. 
+
+    // Irrespect to the annotations when the teacher do scrren change like shifting from video showing that has been shared by the student or choosing the video default screen we have to make sure that changes should be properly progate on the student screen also. 
+
     <>
       <div className="footer-landing-wrapper">
         <div className="container">

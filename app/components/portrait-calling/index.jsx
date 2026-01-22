@@ -451,7 +451,19 @@ const VideoCallUI = ({
 
     const handleVideoSelect = ({ videos, type }) => {
       if (type === "clips") {
-        setSelectedClips([...videos]);
+        // Handle both empty array and array with clips
+        // Empty array means exit clip mode and return to default camera view
+        const newClips = Array.isArray(videos) ? [...videos] : [];
+        setSelectedClips(newClips);
+        
+        // Clear annotations when switching between clip mode and default mode
+        // This ensures clean state when mode changes
+        if (socket && fromUser?._id && toUser?._id) {
+          socket.emit(EVENTS.ON_CLEAR_CANVAS, {
+            userInfo: { from_user: fromUser._id, to_user: toUser._id },
+            canvasIndex: 1, // Clear canvas when mode changes
+          });
+        }
       }
     };
 
@@ -564,19 +576,20 @@ const VideoCallUI = ({
 
   //NOTE - separate funtion for emit seelcted clip videos  and using same even for swapping the videos
   const emitVideoSelectEvent = (type, videos) => {
-    if (socket) {
+    if (socket && fromUser?._id && toUser?._id) {
       socket.emit(EVENTS.ON_VIDEO_SELECT, {
         userInfo: { from_user: fromUser._id, to_user: toUser._id },
         type,
-        videos,
+        videos: videos || [],
       });
     }
   };
 
   //NOTE - emit event after selecting the clips
   useEffect(() => {
+    // Emit event whenever selectedClips changes (including when it becomes empty)
     emitVideoSelectEvent("clips", selectedClips);
-  }, [selectedClips?.length]);
+  }, [selectedClips?.length, socket, fromUser?._id, toUser?._id]);
 
   // selects trainee clips on load
 
@@ -1488,7 +1501,9 @@ const VideoCallUI = ({
         <ModalHeader
           toggle={() => {
             setIsOpenConfirm(false);
+            // Clear clips and emit socket event to sync with student
             setSelectedClips([]);
+            emitVideoSelectEvent("clips", []);
           }}
           close={() => <></>}
           className="clip-exit-confirm-modal__header"
@@ -1526,7 +1541,10 @@ const VideoCallUI = ({
           <Button
             color="primary"
             onClick={() => {
+              // Clear clips and emit socket event to sync with student
               setSelectedClips([]);
+              // Explicitly emit the event to ensure student receives it immediately
+              emitVideoSelectEvent("clips", []);
               setIsOpenConfirm(false);
             }}
             className="clip-exit-confirm-modal__btn-confirm"
