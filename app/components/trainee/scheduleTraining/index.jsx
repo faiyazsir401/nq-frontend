@@ -5,7 +5,6 @@ import "../scheduleTraining/index.scss";
 import { Popover } from "react-tiny-popover";
 import PopupContent from "./PopupContent";
 import { useRouter } from "next/router";
-import Slider from "react-slick";
 import ShareModalTrainee from "../../bookings/start/SelectClips";
 
 import {
@@ -71,62 +70,6 @@ import BookingTable from "./BookingTable";
 import Trainer from "./Trainer";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
 import { fetchAllLatestOnlineUsers } from "../../auth/auth.api";
-
-const settings = {
-  autoplay: false,
-  infinite: true,
-  speed: 200,
-  slidesToShow: 6,
-  slidesToScroll: 1,
-  swipetoslide: true,
-  autoplaySpeed: 1000,
-  swipe: true,
-  touchMove: true,
-  draggable: true,
-  // arrows:false,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        autoplay: false,
-        slidesToShow: 4,
-        swipe: true,
-        touchMove: true,
-        draggable: true,
-      },
-    },
-    {
-      breakpoint: 768,
-      settings: {
-        autoplay: false,
-        slidesToShow: 3,
-        swipe: true,
-        touchMove: true,
-        draggable: true,
-      },
-    },
-    {
-      breakpoint: 500,
-      settings: {
-        autoplay: false,
-        slidesToShow: 2,
-        swipe: true,
-        touchMove: true,
-        draggable: true,
-      },
-    },
-    {
-      breakpoint: 350,
-      settings: {
-        autoplay: false,
-        slidesToShow: 1,
-        swipe: true,
-        touchMove: true,
-        draggable: true,
-      },
-    },
-  ],
-};
 
 const { isSidebarToggleEnabled } = bookingsAction;
 const { removePaymentIntent } = traineeAction;
@@ -958,67 +901,6 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
           }}
           activeTrainer={activeTrainer}
         />
-      </div>
-      <div className="trainer-recommended Slider" style={{ 
-        marginTop: isSmallMobile ? "15px" : isMobileScreen ? "20px" : isTabletScreen ? "22px" : "25px",
-        marginBottom: isSmallMobile ? "15px" : isMobileScreen ? "20px" : isTabletScreen ? "22px" : "25px",
-        padding: isSmallMobile ? "0 8px" : isMobileScreen ? "0 10px" : isTabletScreen ? "0 15px" : "0 20px",
-        width: "100%",
-        overflow: "hidden"
-      }}>
-        <div className="row" style={{
-          width: "100%",
-          maxWidth: "100%",
-          display: "flex",
-          justifyContent: "center",
-          margin: "0 auto",
-          transition: 'width 0.3s ease'
-        }}>
-          <div className="col" style={{ display: "flex", justifyContent: "center", width: "100%", padding: "0" }}>
-            <Slider {...settings} style={{ width: "100%" }}>
-              {data?.category?.map((item, index) => (
-                <div key={`slider-item-${index}`} style={{ 
-                  padding: isSmallMobile ? "0 4px" : isMobileScreen ? "0 5px" : isTabletScreen ? "0 6px" : "0 8px" 
-                }}>
-                  <span
-                    className="badge badge-light lg"
-                    style={{
-                      padding: isSmallMobile ? "6px 10px" : isMobileScreen ? "8px 12px" : isTabletScreen ? "10px 15px" : "12px 18px",
-                      fontSize: isSmallMobile ? "11px" : isMobileScreen ? "12px" : isTabletScreen ? "13px" : "14px",
-                      color: "black",
-                      cursor: "pointer",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      borderRadius: "20px",
-                      whiteSpace: "nowrap",
-                      transition: "all 0.3s ease",
-                      border: "1px solid #ddd",
-                      width: "fit-content",
-                      margin: "0 auto"
-                    }}
-                    onClick={() => {
-                      debouncedSearchAPI.cancel();
-                      setTrainerInfo((prev) => ({
-                        ...prev,
-                        userInfo: {
-                          id: item,
-                          isCategory: true,
-                          name: item,
-                        },
-                        selected_category: item,
-                      }));
-                      dispatch(getTraineeWithSlotsAsync({ search: item }));
-                      setParams({ search: item });
-                    }}
-                  >
-                    {item}
-                  </span>
-                </div>
-              ))}
-            </Slider>
-          </div>
-        </div>
       </div>
 
       <div style={{ 
