@@ -1,18 +1,51 @@
 .sidebar-top .menu-name {
     margin: 0px;
     margin-top: 10px;
-    color: black;
+    color: #333;
     font-weight: 500;
+    font-size: 12px;
+    transition: color 0.2s ease;
 }
 
-// Active state styling for sidebar icons
+// Active menu name styling - when icon-btn is active, make menu name blue
+.sidebar-top li {
+    // When the li contains an active icon-btn, style the menu-name
+    &:has(.icon-btn.active) .menu-name {
+        color: #1976d2 !important;
+        font-weight: 600;
+    }
+    
+    // Fallback for browsers that don't support :has()
+    .icon-btn.active ~ .menu-name {
+        color: #1976d2 !important;
+        font-weight: 600;
+    }
+}
+
+// Active state styling for sidebar icons - Modern and subtle
 .sidebar-top .icon-btn.active {
-    background-color: #000080 !important;
-    color: white !important;
+    background-color: #e3f2fd !important; // Light blue background instead of dark blue
+    color: #1976d2 !important; // Blue icon color
     
     svg {
-        color: white !important;
-        stroke: white !important;
+        color: #1976d2 !important;
+        stroke: #1976d2 !important;
+        fill: none !important;
+    }
+    
+    // Add a subtle border or indicator
+    position: relative;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background-color: #1976d2;
+        border-radius: 0 3px 3px 0;
     }
 }
 
@@ -32,6 +65,9 @@
     visibility: visible !important;
     opacity: 1 !important;
     overflow: visible !important;
+    border-radius: 8px !important; // Rounded corners for modern look
+    transition: all 0.2s ease !important; // Smooth transitions
+    background-color: transparent !important; // Default transparent background
     
     svg,
     svg * {
@@ -40,21 +76,25 @@
         display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        color: #333 !important;
-        stroke: #333 !important;
+        color: #666 !important; // Softer default color
+        stroke: #666 !important;
         fill: none !important;
         pointer-events: none !important;
         overflow: visible !important;
+        transition: all 0.2s ease !important;
     }
     
-    // Ensure icons are visible on hover
-    &:hover {
+    // Hover state - subtle background with icon color change
+    &:hover:not(.active) {
+        background-color: #f5f5f5 !important; // Light gray on hover
         svg,
         svg * {
-            color: #000080 !important;
-            stroke: #000080 !important;
+            color: #1976d2 !important;
+            stroke: #1976d2 !important;
         }
     }
+    
+    // Active state handled separately above
 }
 
 // Ensure all list items show icons

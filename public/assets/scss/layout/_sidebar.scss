@@ -57,19 +57,48 @@
       .sidebar-top,
       .sidebar-bottom {
         .btn-light {
+          border-radius: 8px;
+          transition: all 0.2s ease;
+          background-color: transparent;
+          
+          // Default hover state
+          &:hover:not(.active) {
+            background-color: #f5f5f5;
+            
+            svg,
+            svg * {
+              color: #1976d2 !important;
+              stroke: #1976d2 !important;
+            }
+          }
+          
           &.active {
-            background-color: $primary-color !important;
+            background-color: #e3f2fd !important; // Light blue background
+            position: relative;
 
-            // Ensure any icon inside the active sidebar button is visible on dark blue
+            // Ensure any icon inside the active sidebar button is blue
             i {
-              color: $white;
+              color: #1976d2;
             }
 
             svg,
             svg * {
-              color: $white !important;
-              stroke: $white !important;
-              fill: $white !important;
+              color: #1976d2 !important;
+              stroke: #1976d2 !important;
+              fill: none !important;
+            }
+            
+            // Add left border indicator
+            &::before {
+              content: '';
+              position: absolute;
+              left: 0;
+              top: 50%;
+              transform: translateY(-50%);
+              width: 3px;
+              height: 60%;
+              background-color: #1976d2;
+              border-radius: 0 3px 3px 0;
             }
           }
         }
@@ -408,11 +437,45 @@
         .sidebar-top,
         .sidebar-bottom {
           .btn-light {
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            background-color: transparent;
+            
+            &:hover:not(.active) {
+              background-color: #f5f5f5;
+              
+              svg,
+              svg * {
+                color: #1976d2 !important;
+                stroke: #1976d2 !important;
+              }
+            }
+            
             &.active {
-              background-color: $primary-color !important;
+              background-color: #e3f2fd !important; // Light blue background
+              position: relative;
 
               i {
-                color: $white;
+                color: #1976d2;
+              }
+              
+              svg,
+              svg * {
+                color: #1976d2 !important;
+                stroke: #1976d2 !important;
+                fill: none !important;
+              }
+              
+              &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 3px;
+                height: 60%;
+                background-color: #1976d2;
+                border-radius: 0 3px 3px 0;
               }
             }
           }
