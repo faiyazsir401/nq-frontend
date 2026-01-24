@@ -840,28 +840,40 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
         marginLeft: openCloseToggleSideNav ? (isSmallMobile ? '60px' : isMobileScreen ? '65px' : isTabletScreen ? '90px' : '105px') : '0px',
         transition: 'margin-left 0.3s ease',
         width: openCloseToggleSideNav ? (isSmallMobile ? 'calc(100% - 60px)' : isMobileScreen ? 'calc(100% - 65px)' : isTabletScreen ? 'calc(100% - 90px)' : 'calc(100% - 105px)') : '100%',
-        padding: isSmallMobile ? '8px' : isMobileScreen ? '10px' : isTabletScreen ? '15px' : '20px',
-        boxSizing: 'border-box'
+        padding: isSmallMobile ? '10px 5px' : isMobileScreen ? '12px 8px' : isTabletScreen ? '15px 12px' : '20px 15px',
+        boxSizing: 'border-box',
+        overflowX: 'hidden'
       }}
     >
-      <div className="row" style={{ margin: "0px", padding: isMobileScreen ? "0 10px" : "0 15px" }}>
-        <div className="trainer-recommended">
+      <div className="row" style={{ 
+        margin: "0px", 
+        padding: isSmallMobile ? "0 8px" : isMobileScreen ? "0 12px" : isTabletScreen ? "0 15px" : "0 15px",
+        width: "100%",
+        boxSizing: "border-box"
+      }}>
+        <div className="trainer-recommended" style={{ width: "100%" }}>
           <h1 style={{ 
-            marginBottom: isSmallMobile ? "8px" : isMobileScreen ? "10px" : "12px",
-            fontSize: isSmallMobile ? "18px" : isMobileScreen ? "22px" : isTabletScreen ? "24px" : "28px", 
+            marginBottom: isSmallMobile ? "10px" : isMobileScreen ? "12px" : isTabletScreen ? "14px" : "16px",
+            fontSize: isSmallMobile ? "20px" : isMobileScreen ? "24px" : isTabletScreen ? "26px" : "28px", 
             fontWeight: "600",
             textAlign: isMobileScreen ? "center" : "left",
-            padding: isMobileScreen ? "0 5px" : "0"
+            padding: "0",
+            lineHeight: isSmallMobile ? "1.3" : isMobileScreen ? "1.4" : "1.5",
+            wordWrap: "break-word",
+            overflowWrap: "break-word"
           }}>
             Book Your Session now
           </h1>
           <p style={{
-            fontSize: isSmallMobile ? "12px" : isMobileScreen ? "14px" : isTabletScreen ? "16px" : "18px", 
-            lineHeight: "1.6", 
+            fontSize: isSmallMobile ? "13px" : isMobileScreen ? "15px" : isTabletScreen ? "16px" : "18px", 
+            lineHeight: isSmallMobile ? "1.5" : isMobileScreen ? "1.6" : "1.7", 
             color: "#666",
             textAlign: isMobileScreen ? "center" : "left",
-            padding: isMobileScreen ? "0 5px" : "0",
-            marginBottom: isMobileScreen ? "15px" : "20px"
+            padding: "0",
+            marginBottom: isSmallMobile ? "18px" : isMobileScreen ? "20px" : isTabletScreen ? "22px" : "25px",
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+            maxWidth: "100%"
           }}>
             Pick your favorite activity and then search for your Expert below. NetQwix is here to revolutionize the way you learn and connect LIVE on our cutting-edge platform.
           </p>
