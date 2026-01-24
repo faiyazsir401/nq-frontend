@@ -210,7 +210,7 @@ const Dashboard = () => {
     // STEP 6: Centralized Dashboard API calls - called only once on mount
     // These APIs are called from Dashboard only, not from child components
     dispatch(getMasterDataAsync());
-    dispatch(getAllNotifications({page : 1, limit : 10}));
+    dispatch(getAllNotifications({page : 1, limit : 20}));
     
     // Get user info if not already loaded and user is logged in
     if ((!userInfo || !userInfo._id)) {

@@ -5,7 +5,10 @@ import { getNotifications, updateNotifications } from "./notification.api";
 const initialState = {
   status: "idle",
   isLoading : false,
-  notifications: []
+  notifications: [],
+  hasMoreNotifications: true, // Track if there are more notifications to load
+  totalCount: 0,
+  currentPage: 1
 };
 
 export const getAllNotifications = createAsyncThunk("get/notifications", async (payload) => {
@@ -54,8 +57,35 @@ export const notificationSlice = createSlice({
       })
       .addCase(getAllNotifications.fulfilled, (state, action) => {
         state.status = "fulfilled";
-        state.notifications = action.payload.data;
         state.isLoading = false;
+        
+        const newNotifications = action.payload?.data || [];
+        const append = action.meta?.arg?.append || false;
+        const limit = action.meta?.arg?.limit || 20;
+        
+        if (append) {
+          // Append new notifications to existing ones (for infinite scroll)
+          // Filter out duplicates based on _id
+          const existingIds = new Set(state.notifications.map(n => n._id));
+          const uniqueNewNotifications = newNotifications.filter(n => !existingIds.has(n._id));
+          state.notifications = [...state.notifications, ...uniqueNewNotifications];
+        } else {
+          // Replace notifications (for initial load or refresh)
+          state.notifications = newNotifications;
+          state.currentPage = 1;
+        }
+        
+        // Check if there are more notifications to load
+        // If we got fewer notifications than the limit, we've reached the end
+        state.hasMoreNotifications = newNotifications.length >= limit;
+        state.totalCount = action.payload?.totalCount || state.notifications.length;
+        
+        // Update current page
+        if (append) {
+          state.currentPage = action.meta?.arg?.page || state.currentPage;
+        } else {
+          state.currentPage = 1;
+        }
       })
       .addCase(getAllNotifications.rejected, (state, action) => {
         state.status = "rejected";

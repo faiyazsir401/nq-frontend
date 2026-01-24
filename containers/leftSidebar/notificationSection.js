@@ -2,43 +2,131 @@ import Link from "next/link";
 import {X} from "react-feather"
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { getAllNotifications, notificationState ,  updateNotificationsStatus } from "../../app/components/notifications-service/notification.slice";
-import {  useEffect, useState } from "react";
+import {  useEffect, useState, useRef } from "react";
 import { Utils } from "../../utils/utils";
 import { authState } from "../../app/components/auth/auth.slice";
+import { debounce } from "lodash";
+
+const NOTIFICATION_LIMIT = 20; // Show 20 notifications per page
 
 const NotificationSection = (props) => {
     const dispatch = useAppDispatch();
     const {sidebarModalActiveTab} = useAppSelector(authState);
     const [page , setPage] = useState(1);
-    const {notifications , isLoading} = useAppSelector(notificationState)
+    const [hasMore, setHasMore] = useState(true);
+    const {notifications , isLoading, hasMoreNotifications} = useAppSelector(notificationState);
+    const scrollContainerRef = useRef(null);
+    const isInitialLoadRef = useRef(false);
+    
+    // Debounced scroll handler to prevent multiple API calls
+    const handleScrollRef = useRef(null);
     
     useEffect(() => {
-      const handleScroll = () => {
-      const ulElement = document.querySelector('.notification-tab');
-      if (ulElement.scrollTop + ulElement.clientHeight >= ulElement.scrollHeight) {
-      setPage(prevPage => prevPage + 1); // Increment page number
-      dispatch(getAllNotifications({ page: page + 1, limit: 10 }));
-      }
+      // Create debounced function that has access to latest state
+      handleScrollRef.current = debounce(() => {
+        const ulElement = scrollContainerRef.current || document.querySelector('.notification-tab .chat-main') || document.querySelector('.notification-tab');
+        if (!ulElement) return;
+        
+        // Get current state values
+        const currentIsLoading = isLoading;
+        const currentHasMore = hasMoreNotifications !== undefined ? hasMoreNotifications : hasMore;
+        const currentPage = page;
+        
+        if (currentIsLoading || !currentHasMore) return;
+        
+        // Check if user scrolled near bottom (within 100px)
+        const scrollTop = ulElement.scrollTop;
+        const scrollHeight = ulElement.scrollHeight;
+        const clientHeight = ulElement.clientHeight;
+        const threshold = 100; // Load more when 100px from bottom
+        
+        if (scrollTop + clientHeight >= scrollHeight - threshold) {
+          const nextPage = currentPage + 1;
+          setPage(nextPage);
+          dispatch(getAllNotifications({ page: nextPage, limit: NOTIFICATION_LIMIT, append: true }));
+        }
+      }, 300); // 300ms debounce
+      
+      return () => {
+        if (handleScrollRef.current) {
+          handleScrollRef.current.cancel();
+        }
+      };
+    }, [isLoading, hasMoreNotifications, hasMore, page, dispatch]);
+
+    useEffect(() => {
+      // Wait for the element to be available in DOM
+      const findScrollElement = () => {
+        return scrollContainerRef.current || 
+               document.querySelector('.notification-tab.active .chat-main') ||
+               document.querySelector('.notification-tab .chat-main') ||
+               document.querySelector('.notification-tab.active');
       };
       
-      const ulElement = document.querySelector('.notification-tab');
-      ulElement.addEventListener('scroll', handleScroll);
+      const ulElement = findScrollElement();
+      if (!ulElement || !handleScrollRef.current) {
+        // Retry after a short delay if element not found
+        const timeoutId = setTimeout(() => {
+          const retryElement = findScrollElement();
+          if (retryElement && handleScrollRef.current) {
+            retryElement.addEventListener('scroll', () => {
+              if (handleScrollRef.current) handleScrollRef.current();
+            }, { passive: true });
+          }
+        }, 100);
+        return () => clearTimeout(timeoutId);
+      }
       
-      return () => ulElement.removeEventListener('scroll', handleScroll); // Clean up
-    }, [dispatch, page]);
+      const scrollHandler = () => {
+        if (handleScrollRef.current) {
+          handleScrollRef.current();
+        }
+      };
+      
+      ulElement.addEventListener('scroll', scrollHandler, { passive: true });
+      
+      return () => {
+        ulElement.removeEventListener('scroll', scrollHandler);
+        if (handleScrollRef.current) {
+          handleScrollRef.current.cancel();
+        }
+      };
+    }, [isLoading, hasMoreNotifications, hasMore, page, sidebarModalActiveTab]);
 
     const closeLeftSide = () => {
       document.querySelector(".notification-tab").classList.remove("active")
       document.querySelector(".recent-default").classList.add("active");
       props.ActiveTab("")
     }
-    useEffect(()=>{
-      if(sidebarModalActiveTab === "notification"){
-        dispatch(getAllNotifications({page , limit : 10})) ;
-        dispatch(updateNotificationsStatus({page : 1 }));
-        dispatch(getAllNotifications({page , limit : 10})) ;
+    
+    // Initial load when notification tab is opened
+    useEffect(() => {
+      if(sidebarModalActiveTab === "notification" && !isInitialLoadRef.current){
+        isInitialLoadRef.current = true;
+        setPage(1);
+        setHasMore(true);
+        // Reset scroll position when opening
+        setTimeout(() => {
+          const scrollElement = scrollContainerRef.current || document.querySelector('.notification-tab.active .chat-main');
+          if (scrollElement) {
+            scrollElement.scrollTop = 0;
+          }
+        }, 100);
+        dispatch(getAllNotifications({page: 1, limit: NOTIFICATION_LIMIT, append: false}));
+        dispatch(updateNotificationsStatus({page: 1}));
+      } else if(sidebarModalActiveTab !== "notification") {
+        isInitialLoadRef.current = false;
+        // Reset page when tab is closed
+        setPage(1);
       }
-    }, [page, sidebarModalActiveTab])
+    }, [sidebarModalActiveTab, dispatch]);
+    
+    // Update hasMore based on Redux state
+    useEffect(() => {
+      if (hasMoreNotifications !== undefined) {
+        setHasMore(hasMoreNotifications);
+      }
+    }, [hasMoreNotifications]);
 
     
   
@@ -53,25 +141,43 @@ const NotificationSection = (props) => {
                 <div className="media-body text-right">   <Link className="icon-btn btn-outline-light btn-sm close-panel" href="#" onClick={() => props.smallSideBarToggle()}><X/></Link></div>
               </div>
             </div>
-            <ul className="chat-main custom-scroll">
-            {notifications?.map((notification) =>{
-              return <>
-              <li key = {notification?._id}>
-                <div className="chat-box notification">
-                  <div className="profile " style={{ backgroundImage: `url(${Utils?.getImageUrlOfS3(notification?.sender?.profile_picture)})` || `url('assets/images/contact/1.jpg')`,backgroundSize:"cover",backgroundPosition:"center",display:"block" }}>
-                  <img className="bg-img" src="/assets/images/contact/1.jpg" alt="Avatar" style={{display:'none'}}/>
-                  </div>
-                  <div className="details"><span>{notification?.sender?.name}</span>
-                    <h5>{notification?.title}</h5>
-                    <p>{notification?.description}</p>
-                  </div>
-                  <div className="date-status">
-                    <h6>{Utils.formatTimeAgo(notification?.createdAt)}</h6>
-                  </div>
-                </div>
+            <ul className="chat-main custom-scroll" ref={scrollContainerRef}>
+            {notifications && notifications.length > 0 ? (
+              notifications.map((notification) => {
+                return (
+                  <li key={notification?._id}>
+                    <div className="chat-box notification">
+                      <div className="profile " style={{ backgroundImage: `url(${Utils?.getImageUrlOfS3(notification?.sender?.profile_picture)})` || `url('assets/images/contact/1.jpg')`,backgroundSize:"cover",backgroundPosition:"center",display:"block" }}>
+                        <img className="bg-img" src="/assets/images/contact/1.jpg" alt="Avatar" style={{display:'none'}}/>
+                      </div>
+                      <div className="details"><span>{notification?.sender?.name}</span>
+                        <h5>{notification?.title}</h5>
+                        <p>{notification?.description}</p>
+                      </div>
+                      <div className="date-status">
+                        <h6>{Utils.formatTimeAgo(notification?.createdAt)}</h6>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })
+            ) : (
+              !isLoading && (
+                <li style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                  No notifications found
+                </li>
+              )
+            )}
+            {isLoading && (
+              <li style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                Loading more notifications...
               </li>
-              </>
-            })}
+            )}
+            {!hasMore && notifications && notifications.length > 0 && (
+              <li style={{ textAlign: 'center', padding: '20px', color: '#666', fontSize: '12px' }}>
+                No more notifications to load
+              </li>
+            )}
             </ul>
         </div>
     );
