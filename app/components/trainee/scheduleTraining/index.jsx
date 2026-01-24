@@ -70,6 +70,7 @@ import BookingTable from "./BookingTable";
 import Trainer from "./Trainer";
 import { useMediaQuery } from "../../../hook/useMediaQuery";
 import { fetchAllLatestOnlineUsers } from "../../auth/auth.api";
+import ImageSkeleton from "../../common/ImageSkeleton";
 
 const { isSidebarToggleEnabled } = bookingsAction;
 const { removePaymentIntent } = traineeAction;
@@ -653,12 +654,26 @@ const ScheduleTraining = ({openCloseToggleSideNav}) => {
       ) => {
         return (
           <div className="text-center">
-            <img
-              height={100}
-              width={100}
-              src={profilePicture}
-              className="rounded"
-            />
+            <div style={{ 
+              width: '100px', 
+              height: '100px', 
+              margin: '0 auto',
+              borderRadius: '8px',
+              overflow: 'hidden'
+            }}>
+              <ImageSkeleton
+                src={Utils?.getImageUrlOfS3(profilePicture) || profilePicture}
+                alt={fullname}
+                fallbackSrc="/assets/images/demoUser.png"
+                lazy={true}
+                skeletonType="rounded"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
+              />
+            </div>
             <p htmlFor="exampleFormControlInput1" className="form-label mt-2">
               {fullname}
             </p>

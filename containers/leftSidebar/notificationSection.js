@@ -6,8 +6,9 @@ import {  useEffect, useState, useRef } from "react";
 import { Utils } from "../../utils/utils";
 import { authState } from "../../app/components/auth/auth.slice";
 import { debounce } from "lodash";
+import ImageSkeleton from "../../app/components/common/ImageSkeleton";
 
-const NOTIFICATION_LIMIT = 20; // Show 20 notifications per page
+const NOTIFICATION_LIMIT = 1000000000; // Load all notifications at once
 
 const NotificationSection = (props) => {
     const dispatch = useAppDispatch();
@@ -147,8 +148,26 @@ const NotificationSection = (props) => {
                 return (
                   <li key={notification?._id}>
                     <div className="chat-box notification">
-                      <div className="profile " style={{ backgroundImage: `url(${Utils?.getImageUrlOfS3(notification?.sender?.profile_picture)})` || `url('assets/images/contact/1.jpg')`,backgroundSize:"cover",backgroundPosition:"center",display:"block" }}>
-                        <img className="bg-img" src="/assets/images/contact/1.jpg" alt="Avatar" style={{display:'none'}}/>
+                      <div className="profile" style={{ 
+                        position: 'relative',
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        flexShrink: 0
+                      }}>
+                        <ImageSkeleton
+                          src={Utils?.getImageUrlOfS3(notification?.sender?.profile_picture) || '/assets/images/contact/1.jpg'}
+                          alt={notification?.sender?.name || 'Avatar'}
+                          fallbackSrc="/assets/images/contact/1.jpg"
+                          lazy={true}
+                          skeletonType="circular"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
                       </div>
                       <div className="details"><span>{notification?.sender?.name}</span>
                         <h5>{notification?.title}</h5>

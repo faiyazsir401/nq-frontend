@@ -77,7 +77,8 @@ export const notificationSlice = createSlice({
         
         // Check if there are more notifications to load
         // If we got fewer notifications than the limit, we've reached the end
-        state.hasMoreNotifications = newNotifications.length >= limit;
+        // For very large limits (like 1000000000), assume we got all if response is less than limit
+        state.hasMoreNotifications = limit < 1000 ? newNotifications.length >= limit : false;
         state.totalCount = action.payload?.totalCount || state.notifications.length;
         
         // Update current page

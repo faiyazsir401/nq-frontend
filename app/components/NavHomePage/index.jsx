@@ -35,6 +35,7 @@ import { fetchAllLatestOnlineUsers } from "../auth/auth.api";
 import { acceptFriendRequest, getFriendRequests, rejectFriendRequest } from "../../common/common.api";
 import { toast } from "react-toastify";
 import { Star } from "react-feather";
+import ImageSkeleton from "../common/ImageSkeleton";
 const NavHomePage = () => {
   const [progress, setProgress] = useState(0);
   const width2000 = useMediaQuery(2000);
@@ -619,7 +620,7 @@ const NavHomePage = () => {
                               padding: "5px",
                             }}
                           >
-                            <img
+                            <ImageSkeleton
                               src={
                                 session.trainer_info.profile_picture ||
                                   session.trainee_info.profile_picture
@@ -631,16 +632,15 @@ const NavHomePage = () => {
                                   : "/assets/images/demoUser.png"
                               }
                               alt="trainer_image"
-                              className="rounded"
+                              fallbackSrc="/assets/images/demoUser.png"
+                              lazy={true}
+                              skeletonType="circular"
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "contain",
                                 borderRadius: "50%",
                                 transition: "all 0.6s linear",
-                              }}
-                              onError={(e) => {
-                                e.target.src = "/assets/images/demoUser.png";
                               }}
                             />
                           </div>
@@ -850,18 +850,21 @@ const NavHomePage = () => {
                           }}
                           key={index}
                         >
-                          <div>
-                            <img
-                              height={100}
-                              width={100}
+                          <div style={{ width: '100px', height: '100px', borderRadius: '8px', overflow: 'hidden' }}>
+                            <ImageSkeleton
                               src={
                                 Utils?.getImageUrlOfS3(
                                   request.senderId?.profile_picture
                                 ) || "/assets/images/userdemo.png"
                               }
-                              alt="Card image cap"
-                              onError={(e) => {
-                                e.target.src = "/assets/images/demoUser.png"; // Set default image on error
+                              alt={request.senderId?.fullname || "User"}
+                              fallbackSrc="/assets/images/demoUser.png"
+                              lazy={true}
+                              skeletonType="rounded"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover"
                               }}
                             />
                           </div>

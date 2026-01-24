@@ -1,6 +1,7 @@
 import React from 'react'
 import { Utils } from '../../../../utils/utils'
 import { useMediaQuery } from '../../../hook/useMediaQuery'
+import ImageSkeleton from '../../common/ImageSkeleton'
 
 const Trainer = ({trainer , onClickFunc}) => {
   const isMobileScreen = useMediaQuery(768);
@@ -42,17 +43,25 @@ const Trainer = ({trainer , onClickFunc}) => {
           <div
             className="recent-profile"
             style={{
-              backgroundImage: `url(${Utils?.getImageUrlOfS3(trainer?.profile_picture) || "/assets/images/demoUser.png"})`,
-              backgroundSize: "cover",
-              backgroundRepeat: "no-repeat",
-              backgroundPosition: "center",
-              display: "block",
               width: "100%",
               aspectRatio: "1/1",
               borderRadius: "8px",
-              position: "relative"
+              position: "relative",
+              overflow: "hidden"
             }}
           >
+            <ImageSkeleton
+              src={Utils?.getImageUrlOfS3(trainer?.profile_picture) || "/assets/images/demoUser.png"}
+              alt={trainer?.fullname || trainer?.fullName || "Expert"}
+              fallbackSrc="/assets/images/demoUser.png"
+              lazy={true}
+              skeletonType="rounded"
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover"
+              }}
+            />
             <h6 style={{
               position: "absolute",
               bottom: "8px",
