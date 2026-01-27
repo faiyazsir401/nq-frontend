@@ -33,6 +33,7 @@ const OneOnOneCall = ({
   const lastPosRef = useRef({ x: 0, y: 0 });
   const drawingPathRef = useRef([]); // Store current drawing path for sync
   const [isCanvasMenuOpen, setIsCanvasMenuOpen] = useState(false);
+  const annotationHistoryRef = useRef([]); // Snapshot history for undo
 
   // Mirror basic CanvasMenuBar configuration so trainer gets similar tools
   const [canvasConfigs, setCanvasConfigs] = useState({
@@ -95,6 +96,19 @@ const OneOnOneCall = ({
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // Save current canvas snapshot for undo
+    try {
+      const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      annotationHistoryRef.current.push(snapshot);
+      // Keep history bounded to avoid excessive memory
+      if (annotationHistoryRef.current.length > 20) {
+        annotationHistoryRef.current.shift();
+      }
+    } catch (err) {
+      // getImageData may fail on tainted canvas; fail silently and continue drawing
+    }
+
     const { x, y } = getCanvasPos(e);
     // Use current canvas configuration (color / width) similar to clip mode
     ctx.strokeStyle = canvasConfigs?.sender?.strokeStyle || "#ff0000";
@@ -162,6 +176,7 @@ const OneOnOneCall = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    annotationHistoryRef.current = [];
     
     // Emit clear event to student
     if (accountType === AccountType.TRAINER && socket && fromUser?._id && toUser?._id) {
@@ -290,6 +305,43 @@ const OneOnOneCall = ({
     }
   };
 
+  const handleUndoAnnotation = () => {
+    if (accountType !== AccountType.TRAINER || !isAnnotating) return;
+    const canvas = annotationCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // If no history, nothing to undo
+    if (!annotationHistoryRef.current.length) {
+      return;
+    }
+
+    const lastSnapshot = annotationHistoryRef.current.pop();
+    try {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.putImageData(lastSnapshot, 0, 0);
+    } catch (err) {
+      // If putImageData fails, fall back to clearing
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Sync updated canvas to trainee
+    if (socket && fromUser?._id && toUser?._id) {
+      try {
+        const imageData = canvas.toDataURL("image/png");
+        socket.emit(EVENTS.EMIT_DRAWING_CORDS, {
+          userInfo: { from_user: fromUser._id, to_user: toUser._id },
+          strikes: imageData,
+          canvasSize: { width: canvas.width, height: canvas.height },
+          canvasIndex: 1,
+        });
+      } catch (err) {
+        // Ignore sync failure; local undo still applied
+      }
+    }
+  };
+
   return (
     <>
       <div className="d-flex w-100 justify-content-end mr-3 mr-md-5 mt-2">
@@ -388,6 +440,10 @@ const OneOnOneCall = ({
                 onClick={() => {
                   const newMode = !isAnnotating;
                   setIsAnnotating(newMode);
+                  // Show screenshot button when annotating so trainer can capture annotated view
+                  if (typeof setShowScreenshotButton === "function") {
+                    setShowScreenshotButton(newMode);
+                  }
                   // Emit drawing mode toggle to student so they mirror state
                   if (socket && fromUser?._id && toUser?._id) {
                     socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
@@ -410,22 +466,40 @@ const OneOnOneCall = ({
                 {isAnnotating ? "Stop Annotate" : "Annotate"}
               </button>
               {isAnnotating && (
-                <button
-                  type="button"
-                  onClick={clearAnnotations}
-                  style={{
-                    padding: "6px 10px",
-                    fontSize: "12px",
-                    borderRadius: "4px",
-                    border: "none",
-                    backgroundColor: "#ffffff",
-                    color: "#333333",
-                    boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-                    cursor: "pointer",
-                  }}
-                >
-                  Clear
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={handleUndoAnnotation}
+                    style={{
+                      padding: "6px 10px",
+                      fontSize: "12px",
+                      borderRadius: "4px",
+                      border: "none",
+                      backgroundColor: "#ffffff",
+                      color: "#333333",
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Undo last
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearAnnotations}
+                    style={{
+                      padding: "6px 10px",
+                      fontSize: "12px",
+                      borderRadius: "4px",
+                      border: "none",
+                      backgroundColor: "#ffffff",
+                      color: "#333333",
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Clear all
+                  </button>
+                </>
               )}
             </div>
 
