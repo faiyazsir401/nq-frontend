@@ -95,7 +95,6 @@ const VideoContainer = ({
   // const [videoProgress, setVideoProgress] = useState(0);
   const { accountType } = useAppSelector(authState);
   const socket = useContext(SocketContext);
-  const [hasAutopaused, setHasAutopaused] = useState(false);
   // const videoContainerRef = useRef(null);
   const movingVideoContainerRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -759,7 +758,6 @@ const VideoContainer = ({
       index,
       accountType
     });
-    setHasAutopaused(false);
     setIsVideoLoading(true);
   }, [clip?._id, index, accountType]);
 
@@ -877,7 +875,7 @@ const VideoContainer = ({
                   pointerEvents: isVideoLoading ? "none" : "auto",
                 }}
                 id={clip?.id}
-                autoPlay
+                autoPlay={false}
                 muted={true}
                 poster={Utils?.generateThumbnailURL(clip)}
                 preload="auto"
@@ -926,24 +924,14 @@ const VideoContainer = ({
                     console.log("▶️ [VideoContainer] Video play event triggered", {
                       clipId: clip?._id,
                       index,
-                      hasAutopaused,
                       currentTime: e.currentTarget.currentTime,
                       duration: e.currentTarget.duration
                     });
-                    
-                    if (!hasAutopaused) {
-                      console.log("⏸️ [VideoContainer] Auto-pausing video (autoplay prevention)", {
-                        clipId: clip?._id,
-                        index
-                      });
-                      e.currentTarget.pause(); // only pause once (the autoplay)
-                      setHasAutopaused(true);
-                      setIsVideoLoading(false);
-                    }
+                    // Ensure loading state is cleared once playback starts
+                    setIsVideoLoading(false);
                   } catch (error) {
                     console.error("❌ [VideoContainer] Error in onPlay event", error);
                   }
-                  
                 }}
               >
                 <source src={Utils?.generateVideoURL(clip)} type="video/mp4" />
