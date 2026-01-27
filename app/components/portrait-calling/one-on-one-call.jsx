@@ -292,36 +292,45 @@ const OneOnOneCall = ({
 
   return (
     <>
-      <div className="d-flex w-100 justify-content-end mr-5 mt-2">
-      {timeRemaining && <TimeRemaining timeRemaining={timeRemaining} bothUsersJoined={bothUsersJoined} />}
+      <div className="d-flex w-100 justify-content-end mr-3 mr-md-5 mt-2">
+        {timeRemaining && (
+          <TimeRemaining
+            timeRemaining={timeRemaining}
+            bothUsersJoined={bothUsersJoined}
+          />
+        )}
       </div>
 
-      <div className="video-section" style={{ position: "relative" }}>
-        <UserBox
-          id={toUser._id}
-          onClick={handleUserClick}
-          selected={selectedUser === toUser._id}
-          selectedUser={selectedUser}
-          notSelected={selectedUser}
-          videoRef={localVideoRef}
-          user={fromUser}
-          stream={localStream}
-          isStreamOff={isLocalStreamOff}
-          isLandscape={isLandscape}
-          muted={true}
-        />
-        <UserBox
-          id={fromUser._id}
-          onClick={handleUserClick}
-          selectedUser={selectedUser}
-          selected={selectedUser === fromUser._id}
-          notSelected={selectedUser}
-          videoRef={remoteVideoRef}
-          user={toUser}
-          stream={remoteStream}
-          isStreamOff={isRemoteStreamOff}
-          isLandscape={isLandscape}
-        />
+      <div className="video-section one-on-one-layout" style={{ position: "relative" }}>
+        <div className="one-on-one-layout__primary">
+          <UserBox
+            id={toUser._id}
+            onClick={handleUserClick}
+            selected={selectedUser === toUser._id}
+            selectedUser={selectedUser}
+            notSelected={selectedUser}
+            videoRef={localVideoRef}
+            user={fromUser}
+            stream={localStream}
+            isStreamOff={isLocalStreamOff}
+            isLandscape={isLandscape}
+            muted={true}
+          />
+        </div>
+        <div className="one-on-one-layout__secondary">
+          <UserBox
+            id={fromUser._id}
+            onClick={handleUserClick}
+            selectedUser={selectedUser}
+            selected={selectedUser === fromUser._id}
+            notSelected={selectedUser}
+            videoRef={remoteVideoRef}
+            user={toUser}
+            stream={remoteStream}
+            isStreamOff={isRemoteStreamOff}
+            isLandscape={isLandscape}
+          />
+        </div>
 
         {selectedUser && (
           <UserBoxMini

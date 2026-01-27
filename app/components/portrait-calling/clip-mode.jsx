@@ -780,11 +780,12 @@ const VideoContainer = ({
               : isLock
                 ? "40dvh"
                 : "37dvh", // If isMaximized is false and isSingle is false
-          width: isLandscape ? "50vw" : "100vw",
+          width: "100%",
+          maxWidth: isLandscape ? "960px" : "100%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          background: "white",
+          background: "#000",
           position: "relative",
         }}
       >
@@ -969,14 +970,13 @@ const VideoContainer = ({
           ref={canvasRef}
           id="drawing-canvas"
           className="canvas"
-        
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%', 
-            display: drawingMode ? "block" : "none"
+            width: "100%",
+            height: "100%",
+            display: drawingMode ? "block" : "none",
           }}
         />
         {drawingMode && accountType === AccountType.TRAINER && (
@@ -2147,11 +2147,12 @@ const ClipModeCall = ({
                 onClick={() => {
                   const newLockState = !isLock;
                   const lockPointTemp = !isLock
-                    ? (videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
+                    ? (videoRef.current?.duration || 0) >
+                      (videoRef2.current?.duration || 0)
                       ? videoRef.current?.currentTime || 0
                       : videoRef2.current?.currentTime || 0
                     : videoRef.current?.currentTime || 0;
-                  
+
                   console.log("🔒 [ClipModeCall] Toggling lock mode", {
                     oldLockState: isLock,
                     newLockState,
@@ -2160,13 +2161,16 @@ const ClipModeCall = ({
                     video2Time: videoRef2.current?.currentTime,
                     video1Duration: videoRef.current?.duration,
                     video2Duration: videoRef2.current?.duration,
-                    accountType
+                    accountType,
                   });
-                  
+
+                  // Broadcast lock state to trainee (no clearing of annotations)
                   socket.emit(EVENTS.TOGGLE_LOCK_MODE, {
                     userInfo: { from_user: fromUser._id, to_user: toUser._id },
                     isLockMode: newLockState,
                   });
+
+                  // Update local lock state and seek lock point
                   setIsLock(newLockState);
                   setLockPoint(lockPointTemp);
                 }}

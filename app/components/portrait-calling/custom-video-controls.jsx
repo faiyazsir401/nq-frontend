@@ -49,10 +49,10 @@ const CustomVideoControls = ({
     return () => {
       if (videoRef.current) {
         videoRef.current.removeEventListener("ended", handleEnded);
-        videoRef.current.addEventListener("timeupdate", handleUpdate);
+        videoRef.current.removeEventListener("timeupdate", handleUpdate);
       }
     };
-  }, [videoRef]);
+  }, [videoRef, setIsPlaying, setCurrentTime]);
 
   //   const GetVolumeIcon = () => {
   //     if (volume === 0) return <FaVolumeMute />;
@@ -141,42 +141,79 @@ const CustomVideoControls = ({
 
             {/* Progress Bar */}
             {(() => {
+              const formatSecondsToLabel = (seconds) => {
+                if (typeof seconds !== "number" || Number.isNaN(seconds) || seconds < 0) {
+                  return "--:--";
+                }
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                const mm = String(mins).padStart(2, "0");
+                const ss = String(secs).padStart(2, "0");
+                return `${mm}:${ss}`;
+              };
+
               const currentValue = isLock
-                ? Math.max((videoRef.current?.duration || 0) > (videoRef2.current?.duration || 0)
-                  ? videoRef.current?.currentTime || 0
-                  : videoRef2.current?.currentTime || 0, lockPoint)
+                ? Math.max(
+                    (videoRef.current?.duration || 0) >
+                    (videoRef2?.current?.duration || 0)
+                      ? videoRef.current?.currentTime || 0
+                      : videoRef2?.current?.currentTime || 0,
+                    lockPoint
+                  )
                 : videoRef.current?.currentTime || 0;
-              
+
               const maxValue = isLock
-                ? Math.max(videoRef.current?.duration || 0, videoRef2.current?.duration || 0)
-                : videoRef.current?.duration || 100;
-              
+                ? Math.max(
+                    videoRef.current?.duration || 0,
+                    videoRef2?.current?.duration || 0
+                  )
+                : videoRef.current?.duration || 0 || 100;
+
               // Calculate the relative progress for background styling
-              const relativeProgress = isLock 
-                ? ((currentValue - lockPoint) / (maxValue - lockPoint)) * 100
-                : (currentValue / maxValue) * 100;
-              
-               
+              let relativeProgress = 0;
+              if (maxValue > 0) {
+                if (isLock) {
+                  const denom = Math.max(0.0001, maxValue - lockPoint);
+                  relativeProgress = ((currentValue - lockPoint) / denom) * 100;
+                } else {
+                  relativeProgress = (currentValue / maxValue) * 100;
+                }
+              }
+
               return (
-                <input
-                  type="range"
-                  min={isLock ? lockPoint : 0}
-                  step="0.01"
-                  disabled={accountType === AccountType.TRAINEE}
-                  value={currentValue}
-                  max={maxValue}
-                  onChange={handleSeek}
-                  style={{
-                    flex: 1,
-                    cursor: "pointer",
-                    height: "5px",
-                    appearance: "none",
-                    background: `linear-gradient(to right, #2566e8 ${relativeProgress}%, #ccc 0%)`,
-                    borderRadius: "5px",
-                    outline: "none",
-                    transition: "background 0.3s ease",
-                  }}
-                />
+                <>
+                  <input
+                    type="range"
+                    min={isLock ? lockPoint : 0}
+                    step="0.01"
+                    disabled={accountType === AccountType.TRAINEE}
+                    value={currentValue}
+                    max={maxValue}
+                    onChange={handleSeek}
+                    style={{
+                      flex: 1,
+                      cursor: "pointer",
+                      height: "5px",
+                      appearance: "none",
+                      background: `linear-gradient(to right, #2566e8 ${relativeProgress}%, #ccc 0%)`,
+                      borderRadius: "5px",
+                      outline: "none",
+                      transition: "background 0.3s ease",
+                    }}
+                  />
+                  {isLock && (
+                    <span
+                      style={{
+                        marginLeft: 8,
+                        fontSize: 12,
+                        color: "#e5e5e5",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Locked from {formatSecondsToLabel(lockPoint)}
+                    </span>
+                  )}
+                </>
               );
             })()}
           </motion.div>
