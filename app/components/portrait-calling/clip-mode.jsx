@@ -106,6 +106,9 @@ const VideoContainer = ({
     y: 0,
   });
   const [dragStart, setDragStart] = useState(null);
+  // Queue for remote sync events that may arrive before the student's video is ready
+  const pendingPlayStateRef = useRef(null);
+  const pendingTimeRef = useRef(null);
 
   // Zoom logic
   const onWheel = (e) => {
@@ -325,7 +328,15 @@ const VideoContainer = ({
         index,
       });
 
-      if (data?.videoId !== clip?._id || !video) return;
+      if (data?.videoId !== clip?._id) return;
+
+      // If video element is not ready yet on the trainee side, store desired state
+      if (!video) {
+        if (accountType === AccountType.TRAINEE) {
+          pendingPlayStateRef.current = data.isPlaying;
+        }
+        return;
+      }
 
       if (data.isPlaying) {
         if (video.paused) {
@@ -352,6 +363,9 @@ const VideoContainer = ({
           setIsPlaying(false);
         }
       }
+
+      // Clear any pending play state since we've just applied the latest one
+      pendingPlayStateRef.current = null;
     };
 
     const handleTime = (data) => {
@@ -367,7 +381,13 @@ const VideoContainer = ({
         index,
       });
 
-      if (data?.videoId === clip?._id && accountType === AccountType.TRAINEE && video) {
+      if (data?.videoId === clip?._id && accountType === AccountType.TRAINEE) {
+        // If video element not ready, remember the desired time and apply once loaded
+        if (!video || video.readyState < (typeof HTMLMediaElement !== "undefined" ? HTMLMediaElement.HAVE_METADATA : 1)) {
+          pendingTimeRef.current = data.progress;
+          return;
+        }
+
         const oldTime = video.currentTime;
         video.currentTime = data.progress;
         console.log("⏩ [VideoContainer] Video time synced from socket", {
@@ -376,6 +396,7 @@ const VideoContainer = ({
           to: data.progress,
           index,
         });
+        pendingTimeRef.current = null;
       }
     };
     const handleZoomPanChange = (data) => {
@@ -432,6 +453,58 @@ const VideoContainer = ({
       socket?.off(EVENTS?.ON_VIDEO_ZOOM_PAN, handleZoomPanChange);
     };
   }, [socket, clip?._id, videoRef, accountType, scale, translate]);
+
+  // Apply any queued remote sync events once the trainee's video is ready
+  useEffect(() => {
+    const video = videoRef?.current;
+    if (!video || accountType !== AccountType.TRAINEE) return;
+
+    // Only attempt to apply when we've finished the initial loading state
+    if (isVideoLoading) return;
+
+    const applyPending = () => {
+      try {
+        if (pendingTimeRef.current != null) {
+          const targetTime = pendingTimeRef.current;
+          const oldTime = video.currentTime;
+          video.currentTime = targetTime;
+          console.log("⏩ [VideoContainer] Applying queued time sync", {
+            clipId: clip?._id,
+            from: oldTime,
+            to: targetTime,
+            index,
+          });
+          pendingTimeRef.current = null;
+        }
+
+        if (pendingPlayStateRef.current != null) {
+          const shouldPlay = pendingPlayStateRef.current;
+          console.log("▶️ [VideoContainer] Applying queued play/pause sync", {
+            clipId: clip?._id,
+            shouldPlay,
+            currentPaused: video.paused,
+            index,
+          });
+          if (shouldPlay && video.paused) {
+            video
+              .play()
+              .then(() => setIsPlaying(true))
+              .catch((err) =>
+                console.warn("VideoContainer play error from queued state", err)
+              );
+          } else if (!shouldPlay && !video.paused) {
+            video.pause();
+            setIsPlaying(false);
+          }
+          pendingPlayStateRef.current = null;
+        }
+      } catch (err) {
+        console.warn("VideoContainer failed to apply queued sync state", err);
+      }
+    };
+
+    applyPending();
+  }, [videoRef, accountType, isVideoLoading, clip?._id, setIsPlaying]);
   //  
   // useEffect(() => {
   //   const video = videoRef?.current;
