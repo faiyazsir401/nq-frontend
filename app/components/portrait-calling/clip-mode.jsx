@@ -804,15 +804,42 @@ const VideoContainer = ({
       
       const canvas = canvasRef.current;
       const container = videoContainerRef.current;
-      
+
+      // Preserve existing drawing before resizing, because changing
+      // canvas width/height clears its content.
+      let prevDataUrl = null;
+      const prevWidth = canvas.width;
+      const prevHeight = canvas.height;
+      if (prevWidth && prevHeight) {
+        try {
+          prevDataUrl = canvas.toDataURL();
+        } catch (e) {
+          console.warn("🎨 [VideoContainer] Failed to snapshot canvas before resize", e);
+        }
+      }
+
       // Get actual displayed size
       const { width, height } = container.getBoundingClientRect();
-      
+
       // Set internal resolution to match display size
       canvas.width = width;
       canvas.height = height;
-      
-       
+
+      // Restore previous drawing scaled to new size (if we had one)
+      if (prevDataUrl) {
+        const img = new Image();
+        img.onload = () => {
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return;
+          try {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          } catch (err) {
+            console.warn("🎨 [VideoContainer] Failed to restore canvas after resize", err);
+          }
+        };
+        img.src = prevDataUrl;
+      }
     };
   
     // Initial setup

@@ -156,19 +156,19 @@ const CustomVideoControls = ({
                 ? Math.max(
                     (videoRef.current?.duration || 0) >
                     (videoRef2?.current?.duration || 0)
-                      ? videoRef.current?.currentTime || 0
+                  ? videoRef.current?.currentTime || 0
                       : videoRef2?.current?.currentTime || 0,
                     lockPoint
                   )
                 : videoRef.current?.currentTime || 0;
-
+              
               const maxValue = isLock
                 ? Math.max(
                     videoRef.current?.duration || 0,
                     videoRef2?.current?.duration || 0
                   )
                 : videoRef.current?.duration || 0 || 100;
-
+              
               // Calculate the relative progress for background styling
               let relativeProgress = 0;
               if (maxValue > 0) {
@@ -179,28 +179,28 @@ const CustomVideoControls = ({
                   relativeProgress = (currentValue / maxValue) * 100;
                 }
               }
-
+               
               return (
                 <>
-                  <input
-                    type="range"
-                    min={isLock ? lockPoint : 0}
-                    step="0.01"
-                    disabled={accountType === AccountType.TRAINEE}
-                    value={currentValue}
-                    max={maxValue}
-                    onChange={handleSeek}
-                    style={{
-                      flex: 1,
-                      cursor: "pointer",
-                      height: "5px",
-                      appearance: "none",
-                      background: `linear-gradient(to right, #2566e8 ${relativeProgress}%, #ccc 0%)`,
-                      borderRadius: "5px",
-                      outline: "none",
-                      transition: "background 0.3s ease",
-                    }}
-                  />
+                <input
+                  type="range"
+                  min={isLock ? lockPoint : 0}
+                  step="0.01"
+                  disabled={accountType === AccountType.TRAINEE}
+                  value={currentValue}
+                  max={maxValue}
+                  onChange={handleSeek}
+                  style={{
+                    flex: 1,
+                    cursor: "pointer",
+                    height: "5px",
+                    appearance: "none",
+                    background: `linear-gradient(to right, #2566e8 ${relativeProgress}%, #ccc 0%)`,
+                    borderRadius: "5px",
+                    outline: "none",
+                    transition: "background 0.3s ease",
+                  }}
+                />
                   {isLock && (
                     <span
                       style={{

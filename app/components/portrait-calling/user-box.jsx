@@ -115,6 +115,7 @@ export const UserBoxMini = ({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
+  const clickObserver = useClickObserver(handleBoxClick);
 
   const setVideoRef = useCallback(
     (node) => {
@@ -227,10 +228,15 @@ export const UserBoxMini = ({
   return (
     <Draggable
       position={position}
+      onStart={clickObserver.onStart}
       onDrag={handleDrag}
-      onStop={handleStop}
+      onStop={(e, data) => {
+        // Preserve original click-vs-drag behaviour
+        clickObserver.onStop(e, data);
+        // Also run drag-end logic for hide / reset
+        handleStop(e, data);
+      }}
       bounds="parent"
-      {...useClickObserver(handleBoxClick)}
     >
       <div 
         ref={containerRef}
@@ -283,6 +289,7 @@ export const VideoMiniBox = ({ onClick, id, clips, bottom, onHide, onRestore, is
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
+  const clickObserver = useClickObserver(handleBoxClick);
 
   const handleBoxClick = () => {
     if (onClick && !isDragging) {
@@ -357,10 +364,15 @@ export const VideoMiniBox = ({ onClick, id, clips, bottom, onHide, onRestore, is
   return (
     <Draggable
       position={position}
+      onStart={clickObserver.onStart}
       onDrag={handleDrag}
-      onStop={handleStop}
+      onStop={(e, data) => {
+        // Preserve original click-vs-drag behaviour
+        clickObserver.onStop(e, data);
+        // Also run drag-end logic for hide / reset
+        handleStop(e, data);
+      }}
       bounds="parent"
-      {...useClickObserver(handleBoxClick)}
     >
       <div
         ref={containerRef}

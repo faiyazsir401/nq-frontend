@@ -78,10 +78,39 @@ const OneOnOneCall = ({
     const resize = () => {
       const parent = canvas.parentElement;
       if (!parent) return;
+
+      // Snapshot existing drawing before changing size, to avoid losing
+      // annotations when the layout changes (e.g. orientation, layout shifts).
+      let prevDataUrl: string | null = null;
+      const prevWidth = canvas.width;
+      const prevHeight = canvas.height;
+      if (prevWidth && prevHeight) {
+        try {
+          prevDataUrl = canvas.toDataURL();
+        } catch (e) {
+          console.warn("[OneOnOneCall] Failed to snapshot annotation canvas before resize", e);
+        }
+      }
+
       const { offsetWidth, offsetHeight } = parent;
       if (offsetWidth && offsetHeight) {
         canvas.width = offsetWidth;
         canvas.height = offsetHeight;
+      }
+
+      if (prevDataUrl) {
+        const img = new Image();
+        img.onload = () => {
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return;
+          try {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          } catch (err) {
+            console.warn("[OneOnOneCall] Failed to restore annotation canvas after resize", err);
+          }
+        };
+        img.src = prevDataUrl;
       }
     };
     resize();
@@ -316,33 +345,33 @@ const OneOnOneCall = ({
 
       <div className="video-section one-on-one-layout" style={{ position: "relative" }}>
         <div className="one-on-one-layout__primary">
-          <UserBox
-            id={toUser._id}
-            onClick={handleUserClick}
-            selected={selectedUser === toUser._id}
-            selectedUser={selectedUser}
-            notSelected={selectedUser}
-            videoRef={localVideoRef}
-            user={fromUser}
-            stream={localStream}
-            isStreamOff={isLocalStreamOff}
-            isLandscape={isLandscape}
-            muted={true}
-          />
+        <UserBox
+          id={toUser._id}
+          onClick={handleUserClick}
+          selected={selectedUser === toUser._id}
+          selectedUser={selectedUser}
+          notSelected={selectedUser}
+          videoRef={localVideoRef}
+          user={fromUser}
+          stream={localStream}
+          isStreamOff={isLocalStreamOff}
+          isLandscape={isLandscape}
+          muted={true}
+        />
         </div>
         <div className="one-on-one-layout__secondary">
-          <UserBox
-            id={fromUser._id}
-            onClick={handleUserClick}
-            selectedUser={selectedUser}
-            selected={selectedUser === fromUser._id}
-            notSelected={selectedUser}
-            videoRef={remoteVideoRef}
-            user={toUser}
-            stream={remoteStream}
-            isStreamOff={isRemoteStreamOff}
-            isLandscape={isLandscape}
-          />
+        <UserBox
+          id={fromUser._id}
+          onClick={handleUserClick}
+          selectedUser={selectedUser}
+          selected={selectedUser === fromUser._id}
+          notSelected={selectedUser}
+          videoRef={remoteVideoRef}
+          user={toUser}
+          stream={remoteStream}
+          isStreamOff={isRemoteStreamOff}
+          isLandscape={isLandscape}
+        />
         </div>
 
         {selectedUser && (
