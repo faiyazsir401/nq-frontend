@@ -1,8 +1,9 @@
 import Draggable from "react-draggable";
 import { Point, Utils } from "../../../utils/utils";
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useCallback } from "react";
 import { AccountType } from "../../common/constants";
+import { ChevronRight } from "react-feather";
 
 export const UserBox = ({
   onClick,
@@ -44,7 +45,7 @@ export const UserBox = ({
       }`}
       style={{
         position: "relative",
-        width: isLandscape?"50vw":"95vw"
+        width: selected ? "100vw" : (isLandscape ? "50vw" : "95vw")
       }}
       onClick={() => !selected && onClick(id)}
     >
@@ -105,8 +106,16 @@ export const UserBoxMini = ({
   isStreamOff,
   zIndex,
   bottom,
-  muted
+  muted,
+  onHide,
+  onRestore,
+  isHidden,
+  videoType // 'student' | 'teacher'
 }) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
+
   const setVideoRef = useCallback(
     (node) => {
       if (node) {
@@ -126,20 +135,113 @@ export const UserBoxMini = ({
   }, [videoRef, stream, isStreamOff]);
 
   const handleBoxClick = () => {
-    // event.stopPropagation();
-    if (onClick && id) {
-       
+    if (onClick && id && !isDragging) {
       onClick(id);
     }
   };
 
+  const handleDrag = (e, data) => {
+    setIsDragging(true);
+    setPosition({ x: data.x, y: data.y });
+  };
+
+  const handleStop = (e, data) => {
+    setIsDragging(false);
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Check if dragged outside viewport (with some threshold)
+    const threshold = 50;
+    const isOutsideViewport = 
+      data.x + rect.width < -threshold ||
+      data.x > viewportWidth + threshold ||
+      data.y + rect.height < -threshold ||
+      data.y > viewportHeight + threshold;
+
+    if (isOutsideViewport && onHide) {
+      onHide(videoType);
+      // Position it off-screen
+      setPosition({ 
+        x: viewportWidth + 20, 
+        y: Math.max(20, Math.min(data.y, viewportHeight - rect.height - 20))
+      });
+    } else {
+      // Reset to original position if not hidden
+      if (!isHidden) {
+        setPosition({ x: 0, y: 0 });
+      }
+    }
+  };
+
+  const handleRestore = () => {
+    if (onRestore) {
+      onRestore(videoType);
+      setPosition({ x: 0, y: 0 });
+    }
+  };
+
+  if (isHidden) {
+    return (
+      <div
+        ref={containerRef}
+        className="video-restore-indicator hide-in-screenshot"
+        onClick={handleRestore}
+      >
+        <ChevronRight size={20} color="white" />
+        <div className="profile-box mini" style={{ width: "60px", height: "90px", margin: 0 }}>
+          {!isStreamOff ? (
+            <video
+              playsInline
+              autoPlay
+              muted={muted}
+              ref={setVideoRef}
+              style={{
+                height: "100%",
+                width: "100%",
+                position: "absolute",
+                objectFit: "cover",
+                borderRadius: "8px",
+              }}
+            ></video>
+          ) : user?.profile_picture ? (
+            <img
+              src={Utils.getImageUrlOfS3(user?.profile_picture)}
+              className={`profile-img `}
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
+            />
+          ) : (
+            <img
+              src="/user.jpg"
+              alt="Profile"
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <Draggable bounds="parent" {...useClickObserver(handleBoxClick)}>
-      <div className={`profile-box mini hide-in-screenshot`} style={{
-        zIndex: zIndex ?? 100,
-        bottom:bottom??50
-      }}>
+    <Draggable
+      position={position}
+      onDrag={handleDrag}
+      onStop={handleStop}
+      bounds="parent"
+      {...useClickObserver(handleBoxClick)}
+    >
+      <div 
+        ref={containerRef}
+        className={`profile-box mini hide-in-screenshot`} 
+        style={{
+          zIndex: zIndex ?? 100,
+          bottom: bottom ?? 50,
+          cursor: isDragging ? "grabbing" : "grab",
+          transition: isDragging ? "none" : "all 0.2s ease",
+        }}
+      >
         {!isStreamOff ? (
           <video
             playsInline
@@ -177,26 +279,101 @@ export const UserBoxMini = ({
   );
 };
 
-export const VideoMiniBox = ({ onClick, id, clips,bottom }) => {
+export const VideoMiniBox = ({ onClick, id, clips, bottom, onHide, onRestore, isHidden }) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
+
   const handleBoxClick = () => {
-    // event.stopPropagation();
-    if (onClick) {
-       
+    if (onClick && !isDragging) {
       onClick(id);
     }
   };
 
-  return (
-    <Draggable bounds="parent" {...useClickObserver(handleBoxClick)}>
+  const handleDrag = (e, data) => {
+    setIsDragging(true);
+    setPosition({ x: data.x, y: data.y });
+  };
+
+  const handleStop = (e, data) => {
+    setIsDragging(false);
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    // Check if dragged outside viewport (with some threshold)
+    const threshold = 50;
+    const isOutsideViewport = 
+      data.x + rect.width < -threshold ||
+      data.x > viewportWidth + threshold ||
+      data.y + rect.height < -threshold ||
+      data.y > viewportHeight + threshold;
+
+    if (isOutsideViewport && onHide) {
+      onHide('clips');
+      // Position it off-screen
+      setPosition({ 
+        x: viewportWidth + 20, 
+        y: Math.max(20, Math.min(data.y, viewportHeight - rect.height - 20))
+      });
+    } else {
+      // Reset to original position if not hidden
+      if (!isHidden) {
+        setPosition({ x: 0, y: 0 });
+      }
+    }
+  };
+
+  const handleRestore = () => {
+    if (onRestore) {
+      onRestore('clips');
+      setPosition({ x: 0, y: 0 });
+    }
+  };
+
+  if (isHidden) {
+    return (
       <div
+        ref={containerRef}
+        className="video-restore-indicator hide-in-screenshot"
+        onClick={handleRestore}
+      >
+        <ChevronRight size={20} color="white" />
+        <div className="profile-box mini-landscape" style={{ width: "90px", height: "90px", margin: 0 }}>
+          {clips.map((clip, idx) => (
+            <img 
+              key={idx}
+              src={Utils?.generateThumbnailURL(clip)} 
+              style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "8px" }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Draggable
+      position={position}
+      onDrag={handleDrag}
+      onStop={handleStop}
+      bounds="parent"
+      {...useClickObserver(handleBoxClick)}
+    >
+      <div
+        ref={containerRef}
         className={`profile-box mini-landscape hide-in-screenshot`}
         style={{
           zIndex: 5,
-          bottom:bottom??50
+          bottom: bottom ?? 50,
+          cursor: isDragging ? "grabbing" : "grab",
+          transition: isDragging ? "none" : "all 0.2s ease",
         }}
       >
-        {clips.map((clip) => (
-          <img src={Utils?.generateThumbnailURL(clip)} />
+        {clips.map((clip, idx) => (
+          <img key={idx} src={Utils?.generateThumbnailURL(clip)} />
         ))}
       </div>
     </Draggable>

@@ -53,10 +53,23 @@ const OneOnOneCall = ({
   // For now we only support freehand on live video; shapes are ignored but we
   // keep the state so the menu bar looks and behaves consistently.
   const [activeShape, setActiveShape] = useState(null);
+  // Track which videos are hidden (dragged outside viewport)
+  const [hiddenVideos, setHiddenVideos] = useState({
+    student: false,
+    teacher: false
+  });
 
   useEffect(()=>{
     setShowScreenshotButton(false)
   },[])
+
+  const handleHideVideo = (videoType) => {
+    setHiddenVideos(prev => ({ ...prev, [videoType]: true }));
+  };
+
+  const handleRestoreVideo = (videoType) => {
+    setHiddenVideos(prev => ({ ...prev, [videoType]: false }));
+  };
 
   // Resize annotation canvas to match video section
   useEffect(() => {
@@ -344,6 +357,10 @@ const OneOnOneCall = ({
               selectedUser === toUser._id ? isRemoteStreamOff : isLocalStreamOff
             }
             muted={selectedUser === toUser._id ? false : true}
+            videoType={selectedUser === toUser._id ? "student" : "teacher"}
+            onHide={handleHideVideo}
+            onRestore={handleRestoreVideo}
+            isHidden={selectedUser === toUser._id ? hiddenVideos.student : hiddenVideos.teacher}
           />
         )}
 

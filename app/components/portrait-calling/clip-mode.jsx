@@ -854,7 +854,7 @@ const VideoContainer = ({
                 ? "40dvh"
                 : "37dvh", // If isMaximized is false and isSingle is false
           width: "100%",
-          maxWidth: isLandscape ? "960px" : "100%",
+          maxWidth: "100%",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -1149,6 +1149,20 @@ const ClipModeCall = ({
   const [showTextInput, setShowTextInput] = useState(false);
   const [textInputPosition, setTextInputPosition] = useState({ x: 0, y: 0, canvasIndex: 1 });
   const [textInputValue, setTextInputValue] = useState("");
+  // Track which videos are hidden (dragged outside viewport)
+  const [hiddenVideos, setHiddenVideos] = useState({
+    student: false,
+    teacher: false,
+    clips: false
+  });
+
+  const handleHideVideo = (videoType) => {
+    setHiddenVideos(prev => ({ ...prev, [videoType]: true }));
+  };
+
+  const handleRestoreVideo = (videoType) => {
+    setHiddenVideos(prev => ({ ...prev, [videoType]: false }));
+  };
 
   function handleUserClick(id) {
     if (accountType === AccountType.TRAINER) {
@@ -2381,6 +2395,10 @@ const ClipModeCall = ({
             user={toUser}
             bottom={300}
             isStreamOff={isRemoteStreamOff}
+            videoType="student"
+            onHide={handleHideVideo}
+            onRestore={handleRestoreVideo}
+            isHidden={hiddenVideos.student}
           />
         ) : (
           <UserBoxMini
@@ -2393,6 +2411,10 @@ const ClipModeCall = ({
             bottom={300}
             isStreamOff={isLocalStreamOff}
             muted={true}
+            videoType="teacher"
+            onHide={handleHideVideo}
+            onRestore={handleRestoreVideo}
+            isHidden={hiddenVideos.teacher}
           />
         )}
 
@@ -2401,6 +2423,9 @@ const ClipModeCall = ({
           id={null}
           bottom={60}
           onClick={handleUserClick}
+          onHide={handleHideVideo}
+          onRestore={handleRestoreVideo}
+          isHidden={hiddenVideos.clips}
         />
       </div>
       <div
@@ -2553,6 +2578,10 @@ const ClipModeCall = ({
               stream={remoteStream}
               user={toUser}
               isStreamOff={isRemoteStreamOff}
+              videoType="student"
+              onHide={handleHideVideo}
+              onRestore={handleRestoreVideo}
+              isHidden={hiddenVideos.student}
             />
             <UserBoxMini
               id={toUser._id}
@@ -2565,6 +2594,10 @@ const ClipModeCall = ({
               user={fromUser}
               isStreamOff={isLocalStreamOff}
               muted={true}
+              videoType="teacher"
+              onHide={handleHideVideo}
+              onRestore={handleRestoreVideo}
+              isHidden={hiddenVideos.teacher}
             />
           </>
         )}
