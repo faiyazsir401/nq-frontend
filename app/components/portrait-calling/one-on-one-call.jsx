@@ -81,7 +81,7 @@ const OneOnOneCall = ({
 
       // Snapshot existing drawing before changing size, to avoid losing
       // annotations when the layout changes (e.g. orientation, layout shifts).
-      let prevDataUrl: string | null = null;
+      let prevDataUrl = null;
       const prevWidth = canvas.width;
       const prevHeight = canvas.height;
       if (prevWidth && prevHeight) {
