@@ -334,7 +334,12 @@ const OneOnOneCall = ({
 
   return (
     <>
-      <div className="d-flex w-100 justify-content-end mr-3 mr-md-5 mt-2">
+      <div 
+        className="d-flex w-100 justify-content-end mr-3 mr-md-5 mt-2 mb-2"
+        style={{
+          padding: "0 15px",
+        }}
+      >
         {timeRemaining && (
           <TimeRemaining
             timeRemaining={timeRemaining}
@@ -421,11 +426,12 @@ const OneOnOneCall = ({
             <div
               style={{
                 position: "absolute",
-                top: 10,
-                right: 10,
+                top: 15,
+                right: 15,
                 zIndex: 21,
                 display: "flex",
-                gap: "8px",
+                gap: "10px",
+                flexWrap: "wrap",
               }}
               className="hide-in-screenshot"
             >
@@ -443,33 +449,75 @@ const OneOnOneCall = ({
                   }
                 }}
                 style={{
-                  padding: "6px 10px",
-                  fontSize: "12px",
-                  borderRadius: "4px",
-                  border: "none",
+                  padding: "10px 18px",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  borderRadius: "25px",
+                  border: `2px solid ${isAnnotating ? "#1976d2" : "#e0e0e0"}`,
                   backgroundColor: isAnnotating ? "#1976d2" : "#ffffff",
                   color: isAnnotating ? "#ffffff" : "#333333",
-                  boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                   cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isAnnotating) {
+                    e.currentTarget.style.backgroundColor = "#e3f2fd";
+                    e.currentTarget.style.borderColor = "#1976d2";
+                    e.currentTarget.style.color = "#1976d2";
+                  }
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  if (!isAnnotating) {
+                    e.currentTarget.style.backgroundColor = "#ffffff";
+                    e.currentTarget.style.borderColor = "#e0e0e0";
+                    e.currentTarget.style.color = "#333333";
+                  }
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
                 }}
               >
-                {isAnnotating ? "Stop Annotate" : "Annotate"}
+                <span>✏️</span>
+                {isAnnotating ? "Stop Annotating" : "Annotate"}
               </button>
               {isAnnotating && (
                 <button
                   type="button"
                   onClick={clearAnnotations}
                   style={{
-                    padding: "6px 10px",
-                    fontSize: "12px",
-                    borderRadius: "4px",
-                    border: "none",
+                    padding: "10px 18px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    borderRadius: "25px",
+                    border: "2px solid #e0e0e0",
                     backgroundColor: "#ffffff",
-                    color: "#333333",
-                    boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                    color: "#f44336",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                     cursor: "pointer",
+                    transition: "all 0.3s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#ffebee";
+                    e.currentTarget.style.borderColor = "#f44336";
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#ffffff";
+                    e.currentTarget.style.borderColor = "#e0e0e0";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
                   }}
                 >
+                  <span>🗑️</span>
                   Clear
                 </button>
               )}

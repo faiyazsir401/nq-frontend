@@ -1,54 +1,141 @@
 .action-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 50px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+  max-width: 100%;
+  
+  @media (max-width: 768px) {
+    padding: 10px 15px;
+    gap: 8px;
+    border-radius: 30px;
+  }
 }
 
 .button {
-  width: 35px;
-  height: 35px;
+  width: 44px;
+  height: 44px;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  background-color: #f5f5f5;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  color: black;
+  color: #333;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: #b0b0b0;
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+  
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+  }
 }
-
-
 
 /* Individual Button Styling */
-.mic-toggle.off {
+.mic-toggle {
+  &:hover:not(.off) {
+    background-color: #e3f2fd;
+    border-color: #2196f3;
+    color: #2196f3;
+  }
+  
+  &.off {
     color: white;
-    background-color: red;
+    background-color: #f44336;
+    border-color: #d32f2f;
+    
+    &:hover {
+      background-color: #d32f2f;
+    }
+  }
 }
 
-.video-toggle.off {
-  color: white;
-  background-color: red;
+.video-toggle {
+  &:hover:not(.off) {
+    background-color: #e8f5e9;
+    border-color: #4caf50;
+    color: #4caf50;
+  }
+  
+  &.off {
+    color: white;
+    background-color: #f44336;
+    border-color: #d32f2f;
+    
+    &:hover {
+      background-color: #d32f2f;
+    }
+  }
 }
 
-.end-call.off {
-  color: white;
-  background-color: red;
+.end-call {
+  &:hover {
+    background-color: #ffebee;
+    border-color: #f44336;
+    color: #f44336;
+  }
+  
+  &.off {
+    color: white;
+    background-color: #f44336;
+    border-color: #d32f2f;
+    
+    &:hover {
+      background-color: #d32f2f;
+      transform: scale(1.05);
+    }
+  }
 }
 
 .external-link {
-
+  &:hover {
+    background-color: #e1f5fe;
+    border-color: #03a9f4;
+    color: #03a9f4;
+  }
 }
 
 .video-lock {
-
+  &:hover {
+    background-color: #fff3e0;
+    border-color: #ff9800;
+    color: #ff9800;
+  }
 }
 
 .aperture {
-
+  &:hover {
+    background-color: #f3e5f5;
+    border-color: #9c27b0;
+    color: #9c27b0;
+  }
 }
 
 .file-add {
-
+  &:hover {
+    background-color: #e0f2f1;
+    border-color: #009688;
+    color: #009688;
+  }
 }

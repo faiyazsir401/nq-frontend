@@ -859,7 +859,50 @@ const VideoContainer = ({
       accountType
     });
     setIsVideoLoading(true);
-  }, [clip?._id, index, accountType]);
+    
+    // Check if video is already ready when clip changes
+    const checkVideoReady = () => {
+      const video = videoRef?.current;
+      if (video && video.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+        console.log("✅ [VideoContainer] Video already ready, clearing loading state", {
+          clipId: clip?._id,
+          readyState: video.readyState,
+          index
+        });
+        setIsVideoLoading(false);
+      }
+    };
+    
+    // Check immediately and after a short delay
+    checkVideoReady();
+    const timeoutId = setTimeout(checkVideoReady, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, [clip?._id, index, accountType, videoRef]);
+
+  // Calculate responsive height based on device and state
+  // Note: CSS media queries will override these values for better responsiveness
+  const getVideoContainerHeight = () => {
+    if (isSingle) {
+      // Single clip mode - takes more space
+      if (isMaximized) {
+        // Maximized: use most of viewport, leave minimal space for controls
+        return "calc(100vh - 60px)";
+      } else {
+        // Normal: use good portion of viewport
+        return "calc(100vh - 100px)";
+      }
+    } else {
+      // Dual clip mode - splits viewport
+      if (isMaximized) {
+        // Maximized: split viewport in half with minimal gap
+        return isLock ? "calc(50vh - 10px)" : "calc(50vh - 12px)";
+      } else {
+        // Normal: smaller split with more space for other elements
+        return isLock ? "calc(50vh - 30px)" : "calc(50vh - 40px)";
+      }
+    }
+  };
 
   return (
     <>
@@ -867,19 +910,9 @@ const VideoContainer = ({
       <div
         id="video-container"
         ref={videoContainerRef}
-        className={`relative overflow-hidden `}
+        className={`relative overflow-hidden video-container-clip ${isSingle ? 'video-container-single' : 'video-container-dual'} ${isMaximized ? 'video-container-maximized' : 'video-container-normal'}`}
         style={{
-          height: isSingle
-            ? isMaximized
-              ? "88dvh"
-              : "80dvh" // If isSingle is true
-            : isMaximized
-              ? isLock
-                ? "44.5dvh"
-                : "42.5dvh" // If isMaximized is true and isSingle is false
-              : isLock
-                ? "40dvh"
-                : "37dvh", // If isMaximized is false and isSingle is false
+          height: getVideoContainerHeight(),
           width: "100%",
           maxWidth: "100%",
           display: "flex",
@@ -887,11 +920,17 @@ const VideoContainer = ({
           alignItems: "center",
           background: "#000",
           position: "relative",
+          minHeight: isSingle ? (isMaximized ? "70vh" : "60vh") : (isMaximized ? "35vh" : "30vh"),
         }}
       >
         {isVideoLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-800 z-10">
-            <div className="text-white">Loading video...</div>
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
+            <div className="flex flex-col items-center gap-3">
+              <div className="spinner-border spinner-border-sm text-white" role="status" style={{ width: "3rem", height: "3rem" }}>
+                <span className="sr-only">Loading...</span>
+              </div>
+              <div className="text-white text-sm">Loading video...</div>
+            </div>
           </div>
         )}
         {drawingMode && accountType === AccountType.TRAINER && (
@@ -981,17 +1020,49 @@ const VideoContainer = ({
                 poster={Utils?.generateThumbnailURL(clip)}
                 preload="auto"
                 crossOrigin="anonymous"
+                onLoadedMetadata={(e) => {
+                  try {
+                    const video = e.currentTarget;
+                    console.log("📹 [VideoContainer] Video metadata loaded", {
+                      clipId: clip?._id,
+                      index,
+                      readyState: video.readyState,
+                      duration: video.duration
+                    });
+                    // Clear loading if video has enough data
+                    if (video.readyState >= 2) {
+                      setIsVideoLoading(false);
+                    }
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onLoadedMetadata event", error);
+                  }
+                }}
                 onLoadedData={(e) => {
                   try {
+                  const video = e.currentTarget;
                   console.log("📹 [VideoContainer] Video data loaded", {
                     clipId: clip?._id,
                     index,
-                    currentTime: e?.currentTarget?.currentTime,
-                    duration: e?.currentTarget?.duration
+                    currentTime: video.currentTime,
+                    duration: video.duration,
+                    readyState: video.readyState
                   });
                   setIsVideoLoading(false);
                   } catch (error) {
                     console.error("❌ [VideoContainer] Error in onLoadedData event", error);
+                  }
+                }}
+                onCanPlay={(e) => {
+                  try {
+                    const video = e.currentTarget;
+                    console.log("✅ [VideoContainer] Video can play", {
+                      clipId: clip?._id,
+                      index,
+                      readyState: video.readyState
+                    });
+                    setIsVideoLoading(false);
+                  } catch (error) {
+                    console.error("❌ [VideoContainer] Error in onCanPlay event", error);
                   }
                 }}
                 onCanPlayThrough={(e) => {
@@ -2226,13 +2297,25 @@ const ClipModeCall = ({
     <>
 
       <div
-        className={`d-flex  pl-1 pr-1 ${accountType === AccountType.TRAINER && !selectedUser
-          ? "mt-1 mb-1 justify-content-between"
-          : "mt-2 mb-2  justify-content-end"
+        className={`d-flex  pl-2 pr-2 ${accountType === AccountType.TRAINER && !selectedUser
+          ? "mt-2 mb-2 justify-content-between align-items-center"
+          : "mt-2 mb-2  justify-content-end align-items-center"
           } ${isMaximized ? "" : "w-100"}`}
+        style={{
+          background: accountType === AccountType.TRAINER && !selectedUser 
+            ? "rgba(255, 255, 255, 0.95)" 
+            : "transparent",
+          backdropFilter: accountType === AccountType.TRAINER && !selectedUser ? "blur(10px)" : "none",
+          borderRadius: accountType === AccountType.TRAINER && !selectedUser ? "15px" : "0",
+          padding: accountType === AccountType.TRAINER && !selectedUser ? "10px 15px" : "0",
+          boxShadow: accountType === AccountType.TRAINER && !selectedUser 
+            ? "0 2px 10px rgba(0, 0, 0, 0.1)" 
+            : "none",
+          marginBottom: "10px",
+        }}
       >
         {accountType === AccountType.TRAINER && !selectedUser && (
-          <div className="d-flex">
+          <div className="d-flex align-items-center gap-2" style={{ flexWrap: "wrap" }}>
             <div
               className="button"
               onClick={() => {
@@ -2245,19 +2328,70 @@ const ClipModeCall = ({
                   isMaximized: !isMaximized,
                 });
               }}
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "50%",
+                background: isMaximized ? "#4a90e2" : "#f5f5f5",
+                color: isMaximized ? "white" : "#333",
+                border: "2px solid",
+                borderColor: isMaximized ? "#4a90e2" : "#e0e0e0",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.1)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.2)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
+              }}
             >
               {isMaximized ? <Minimize size={18} /> : <Maximize size={18} />}
             </div>
 
             {isMaximized && (
-              <div className="button aperture ml-1" onClick={takeScreenshot}>
+              <div 
+                className="button aperture" 
+                onClick={takeScreenshot}
+                style={{
+                  width: "38px",
+                  height: "38px",
+                  borderRadius: "50%",
+                  background: "#f5f5f5",
+                  border: "2px solid #e0e0e0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#f3e5f5";
+                  e.currentTarget.style.borderColor = "#9c27b0";
+                  e.currentTarget.style.color = "#9c27b0";
+                  e.currentTarget.style.transform = "scale(1.1)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#f5f5f5";
+                  e.currentTarget.style.borderColor = "#e0e0e0";
+                  e.currentTarget.style.color = "#333";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+              >
                 <Aperture size={16} />
               </div>
             )}
 
             {isMaximized && (
               <div
-                className="button video-lock  ml-1"
+                className="button video-lock"
                 onClick={() => {
                   const newLockState = !isLock;
                   const lockPointTemp = !isLock
@@ -2288,6 +2422,29 @@ const ClipModeCall = ({
                   setIsLock(newLockState);
                   setLockPoint(lockPointTemp);
                 }}
+                style={{
+                  width: "38px",
+                  height: "38px",
+                  borderRadius: "50%",
+                  background: isLock ? "#ff9800" : "#f5f5f5",
+                  color: isLock ? "white" : "#333",
+                  border: "2px solid",
+                  borderColor: isLock ? "#ff9800" : "#e0e0e0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.1)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
+                }}
               >
                 {isLock ? <FaLock size={16} /> : <FaUnlock size={16} />}
               </div>
@@ -2299,7 +2456,7 @@ const ClipModeCall = ({
               }}
             >
               <div
-                className="button ml-1"
+                className="button"
                 onClick={() => {
                   setDrawingMode(!drawingMode);
                   socket.emit(EVENTS.TOGGLE_DRAWING_MODE, {
@@ -2311,8 +2468,39 @@ const ClipModeCall = ({
                   });
                   setShowDrawingTools(false);
                 }}
+                style={{
+                  width: "38px",
+                  height: "38px",
+                  borderRadius: "50%",
+                  background: drawingMode ? "#2196f3" : "#f5f5f5",
+                  color: drawingMode ? "white" : "#333",
+                  border: "2px solid",
+                  borderColor: drawingMode ? "#2196f3" : "#e0e0e0",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!drawingMode) {
+                    e.currentTarget.style.background = "#e3f2fd";
+                    e.currentTarget.style.borderColor = "#2196f3";
+                    e.currentTarget.style.color = "#2196f3";
+                  }
+                  e.currentTarget.style.transform = "scale(1.1)";
+                }}
+                onMouseLeave={(e) => {
+                  if (!drawingMode) {
+                    e.currentTarget.style.background = "#f5f5f5";
+                    e.currentTarget.style.borderColor = "#e0e0e0";
+                    e.currentTarget.style.color = "#333";
+                  }
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
               >
-                <PenTool size={18} color={drawingMode ? "blue" : "black"} />
+                <PenTool size={18} color={drawingMode ? "white" : "black"} />
               </div>
             </div>
 

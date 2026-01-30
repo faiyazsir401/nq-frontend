@@ -208,9 +208,42 @@ const TimeRemaining = ({ timeRemaining, bothUsersJoined = false }) => {
 
   return (
     <>
-      <div className="time-container">
-        <h3 className="label">Time remaining:</h3>
-        <h3 className="value" style={{ color: timerColor }}>
+      <div 
+        className="time-container"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "8px 16px",
+          background: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(10px)",
+          borderRadius: "25px",
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+        }}
+      >
+        <h3 
+          className="label" 
+          style={{ 
+            margin: 0, 
+            fontSize: "14px", 
+            fontWeight: "500",
+            color: "#666",
+          }}
+        >
+          Time remaining:
+        </h3>
+        <h3 
+          className="value" 
+          style={{ 
+            margin: 0,
+            color: timerColor,
+            fontSize: "16px",
+            fontWeight: "600",
+            fontFamily: "monospace",
+            letterSpacing: "1px",
+          }}
+        >
           {displayTime}
         </h3>
       </div>

@@ -74,6 +74,8 @@ const CustomVideoControls = ({
         justifyContent: "center",
         gap: "5px",
         width: "100%",
+        padding: "10px 15px",
+        zIndex: 100,
       }}
       className="hide-in-screenshot"
     >
@@ -90,23 +92,46 @@ const CustomVideoControls = ({
             style={{
               display: "flex",
               alignItems: "center",
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
-              padding: "5px 15px",
+              backgroundColor: "rgba(0, 0, 0, 0.85)",
+              backdropFilter: "blur(10px)",
+              padding: "12px 20px",
               width: "100%",
-              gap: "12px",
+              maxWidth: "95%",
+              gap: "15px",
+              borderRadius: "50px",
+              boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
             }}
           >
             {/* Play/Pause Button */}
             <button
               onClick={togglePlayPause}
               style={{
-                background: "none",
-                border: "none",
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                borderRadius: "50%",
                 color: "white",
-                fontSize: "16px",
-                cursor: "pointer",
+                fontSize: "18px",
+                cursor: accountType === AccountType.TRAINEE ? "not-allowed" : "pointer",
+                width: "40px",
+                height: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.3s ease",
+                opacity: accountType === AccountType.TRAINEE ? 0.5 : 1,
               }}
               disabled={accountType === AccountType.TRAINEE}
+              onMouseEnter={(e) => {
+                if (accountType !== AccountType.TRAINEE) {
+                  e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)";
+                  e.currentTarget.style.transform = "scale(1.1)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
             >
               {isPlaying ? <FaPause /> : <FaPlay />}
             </button>
@@ -192,25 +217,38 @@ const CustomVideoControls = ({
                   onChange={handleSeek}
                   style={{
                     flex: 1,
-                    cursor: "pointer",
-                    height: "5px",
+                    cursor: accountType === AccountType.TRAINEE ? "not-allowed" : "pointer",
+                    height: "6px",
                     appearance: "none",
-                    background: `linear-gradient(to right, #2566e8 ${relativeProgress}%, #ccc 0%)`,
-                    borderRadius: "5px",
+                    background: `linear-gradient(to right, #4a90e2 ${relativeProgress}%, rgba(255, 255, 255, 0.3) ${relativeProgress}%)`,
+                    borderRadius: "10px",
                     outline: "none",
                     transition: "background 0.3s ease",
+                    opacity: accountType === AccountType.TRAINEE ? 0.5 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (accountType !== AccountType.TRAINEE) {
+                      e.currentTarget.style.height = "8px";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.height = "6px";
                   }}
                 />
                   {isLock && (
                     <span
                       style={{
-                        marginLeft: 8,
-                        fontSize: 12,
-                        color: "#e5e5e5",
+                        marginLeft: 12,
+                        fontSize: 11,
+                        color: "#b0b0b0",
                         whiteSpace: "nowrap",
+                        padding: "4px 8px",
+                        background: "rgba(255, 255, 255, 0.1)",
+                        borderRadius: "12px",
+                        border: "1px solid rgba(255, 255, 255, 0.2)",
                       }}
                     >
-                      Locked from {formatSecondsToLabel(lockPoint)}
+                      🔒 {formatSecondsToLabel(lockPoint)}
                     </span>
                   )}
                 </>

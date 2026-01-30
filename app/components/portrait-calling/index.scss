@@ -9,9 +9,10 @@
 .time-container {
   display: flex;
   flex-direction: row;
-  gap: 5px;
+  gap: 8px;
   justify-content: center;
   align-items: center;
+  transition: all 0.3s ease;
 }
 
 .video-section {
@@ -232,6 +233,149 @@
   position: absolute;
   height: 100%;
   width: 100%;
+}
+
+// Spinner for video loading
+.spinner-border {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  vertical-align: text-bottom;
+  border: 0.25em solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.2em;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// Video container responsive styles for clip mode
+.video-container-clip {
+  // Base styles for all containers
+  flex: 1;
+  
+  // Single clip mode - takes more space
+  &.video-container-single {
+    // Mobile devices (phones)
+    @media (max-width: 576px) {
+      height: calc(100vh - 100px) !important;
+      min-height: 60vh !important;
+    }
+    
+    // Tablet devices
+    @media (min-width: 577px) and (max-width: 1024px) {
+      height: calc(100vh - 90px) !important;
+      min-height: 65vh !important;
+    }
+    
+    // Desktop devices
+    @media (min-width: 1025px) {
+      height: calc(100vh - 80px) !important;
+      min-height: 70vh !important;
+    }
+    
+    // Maximized single clip
+    &.video-container-maximized {
+      @media (max-width: 576px) {
+        height: calc(100vh - 80px) !important;
+        min-height: 70vh !important;
+      }
+      
+      @media (min-width: 577px) and (max-width: 1024px) {
+        height: calc(100vh - 70px) !important;
+        min-height: 75vh !important;
+      }
+      
+      @media (min-width: 1025px) {
+        height: calc(100vh - 60px) !important;
+        min-height: 80vh !important;
+      }
+    }
+  }
+  
+  // Dual clip mode - splits space
+  &.video-container-dual {
+    // Mobile devices (phones)
+    @media (max-width: 576px) {
+      height: calc(50vh - 30px) !important;
+      min-height: 40vh !important;
+    }
+    
+    // Tablet devices
+    @media (min-width: 577px) and (max-width: 1024px) {
+      height: calc(50vh - 25px) !important;
+      min-height: 42vh !important;
+    }
+    
+    // Desktop devices
+    @media (min-width: 1025px) {
+      height: calc(50vh - 20px) !important;
+      min-height: 45vh !important;
+    }
+    
+    // Maximized dual clip
+    &.video-container-maximized {
+      @media (max-width: 576px) {
+        height: calc(50vh - 15px) !important;
+        min-height: 45vh !important;
+      }
+      
+      @media (min-width: 577px) and (max-width: 1024px) {
+        height: calc(50vh - 12px) !important;
+        min-height: 47vh !important;
+      }
+      
+      @media (min-width: 1025px) {
+        height: calc(50vh - 10px) !important;
+        min-height: 48vh !important;
+      }
+    }
+  }
+  
+  // Landscape orientation adjustments
+  @media (orientation: landscape) and (max-height: 600px) {
+    &.video-container-single {
+      height: calc(100vh - 60px) !important;
+      min-height: 55vh !important;
+      
+      &.video-container-maximized {
+        height: calc(100vh - 50px) !important;
+        min-height: 60vh !important;
+      }
+    }
+    
+    &.video-container-dual {
+      height: calc(50vh - 10px) !important;
+      min-height: 45vh !important;
+      
+      &.video-container-maximized {
+        height: calc(50vh - 8px) !important;
+        min-height: 47vh !important;
+      }
+    }
+  }
 }
 
 // Grace Period Modal
