@@ -78,8 +78,28 @@ export const getScheduledMeetingDetails = async (payload) => {
             return ratingInfo && ratingInfo.sessionRating;
           };
 
-          // Check if the meeting is done, and if so, update its status to completed
-          if (isMeetingCompleted(item) || has24HoursPassedSinceBooking) {
+          // Check if the meeting time has actually passed before marking as completed
+          const isMeetingTimePassed = () => {
+            if (!item.end_time) return false;
+            try {
+              const endTime = new Date(item.end_time);
+              const now = new Date();
+              return endTime < now;
+            } catch (e) {
+              console.warn("Error checking meeting end time:", item._id, e);
+              return false;
+            }
+          };
+
+          // Only mark as completed if:
+          // 1. Meeting has a rating AND the meeting time has passed, OR
+          // 2. 24 hours have passed since booking AND the meeting time has passed
+          // This prevents marking future meetings as completed just because they have ratings
+          const shouldMarkAsCompleted = 
+            (isMeetingCompleted(item) && isMeetingTimePassed()) || 
+            (has24HoursPassedSinceBooking && isMeetingTimePassed());
+
+          if (shouldMarkAsCompleted) {
             item.status = "completed"; // Update the status to completed
           }
         } catch (error) {
@@ -91,15 +111,27 @@ export const getScheduledMeetingDetails = async (payload) => {
     });
 
     // Filter based on the status provided in payload
-    // Note: For "upcoming", we return all confirmed/booked meetings and let the component filter by time
-    // This is because the component has better logic to check if meetings are actually upcoming
     if (payload?.status === "upcoming") {
-      // Return all confirmed/booked meetings - let component filter by actual time
-      filteredData = filteredData.filter(
-        (item) => {
-          return item.status === "booked" || item.status === "confirmed";
+      // For "upcoming", include meetings that are:
+      // 1. Still booked/confirmed (not completed), OR
+      // 2. Have a future start_time (even if marked as completed due to ratings)
+      filteredData = filteredData.filter((item) => {
+        const isBookedOrConfirmed = item.status === "booked" || item.status === "confirmed";
+        
+        // Also include meetings with future start times (even if they have ratings)
+        let isFutureMeeting = false;
+        if (item.start_time) {
+          try {
+            const startTime = new Date(item.start_time);
+            const now = new Date();
+            isFutureMeeting = startTime > now;
+          } catch (e) {
+            console.warn("Error checking start_time for upcoming filter:", item._id, e);
+          }
         }
-      );
+        
+        return isBookedOrConfirmed || isFutureMeeting;
+      });
     } else if (payload?.status === "canceled") {
       filteredData = filteredData.filter((item) => item.status === "canceled");
     } else if (payload?.status === "completed") {

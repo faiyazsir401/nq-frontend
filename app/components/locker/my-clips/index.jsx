@@ -50,6 +50,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   });
   const isMobileScreen= useMediaQuery(600)
   const closeButtonRef = useRef(null);
+  const videoPlayerRef = useRef(null);
   //  const { userInfo } = useAppSelector(authState);
 
   //  
@@ -231,6 +232,11 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const handleNextClip = () => {
     const next = findNextClipPosition();
     if (!next) return;
+    // Pause and reset current video if playing
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.pause();
+      videoPlayerRef.current.currentTime = 0;
+    }
     setCurrentGroupIndex(next.groupIndex);
     setCurrentClipIndex(next.clipIndex);
     setSelectedVideo(Utils?.generateVideoURL(next.clip));
@@ -240,6 +246,11 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const handlePreviousClip = () => {
     const prev = findPreviousClipPosition();
     if (!prev) return;
+    // Pause and reset current video if playing
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.pause();
+      videoPlayerRef.current.currentTime = 0;
+    }
     setCurrentGroupIndex(prev.groupIndex);
     setCurrentClipIndex(prev.clipIndex);
     setSelectedVideo(Utils?.generateVideoURL(prev.clip));
@@ -484,22 +495,38 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(0, 0, 128, 0.8)",
-                      border: "2px solid #000080",
+                      backgroundColor: "#000000",
+                      border: "2px solid #000000",
                       padding: "10px",
                       opacity: !findPreviousClipPosition() ? 0.5 : 1,
                       cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                      transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      if (findPreviousClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "#333333";
+                        e.currentTarget.style.transform = "scale(1.1)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (findPreviousClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "#000000";
+                        e.currentTarget.style.transform = "scale(1)";
+                      }
                     }}
                   >
                     <ChevronLeft size={20} color="#fff" />
                   </button>
 
                   <video
+                    ref={videoPlayerRef}
                     key={selectedVideo}
                     style={videoDimensions}
-                    autoPlay
+                    autoPlay={false}
                     controls
+                    playsInline
+                    preload="metadata"
                     onLoadedData={handleVideoLoad}
                   >
                     <source src={selectedVideo} type="video/mp4" />
@@ -517,12 +544,25 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "rgba(0, 0, 128, 0.8)",
-                      border: "2px solid #000080",
+                      backgroundColor: "#000000",
+                      border: "2px solid #000000",
                       padding: "10px",
                       opacity: !findNextClipPosition() ? 0.5 : 1,
                       cursor: !findNextClipPosition() ? "not-allowed" : "pointer",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)"
+                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                      transition: "all 0.3s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      if (findNextClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "#333333";
+                        e.currentTarget.style.transform = "scale(1.1)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (findNextClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "#000000";
+                        e.currentTarget.style.transform = "scale(1)";
+                      }
                     }}
                   >
                     <ChevronRight size={20} color="#fff" />
@@ -562,21 +602,23 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         }}
                         style={{
                           border: "none",
-                          background: "#dc3545",
+                          background: "#ff0000",
                           color: "#fff",
                           borderRadius: "6px",
-                          padding: "10px 20px",
+                          padding: "12px 20px",
                           display: "flex",
                           alignItems: "center",
+                          justifyContent: "center",
                           gap: "8px",
                           fontSize: "14px",
                           fontWeight: 500,
                           cursor: "pointer",
                           transition: "all 0.3s ease",
-                          flex: "1"
+                          flex: "1",
+                          height: "44px"
                         }}
-                        onMouseEnter={(e) => e.target.style.background = "#c82333"}
-                        onMouseLeave={(e) => e.target.style.background = "#dc3545"}
+                        onMouseEnter={(e) => e.target.style.background = "#cc0000"}
+                        onMouseLeave={(e) => e.target.style.background = "#ff0000"}
                       >
                         <FaTrash size={14} />
                         <span>Delete</span>
@@ -586,21 +628,23 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         download={true}
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          background: "#007bff",
+                          background: "#28a745",
                           color: "#fff",
                           borderRadius: "6px",
-                          padding: "10px 20px",
+                          padding: "12px 20px",
                           display: "flex",
                           alignItems: "center",
+                          justifyContent: "center",
                           gap: "8px",
                           fontSize: "14px",
                           fontWeight: 500,
                           textDecoration: "none",
                           transition: "all 0.3s ease",
-                          flex: "1"
+                          flex: "1",
+                          height: "44px"
                         }}
-                        onMouseEnter={(e) => e.target.style.background = "#0056b3"}
-                        onMouseLeave={(e) => e.target.style.background = "#007bff"}
+                        onMouseEnter={(e) => e.target.style.background = "#218838"}
+                        onMouseLeave={(e) => e.target.style.background = "#28a745"}
                         target="_self"
                       >
                         <FaDownload size={14} />
@@ -618,9 +662,9 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON));
                     }}
                     style={{
-                      border: "none",
-                      background: "#ff6b6b",
-                      color: "#fff",
+                      border: "2px solid #28a745",
+                      background: "#28a745",
+                      color: "#000000",
                       borderRadius: "6px",
                       padding: "12px 24px",
                       display: "flex",
@@ -630,18 +674,20 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       fontWeight: 600,
                       cursor: "pointer",
                       transition: "all 0.3s ease",
-                      boxShadow: "0 2px 8px rgba(251, 0, 0, 0.4)",
+                      boxShadow: "0 2px 8px rgba(40, 167, 69, 0.4)",
                       width: "100%",
                       maxWidth: "400px",
                       justifyContent: "center"
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.background = "#ff5252";
-                      e.target.style.boxShadow = "0 4px 12px rgba(255, 0, 0, 0.6)";
+                      e.currentTarget.style.background = "#218838";
+                      e.currentTarget.style.borderColor = "#218838";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(40, 167, 69, 0.6)";
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.background = "#ff6b6b";
-                      e.target.style.boxShadow = "0 2px 8px rgba(224, 0, 0, 0.4)";
+                      e.currentTarget.style.background = "#28a745";
+                      e.currentTarget.style.borderColor = "#28a745";
+                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(40, 167, 69, 0.4)";
                     }}
                   >
                     <span>Book An Instant Lesson Now!</span>
