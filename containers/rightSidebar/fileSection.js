@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Nav, NavLink, NavItem, TabContent, TabPane, Col, Button, Row } from "reactstrap";
-import { Link, X } from "react-feather";
+import { Link, X, ChevronLeft, ChevronRight } from "react-feather";
+import { FaDownload, FaTrash } from "react-icons/fa";
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 import { useAppDispatch, useAppSelector } from "../../app/store";
@@ -17,6 +18,7 @@ import { authAction, authState } from "../../app/components/auth/auth.slice";
 import { awsS3Url } from "../../utils/constant";
 import { useMediaQuery } from "../../app/hook/useMediaQuery";
 import { Spinner } from "reactstrap";
+import UserInfoCard from "../../app/components/cards/user-card";
 
 const fiveImageGallary = [
   {
@@ -160,13 +162,19 @@ const FileSection = (props) => {
   const [collapse4, setCollapse4] = useState(false);
   const [isOpenPlayVideo, setIsOpen] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState("");
+  const [selectedClip, setSelectedClip] = useState(null);
+  const [currentGroupIndex, setCurrentGroupIndex] = useState(null);
+  const [currentClipIndex, setCurrentClipIndex] = useState(null);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const videoPlayerRef = useRef(null);
+  const closeButtonRef = useRef(null);
   const [traineeClip, setTraineeClips] = useState([]);
   const [accountType, setAccountType] = useState("");
   const [reportsData, setReportsData] = useState([]);
   const [isOpenPDF, setIsOpenPDF] = useState(false);
   const [reportName, setReportName] = useState("");
   const [isOpenReport, setIsOpenReport] = useState(false);
-  const { sidebarLockerActiveTab } = useAppSelector(authState);
+  const { sidebarLockerActiveTab, userInfo } = useAppSelector(authState);
   const [currentReportData, setCurrentReportData] = useState({})
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
   const [screenShots, setScreenShots] = useState([]);
@@ -174,7 +182,13 @@ const FileSection = (props) => {
 
   const width500 = useMediaQuery(500);
 
-  const [videoDimensions, setVideoDimensions] = useState({ width: "470px", height: "587px" });
+  const [videoDimensions, setVideoDimensions] = useState({ 
+    maxWidth: width500 ? "100%" : "600px",
+    width: width500 ? "100%" : "auto",
+    height: width500 ? "70vh" : "75vh",
+    maxHeight: width500 ? "600px" : "800px",
+    minHeight: width500 ? "400px" : "500px",
+  });
 
   useEffect(() => {
     setActiveTab(sidebarLockerActiveTab)
@@ -189,12 +203,104 @@ const FileSection = (props) => {
     const video = event.target;
     const aspectRatio = video.videoWidth / video.videoHeight;
 
-    // Set width and height based on aspect ratio
+    // Set width and height based on aspect ratio and device
     if (aspectRatio > 1) {
-      setVideoDimensions({ width: "100%", height: "70%" });
+      // Landscape video
+      setVideoDimensions({ 
+        width: width500 ? "100%" : "90%", 
+        maxWidth: width500 ? "100%" : "800px",
+        height: width500 ? "65vh" : "70vh",
+        maxHeight: width500 ? "500px" : "700px",
+        minHeight: width500 ? "350px" : "450px"
+      });
     } else {
-      setVideoDimensions({ width: width500 ? "320px" : "470px", height: width500 ? "350px" : "587px" });
+      // Portrait/square video
+      setVideoDimensions({
+        maxWidth: width500 ? "100%" : "600px",
+        width: width500 ? "100%" : "auto",
+        height: width500 ? "75vh" : "80vh",
+        maxHeight: width500 ? "600px" : "800px",
+        minHeight: width500 ? "450px" : "550px"
+      });
     }
+  };
+
+  const findNextClipPosition = () => {
+    if (currentGroupIndex === null || currentClipIndex === null) return null;
+
+    // Check if we're in trainee clips or regular clips
+    const currentClips = activeTab === "trainee" ? traineeClip : clips;
+    if (!currentClips || currentClips.length === 0) return null;
+
+    let g = currentGroupIndex;
+    let c = currentClipIndex + 1;
+
+    while (g < currentClips.length) {
+      const group = currentClips[g];
+      const clipsInGroup = activeTab === "trainee" ? (group?.clips || []).map(clp => clp?.clips) : (group?.clips || []);
+      if (c < clipsInGroup.length) {
+        const clip = clipsInGroup[c];
+        return { groupIndex: g, clipIndex: c, clip: activeTab === "trainee" ? clip : clip };
+      }
+      g += 1;
+      c = 0;
+    }
+    return null;
+  };
+
+  const findPreviousClipPosition = () => {
+    if (currentGroupIndex === null || currentClipIndex === null) return null;
+
+    // Check if we're in trainee clips or regular clips
+    const currentClips = activeTab === "trainee" ? traineeClip : clips;
+    if (!currentClips || currentClips.length === 0) return null;
+
+    let g = currentGroupIndex;
+    let c = currentClipIndex - 1;
+
+    while (g >= 0) {
+      const group = currentClips[g];
+      const clipsInGroup = activeTab === "trainee" ? (group?.clips || []).map(clp => clp?.clips) : (group?.clips || []);
+      if (c >= 0 && c < clipsInGroup.length) {
+        const clip = clipsInGroup[c];
+        return { groupIndex: g, clipIndex: c, clip: activeTab === "trainee" ? clip : clip };
+      }
+      g -= 1;
+      if (g >= 0) {
+        const prevGroup = currentClips[g];
+        const prevClips = activeTab === "trainee" ? (prevGroup?.clips || []).map(clp => clp?.clips) : (prevGroup?.clips || []);
+        c = prevClips.length - 1;
+      }
+    }
+    return null;
+  };
+
+  const handleNextClip = () => {
+    const next = findNextClipPosition();
+    if (!next) return;
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.pause();
+      videoPlayerRef.current.currentTime = 0;
+    }
+    setIsVideoLoading(true);
+    setCurrentGroupIndex(next.groupIndex);
+    setCurrentClipIndex(next.clipIndex);
+    setSelectedVideo(Utils?.generateVideoURL(next.clip));
+    setSelectedClip(next.clip);
+  };
+
+  const handlePreviousClip = () => {
+    const prev = findPreviousClipPosition();
+    if (!prev) return;
+    if (videoPlayerRef.current) {
+      videoPlayerRef.current.pause();
+      videoPlayerRef.current.currentTime = 0;
+    }
+    setIsVideoLoading(true);
+    setCurrentGroupIndex(prev.groupIndex);
+    setCurrentClipIndex(prev.clipIndex);
+    setSelectedVideo(Utils?.generateVideoURL(prev.clip));
+    setSelectedClip(prev.clip);
   };
 
   useEffect(() => {
@@ -235,6 +341,21 @@ const FileSection = (props) => {
 
   return (
     <div className="apps-content" id="files" style={{ padding: "15px 20px" }}>
+      {/* Trainer/User Info Card at the top */}
+      <div style={{ 
+        marginBottom: "20px",
+        display: "flex",
+        justifyContent: "center",
+        width: "100%"
+      }}>
+        <div style={{
+          width: "100%",
+          maxWidth: width500 ? "100%" : "350px"
+        }}>
+          <UserInfoCard />
+        </div>
+      </div>
+
       <div className="theme-title" style={{ marginBottom: "20px" }}>
         <div className="media">
           <div>
@@ -428,19 +549,25 @@ const FileSection = (props) => {
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
                   <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px" }}>
-                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
+                    <div className="row m-0 justify-content-center">
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
-                          className={`col-4`}
+                          className="col-4"
                           style={{ 
                             borderRadius: 8,
                             padding: "8px",
                             cursor: "pointer",
-                            transition: "all 0.3s ease"
+                            transition: "all 0.3s ease",
+                            maxWidth: "33.333%",
+                            flex: "0 0 33.333%"
                           }}
                           onClick={() => {
+                            setIsVideoLoading(false);
                             setSelectedVideo(Utils?.generateVideoURL(clp))
+                            setSelectedClip(clp)
+                            setCurrentGroupIndex(ind)
+                            setCurrentClipIndex(index)
                             setIsOpen(true)
                           }}
                           onMouseEnter={(e) => {
@@ -500,19 +627,27 @@ const FileSection = (props) => {
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
                   <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px" }}>
-                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
+                    <div className="row m-0 justify-content-center">
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
-                          className={`col-4`}
+                          className="col-4"
                           style={{ 
                             borderRadius: 8,
                             padding: "8px",
                             cursor: "pointer",
-                            transition: "all 0.3s ease"
+                            transition: "all 0.3s ease",
+                            maxWidth: "33.333%",
+                            flex: "0 0 33.333%"
                           }}
                           onClick={() => {
+                            setIsVideoLoading(false);
                             setSelectedVideo(Utils?.generateVideoURL(clp?.clips))
+                            setSelectedClip(clp?.clips)
+                            // For trainee clips, we need to find the group index
+                            const groupIndex = traineeClip.findIndex(tc => tc._id?.fullname === cl?._id?.fullname);
+                            setCurrentGroupIndex(groupIndex);
+                            setCurrentClipIndex(index);
                             setIsOpen(true)
                           }}
                           onMouseEnter={(e) => {
@@ -947,29 +1082,283 @@ const FileSection = (props) => {
 
       <Modal
         isOpen={isOpenPlayVideo}
-        // allowFullWidth={true}
         element={
           <>
-            <div className="d-flex flex-column align-items-center p-3 justify-content-center h-100">
+            <div className="d-flex flex-column align-items-center justify-content-center h-100" style={{ padding: "20px", minHeight: "100vh", maxHeight: "100vh", overflow: "auto" }}>
               <div
-                style={{ borderRadius: 5 }}
+                className="position-relative"
+                style={{ 
+                  borderRadius: 8, 
+                  maxWidth: "100%",
+                  width: "100%",
+                  backgroundColor: "#1a1a1a",
+                  padding: "20px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
               >
-                <div className="media-body media-body text-right">
-                  <div
+                {/* Close button */}
+                <div className="media-body text-right" style={{ position: "absolute", top: "10px", right: "10px", zIndex: 10 }}>
+                  <button
+                    ref={closeButtonRef}
+                    type="button"
                     className="icon-btn btn-sm btn-outline-light close-apps pointer"
                     onClick={() => setIsOpen(false)}
+                    aria-label="Close video"
+                    style={{
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                      borderRadius: "50%",
+                      padding: "8px"
+                    }}
                   >
                     <X />
-                  </div>
+                  </button>
                 </div>
-                <video
-                  style={videoDimensions}
-                  autoPlay
-                  controls
-                  onLoadedData={handleVideoLoad}
-                >
-                  <source src={selectedVideo} type="video/mp4" />
-                </video>
+
+                {/* Title at top center */}
+                {selectedClip && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: "20px",
+                      paddingTop: "10px"
+                    }}
+                  >
+                    <h4
+                      style={{
+                        margin: 0,
+                        fontSize: "18px",
+                        fontWeight: 600,
+                        color: "#fff",
+                        textAlign: "center",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        maxWidth: "80%",
+                      }}
+                    >
+                      {selectedClip.title}
+                    </h4>
+                  </div>
+                )}
+
+                {/* Video with navigation buttons */}
+                <div className="d-flex align-items-center justify-content-center" style={{ marginBottom: "20px", position: "relative", width: "100%" }}>
+                  {/* Previous button */}
+                  <button
+                    type="button"
+                    className="icon-btn btn-sm btn-outline-light mr-2"
+                    onClick={handlePreviousClip}
+                    disabled={!findPreviousClipPosition()}
+                    aria-label="Previous clip"
+                    style={{
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid rgba(255, 255, 255, 0.3)",
+                      padding: "12px",
+                      width: "48px",
+                      height: "48px",
+                      opacity: !findPreviousClipPosition() ? 0.4 : 1,
+                      cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+                      transition: "all 0.3s ease",
+                      backdropFilter: "blur(10px)",
+                      zIndex: 10,
+                      flexShrink: 0
+                    }}
+                    onMouseEnter={(e) => {
+                      if (findPreviousClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 1)";
+                        e.currentTarget.style.transform = "scale(1.15)";
+                        e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.5)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (findPreviousClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.4)";
+                      }
+                    }}
+                  >
+                    <ChevronLeft size={24} color="#000" strokeWidth={2.5} />
+                  </button>
+
+                  <div 
+                    style={{ 
+                      position: "relative", 
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      maxWidth: width500 ? "100%" : "90%",
+                      width: width500 ? "100%" : "auto",
+                      minWidth: width500 ? "100%" : "450px",
+                      height: width500 ? "70vh" : "75vh",
+                      minHeight: width500 ? "450px" : "550px",
+                      maxHeight: width500 ? "600px" : "800px",
+                      overflow: "hidden",
+                      borderRadius: "8px",
+                      backgroundColor: "#000",
+                      margin: "0 auto"
+                    }}
+                  >
+                    {/* Show thumbnail/poster first while video loads */}
+                    {isVideoLoading && selectedClip && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#000",
+                          zIndex: 5,
+                          borderRadius: "8px"
+                        }}
+                      >
+                        <img
+                          src={Utils?.generateThumbnailURL(selectedClip)}
+                          alt="Video thumbnail"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            opacity: 0.6,
+                            borderRadius: "8px"
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "12px",
+                            zIndex: 6
+                          }}
+                        >
+                          <div
+                            className="spinner-border text-white"
+                            role="status"
+                            style={{
+                              width: "3rem",
+                              height: "3rem",
+                              borderWidth: "0.3em",
+                              borderColor: "rgba(255, 255, 255, 0.3)",
+                              borderRightColor: "#fff"
+                            }}
+                          >
+                            <span className="sr-only">Loading...</span>
+                          </div>
+                          <div style={{ color: "#fff", fontSize: "14px", fontWeight: 500, textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+                            Loading video...
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <video
+                      ref={videoPlayerRef}
+                      key={selectedVideo}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        objectFit: "contain",
+                        opacity: isVideoLoading ? 0 : 1,
+                        transition: "opacity 0.2s ease",
+                        position: "relative",
+                        zIndex: 1,
+                        display: "block"
+                      }}
+                      autoPlay={false}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      poster={selectedClip ? Utils?.generateThumbnailURL(selectedClip) : undefined}
+                      onLoadedMetadata={(e) => {
+                        handleVideoLoad(e);
+                        setIsVideoLoading(false);
+                      }}
+                      onLoadedData={() => {
+                        setIsVideoLoading(false);
+                      }}
+                      onCanPlay={() => {
+                        setIsVideoLoading(false);
+                      }}
+                      onWaiting={() => {
+                        if (videoPlayerRef.current && !videoPlayerRef.current.paused) {
+                          setIsVideoLoading(true);
+                        }
+                      }}
+                      onPlaying={() => {
+                        setIsVideoLoading(false);
+                      }}
+                      onError={() => {
+                        setIsVideoLoading(false);
+                      }}
+                    >
+                      <source src={selectedVideo} type="video/mp4" />
+                    </video>
+                  </div>
+
+                  {/* Next button */}
+                  <button
+                    type="button"
+                    className="icon-btn btn-sm btn-outline-light ml-2"
+                    onClick={handleNextClip}
+                    disabled={!findNextClipPosition()}
+                    aria-label="Next clip"
+                    style={{
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid rgba(255, 255, 255, 0.3)",
+                      padding: "12px",
+                      width: "48px",
+                      height: "48px",
+                      opacity: !findNextClipPosition() ? 0.4 : 1,
+                      cursor: !findNextClipPosition() ? "not-allowed" : "pointer",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+                      transition: "all 0.3s ease",
+                      backdropFilter: "blur(10px)",
+                      zIndex: 10,
+                      flexShrink: 0
+                    }}
+                    onMouseEnter={(e) => {
+                      if (findNextClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 1)";
+                        e.currentTarget.style.transform = "scale(1.15)";
+                        e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.5)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (findNextClipPosition()) {
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.4)";
+                      }
+                    }}
+                  >
+                    <ChevronRight size={24} color="#000" strokeWidth={2.5} />
+                  </button>
+                </div>
               </div>
             </div>
           </>
