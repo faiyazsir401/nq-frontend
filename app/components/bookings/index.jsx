@@ -71,8 +71,11 @@ const Bookings = ({ accountType = null }) => {
   const { handleActiveTab, handleSidebarTabClose } = bookingsAction;
   const { newBookingData } = useAppSelector(traineeState);
   const { isLoading, configs } = useAppSelector(bookingsState);
-  const { userInfo } = useAppSelector(authState);
+  const { userInfo, accountType: reduxAccountType } = useAppSelector(authState);
   const { trainersList, selectedTrainerInfo } = useAppSelector(trainerState);
+  
+  // Use accountType from props if provided, otherwise use Redux state
+  const currentAccountType = accountType || reduxAccountType;
 
   const [bIndex, setBIndex] = useState(0);
   const [bookedSession, setBookedSession] = useState({
@@ -173,7 +176,7 @@ const Bookings = ({ accountType = null }) => {
     hasInitialFetchRef.current = true;
     
     // Fetch data if no recent cached data exists or tab changed
-    if (accountType === AccountType.TRAINER) {
+    if (currentAccountType === AccountType.TRAINER) {
       if (tabBook) {
         const payload = {
           status: tabBook,
@@ -183,7 +186,7 @@ const Bookings = ({ accountType = null }) => {
     } else {
       dispatch(getScheduledMeetingDetailsAsync());
     }
-  }, [tabBook, accountType, dispatch, scheduledMeetingDetails, lastFetchedTimestamp, cachedTabBook]);
+  }, [tabBook, currentAccountType, dispatch, scheduledMeetingDetails, lastFetchedTimestamp, cachedTabBook]);
 
   // Silent refresh for upcoming sessions when new bookings are created
   // Listen to socket events for booking updates
@@ -193,7 +196,7 @@ const Bookings = ({ accountType = null }) => {
     // Listen for new booking notifications to silently refresh
     const handleBookingUpdate = () => {
       // Silently refresh without showing loading state
-      if (accountType === AccountType.TRAINER) {
+      if (currentAccountType === AccountType.TRAINER) {
         if (tabBook) {
           const payload = {
             status: tabBook,
@@ -232,7 +235,7 @@ const Bookings = ({ accountType = null }) => {
         socket.off(EVENTS.INSTANT_LESSON.ACCEPT, handleBookingUpdate);
       }
     };
-  }, [socket, accountType, tabBook, dispatch]);
+  }, [socket, currentAccountType, tabBook, dispatch]);
 
   useEffect(() => {
     if (bookedSession.id) {
@@ -241,7 +244,7 @@ const Bookings = ({ accountType = null }) => {
         booked_status: bookedSession.booked_status,
       };
       const payload = {
-        ...(accountType === AccountType.TRAINER
+        ...(currentAccountType === AccountType.TRAINER
           ? { status: tabBook, updatePayload }
           : { updatePayload }),
       };
@@ -286,8 +289,8 @@ const Bookings = ({ accountType = null }) => {
       detail.status === BookedSession.completed ||
       (detail &&
         detail.ratings &&
-        detail.ratings[accountType.toLowerCase()] &&
-        detail.ratings[accountType.toLowerCase()].sessionRating)
+        detail.ratings[currentAccountType.toLowerCase()] &&
+        detail.ratings[currentAccountType.toLowerCase()].sessionRating)
     );
   };
 
@@ -320,7 +323,7 @@ const Bookings = ({ accountType = null }) => {
       isMeetingCompleted(scheduledMeetingDetails[booking_index]) ||
       has24HoursPassedSinceBooking;
 
-    switch (accountType) {
+    switch (currentAccountType) {
       case AccountType.TRAINER:
         return TrainerRenderBooking(
           _id,
@@ -943,16 +946,16 @@ const Bookings = ({ accountType = null }) => {
   const showRatingLabel = (ratingInfo) => {
     // for trainee we're showing recommends
     return ratingInfo &&
-      ratingInfo[accountType.toLowerCase()] &&
-      (ratingInfo[accountType.toLowerCase()].sessionRating ||
-        ratingInfo[accountType.toLowerCase()].sessionRating) ? (
+      ratingInfo[currentAccountType.toLowerCase()] &&
+      (ratingInfo[currentAccountType.toLowerCase()].sessionRating ||
+        ratingInfo[currentAccountType.toLowerCase()].sessionRating) ? (
       <div className="d-flex items-center">
         {" "}
         {/* You rated{" "} */}
         You rated this session{" "}
         <b className="pl-2">
-          {ratingInfo[accountType.toLowerCase()].sessionRating ||
-            ratingInfo[accountType.toLowerCase()].sessionRating}
+          {ratingInfo[currentAccountType.toLowerCase()].sessionRating ||
+            ratingInfo[currentAccountType.toLowerCase()].sessionRating}
         </b>
         <Star color="#FFC436" size={28} className="star-container star-svg" />{" "}
         stars
@@ -1041,9 +1044,9 @@ const Bookings = ({ accountType = null }) => {
       <ReactStrapModal
         allowFullWidth={true}
         element={
-          accountType === AccountType.TRAINEE?
+          currentAccountType === AccountType.TRAINEE?
           <TraineeRatings
-            accountType={accountType}
+            accountType={currentAccountType}
             booking_id={addRatingModel._id}
             key={addRatingModel._id}
             trainer={trainer_info}
@@ -1058,7 +1061,7 @@ const Bookings = ({ accountType = null }) => {
           />
           :
           <Ratings
-            accountType={accountType}
+            accountType={currentAccountType}
             booking_id={addRatingModel._id}
             key={addRatingModel._id}
             onClose={() => {
@@ -1081,7 +1084,7 @@ const Bookings = ({ accountType = null }) => {
   const renderVideoCall = (time) => (
     <StartMeeting
       id={startMeeting.id}
-      accountType={accountType}
+      accountType={currentAccountType}
       traineeInfo={startMeeting.traineeInfo}
       trainerInfo={startMeeting.trainerInfo}
       session_end_time={scheduledMeetingDetails[bIndex]?.session_end_time}
@@ -1357,9 +1360,9 @@ const Bookings = ({ accountType = null }) => {
         >
           {addRatingModel.isOpen ? renderRating(startMeeting.trainerInfo) : null}
           <div>
-            {accountType === AccountType.TRAINER ? (
+            {currentAccountType === AccountType.TRAINER ? (
               <React.Fragment>
-                {/* Trainer Profile Card at the top */}
+                {/* Trainer Profile Card at the top - Only for Trainers */}
                 <div style={{ 
                   marginBottom: "25px",
                   display: "flex",
@@ -1374,7 +1377,7 @@ const Bookings = ({ accountType = null }) => {
                   </div>
                 </div>
 
-                {/* Recent Students Component */}
+                {/* Recent Students Component - Only for Trainers */}
                 <div style={{ marginBottom: "25px" }}>
                   <RecentUsers />
                 </div>
@@ -1397,7 +1400,7 @@ const Bookings = ({ accountType = null }) => {
               </React.Fragment>
             ) : null}
           </div>
-          {accountType === AccountType.TRAINEE && (
+          {currentAccountType === AccountType.TRAINEE && (
             <React.Fragment>
               <h3 className="mt-2 p-3 mb-2 bg-primary text-white rounded">
                 Bookings
