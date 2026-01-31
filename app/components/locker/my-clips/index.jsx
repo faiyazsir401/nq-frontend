@@ -24,6 +24,7 @@ import { masterState } from "../../master/master.slice";
 import { MY_CLIPS_LABEL_LIMIT } from "../../../../utils/constant";
 import { AccountType, topNavbarOptions } from "../../../common/constants";
 import { authAction } from "../../auth/auth.slice";
+import UserInfoCard from "../../cards/user-card";
 
 const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const dispatch = useAppDispatch();
@@ -316,6 +317,21 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
 
   return (
     <>
+      {/* Trainer/User Info Card at the top */}
+      <div style={{ 
+        marginBottom: "20px",
+        display: "flex",
+        justifyContent: "center",
+        width: "100%"
+      }}>
+        <div style={{
+          width: "100%",
+          maxWidth: width500 ? "100%" : "350px"
+        }}>
+          <UserInfoCard />
+        </div>
+      </div>
+
       <div className="media-gallery portfolio-section grid-portfolio">
         <div style={{ marginBottom: "15px", textAlign: "center" }}>
           <h2 style={{ fontSize: "20px", fontWeight: 600, marginBottom: "4px" }}>
