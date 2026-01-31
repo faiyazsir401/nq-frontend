@@ -21,7 +21,6 @@ import { Spinner } from "reactstrap";
 import { deleteClip } from "./fileSection.api";
 import { toast } from "react-toastify";
 import ConfirmModal from "../../app/components/locker/my-clips/confirmModal";
-import { AccountType, topNavbarOptions } from "../../app/common/constants";
 
 const fiveImageGallary = [
   {
