@@ -183,7 +183,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   };
 
   const openClipInModal = (groupIdx, clipIdx, clip) => {
-    setIsVideoLoading(true);
+    setIsVideoLoading(false); // Don't show loading initially, let poster show
     setCurrentGroupIndex(groupIdx);
     setCurrentClipIndex(clipIdx);
     setSelectedVideo(Utils?.generateVideoURL(clip));
@@ -239,6 +239,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
       videoPlayerRef.current.pause();
       videoPlayerRef.current.currentTime = 0;
     }
+    // Show loading state to display thumbnail
     setIsVideoLoading(true);
     setCurrentGroupIndex(next.groupIndex);
     setCurrentClipIndex(next.clipIndex);
@@ -254,6 +255,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
       videoPlayerRef.current.pause();
       videoPlayerRef.current.currentTime = 0;
     }
+    // Show loading state to display thumbnail
     setIsVideoLoading(true);
     setCurrentGroupIndex(prev.groupIndex);
     setCurrentClipIndex(prev.clipIndex);
@@ -486,7 +488,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                 )}
 
                 {/* Video with navigation buttons */}
-                <div className="d-flex align-items-center justify-content-center" style={{ marginBottom: "20px", position: "relative" }}>
+                <div className="d-flex align-items-center justify-content-center" style={{ marginBottom: "20px", position: "relative", width: "100%" }}>
                   {/* Previous button */}
                   <button
                     type="button"
@@ -509,7 +511,8 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
                       transition: "all 0.3s ease",
                       backdropFilter: "blur(10px)",
-                      zIndex: 10
+                      zIndex: 10,
+                      flexShrink: 0
                     }}
                     onMouseEnter={(e) => {
                       if (findPreviousClipPosition()) {
@@ -529,7 +532,20 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                     <ChevronLeft size={24} color="#000" strokeWidth={2.5} />
                   </button>
 
-                  <div style={{ position: "relative", display: "inline-block", ...videoDimensions }}>
+                  <div 
+                    style={{ 
+                      position: "relative", 
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      maxWidth: width500 ? "320px" : "470px",
+                      maxHeight: width500 ? "350px" : "587px",
+                      width: "100%",
+                      overflow: "hidden",
+                      borderRadius: "8px",
+                      backgroundColor: "#000"
+                    }}
+                  >
                     {/* Show thumbnail/poster first while video loads */}
                     {isVideoLoading && selectedClip && (
                       <div
@@ -544,9 +560,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                           justifyContent: "center",
                           backgroundColor: "#000",
                           zIndex: 5,
-                          borderRadius: "8px",
-                          minWidth: videoDimensions.maxWidth || videoDimensions.width || "470px",
-                          minHeight: videoDimensions.height || "587px"
+                          borderRadius: "8px"
                         }}
                       >
                         <img
@@ -596,40 +610,47 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       ref={videoPlayerRef}
                       key={selectedVideo}
                       style={{
-                        ...videoDimensions,
+                        width: "100%",
+                        height: "100%",
+                        maxWidth: "100%",
+                        maxHeight: "100%",
+                        objectFit: "contain",
                         opacity: isVideoLoading ? 0 : 1,
-                        transition: "opacity 0.3s ease",
+                        transition: "opacity 0.2s ease",
                         position: "relative",
-                        zIndex: 1
+                        zIndex: 1,
+                        display: "block"
                       }}
                       autoPlay={false}
                       controls
                       playsInline
-                      preload="none"
+                      preload="metadata"
                       poster={selectedClip ? Utils?.generateThumbnailURL(selectedClip) : undefined}
                       onLoadedMetadata={(e) => {
                         handleVideoLoad(e);
-                        // Video metadata loaded, but still loading actual video data
+                        // Metadata loaded - video poster/thumbnail is ready
                         setIsVideoLoading(false);
                       }}
-                      onLoadedData={(e) => {
-                        handleVideoLoad(e);
+                      onLoadedData={() => {
+                        // Video data loaded - ready to play
                         setIsVideoLoading(false);
                       }}
                       onCanPlay={() => {
-                        setIsVideoLoading(false);
-                      }}
-                      onCanPlayThrough={() => {
+                        // Video can start playing
                         setIsVideoLoading(false);
                       }}
                       onWaiting={() => {
-                        setIsVideoLoading(true);
+                        // Only show loading spinner if video is actually playing and buffering
+                        if (videoPlayerRef.current && !videoPlayerRef.current.paused) {
+                          setIsVideoLoading(true);
+                        }
+                      }}
+                      onPlaying={() => {
+                        // Video started playing - hide loading
+                        setIsVideoLoading(false);
                       }}
                       onError={() => {
                         setIsVideoLoading(false);
-                      }}
-                      onLoadStart={() => {
-                        setIsVideoLoading(true);
                       }}
                     >
                       <source src={selectedVideo} type="video/mp4" />
@@ -658,7 +679,8 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
                       transition: "all 0.3s ease",
                       backdropFilter: "blur(10px)",
-                      zIndex: 10
+                      zIndex: 10,
+                      flexShrink: 0
                     }}
                     onMouseEnter={(e) => {
                       if (findNextClipPosition()) {
