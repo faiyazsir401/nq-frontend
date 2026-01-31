@@ -147,7 +147,16 @@ const NotificationSection = (props) => {
               notifications.map((notification) => {
                 return (
                   <li key={notification?._id}>
-                    <div className="chat-box notification">
+                    <div className="chat-box notification" style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'flex-start',
+                      gap: '12px',
+                      padding: '12px 15px',
+                      position: 'relative',
+                      width: '100%',
+                      boxSizing: 'border-box'
+                    }}>
                       <div className="profile" style={{ 
                         position: 'relative',
                         width: '50px',
@@ -169,12 +178,51 @@ const NotificationSection = (props) => {
                           }}
                         />
                       </div>
-                      <div className="details"><span>{notification?.sender?.name}</span>
-                        <h5>{notification?.title}</h5>
-                        <p>{notification?.description}</p>
+                      <div className="details" style={{
+                        flex: 1,
+                        minWidth: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                        paddingRight: '60px'
+                      }}>
+                        <span style={{
+                          fontSize: '14px',
+                          fontWeight: 600,
+                          color: '#333',
+                          marginBottom: '2px'
+                        }}>{notification?.sender?.name}</span>
+                        <h5 style={{
+                          margin: 0,
+                          fontSize: '15px',
+                          fontWeight: 600,
+                          color: '#1a1a1a',
+                          lineHeight: '1.4',
+                          marginBottom: '4px'
+                        }}>{notification?.title}</h5>
+                        <p style={{
+                          margin: 0,
+                          fontSize: '13px',
+                          color: '#666',
+                          lineHeight: '1.5',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word'
+                        }}>{notification?.description}</p>
                       </div>
-                      <div className="date-status">
-                        <h6>{Utils.formatTimeAgo(notification?.createdAt)}</h6>
+                      <div className="date-status" style={{
+                        position: 'absolute',
+                        top: '12px',
+                        right: '15px',
+                        flexShrink: 0,
+                        textAlign: 'right'
+                      }}>
+                        <h6 style={{
+                          margin: 0,
+                          fontSize: '11px',
+                          fontWeight: 500,
+                          color: '#999',
+                          whiteSpace: 'nowrap'
+                        }}>{Utils.formatTimeAgo(notification?.createdAt)}</h6>
                       </div>
                     </div>
                   </li>

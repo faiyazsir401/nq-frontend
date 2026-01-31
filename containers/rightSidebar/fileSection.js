@@ -561,19 +561,20 @@ const FileSection = (props) => {
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
                   <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px", marginBottom: "15px" }}>
-                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
+                    <div className="row m-0" style={{ display: "flex", flexWrap: "wrap", margin: "0 -4px" }}>
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
                           className="col-4"
                           style={{ 
                             borderRadius: 8,
-                            padding: "8px",
+                            padding: "4px",
                             cursor: "pointer",
                             transition: "all 0.3s ease",
-                            maxWidth: "33.333%",
+                            width: "33.333%",
                             flex: "0 0 33.333%",
-                            marginBottom: "8px"
+                            maxWidth: "33.333%",
+                            boxSizing: "border-box"
                           }}
                           onClick={() => {
                             setIsVideoLoading(false);
@@ -640,19 +641,20 @@ const FileSection = (props) => {
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
                   <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px", marginBottom: "15px" }}>
-                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
+                    <div className="row m-0" style={{ display: "flex", flexWrap: "wrap", margin: "0 -4px" }}>
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
                           className="col-4"
                           style={{ 
                             borderRadius: 8,
-                            padding: "8px",
+                            padding: "4px",
                             cursor: "pointer",
                             transition: "all 0.3s ease",
-                            maxWidth: "33.333%",
+                            width: "33.333%",
                             flex: "0 0 33.333%",
-                            marginBottom: "8px"
+                            maxWidth: "33.333%",
+                            boxSizing: "border-box"
                           }}
                           onClick={() => {
                             setIsVideoLoading(false);
