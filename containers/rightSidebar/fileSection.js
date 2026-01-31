@@ -428,98 +428,104 @@ const FileSection = (props) => {
       <VideoUpload />
       <div className="theme-tab" style={{ marginTop: "20px", marginBottom: "20px" }}>
         <Nav tabs style={{ borderBottom: "2px solid #e0e0e0" }}>
-          <div className="row mb-2" style={{ width: '100%', alignItems: 'center', margin: "0px" }}>
-            <div className="col" style={{ padding: "5px 5px", marginTop: "5px" }}>
-              <NavItem className="ml-5px">
+          <div className="row" style={{ width: '100%', alignItems: 'center', margin: "0px", gap: "8px" }}>
+            <div className="col" style={{ padding: "0px 4px", flex: "1 1 0" }}>
+              <NavItem>
                 <NavLink
                   className={`button-effect ${activeTab === "media" ? "active" : ""}`}
                   onClick={() => setActiveTab("media")}
                   style={{ 
                     width: '100%',
                     textAlign: 'center',
-                    padding: '10px 15px',
+                    padding: '12px 16px',
                     borderRadius: '6px 6px 0 0',
                     backgroundColor: activeTab === "media" ? '#007bff' : 'transparent',
                     color: activeTab === "media" ? '#ffffff' : '#666',
                     fontWeight: activeTab === "media" ? '600' : '500',
                     borderBottom: activeTab === "media" ? '3px solid #007bff' : '3px solid transparent',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    margin: "0 2px"
                   }}
                 >
                   My Clips
                 </NavLink>
               </NavItem>
             </div>
-            <div className="col text-right" style={{ padding: "0px 5px", marginTop: "10px" }}>
-              <NavItem className="ml-5px">
+            <div className="col" style={{ padding: "0px 4px", flex: "1 1 0" }}>
+              <NavItem>
                 <NavLink
                   className={`button-effect ${activeTab === "report" ? "active" : ""}`}
                   onClick={() => setActiveTab("report")}
                   style={{ 
                     width: '100%',
                     textAlign: 'center',
-                    padding: '10px 15px',
+                    padding: '12px 16px',
                     borderRadius: '6px 6px 0 0',
                     backgroundColor: activeTab === "report" ? '#007bff' : 'transparent',
                     color: activeTab === "report" ? '#ffffff' : '#666',
                     fontWeight: activeTab === "report" ? '600' : '500',
                     borderBottom: activeTab === "report" ? '3px solid #007bff' : '3px solid transparent',
-                    transition: 'all 0.3s ease'
+                    transition: 'all 0.3s ease',
+                    margin: "0 2px"
                   }}
                 >
                   Reports
                 </NavLink>
               </NavItem>
             </div>
-          </div>
-          <div className="row" style={{ width: '100%', alignItems: 'center', margin: "0px" }}>
-            <div className="col" style={{ padding: "0px 5px", marginTop: "10px" }}>
-              {accountType === "Trainer" && <NavItem className="ml-5px">
-                <NavLink
-                  className={`button-effect ${activeTab === "trainee" ? "active" : ""}`}
-                  onClick={() => setActiveTab("trainee")}
-                  style={{ 
-                    width: '100%',
-                    textAlign: 'center',
-                    padding: '10px 15px',
-                    borderRadius: '6px 6px 0 0',
-                    backgroundColor: activeTab === "trainee" ? '#007bff' : 'transparent',
-                    color: activeTab === "trainee" ? '#ffffff' : '#666',
-                    fontWeight: activeTab === "trainee" ? '600' : '500',
-                    borderBottom: activeTab === "trainee" ? '3px solid #007bff' : '3px solid transparent',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  Enthusiast
-                </NavLink>
-              </NavItem>}
-            </div>
-            <div className="col text-right" style={{ padding: "0px 5px", marginTop: "10px" }}>
-              {accountType === "Trainer" && <NavItem className="ml-5px">
-                <NavLink
-                  className={`button-effect ${activeTab === "docs" ? "active" : ""}`}
-                  onClick={() => setActiveTab("docs")}
-                  style={{ 
-                    width: '100%',
-                    textAlign: 'center',
-                    padding: '10px 15px',
-                    borderRadius: '6px 6px 0 0',
-                    backgroundColor: activeTab === "docs" ? '#007bff' : 'transparent',
-                    color: activeTab === "docs" ? '#ffffff' : '#666',
-                    fontWeight: activeTab === "docs" ? '600' : '500',
-                    borderBottom: activeTab === "docs" ? '3px solid #007bff' : '3px solid transparent',
-                    transition: 'all 0.3s ease'
-                  }}
-                >
-                  NetQwix
-                </NavLink>
-              </NavItem>}
-            </div>
+            {accountType === "Trainer" && (
+              <>
+                <div className="col" style={{ padding: "0px 4px", flex: "1 1 0" }}>
+                  <NavItem>
+                    <NavLink
+                      className={`button-effect ${activeTab === "trainee" ? "active" : ""}`}
+                      onClick={() => setActiveTab("trainee")}
+                      style={{ 
+                        width: '100%',
+                        textAlign: 'center',
+                        padding: '12px 16px',
+                        borderRadius: '6px 6px 0 0',
+                        backgroundColor: activeTab === "trainee" ? '#007bff' : 'transparent',
+                        color: activeTab === "trainee" ? '#ffffff' : '#666',
+                        fontWeight: activeTab === "trainee" ? '600' : '500',
+                        borderBottom: activeTab === "trainee" ? '3px solid #007bff' : '3px solid transparent',
+                        transition: 'all 0.3s ease',
+                        margin: "0 2px"
+                      }}
+                    >
+                      Enthusiast
+                    </NavLink>
+                  </NavItem>
+                </div>
+                <div className="col" style={{ padding: "0px 4px", flex: "1 1 0" }}>
+                  <NavItem>
+                    <NavLink
+                      className={`button-effect ${activeTab === "docs" ? "active" : ""}`}
+                      onClick={() => setActiveTab("docs")}
+                      style={{ 
+                        width: '100%',
+                        textAlign: 'center',
+                        padding: '12px 16px',
+                        borderRadius: '6px 6px 0 0',
+                        backgroundColor: activeTab === "docs" ? '#007bff' : 'transparent',
+                        color: activeTab === "docs" ? '#ffffff' : '#666',
+                        fontWeight: activeTab === "docs" ? '600' : '500',
+                        borderBottom: activeTab === "docs" ? '3px solid #007bff' : '3px solid transparent',
+                        transition: 'all 0.3s ease',
+                        margin: "0 2px"
+                      }}
+                    >
+                      NetQwix
+                    </NavLink>
+                  </NavItem>
+                </div>
+              </>
+            )}
           </div>
         </Nav>
       </div>
-      <div className="file-tab" style={{ paddingTop: "10px" }}>
-        <TabContent activeTab={activeTab} className="custom-scroll" style={{ minHeight: "400px" }}>
+      <div className="file-tab" style={{ paddingTop: "10px", paddingBottom: "20px" }}>
+        <TabContent activeTab={activeTab} className="custom-scroll" style={{ minHeight: "400px", paddingBottom: "20px" }}>
           <TabPane tabId="media">
             {isLoading ? (
               <div style={{
@@ -554,8 +560,8 @@ const FileSection = (props) => {
                     <label className="badge badge-primary sm ml-2">{cl?.clips?.length}</label>
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
-                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px" }}>
-                    <div className="row m-0 justify-content-center">
+                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px", marginBottom: "15px" }}>
+                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
@@ -566,7 +572,8 @@ const FileSection = (props) => {
                             cursor: "pointer",
                             transition: "all 0.3s ease",
                             maxWidth: "33.333%",
-                            flex: "0 0 33.333%"
+                            flex: "0 0 33.333%",
+                            marginBottom: "8px"
                           }}
                           onClick={() => {
                             setIsVideoLoading(false);
@@ -632,8 +639,8 @@ const FileSection = (props) => {
                     <label className="badge badge-primary sm ml-2">{cl?.clips?.length}</label>
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
-                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px" }}>
-                    <div className="row m-0 justify-content-center">
+                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px", marginBottom: "15px" }}>
+                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
@@ -644,7 +651,8 @@ const FileSection = (props) => {
                             cursor: "pointer",
                             transition: "all 0.3s ease",
                             maxWidth: "33.333%",
-                            flex: "0 0 33.333%"
+                            flex: "0 0 33.333%",
+                            marginBottom: "8px"
                           }}
                           onClick={() => {
                             setIsVideoLoading(false);
@@ -1378,77 +1386,75 @@ const FileSection = (props) => {
                     borderTop: "1px solid rgba(255,255,255,0.1)"
                   }}
                 >
-                  {/* Delete and Download buttons - only for user's own clips */}
-                  {selectedClip?.user_id === userInfo?._id && (
-                    <div
+                  {/* Delete and Download buttons - shown for all users (students and trainers) */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "12px",
+                      width: "100%",
+                      maxWidth: "400px"
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsConfirmModalOpen(true);
+                        setSelectedId(selectedClip?._id);
+                      }}
                       style={{
+                        border: "none",
+                        background: "#ff0000",
+                        color: "#fff",
+                        borderRadius: "6px",
+                        padding: "12px 20px",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        gap: "12px",
-                        width: "100%",
-                        maxWidth: "400px"
+                        gap: "8px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                        flex: "1",
+                        height: "44px"
                       }}
+                      onMouseEnter={(e) => e.target.style.background = "#cc0000"}
+                      onMouseLeave={(e) => e.target.style.background = "#ff0000"}
                     >
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsConfirmModalOpen(true);
-                          setSelectedId(selectedClip?._id);
-                        }}
-                        style={{
-                          border: "none",
-                          background: "#ff0000",
-                          color: "#fff",
-                          borderRadius: "6px",
-                          padding: "12px 20px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "8px",
-                          fontSize: "14px",
-                          fontWeight: 500,
-                          cursor: "pointer",
-                          transition: "all 0.3s ease",
-                          flex: "1",
-                          height: "44px"
-                        }}
-                        onMouseEnter={(e) => e.target.style.background = "#cc0000"}
-                        onMouseLeave={(e) => e.target.style.background = "#ff0000"}
-                      >
-                        <FaTrash size={14} />
-                        <span>Delete</span>
-                      </button>
-                      <a
-                        href={Utils?.generateVideoURL(selectedClip)}
-                        download={true}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          background: "#007bff",
-                          color: "#fff",
-                          borderRadius: "6px",
-                          padding: "12px 20px",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: "8px",
-                          fontSize: "14px",
-                          fontWeight: 500,
-                          textDecoration: "none",
-                          transition: "all 0.3s ease",
-                          flex: "1",
-                          height: "44px"
-                        }}
-                        onMouseEnter={(e) => e.target.style.background = "#0056b3"}
-                        onMouseLeave={(e) => e.target.style.background = "#007bff"}
-                        target="_self"
-                      >
-                        <FaDownload size={14} />
-                        <span>Download</span>
-                      </a>
-                    </div>
-                  )}
+                      <FaTrash size={14} />
+                      <span>Delete</span>
+                    </button>
+                    <a
+                      href={Utils?.generateVideoURL(selectedClip)}
+                      download={true}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        background: "#007bff",
+                        color: "#fff",
+                        borderRadius: "6px",
+                        padding: "12px 20px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        textDecoration: "none",
+                        transition: "all 0.3s ease",
+                        flex: "1",
+                        height: "44px"
+                      }}
+                      onMouseEnter={(e) => e.target.style.background = "#0056b3"}
+                      onMouseLeave={(e) => e.target.style.background = "#007bff"}
+                      target="_self"
+                    >
+                      <FaDownload size={14} />
+                      <span>Download</span>
+                    </a>
+                  </div>
                   
                   {/* Book An Instant Lesson Now button - only for trainees (not trainers) */}
                   {accountType !== "Trainer" && (
