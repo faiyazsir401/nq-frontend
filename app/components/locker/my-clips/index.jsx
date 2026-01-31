@@ -51,6 +51,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const isMobileScreen= useMediaQuery(600)
   const closeButtonRef = useRef(null);
   const videoPlayerRef = useRef(null);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
   //  const { userInfo } = useAppSelector(authState);
 
   //  
@@ -182,6 +183,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   };
 
   const openClipInModal = (groupIdx, clipIdx, clip) => {
+    setIsVideoLoading(true);
     setCurrentGroupIndex(groupIdx);
     setCurrentClipIndex(clipIdx);
     setSelectedVideo(Utils?.generateVideoURL(clip));
@@ -237,6 +239,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
       videoPlayerRef.current.pause();
       videoPlayerRef.current.currentTime = 0;
     }
+    setIsVideoLoading(true);
     setCurrentGroupIndex(next.groupIndex);
     setCurrentClipIndex(next.clipIndex);
     setSelectedVideo(Utils?.generateVideoURL(next.clip));
@@ -251,6 +254,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
       videoPlayerRef.current.pause();
       videoPlayerRef.current.currentTime = 0;
     }
+    setIsVideoLoading(true);
     setCurrentGroupIndex(prev.groupIndex);
     setCurrentClipIndex(prev.clipIndex);
     setSelectedVideo(Utils?.generateVideoURL(prev.clip));
@@ -482,7 +486,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                 )}
 
                 {/* Video with navigation buttons */}
-                <div className="d-flex align-items-center justify-content-center" style={{ marginBottom: "20px" }}>
+                <div className="d-flex align-items-center justify-content-center" style={{ marginBottom: "20px", position: "relative" }}>
                   {/* Previous button */}
                   <button
                     type="button"
@@ -495,42 +499,142 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "#000000",
-                      border: "2px solid #000000",
-                      padding: "10px",
-                      opacity: !findPreviousClipPosition() ? 0.5 : 1,
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid rgba(255, 255, 255, 0.3)",
+                      padding: "12px",
+                      width: "48px",
+                      height: "48px",
+                      opacity: !findPreviousClipPosition() ? 0.4 : 1,
                       cursor: !findPreviousClipPosition() ? "not-allowed" : "pointer",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
-                      transition: "all 0.3s ease"
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+                      transition: "all 0.3s ease",
+                      backdropFilter: "blur(10px)",
+                      zIndex: 10
                     }}
                     onMouseEnter={(e) => {
                       if (findPreviousClipPosition()) {
-                        e.currentTarget.style.backgroundColor = "#333333";
-                        e.currentTarget.style.transform = "scale(1.1)";
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 1)";
+                        e.currentTarget.style.transform = "scale(1.15)";
+                        e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.5)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (findPreviousClipPosition()) {
-                        e.currentTarget.style.backgroundColor = "#000000";
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
                         e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.4)";
                       }
                     }}
                   >
-                    <ChevronLeft size={20} color="#fff" />
+                    <ChevronLeft size={24} color="#000" strokeWidth={2.5} />
                   </button>
 
-                  <video
-                    ref={videoPlayerRef}
-                    key={selectedVideo}
-                    style={videoDimensions}
-                    autoPlay={false}
-                    controls
-                    playsInline
-                    preload="metadata"
-                    onLoadedData={handleVideoLoad}
-                  >
-                    <source src={selectedVideo} type="video/mp4" />
-                  </video>
+                  <div style={{ position: "relative", display: "inline-block", ...videoDimensions }}>
+                    {/* Show thumbnail/poster first while video loads */}
+                    {isVideoLoading && selectedClip && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#000",
+                          zIndex: 5,
+                          borderRadius: "8px",
+                          minWidth: videoDimensions.maxWidth || videoDimensions.width || "470px",
+                          minHeight: videoDimensions.height || "587px"
+                        }}
+                      >
+                        <img
+                          src={Utils?.generateThumbnailURL(selectedClip)}
+                          alt="Video thumbnail"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            opacity: 0.6,
+                            borderRadius: "8px"
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: "12px",
+                            zIndex: 6
+                          }}
+                        >
+                          <div
+                            className="spinner-border text-white"
+                            role="status"
+                            style={{
+                              width: "3rem",
+                              height: "3rem",
+                              borderWidth: "0.3em",
+                              borderColor: "rgba(255, 255, 255, 0.3)",
+                              borderRightColor: "#fff"
+                            }}
+                          >
+                            <span className="sr-only">Loading...</span>
+                          </div>
+                          <div style={{ color: "#fff", fontSize: "14px", fontWeight: 500, textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}>
+                            Loading video...
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <video
+                      ref={videoPlayerRef}
+                      key={selectedVideo}
+                      style={{
+                        ...videoDimensions,
+                        opacity: isVideoLoading ? 0 : 1,
+                        transition: "opacity 0.3s ease",
+                        position: "relative",
+                        zIndex: 1
+                      }}
+                      autoPlay={false}
+                      controls
+                      playsInline
+                      preload="none"
+                      poster={selectedClip ? Utils?.generateThumbnailURL(selectedClip) : undefined}
+                      onLoadedMetadata={(e) => {
+                        handleVideoLoad(e);
+                        // Video metadata loaded, but still loading actual video data
+                        setIsVideoLoading(false);
+                      }}
+                      onLoadedData={(e) => {
+                        handleVideoLoad(e);
+                        setIsVideoLoading(false);
+                      }}
+                      onCanPlay={() => {
+                        setIsVideoLoading(false);
+                      }}
+                      onCanPlayThrough={() => {
+                        setIsVideoLoading(false);
+                      }}
+                      onWaiting={() => {
+                        setIsVideoLoading(true);
+                      }}
+                      onError={() => {
+                        setIsVideoLoading(false);
+                      }}
+                      onLoadStart={() => {
+                        setIsVideoLoading(true);
+                      }}
+                    >
+                      <source src={selectedVideo} type="video/mp4" />
+                    </video>
+                  </div>
 
                   {/* Next button */}
                   <button
@@ -544,28 +648,34 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      backgroundColor: "#000000",
-                      border: "2px solid #000000",
-                      padding: "10px",
-                      opacity: !findNextClipPosition() ? 0.5 : 1,
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      border: "2px solid rgba(255, 255, 255, 0.3)",
+                      padding: "12px",
+                      width: "48px",
+                      height: "48px",
+                      opacity: !findNextClipPosition() ? 0.4 : 1,
                       cursor: !findNextClipPosition() ? "not-allowed" : "pointer",
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
-                      transition: "all 0.3s ease"
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+                      transition: "all 0.3s ease",
+                      backdropFilter: "blur(10px)",
+                      zIndex: 10
                     }}
                     onMouseEnter={(e) => {
                       if (findNextClipPosition()) {
-                        e.currentTarget.style.backgroundColor = "#333333";
-                        e.currentTarget.style.transform = "scale(1.1)";
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 1)";
+                        e.currentTarget.style.transform = "scale(1.15)";
+                        e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 0, 0.5)";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (findNextClipPosition()) {
-                        e.currentTarget.style.backgroundColor = "#000000";
+                        e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.9)";
                         e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.4)";
                       }
                     }}
                   >
-                    <ChevronRight size={20} color="#fff" />
+                    <ChevronRight size={24} color="#000" strokeWidth={2.5} />
                   </button>
                 </div>
 
@@ -628,7 +738,7 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                         download={true}
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                          background: "#28a745",
+                          background: "#007bff",
                           color: "#fff",
                           borderRadius: "6px",
                           padding: "12px 20px",
@@ -643,8 +753,8 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                           flex: "1",
                           height: "44px"
                         }}
-                        onMouseEnter={(e) => e.target.style.background = "#218838"}
-                        onMouseLeave={(e) => e.target.style.background = "#28a745"}
+                        onMouseEnter={(e) => e.target.style.background = "#0056b3"}
+                        onMouseLeave={(e) => e.target.style.background = "#007bff"}
                         target="_self"
                       >
                         <FaDownload size={14} />
