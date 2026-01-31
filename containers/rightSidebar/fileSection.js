@@ -234,49 +234,111 @@ const FileSection = (props) => {
   useEffect(() => { setActiveTab("media") }, [])
 
   return (
-    <div className="apps-content" id="files">
-      <div className="theme-title">
+    <div className="apps-content" id="files" style={{ padding: "15px 20px" }}>
+      <div className="theme-title" style={{ marginBottom: "20px" }}>
         <div className="media">
           <div>
-            <h2>Locker</h2>
+            <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "600", color: "#333" }}>Locker</h2>
             {/* <h4>Shared Media</h4> */}
           </div>
           <div className="media-body media-body text-right">
             <div
               className="icon-btn btn-sm btn-outline-light close-apps pointer"
               onClick={() => { dispatch(authAction?.setActiveModalTab(null)); dispatch(authAction?.setActiveLockerTab(null)); props.smallSideBarToggle() }}
+              style={{
+                padding: "8px",
+                borderRadius: "50%",
+                backgroundColor: "rgba(0, 0, 0, 0.05)",
+                transition: "all 0.3s ease"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.1)";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.05)";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
             >
               <X />
             </div>
           </div>
         </div>
       </div>
-      <Button className="button-effect mb-3" style={{ width: "100%", justifyContent: 'center' }} color="primary" onClick={() => dispatch(videouploadAction.setIsOpen(true))} >
+      <Button 
+        className="button-effect mb-3" 
+        style={{ 
+          width: "100%", 
+          justifyContent: 'center',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '12px 20px',
+          fontSize: '16px',
+          fontWeight: '600',
+          backgroundColor: '#007bff',
+          borderColor: '#007bff',
+          color: '#ffffff',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(0, 123, 255, 0.3)',
+          transition: 'all 0.3s ease',
+          marginBottom: '20px'
+        }} 
+        color="primary" 
+        onClick={() => dispatch(videouploadAction.setIsOpen(true))}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = '#0056b3';
+          e.currentTarget.style.transform = 'translateY(-2px)';
+          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 123, 255, 0.4)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#007bff';
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 123, 255, 0.3)';
+        }}
+      >
         Upload Clip
       </Button>
       <VideoUpload />
-      <div className="theme-tab">
-        <Nav tabs>
+      <div className="theme-tab" style={{ marginTop: "20px", marginBottom: "20px" }}>
+        <Nav tabs style={{ borderBottom: "2px solid #e0e0e0" }}>
           <div className="row mb-2" style={{ width: '100%', alignItems: 'center', margin: "0px" }}>
-            <div className="col" style={{ padding: "0px", marginTop: "10px" }}>
+            <div className="col" style={{ padding: "0px 5px", marginTop: "10px" }}>
               <NavItem className="ml-5px">
                 <NavLink
-                  className={`button-effect ${activeTab === "media" ? "active" : ""
-                    }`}
+                  className={`button-effect ${activeTab === "media" ? "active" : ""}`}
                   onClick={() => setActiveTab("media")}
-                  style={{ width: '100%' }}
+                  style={{ 
+                    width: '100%',
+                    textAlign: 'center',
+                    padding: '10px 15px',
+                    borderRadius: '6px 6px 0 0',
+                    backgroundColor: activeTab === "media" ? '#007bff' : 'transparent',
+                    color: activeTab === "media" ? '#ffffff' : '#666',
+                    fontWeight: activeTab === "media" ? '600' : '500',
+                    borderBottom: activeTab === "media" ? '3px solid #007bff' : '3px solid transparent',
+                    transition: 'all 0.3s ease'
+                  }}
                 >
                   My Clips
                 </NavLink>
               </NavItem>
             </div>
-            <div className="col text-right" style={{ padding: "0px", marginTop: "10px" }}>
-
+            <div className="col text-right" style={{ padding: "0px 5px", marginTop: "10px" }}>
               <NavItem className="ml-5px">
                 <NavLink
                   className={`button-effect ${activeTab === "report" ? "active" : ""}`}
                   onClick={() => setActiveTab("report")}
-                  style={{ width: '100%' }}
+                  style={{ 
+                    width: '100%',
+                    textAlign: 'center',
+                    padding: '10px 15px',
+                    borderRadius: '6px 6px 0 0',
+                    backgroundColor: activeTab === "report" ? '#007bff' : 'transparent',
+                    color: activeTab === "report" ? '#ffffff' : '#666',
+                    fontWeight: activeTab === "report" ? '600' : '500',
+                    borderBottom: activeTab === "report" ? '3px solid #007bff' : '3px solid transparent',
+                    transition: 'all 0.3s ease'
+                  }}
                 >
                   Reports
                 </NavLink>
@@ -284,26 +346,43 @@ const FileSection = (props) => {
             </div>
           </div>
           <div className="row" style={{ width: '100%', alignItems: 'center', margin: "0px" }}>
-            <div className="col" style={{ padding: "0px", marginTop: "10px" }}>
+            <div className="col" style={{ padding: "0px 5px", marginTop: "10px" }}>
               {accountType === "Trainer" && <NavItem className="ml-5px">
                 <NavLink
-                  className={`button-effect ${activeTab === "trainee" ? "active" : ""
-                    }`}
+                  className={`button-effect ${activeTab === "trainee" ? "active" : ""}`}
                   onClick={() => setActiveTab("trainee")}
-                  style={{ width: '100%' }}
+                  style={{ 
+                    width: '100%',
+                    textAlign: 'center',
+                    padding: '10px 15px',
+                    borderRadius: '6px 6px 0 0',
+                    backgroundColor: activeTab === "trainee" ? '#007bff' : 'transparent',
+                    color: activeTab === "trainee" ? '#ffffff' : '#666',
+                    fontWeight: activeTab === "trainee" ? '600' : '500',
+                    borderBottom: activeTab === "trainee" ? '3px solid #007bff' : '3px solid transparent',
+                    transition: 'all 0.3s ease'
+                  }}
                 >
                   Enthusiast
                 </NavLink>
               </NavItem>}
             </div>
-            <div className="col text-right" style={{ padding: "0px", marginTop: "10px" }}>
-
+            <div className="col text-right" style={{ padding: "0px 5px", marginTop: "10px" }}>
               {accountType === "Trainer" && <NavItem className="ml-5px">
                 <NavLink
-                  className={`button-effect ${activeTab === "docs" ? "active" : ""
-                    }`}
+                  className={`button-effect ${activeTab === "docs" ? "active" : ""}`}
                   onClick={() => setActiveTab("docs")}
-                  style={{ width: '100%' }}
+                  style={{ 
+                    width: '100%',
+                    textAlign: 'center',
+                    padding: '10px 15px',
+                    borderRadius: '6px 6px 0 0',
+                    backgroundColor: activeTab === "docs" ? '#007bff' : 'transparent',
+                    color: activeTab === "docs" ? '#ffffff' : '#666',
+                    fontWeight: activeTab === "docs" ? '600' : '500',
+                    borderBottom: activeTab === "docs" ? '3px solid #007bff' : '3px solid transparent',
+                    transition: 'all 0.3s ease'
+                  }}
                 >
                   NetQwix
                 </NavLink>
@@ -312,8 +391,8 @@ const FileSection = (props) => {
           </div>
         </Nav>
       </div>
-      <div className="file-tab">
-        <TabContent activeTab={activeTab} className="custom-scroll">
+      <div className="file-tab" style={{ paddingTop: "10px" }}>
+        <TabContent activeTab={activeTab} className="custom-scroll" style={{ minHeight: "400px" }}>
           <TabPane tabId="media">
             {isLoading ? (
               <div style={{
@@ -348,16 +427,29 @@ const FileSection = (props) => {
                     <label className="badge badge-primary sm ml-2">{cl?.clips?.length}</label>
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
-                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`}>
-                    <div className="row m-0 justify-content-center">
+                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px" }}>
+                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
-                          className={`col-4 p-1`}
-                          style={{ borderRadius: 5 }}
+                          className={`col-4`}
+                          style={{ 
+                            borderRadius: 8,
+                            padding: "8px",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease"
+                          }}
                           onClick={() => {
                             setSelectedVideo(Utils?.generateVideoURL(clp))
                             setIsOpen(true)
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.05)";
+                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1)";
+                            e.currentTarget.style.boxShadow = "none";
                           }}
                         >
                           <Tooltip title={clp?.title} position="top" trigger="mouseenter">
@@ -365,13 +457,14 @@ const FileSection = (props) => {
                               poster={Utils?.generateThumbnailURL(clp)}
                               style={{
                                 position: "relative",
-                              
                                 width: "100%",
-                                border: "4px solid #b4bbd1",
-                                borderRadius: "5px",
+                                border: "3px solid #b4bbd1",
+                                borderRadius: "8px",
                                 objectFit: "cover",
-                                aspectRatio:"1/1"
-                              }}  >
+                                aspectRatio: "1/1",
+                                display: "block"
+                              }}
+                            >
                               <source src={Utils?.generateVideoURL(clp)} type="video/mp4" />
                             </video>
                           </Tooltip>
@@ -406,28 +499,41 @@ const FileSection = (props) => {
                     <label className="badge badge-primary sm ml-2">{cl?.clips?.length}</label>
                   </h5>
                   {/*  NORMAL  STRUCTURE END  */}
-                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`}>
-                    <div className="row m-0 justify-content-center">
+                  <div className={`block-content ${!cl?.show ? "d-none" : ""}`} style={{ padding: "15px 10px" }}>
+                    <div className="row m-0 justify-content-center" style={{ gap: "8px" }}>
                       {cl?.clips.map((clp, index) => (
                         <div
                           key={index}
-                          className={`col-4 p-1`}
-                          style={{ borderRadius: 5 }}
+                          className={`col-4`}
+                          style={{ 
+                            borderRadius: 8,
+                            padding: "8px",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease"
+                          }}
                           onClick={() => {
                             setSelectedVideo(Utils?.generateVideoURL(clp?.clips))
                             setIsOpen(true)
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.05)";
+                            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1)";
+                            e.currentTarget.style.boxShadow = "none";
                           }}
                         >
                           <Tooltip title={clp?.clips?.title} position="top" trigger="mouseenter">
                             <video poster={Utils?.generateThumbnailURL(clp?.clips)} style={{
                               position: "relative",
-                            
                               width: "100%",
-                              border: "4px solid #b4bbd1",
-                              borderRadius: "5px",
+                              border: "3px solid #b4bbd1",
+                              borderRadius: "8px",
                               objectFit: "cover",
-                                aspectRatio:"1/1"
-                            }}  >
+                              aspectRatio: "1/1",
+                              display: "block"
+                            }}>
                               <source src={Utils?.generateVideoURL(clp?.clips)} type="video/mp4" />
                             </video>
                           </Tooltip>
