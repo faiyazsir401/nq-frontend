@@ -62,6 +62,7 @@ import TrainerInfo from "./trainerInfo";
 import RecentUsers from "../recent-users";
 import { set } from "lodash";
 import TraineeRatings from "./ratings/trainee";
+import UserInfoCard from "../cards/user-card";
 const { isMobileFriendly, isSidebarToggleEnabled } = bookingsAction;
 
 const Bookings = ({ accountType = null }) => {
@@ -1358,25 +1359,37 @@ const Bookings = ({ accountType = null }) => {
           <div>
             {accountType === AccountType.TRAINER ? (
               <React.Fragment>
-                {/* Welcome, <br /> {userInfo && userInfo?.fullname} */}
-                {/* <VideoUpload /> */}
-                {/* <div>{<TrainerInfo />}</div> */}
-                {/* <h2 className="d-flex justify-content-center mt-2 p-5 mb-2 bg-primary text-white rounded">
-                  Bookings
-                </h2> */}
+                {/* Trainer Profile Card at the top */}
+                <div style={{ 
+                  marginBottom: "25px",
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%"
+                }}>
+                  <div style={{
+                    width: "100%",
+                    maxWidth: "400px"
+                  }}>
+                    <UserInfoCard />
+                  </div>
+                </div>
+
+                {/* Recent Students Component */}
+                <div style={{ marginBottom: "25px" }}>
+                  <RecentUsers />
+                </div>
+
+                {/* Bookings Section */}
                 <div
                   className="Content-Trainer"
                   style={{
-                    // display: "flex",
                     justifyContent: "space-between",
-                    // marginTop: "10px",
                   }}
                 >
-                  {/* <RecentUsers /> */}
                   <h3 className="mt-2 p-3 mb-2 bg-primary text-white rounded">
-                  Bookings
-                </h3>
-                {Bookings()}
+                    Bookings
+                  </h3>
+                  {Bookings()}
                 </div>
 
                 {/* <h2 className="d-flex justify-content-center p-5">Bookings</h2>

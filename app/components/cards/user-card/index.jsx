@@ -69,10 +69,27 @@ const UserInfoCard = () => {
     const { ratingRatio, totalRating } = Utils.getRatings(ratings);
     return (
       <>
-        <div className={extraClasses}>
-          <Star color="#FFC436" size={28} className="star-container star-svg" />
-          <p className="ml-1 mt-1 mr-1 font-weight-light">{ratingRatio || 0}</p>
-          <p className="mt-1">({totalRating || 0})</p>
+        <div className={extraClasses} style={{
+          gap: width600 ? "6px" : "8px",
+          marginTop: width600 ? "4px" : "6px"
+        }}>
+          <Star color="#FFC436" size={width600 ? 24 : 28} style={{ flexShrink: 0 }} />
+          <p style={{ 
+            margin: 0, 
+            fontWeight: "600", 
+            color: "#333",
+            fontSize: width600 ? "14px" : "16px"
+          }}>
+            {ratingRatio || 0}
+          </p>
+          <p style={{ 
+            margin: 0, 
+            fontWeight: "500", 
+            color: "#666",
+            fontSize: width600 ? "12px" : "14px"
+          }}>
+            ({totalRating || 0})
+          </p>
         </div>
       </>
     );
@@ -111,21 +128,36 @@ const UserInfoCard = () => {
         display: "flex", 
         flexDirection: "column", 
         alignItems: "center", 
-        gap: width600 ? "10px" : "15px",
-        padding: width600 ? "10px" : "15px"
+        gap: width600 ? "12px" : "18px",
+        padding: width600 ? "15px 12px" : "20px 18px",
+        backgroundColor: "#ffffff",
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        border: "1px solid #e0e0e0",
+        transition: "all 0.3s ease"
       }}>
         <div
           className="profile-picture-container"
           style={{
             position: "relative",
-            width: width600 ? "100px" : width1200 ? "140px" : "180px",
-            height: width600 ? "100px" : width1200 ? "140px" : "180px",
-            borderRadius: "5px",
-            border: width600 ? "2px solid #000080" : "3px solid #000080",
+            width: width600 ? "110px" : width1200 ? "150px" : "200px",
+            height: width600 ? "110px" : width1200 ? "150px" : "200px",
+            borderRadius: "50%",
+            border: width600 ? "3px solid #000080" : "4px solid #000080",
             overflow: "hidden",
             margin: "0 auto",
-            padding: "5px",
-            backgroundColor: "#fff"
+            padding: width600 ? "3px" : "4px",
+            backgroundColor: "#fff",
+            boxShadow: "0 4px 12px rgba(0, 0, 128, 0.2)",
+            transition: "all 0.3s ease"
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "scale(1.05)";
+            e.currentTarget.style.boxShadow = "0 6px 16px rgba(0, 0, 128, 0.3)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 128, 0.2)";
           }}
         >
           <img
@@ -138,7 +170,7 @@ const UserInfoCard = () => {
               height: "100%",
               objectFit: "cover",
               display: "block",
-              borderRadius: "3px"
+              borderRadius: "50%"
             }}
             onError={(e) => {
               e.target.src = "/assets/images/demoUser.png";
@@ -147,10 +179,11 @@ const UserInfoCard = () => {
         </div>
         <div style={{ width: "100%", textAlign: "center" }}>
           <h4 style={{ 
-            marginBottom: width600 ? "8px" : "10px", 
-            fontWeight: "600", 
-            color: "#333",
-            fontSize: width600 ? "14px" : width1200 ? "16px" : "18px"
+            marginBottom: width600 ? "10px" : "12px", 
+            fontWeight: "700", 
+            color: "#1a1a1a",
+            fontSize: width600 ? "16px" : width1200 ? "20px" : "24px",
+            letterSpacing: "0.3px"
           }}>
             {profile?.fullname || userInfo?.fullname || "User"}
           </h4>
@@ -160,15 +193,15 @@ const UserInfoCard = () => {
               display: "flex", 
               alignItems: "center", 
               justifyContent: "center", 
-              gap: width600 ? "6px" : "10px",
-              marginBottom: width600 ? "8px" : "10px",
+              gap: width600 ? "8px" : "12px",
+              marginBottom: width600 ? "10px" : "12px",
               flexWrap: "wrap"
             }}>
               <h5 style={{ 
                 margin: 0, 
-                fontWeight: "500", 
-                color: "#666",
-                fontSize: width600 ? "12px" : width1200 ? "14px" : "16px"
+                fontWeight: "600", 
+                color: "#555",
+                fontSize: width600 ? "13px" : width1200 ? "15px" : "17px"
               }}>
                 Hourly Rate: $
                 {isEditing ? (
@@ -176,18 +209,29 @@ const UserInfoCard = () => {
                     type="number"
                     value={profile?.extraInfo?.hourly_rate || 0}
                     onChange={handleRateChange}
-                    onBlur={handleSaveClick}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#000080";
+                      e.target.style.boxShadow = "none";
+                      handleSaveClick(e);
+                    }}
                     style={{
-                      width: width600 ? "60px" : "80px",
-                      padding: width600 ? "3px 6px" : "4px 8px",
-                      border: "1px solid #000080",
-                      borderRadius: "4px",
-                      fontSize: width600 ? "12px" : "14px",
-                      marginLeft: "5px"
+                      width: width600 ? "70px" : "90px",
+                      padding: width600 ? "4px 8px" : "5px 10px",
+                      border: "2px solid #000080",
+                      borderRadius: "6px",
+                      fontSize: width600 ? "13px" : "15px",
+                      marginLeft: "6px",
+                      fontWeight: "600",
+                      outline: "none",
+                      transition: "all 0.3s ease"
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#0056b3";
+                      e.target.style.boxShadow = "0 0 0 3px rgba(0, 0, 128, 0.1)";
                     }}
                   />
                 ) : (
-                  <span style={{ color: "#000080", fontWeight: "600" }}>
+                  <span style={{ color: "#000080", fontWeight: "700", fontSize: width600 ? "15px" : "18px" }}>
                     {profile?.extraInfo?.hourly_rate || 0}
                   </span>
                 )}
@@ -197,28 +241,50 @@ const UserInfoCard = () => {
                 type="button"
                 onClick={isEditing ? handleSaveClick : handleEditClick}
                 style={{
-                  padding: width600 ? "3px 6px" : "4px 8px",
-                  border: "1px solid #000080",
-                  borderRadius: "4px",
+                  padding: width600 ? "5px 8px" : "6px 10px",
+                  border: "2px solid #000080",
+                  borderRadius: "6px",
                   backgroundColor: isEditing ? "#000080" : "transparent",
                   color: isEditing ? "white" : "#000080",
                   cursor: "pointer",
-                  transition: "all 0.3s ease"
+                  transition: "all 0.3s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+                onMouseEnter={(e) => {
+                  if (!isEditing) {
+                    e.currentTarget.style.backgroundColor = "#000080";
+                    e.currentTarget.style.color = "white";
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isEditing) {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                    e.currentTarget.style.color = "#000080";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }
                 }}
               >
-                {isEditing ? <Save size={width600 ? 14 : 16} /> : <Edit size={width600 ? 14 : 16} />}
+                {isEditing ? <Save size={width600 ? 16 : 18} /> : <Edit size={width600 ? 16 : 18} />}
               </button>
             </div>
           )}
 
           {accountType === AccountType?.TRAINER &&
-            showRatings(trainerRatings, "d-flex justify-content-center")}
+            showRatings(trainerRatings, "d-flex justify-content-center align-items-center")}
           
           {userInfo &&
             userInfo.extraInfo &&
             userInfo.extraInfo.social_media_links &&
-            userInfo.extraInfo.social_media_links ? (
-            <div style={{ marginTop: width600 ? "8px" : "10px" }}>
+            Object.keys(userInfo.extraInfo.social_media_links).some(key => userInfo.extraInfo.social_media_links[key]) && (
+            <div style={{ 
+              marginTop: width600 ? "10px" : "12px",
+              display: "flex",
+              justifyContent: "center",
+              width: "100%"
+            }}>
               <SocialMediaIcons
                 profileImageURL={""}
                 social_media_links={userInfo.extraInfo.social_media_links}
@@ -226,7 +292,7 @@ const UserInfoCard = () => {
                 isMobile={width600}
               />
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </>

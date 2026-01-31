@@ -7,7 +7,7 @@ import "photoswipe/style.css";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { videouploadAction, videouploadState } from "../../app/components/videoupload/videoupload.slice";
 import { myClips, reports, traineeClips } from "./fileSection.api";
-import { LOCAL_STORAGE_KEYS } from "../../app/common/constants";
+import { LOCAL_STORAGE_KEYS, AccountType, topNavbarOptions } from "../../app/common/constants";
 import Modal from "../../app/common/modal";
 import VideoUpload from "../../app/components/videoupload";
 import ReportModal from "../../app/components/video/reportModal";
@@ -18,7 +18,10 @@ import { authAction, authState } from "../../app/components/auth/auth.slice";
 import { awsS3Url } from "../../utils/constant";
 import { useMediaQuery } from "../../app/hook/useMediaQuery";
 import { Spinner } from "reactstrap";
-import UserInfoCard from "../../app/components/cards/user-card";
+import { deleteClip } from "./fileSection.api";
+import { toast } from "react-toastify";
+import ConfirmModal from "../../app/components/locker/my-clips/confirmModal";
+import { AccountType, topNavbarOptions } from "../../app/common/constants";
 
 const fiveImageGallary = [
   {
@@ -179,6 +182,8 @@ const FileSection = (props) => {
   const [reportObj, setReportObj] = useState({ title: "", topic: "" });
   const [screenShots, setScreenShots] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   const width500 = useMediaQuery(500);
 
@@ -339,23 +344,25 @@ const FileSection = (props) => {
 
   useEffect(() => { setActiveTab("media") }, [])
 
+  const handleDelete = async (id) => {
+    const res = await deleteClip({ id });
+    if (res?.success) {
+      toast.success(res?.message);
+      setIsConfirmModalOpen(false);
+      setSelectedId(null);
+      await getMyClips();
+    } else {
+      toast.error(res?.message);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsConfirmModalOpen(false);
+    setSelectedId(null);
+  };
+
   return (
     <div className="apps-content" id="files" style={{ padding: "15px 20px" }}>
-      {/* Trainer/User Info Card at the top */}
-      <div style={{ 
-        marginBottom: "20px",
-        display: "flex",
-        justifyContent: "center",
-        width: "100%"
-      }}>
-        <div style={{
-          width: "100%",
-          maxWidth: width500 ? "100%" : "350px"
-        }}>
-          <UserInfoCard />
-        </div>
-      </div>
-
       <div className="theme-title" style={{ marginBottom: "20px" }}>
         <div className="media">
           <div>
@@ -423,7 +430,7 @@ const FileSection = (props) => {
       <div className="theme-tab" style={{ marginTop: "20px", marginBottom: "20px" }}>
         <Nav tabs style={{ borderBottom: "2px solid #e0e0e0" }}>
           <div className="row mb-2" style={{ width: '100%', alignItems: 'center', margin: "0px" }}>
-            <div className="col" style={{ padding: "0px 5px", marginTop: "10px" }}>
+            <div className="col" style={{ padding: "5px 5px", marginTop: "5px" }}>
               <NavItem className="ml-5px">
                 <NavLink
                   className={`button-effect ${activeTab === "media" ? "active" : ""}`}
@@ -1359,11 +1366,148 @@ const FileSection = (props) => {
                     <ChevronRight size={24} color="#000" strokeWidth={2.5} />
                   </button>
                 </div>
+
+                {/* Action buttons at bottom */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "12px",
+                    paddingTop: "15px",
+                    borderTop: "1px solid rgba(255,255,255,0.1)"
+                  }}
+                >
+                  {/* Delete and Download buttons - only for user's own clips */}
+                  {selectedClip?.user_id === userInfo?._id && (
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "12px",
+                        width: "100%",
+                        maxWidth: "400px"
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsConfirmModalOpen(true);
+                          setSelectedId(selectedClip?._id);
+                        }}
+                        style={{
+                          border: "none",
+                          background: "#ff0000",
+                          color: "#fff",
+                          borderRadius: "6px",
+                          padding: "12px 20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          fontSize: "14px",
+                          fontWeight: 500,
+                          cursor: "pointer",
+                          transition: "all 0.3s ease",
+                          flex: "1",
+                          height: "44px"
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = "#cc0000"}
+                        onMouseLeave={(e) => e.target.style.background = "#ff0000"}
+                      >
+                        <FaTrash size={14} />
+                        <span>Delete</span>
+                      </button>
+                      <a
+                        href={Utils?.generateVideoURL(selectedClip)}
+                        download={true}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          background: "#007bff",
+                          color: "#fff",
+                          borderRadius: "6px",
+                          padding: "12px 20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "8px",
+                          fontSize: "14px",
+                          fontWeight: 500,
+                          textDecoration: "none",
+                          transition: "all 0.3s ease",
+                          flex: "1",
+                          height: "44px"
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = "#0056b3"}
+                        onMouseLeave={(e) => e.target.style.background = "#007bff"}
+                        target="_self"
+                      >
+                        <FaDownload size={14} />
+                        <span>Download</span>
+                      </a>
+                    </div>
+                  )}
+                  
+                  {/* Book An Instant Lesson Now button - only for trainees (not trainers) */}
+                  {accountType !== "Trainer" && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOpen(false);
+                        dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON));
+                      }}
+                      style={{
+                        border: "2px solid #28a745",
+                        background: "#28a745",
+                        color: "#000000",
+                        borderRadius: "6px",
+                        padding: "12px 24px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        fontSize: "15px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                        boxShadow: "0 2px 8px rgba(40, 167, 69, 0.4)",
+                        width: "100%",
+                        maxWidth: "400px",
+                        justifyContent: "center"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "#218838";
+                        e.currentTarget.style.borderColor = "#218838";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(40, 167, 69, 0.6)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "#28a745";
+                        e.currentTarget.style.borderColor = "#28a745";
+                        e.currentTarget.style.boxShadow = "0 2px 8px rgba(40, 167, 69, 0.4)";
+                      }}
+                    >
+                      <span>Book An Instant Lesson Now!</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </>
         }
       />
+
+      {isConfirmModalOpen && (
+        <ConfirmModal
+          isModelOpen={isConfirmModalOpen}
+          setIsModelOpen={setIsConfirmModalOpen}
+          selectedId={selectedId}
+          deleteFunc={handleDelete}
+          closeModal={handleCloseModal}
+        />
+      )}
 
       <Modal
         isOpen={isOpenPDF}

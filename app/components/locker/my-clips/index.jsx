@@ -808,45 +808,47 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                     </div>
                   )}
                   
-                  {/* Book An Instant Lesson Now button - for everyone */}
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsOpen(false);
-                      dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON));
-                    }}
-                    style={{
-                      border: "2px solid #28a745",
-                      background: "#28a745",
-                      color: "#000000",
-                      borderRadius: "6px",
-                      padding: "12px 24px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      fontSize: "15px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.3s ease",
-                      boxShadow: "0 2px 8px rgba(40, 167, 69, 0.4)",
-                      width: "100%",
-                      maxWidth: "400px",
-                      justifyContent: "center"
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = "#218838";
-                      e.currentTarget.style.borderColor = "#218838";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(40, 167, 69, 0.6)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = "#28a745";
-                      e.currentTarget.style.borderColor = "#28a745";
-                      e.currentTarget.style.boxShadow = "0 2px 8px rgba(40, 167, 69, 0.4)";
-                    }}
-                  >
-                    <span>Book An Instant Lesson Now!</span>
-                  </button>
+                  {/* Book An Instant Lesson Now button - only for trainees (not trainers) */}
+                  {accountType !== AccountType.TRAINER && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsOpen(false);
+                        dispatch(authAction?.setTopNavbarActiveTab(topNavbarOptions?.BOOK_LESSON));
+                      }}
+                      style={{
+                        border: "2px solid #28a745",
+                        background: "#28a745",
+                        color: "#000000",
+                        borderRadius: "6px",
+                        padding: "12px 24px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        fontSize: "15px",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                        boxShadow: "0 2px 8px rgba(40, 167, 69, 0.4)",
+                        width: "100%",
+                        maxWidth: "400px",
+                        justifyContent: "center"
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "#218838";
+                        e.currentTarget.style.borderColor = "#218838";
+                        e.currentTarget.style.boxShadow = "0 4px 12px rgba(40, 167, 69, 0.6)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "#28a745";
+                        e.currentTarget.style.borderColor = "#28a745";
+                        e.currentTarget.style.boxShadow = "0 2px 8px rgba(40, 167, 69, 0.4)";
+                      }}
+                    >
+                      <span>Book An Instant Lesson Now!</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
