@@ -634,13 +634,13 @@ const UploadClipCard = (props) => {
           >
             {isUploading ? (
               <>
-                <Loader size={20} className="spinning" />
-                <span>Uploading...</span>
+                <Loader size={20} className="spinning" style={{ color: '#ffffff' }} />
+                <span style={{ color: '#ffffff' }}>Uploading...</span>
               </>
             ) : (
               <>
-                <Upload size={20} />
-                <span>Upload {selectedFiles.length} Video{selectedFiles.length > 1 ? 's' : ''}</span>
+                <Upload size={20} style={{ color: '#ffffff' }} />
+                <span style={{ color: '#ffffff' }}>Upload {selectedFiles.length} Video{selectedFiles.length > 1 ? 's' : ''}</span>
               </>
             )}
           </Button>
