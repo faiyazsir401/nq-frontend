@@ -45,8 +45,11 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
   const [selectedId, setSelectedId] = useState(null);
   const width500 = useMediaQuery(500);
   const [videoDimensions, setVideoDimensions] = useState({
-    maxWidth: "470px",
-    height: "587px",
+    maxWidth: width500 ? "100%" : "600px",
+    width: width500 ? "100%" : "auto",
+    height: width500 ? "70vh" : "75vh",
+    maxHeight: width500 ? "600px" : "800px",
+    minHeight: width500 ? "400px" : "500px",
   });
   const isMobileScreen= useMediaQuery(600)
   const closeButtonRef = useRef(null);
@@ -146,13 +149,24 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
     const video = event.target;
     const aspectRatio = video.videoWidth / video.videoHeight;
 
-    // Set width and height based on aspect ratio
+    // Set width and height based on aspect ratio and device
     if (aspectRatio > 1) {
-      setVideoDimensions({ width: "100%", height: "70%" });
+      // Landscape video - use more horizontal space
+      setVideoDimensions({ 
+        width: width500 ? "100%" : "90%", 
+        maxWidth: width500 ? "100%" : "800px",
+        height: width500 ? "65vh" : "70vh",
+        maxHeight: width500 ? "500px" : "700px",
+        minHeight: width500 ? "350px" : "450px"
+      });
     } else {
+      // Portrait/square video - use more vertical space
       setVideoDimensions({
-        maxWidth: width500 ? "320px" : "470px",
-        height: width500 ? "350px" : "587px",
+        maxWidth: width500 ? "100%" : "600px",
+        width: width500 ? "100%" : "auto",
+        height: width500 ? "75vh" : "80vh",
+        maxHeight: width500 ? "600px" : "800px",
+        minHeight: width500 ? "450px" : "550px"
       });
     }
   };
@@ -429,15 +443,20 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
         isOpen={isOpenPlayVideo}
         element={
           <>
-            <div className="d-flex flex-column align-items-center justify-content-center h-100" style={{ padding: "20px" }}>
+            <div className="d-flex flex-column align-items-center justify-content-center h-100" style={{ padding: "20px", minHeight: "100vh", maxHeight: "100vh", overflow: "auto" }}>
               <div
                 className="position-relative"
                 style={{ 
                   borderRadius: 8, 
                   maxWidth: "100%",
+                  width: "100%",
                   backgroundColor: "#1a1a1a",
                   padding: "20px",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
                 }}
               >
                 {/* Close button */}
@@ -538,12 +557,16 @@ const MyClips = ({ activeCenterContainerTab, trainee_id }) => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      maxWidth: width500 ? "320px" : "470px",
-                      maxHeight: width500 ? "350px" : "587px",
-                      width: "100%",
+                      maxWidth: width500 ? "100%" : "90%",
+                      width: width500 ? "100%" : "auto",
+                      minWidth: width500 ? "100%" : "450px",
+                      height: width500 ? "70vh" : "75vh",
+                      minHeight: width500 ? "450px" : "550px",
+                      maxHeight: width500 ? "600px" : "800px",
                       overflow: "hidden",
                       borderRadius: "8px",
-                      backgroundColor: "#000"
+                      backgroundColor: "#000",
+                      margin: "0 auto"
                     }}
                   >
                     {/* Show thumbnail/poster first while video loads */}
